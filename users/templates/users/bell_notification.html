@@ -1019,13 +1019,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
   var firebaseConfig = {
-    apiKey: {{user_data.FIREBASE_API_KEY}},
-    authDomain: {{user_data.FIREBASE_AUTH_DOMAIN}},
-    projectId: {{user_data.FIREBASE_PROJECT_ID}},
-    storageBucket: {{user_data.FIREBASE_STORAGE_BUCKET}},
-    messagingSenderId: {{user_data.FIREBASE_MESSAGING_SENDER_ID}},
-    appId: {{user_data.FIREBASE_APP_ID}},
-    measurementId: {{user_data.FIREBASE_MEASUREMENT_ID}}
+    apiKey: "{{user_data.FIREBASE_API_KEY}}",
+    authDomain: "{{user_data.FIREBASE_AUTH_DOMAIN}}",
+    projectId: "{{user_data.FIREBASE_PROJECT_ID}}",
+    storageBucket: "{{user_data.FIREBASE_STORAGE_BUCKET}}",
+    messagingSenderId: "{{user_data.FIREBASE_MESSAGING_SENDER_ID}}",
+    appId: "{{user_data.FIREBASE_APP_ID}}",
+    measurementId: "{{user_data.FIREBASE_MEASUREMENT_ID}}"
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
