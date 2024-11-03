@@ -12,6 +12,7 @@ import json,os
 from datetime import datetime
 from insb_port import settings
 from central_branch.models import Email_Draft
+from recruitment.models import recruited_members
 from system_administration.google_authorisation_handler import GoogleAuthorisationHandler
 from googleapiclient.discovery import build
 from django.template.loader import render_to_string
@@ -113,6 +114,14 @@ class PRT_Email_System:
                                 else:
                                     if ex.ex_member.email and ex.ex_member.email != 'None':
                                         to_email_final_list.append(ex.ex_member.email)
+                elif email[0:9] == "recruits_":
+                    recruit_id = int(email[9:])
+                    recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
+                    for mem in recruited_mem:
+                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
+                            to_email_final_list.append(mem.email_personal)
+
+
         # Removing the mails which are common in single email list and to email list
         for email in to_email_final_list:
             if email in single_emails_final_list:
@@ -179,6 +188,12 @@ class PRT_Email_System:
                                 else:
                                     if ex.ex_member.email and ex.ex_member.email != 'None':
                                         cc_email_final_list.append(ex.ex_member.email)
+                elif email[0:9] == "recruits_":
+                    recruit_id = int(email[9:])
+                    recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
+                    for mem in recruited_mem:
+                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
+                            cc_email_final_list.append(mem.email_personal)
                 else:
                     if email != 'None':
                         cc_email_final_list.append(email)
@@ -243,6 +258,12 @@ class PRT_Email_System:
                                 else:
                                     if ex.ex_member.email and ex.ex_member.email != 'None':
                                         bcc_email_final_list.append(ex.ex_member.email)
+                elif email[0:9] == "recruits_":
+                    recruit_id = int(email[9:])
+                    recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
+                    for mem in recruited_mem:
+                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
+                            bcc_email_final_list.append(mem.email_personal)
                 else:
                     if email != 'None':
                         bcc_email_final_list.append(email)
