@@ -454,7 +454,11 @@
                                             <div class="col-sm-10">
                                               <select id="further_details" name="further_contact_member_id">
                                                 {% for member in mdt_team_member %}
-                                                  <option value={{member.ieee_id}}>{{member.name}}</option>
+                                                {% if member.ieee_id|stringformat:"s" == form_data.further_contact_member_id %}
+                                                <option value={{member.ieee_id}} selected>{{member.name}}</option>
+                                                {% else %}
+                                                <option value={{member.ieee_id}}>{{member.name}}</option>
+                                                {% endif %}
                                                 {% endfor %}
                                               </select>
                                             </div>
