@@ -1773,7 +1773,7 @@ def sc_ag_panel_members(request,sc_ag_primary,panel_pk,panel_year):
     sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
     
     # get all the panels of sc ag
-    get_all_panels=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-year')
+    get_all_panels=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),display=True).order_by('-year')
 
 
     # get the panel
