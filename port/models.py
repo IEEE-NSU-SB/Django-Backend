@@ -93,12 +93,14 @@ class Panels(models.Model):
         -year indicates the tenure of the panel
         -creation_time is initialized whenever the panel is created from the Panel Page.
         -panel_of means for which society or AG the panel is for
+        -display is used to determine if the panel is to be displayed in portal and main site. (Used for joining panels with different ranges)
     '''
     year=models.CharField(max_length=40,null=False,blank=False)
     creation_time=models.DateTimeField(null=True,blank=True)
     current=models.BooleanField(null=False,blank=False,default=False)
     panel_of=models.ForeignKey(Chapters_Society_and_Affinity_Groups,null=True,blank=True,on_delete=models.CASCADE)
     panel_end_time=models.DateTimeField(null=True,blank=True)
+    display=models.BooleanField(null=False,blank=False,default=True)
     
     class Meta:
         verbose_name='IEEE NSU SB Panels'

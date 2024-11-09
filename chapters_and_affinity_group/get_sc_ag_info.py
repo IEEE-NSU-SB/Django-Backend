@@ -33,7 +33,7 @@ class SC_AG_Info:
     def get_panels_of_sc_ag(request,sc_ag_primary):
         # returns the entire panel object
         try:
-            return Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')
+            return Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),display=True).order_by('-current','-year')
         except Exception as e:
             SC_AG_Info.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
             ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
