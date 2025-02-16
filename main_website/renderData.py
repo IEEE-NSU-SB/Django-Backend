@@ -344,8 +344,8 @@ class HomepageItems:
                 for role in roles:
                     try:
                         #getting the member of the particular society whose role matches with the role iteration in the list and is if current panel
-                        member = Panel_Members.objects.get(tenure = current_tenure,position = role)
-                        eb_members.append(member)
+                        member = Panel_Members.objects.filter(tenure = current_tenure,position = role)
+                        eb_members.extend(member)
                     except:
                         pass
                 return eb_members
