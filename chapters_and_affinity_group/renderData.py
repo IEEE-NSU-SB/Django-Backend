@@ -27,18 +27,50 @@ class Sc_Ag:
         count=0
         try:
             for ieee_id in ieee_id_list:
+                updated_team = None
+                updated_position = None
+
+                if team_pk is not None:
+                    updated_team=Teams.objects.get(pk=team_pk)
+                if position_id is not None:
+                    updated_position=Roles_and_Position.objects.get(id=position_id)
+
                 if(SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=ieee_id)).exists()):
-                    messages.info(request,f"Member with IEEE ID: {ieee_id} already exists in Database")
+                    
+                    if updated_team is not None or updated_position is not None:
+                        sc_ag_member = SC_AG_Members.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=ieee_id))
+                        sc_ag_panel_member = Panel_Members.objects.filter(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=sc_ag_member.member, team=sc_ag_member.team, position=sc_ag_member.position)
+                        sc_ag_member.team = updated_team
+                        if updated_position:
+                            sc_ag_member.position = updated_position
+                        sc_ag_member.save()
+
+                        if(len(sc_ag_panel_member)>0):
+                            sc_ag_panel_member[0].team = sc_ag_member.team
+                            if updated_position:
+                                sc_ag_panel_member[0].position = sc_ag_member.position
+                            sc_ag_panel_member[0].save()
+                            
+                        elif updated_position:
+                            Panel_Members.objects.create(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=sc_ag_member.member, team=sc_ag_member.team, position=sc_ag_member.position)
+                    
+                        messages.info(request,f"Member with IEEE ID: {ieee_id} already exists in Database")
+                        messages.info(request,f"Team and Position data updated")
+
                 else:
                     new_sc_ag_member=SC_AG_Members.objects.create(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
                                                                 ,member=Members.objects.get(ieee_id=ieee_id))
-                    if team_pk is not None:
-                        new_sc_ag_member.team=Teams.objects.get(pk=team_pk)
-                    if position_id is not None:
-                        new_sc_ag_member.position=Roles_and_Position.objects.get(id=position_id)
+                    
+                    new_sc_ag_member.team=updated_team
+                    if updated_position:
+                        new_sc_ag_member.position=updated_position
+
+                        Panel_Members.objects.create(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=new_sc_ag_member.member, team=new_sc_ag_member.team, position=new_sc_ag_member.position)                        
                     new_sc_ag_member.save()
+
                     count+=1
-            messages.success(request,f"{count} new members were added to the Member List of {get_sc_ag.group_name} ")
+
+            messages.success(request,f"{count} new members were added to the Member List of {get_sc_ag.group_name} and also to panels if selected")
             return True
         except Exception as e:
             Sc_Ag.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)

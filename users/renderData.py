@@ -541,7 +541,7 @@ def get_top_5_performers(request):
 
     '''This function will return top 5 performers of all time'''
 
-    performers = Members.objects.all().order_by('-completed_task_points')[:5]
+    performers = Members.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5]
     print(performers)
     return performers
 
@@ -549,7 +549,7 @@ def get_top_3_teams(request):
 
     '''This function will return the top 3 teams'''
     
-    teams = Teams.objects.all().order_by('-completed_task_points')[:3]
+    teams = Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:3]
     return teams
 class PanelMembersData:
     logger=logging.getLogger(__name__)
