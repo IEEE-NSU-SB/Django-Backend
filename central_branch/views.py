@@ -4760,6 +4760,7 @@ def task_home(request,team_primary = None):
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
         all_task_categories = Task_Category.objects.all().order_by('name')
+        all_branch_panels = Branch.load_all_panels()
 
         if request.method == "POST":
 
@@ -4774,16 +4775,25 @@ def task_home(request,team_primary = None):
                     messages.warning(request,"Something went wrong while creating the task category!")
 
             elif request.POST.get('reset_task_points'):
-                if Task_Assignation.reset_task_points():
-                    messages.success(request,"Task Points were saved and reset successfully!")
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
                 else:
-                    messages.warning(request,"Something went wrong while resetting/saving the task points!")
+                    if Task_Assignation.reset_task_points(selected_panel):
+                        messages.success(request,"Task Points were saved and reset successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while resetting/saving the task points!")
             
             elif request.POST.get('reinstate_task_points'):
-                if Task_Assignation.reinstate_task_points():
-                    messages.success(request,"Task Points were reinstated successfully!")
+                selected_panel = request.POST.get('selected_panel')
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
                 else:
-                    messages.warning(request,"Something went wrong while reinstating the task points!")
+                    if Task_Assignation.reinstate_task_points(selected_panel):
+                        messages.success(request,"Task Points were reinstated successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while reinstating the task points!")
 
         #modify this so that team incharge and volunteer both can create task in respective team
         #so modify the funtions with a team_primary parameter
@@ -4802,6 +4812,7 @@ def task_home(request,team_primary = None):
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
 
             'app_name':app_name,

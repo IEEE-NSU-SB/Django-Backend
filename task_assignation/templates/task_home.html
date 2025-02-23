@@ -615,6 +615,15 @@
 
           <div class="modal-footer">
               <input type="submit" class="btn btn-outline-success cancel_view_btn" name="reset_task_points" value="Confirm"/>
+              <div>
+                <button class="btn btn-outline-primary dropdown-toggle" id="selected_panel_display" data-toggle="dropdown">Select Panel</button>
+                <input type="hidden" id="selected_panel" name="selected_panel">
+                <div class="dropdown-menu dropdown-menu-scale info pull-right" style="right: 50%; left: 50%;">
+                  {% for panel in all_branch_panels %}
+                  <button class="dropdown-item" type="button" onclick="selectPanel('{{panel}}')">{{panel}}</button>
+                  {% endfor %}
+                </div>
+              </div>      
               <a href="#" class="btn btn-outline-danger cancel_view_btn" data-dismiss="modal">Cancel</a>
             </div>
           </form>
@@ -891,6 +900,14 @@
           }
       }
       };
+
+      function selectPanel(panel) {
+        var display = document.getElementById('selected_panel_display');
+        var selected_panel_input = document.getElementById('selected_panel');
+
+        display.innerHTML = panel;
+        selected_panel_input.value = panel;
+      }
     </script>
     <!-- endbuild -->
   </body>

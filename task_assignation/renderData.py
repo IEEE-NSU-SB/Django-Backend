@@ -3108,7 +3108,7 @@ This is an automated message. Do not reply
             return True   
 
         
-    def reset_task_points():
+    def reset_task_points(panel):
         try:
             all_members_with_task_points = Members.objects.all().exclude(completed_task_points=0.0)
             all_teams_with_task_points = Teams.objects.all().exclude(completed_task_points=0.0)
@@ -3118,15 +3118,15 @@ This is an automated message. Do not reply
             all_task_medias = Task_Media.objects.all()
             all_permission_paper = Permission_Paper.objects.all()
 
-            current_panel = Branch.load_current_panel()
+            selected_panel = Branch.get_panel_by_year(panel)
             
             for member in all_members_with_task_points:
-                Member_Task_Points_History.objects.create(member=member, panel_of=current_panel, points=member.completed_task_points)
+                Member_Task_Points_History.objects.create(member=member, panel_of=selected_panel, points=member.completed_task_points)
                 member.completed_task_points = 0.0
                 member.save()
 
             for team in all_teams_with_task_points:
-                Team_Task_Points_History.objects.create(team=team, panel_of=current_panel, points=team.completed_task_points)
+                Team_Task_Points_History.objects.create(team=team, panel_of=selected_panel, points=team.completed_task_points)
                 team.completed_task_points = 0.0
                 team.save()
 
@@ -3152,12 +3152,12 @@ This is an automated message. Do not reply
         except:
             return False
 
-    def reinstate_task_points():
+    def reinstate_task_points(panel):
 
         try:
-            current_panel = Branch.load_current_panel()
-            member_points_histories = Member_Task_Points_History.objects.filter(panel_of=current_panel)
-            team_points_histories = Team_Task_Points_History.objects.filter(panel_of=current_panel)
+            selected_panel = Branch.get_panel_by_year(panel)
+            member_points_histories = Member_Task_Points_History.objects.filter(panel_of=selected_panel)
+            team_points_histories = Team_Task_Points_History.objects.filter(panel_of=selected_panel)
 
             for member_history in member_points_histories:
                 member_history.member.completed_task_points = member_history.points
@@ -3175,7 +3175,7 @@ This is an automated message. Do not reply
 
     def export():
         """Generates the ZIP file and returns its file path."""
-        export_dir = os.path.join(settings.MEDIA_ROOT, "exported_files")
+        export_dir = os.path.join(settings.MEDIA_ROOT, "Task_Assignation/Exported_Files")
         os.makedirs(export_dir, exist_ok=True)  # Ensure directory exists
 
         zip_filename = os.path.join(export_dir, "exported_content.zip")
