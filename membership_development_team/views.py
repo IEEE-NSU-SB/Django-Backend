@@ -937,7 +937,7 @@ def generateExcelSheet_renewal_requestList(request,session_id):
             font_style = xlwt.XFStyle()
 
             # getting all the values of members as rows with same session
-            rows = Renewal_requests.objects.all().values_list('name',
+            rows = Renewal_requests.objects.filter(session_id=session_id).values_list('name',
                                                     'ieee_id',
                                                     'email_associated',
                                                     'email_ieee',
