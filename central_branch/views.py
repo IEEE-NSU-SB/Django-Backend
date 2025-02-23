@@ -4786,7 +4786,6 @@ def task_home(request,team_primary = None):
             
             elif request.POST.get('reinstate_task_points'):
                 selected_panel = request.POST.get('selected_panel')
-                selected_panel = request.POST.get('selected_panel')
                 if not selected_panel:
                     messages.warning(request,"Please select a panel!")
                 else:
