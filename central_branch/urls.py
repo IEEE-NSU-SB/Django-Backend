@@ -146,6 +146,7 @@ urlpatterns = [
     path('task_history/team/<int:team_primary>',views.team_task_history,name="team_task_history"),
     ##
     path('task_leaderboard/',views.task_leaderboard,name="task_leaderboard"),
+    path('export_task_contents/',views.export_task_contents, name='export_task_contents'),
 
     #Email
     path('mail/',views.mail,name="mail"),

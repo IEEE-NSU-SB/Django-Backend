@@ -277,6 +277,23 @@
         background: white;
         border-color: #FCCB02;
     }
+
+    .reset-task-button {
+      padding: 5px 15px;
+      color: white;
+      background: #f44455;
+      margin: 16px 4px 16px; 
+      border-radius: 4px;
+      border: 2px solid #f10e25;
+      transition: all ease-in-out .3s;
+      cursor: pointer;
+    }
+
+    .reset-task-button:hover{
+      background: white;
+      border-color: #f10e25;
+      color: #f10e25;
+  }
     </style>
   </head>
   {% block preloader %}
@@ -325,6 +342,7 @@
           >
             Create Task Category
           </button>
+
           {% endif %}
           
           {% if app_name == 'central_branch' %}
@@ -335,6 +353,19 @@
           >
           Task LeaderBoards
         </a>
+
+        {% if user_data.is_admin_user %}
+        <button
+          type="button"
+          class="reset-task-button"
+          data-toggle="modal"
+          data-target="#TaskPointResetModal"
+          style="margin-bottom: 15px; cursor: pointer;"
+        >
+          Save & Reset Task Points
+        </button>
+        {% endif %}
+        
         {% endif %}
       </div>
 
@@ -556,6 +587,50 @@
         </div>
       </div>
     </div>
+
+    {% if user_data.is_admin_user %}
+    <!-- Task Point Reset modal -->
+    <div id="TaskPointResetModal" class="modal fade" role="dialog" aria-labelledby="TaskPointResetModalLabel"
+    aria-hidden="true">
+      <!-- Modal content -->
+      <div class="modal-dialog modal-dialog-centered" style="left: auto" role="document">
+      <div class="modal-content" style="max-width: none">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure you want to reset the task points?</h5>
+          </div>
+          
+          <form method="POST">
+            {% csrf_token %}
+          <div class="modal-body text-left p-lg">
+              <p>You should only Reset Task Points when there is a new Current Panel.</p>
+              <p style="color:red">This will remove all files of the previous tasks and will reset all Members' and Teams' task points to Zero</p>
+              <p>However, The task points will be preserved and can be reinstated later if required, but all task files will be lost!</p>
+              <p>Just incase it has been done mistakenly, you can click reinstate to restore the points. But the task files are unrecoverable.</p>
+              <div style="display:flex; justify-content:space-between;">
+                <input type="submit" class="btn btn-outline-danger cancel_view_btn" name="reinstate_task_points" value="Reinstate"/>
+                <a class="btn btn-outline-info" href="{% url 'central_branch:export_task_contents' %}" target="_blank">Export Task Contents -></a>
+              </div>
+          </div>
+
+
+          <div class="modal-footer">
+              <input type="submit" class="btn btn-outline-success cancel_view_btn" name="reset_task_points" value="Confirm"/>
+              <div>
+                <button class="btn btn-outline-primary dropdown-toggle" id="selected_panel_display" data-toggle="dropdown">Select Panel</button>
+                <input type="hidden" id="selected_panel" name="selected_panel">
+                <div class="dropdown-menu dropdown-menu-scale info pull-right" style="right: 50%; left: 50%;">
+                  {% for panel in all_branch_panels %}
+                  <button class="dropdown-item" type="button" onclick="selectPanel('{{panel}}')">{{panel}}</button>
+                  {% endfor %}
+                </div>
+              </div>      
+              <a href="#" class="btn btn-outline-danger cancel_view_btn" data-dismiss="modal">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   
     <!-- build:js scripts/app.html.js -->
     <!-- jQuery -->
@@ -825,6 +900,14 @@
           }
       }
       };
+
+      function selectPanel(panel) {
+        var display = document.getElementById('selected_panel_display');
+        var selected_panel_input = document.getElementById('selected_panel');
+
+        display.innerHTML = panel;
+        selected_panel_input.value = panel;
+      }
     </script>
     <!-- endbuild -->
   </body>

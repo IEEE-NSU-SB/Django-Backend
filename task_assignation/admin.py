@@ -55,3 +55,15 @@ class Team_Task_Forward(admin.ModelAdmin):
     list_display=[
         'task','team','task_forwarded_to_incharge','task_forwarded_to_core_or_team_volunteers','forwared_by','forwarded_by_for_volunteers'
     ]
+
+@admin.register(Member_Task_Points_History)
+class Member_Task_Points_History(admin.ModelAdmin):
+    list_display = [
+        'member', 'panel_of', 'points'
+    ]
+
+@admin.register(Team_Task_Points_History)
+class Team_Task_Points_History(admin.ModelAdmin):
+    list_display = [
+        'team', 'panel_of', 'points'
+    ]

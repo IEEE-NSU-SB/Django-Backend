@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 import json
 import logging
 import traceback
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
 from django_celery_beat.models import ClockedSchedule
 from django.http import HttpResponse
@@ -4763,6 +4763,7 @@ def task_home(request,team_primary = None):
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
         all_task_categories = Task_Category.objects.all().order_by('name')
+        all_branch_panels = Branch.load_all_panels()
 
         if request.method == "POST":
 
@@ -4775,6 +4776,26 @@ def task_home(request,team_primary = None):
                     messages.success(request,"Task Category Created successfully!")
                 else:
                     messages.warning(request,"Something went wrong while creating the task category!")
+
+            elif request.POST.get('reset_task_points'):
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
+                else:
+                    if Task_Assignation.reset_task_points(selected_panel):
+                        messages.success(request,"Task Points were saved and reset successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while resetting/saving the task points!")
+            
+            elif request.POST.get('reinstate_task_points'):
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
+                else:
+                    if Task_Assignation.reinstate_task_points(selected_panel):
+                        messages.success(request,"Task Points were reinstated successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while reinstating the task points!")
 
         #modify this so that team incharge and volunteer both can create task in respective team
         #so modify the funtions with a team_primary parameter
@@ -4793,6 +4814,7 @@ def task_home(request,team_primary = None):
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
 
             'app_name':app_name,
@@ -5733,6 +5755,29 @@ def task_leaderboard(request):
         }
 
         return render(request,"LeaderBoards/task_leaderboard.html",context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+    
+@login_required
+@member_login_permission
+def export_task_contents(request):
+
+    try:
+        username = request.user.username
+        has_access = Access_Render.system_administrator_superuser_access(username=username) or Access_Render.system_administrator_staffuser_access(username=username)
+        
+        if has_access:
+            zip_filepath = Task_Assignation.export()
+
+            if os.path.exists(zip_filepath):
+                return FileResponse(open(zip_filepath, "rb"), as_attachment=True, filename="exported_content.zip")
+            else:
+                return HttpResponse("File not found.", status=404)
+        else:
+            return redirect('central_branch:task_home')
+        
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())

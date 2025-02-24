@@ -1,7 +1,7 @@
 import os
 from django.db import models
 
-from port.models import Chapters_Society_and_Affinity_Groups, Teams
+from port.models import Chapters_Society_and_Affinity_Groups, Panels, Teams
 from users.models import Members
 
 # Create your models here.
@@ -28,6 +28,7 @@ class Task(models.Model):
     deadline = models.DateTimeField(null=True,blank=True)
     others_description = models.TextField(null=True,blank=True)
     is_task_completed = models.BooleanField(null=False,blank=False,default=False)
+    task_panel_of = models.ForeignKey(Panels, null=False, blank=False, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name="Task"
@@ -160,6 +161,30 @@ class Team_Task_Forwarded(models.Model):
 
     class Meta:
         verbose_name="Team Task Forward"
+
+    def __str__(self) -> str:
+        return str(self.pk)
+    
+class Member_Task_Points_History(models.Model):
+
+    member = models.ForeignKey(Members, null=False, blank=False, on_delete=models.CASCADE)
+    panel_of = models.ForeignKey(Panels, null=False, blank=False, on_delete=models.CASCADE)
+    points = models.FloatField(null=False, blank=False, default=0)
+
+    class Meta:
+        verbose_name='Member Task Points History'
+
+    def __str__(self) -> str:
+        return str(self.pk)
+    
+class Team_Task_Points_History(models.Model):
+
+    team = models.ForeignKey(Teams, null=False, blank=False, on_delete=models.CASCADE)
+    panel_of = models.ForeignKey(Panels, null=False, blank=False, on_delete=models.CASCADE)
+    points = models.FloatField(null=False, blank=False, default=0)
+
+    class Meta:
+        verbose_name='Team Task Points History'
 
     def __str__(self) -> str:
         return str(self.pk)

@@ -1,6 +1,10 @@
 
+import tempfile
+import zipfile
+from django.http import FileResponse
 from django.shortcuts import redirect
 from django.contrib import messages
+import xlwt
 from central_branch.renderData import Branch
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from port.models import Chapters_Society_and_Affinity_Groups, Panels, Teams
@@ -60,6 +64,8 @@ class Task_Assignation:
         except:
             task_created_by=adminUsers.objects.get(username=current_user.user.username).username
             username = task_created_by
+
+        current_panel = Branch.load_current_panel()
     
         #Create a new task and save it
         new_task = Task(title=title,
@@ -68,7 +74,8 @@ class Task_Assignation:
                         task_type=task_type,
                         task_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=task_of),
                         task_created_by=task_created_by,
-                        deadline=deadline
+                        deadline=deadline,
+                        task_panel_of=current_panel
                         )
         
         new_task.save()
@@ -2849,14 +2856,16 @@ This is an automated message. Do not reply
         '''This function will load all the task for central branch and respective
         task for teams home page'''
 
+        current_panel = Branch.load_current_panel()
+
         if team_primary == None or team_primary == "1":
             
-            return Task.objects.all().order_by('-pk','is_task_completed')
+            return Task.objects.filter(task_panel_of=current_panel).order_by('-pk','is_task_completed')
         else:
 
             team = Teams.objects.get(primary = int(team_primary))
-            tasks = list(Task.objects.filter(task_type = "Team",team = team).order_by('-pk','is_task_completed'))
-            tasks += (Task.objects.filter(task_type = "Individuals",team=team).order_by('-pk','is_task_completed'))
+            tasks = list(Task.objects.filter(task_type = "Team",team = team, task_panel_of=current_panel).order_by('-pk','is_task_completed'))
+            tasks += (Task.objects.filter(task_type = "Individuals",team=team, task_panel_of=current_panel).order_by('-pk','is_task_completed'))
 
         return tasks
                 
@@ -3101,5 +3110,120 @@ This is an automated message. Do not reply
             return True   
 
         
+    def reset_task_points(panel):
+        try:
+            all_members_with_task_points = Members.objects.all().exclude(completed_task_points=0.0)
+            all_teams_with_task_points = Teams.objects.all().exclude(completed_task_points=0.0)
+            all_task_drive_links = Task_Drive_Link.objects.all()
+            all_task_contents = Task_Content.objects.all()
+            all_task_documents = Task_Document.objects.all()
+            all_task_medias = Task_Media.objects.all()
+            all_permission_paper = Permission_Paper.objects.all()
+
+            selected_panel = Branch.get_panel_by_year(panel)
             
-                        
+            for member in all_members_with_task_points:
+                Member_Task_Points_History.objects.create(member=member, panel_of=selected_panel, points=member.completed_task_points)
+                member.completed_task_points = 0.0
+                member.save()
+
+            for team in all_teams_with_task_points:
+                Team_Task_Points_History.objects.create(team=team, panel_of=selected_panel, points=team.completed_task_points)
+                team.completed_task_points = 0.0
+                team.save()
+
+            all_task_drive_links.delete()
+            all_task_contents.delete()
+            all_permission_paper.delete()
+
+            for document in all_task_documents:
+                path = settings.MEDIA_ROOT+str(document.document)
+                if os.path.exists(path):
+                    os.remove(path)
+                document.delete()
+
+            for media in all_task_medias:
+                path = settings.MEDIA_ROOT+str(media.media)
+                if os.path.exists(path):
+                    os.remove(path)
+                media.delete()
+            
+            Task_Assignation.delete_exported_content()
+
+            return True
+        except:
+            return False
+
+    def reinstate_task_points(panel):
+
+        try:
+            selected_panel = Branch.get_panel_by_year(panel)
+            member_points_histories = Member_Task_Points_History.objects.filter(panel_of=selected_panel)
+            team_points_histories = Team_Task_Points_History.objects.filter(panel_of=selected_panel)
+
+            for member_history in member_points_histories:
+                member_history.member.completed_task_points = member_history.points
+                member_history.member.save()
+                member_history.delete()   
+
+            for team_history in team_points_histories:
+                team_history.team.completed_task_points = team_history.points
+                team_history.team.save()
+                team_history.delete()
+
+            return True
+        except:
+            return False
+
+    def export():
+        """Generates the ZIP file and returns its file path."""
+        export_dir = os.path.join(settings.MEDIA_ROOT, "Task_Assignation/Exported_Files")
+        os.makedirs(export_dir, exist_ok=True)  # Ensure directory exists
+
+        zip_filename = os.path.join(export_dir, "exported_content.zip")
+        excel_path = os.path.join(export_dir, "task_drive_links.xls")
+
+        # Create an Excel file using xlwt
+        workbook = xlwt.Workbook()
+        sheet = workbook.add_sheet("Task Drive Links")
+
+        # Write header row
+        headers = ["Task ID", "Task", "Drive Link", "Uploaded By"]
+        for col, header in enumerate(headers):
+            sheet.write(0, col, header)
+
+        # Write data rows
+        for row, link in enumerate(Task_Drive_Link.objects.all(), start=1):
+            sheet.write(row, 0, link.task.id)
+            sheet.write(row, 1, link.task.title)
+            sheet.write(row, 2, link.drive_link)
+            sheet.write(row, 3, link.uploaded_by)
+
+        # Save the Excel file
+        workbook.save(excel_path)
+
+        # Create ZIP file
+        with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+            # Add Excel file
+            zipf.write(excel_path, os.path.basename(excel_path))
+
+            # Add Task Documents
+            for doc in Task_Document.objects.all():
+                if doc.document and os.path.exists(doc.document.path):
+                    zipf.write(doc.document.path, os.path.basename(doc.document.path))
+
+            # Add Task Media
+            for media in Task_Media.objects.all():
+                if media.media and os.path.exists(media.media.path):
+                    zipf.write(media.media.path, os.path.basename(media.media.path))
+        
+        os.remove(excel_path)
+
+        return zip_filename  # Return the path of the ZIP file
+    
+    def delete_exported_content():
+        export_dir = os.path.join(settings.MEDIA_ROOT, "exported_files")
+        zip_filename = os.path.join(export_dir, "exported_content.zip")
+
+        if os.path.exists(zip_filename):
+            os.remove(zip_filename)
