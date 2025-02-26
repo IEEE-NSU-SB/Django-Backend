@@ -632,6 +632,43 @@
 .mediaUploaded{
     display: flex;
 }
+#scrollToBottomBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #00629B;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    z-index: 1000; /* Ensure it's above other elements */
+    transition: opacity 0.3s ease; /* Smooth hide/show transition */
+    }
+
+#scrollToBottomBtn:hover {
+    background-color: white;
+    color: #00629B;
+    }
+
+@media (max-width: 768px) {
+    #scrollToBottomBtn {
+        font-size: 13px;
+        padding: 8px 15px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    #scrollToBottomBtn {
+        font-size: 12px;
+        padding: 7px 12px;
+        bottom: 10px;
+        right: 10px;
+    }
+}
 @media screen and (max-width:1440px) {
     .fileUploaded , .mediaUploaded{
         max-width: 643px;
@@ -807,16 +844,17 @@
                         </div>
                     </div> -->
                     <textarea id="members_task_type_content" class="members_task_type_content" name="content_details">{{content_loaded.content}}</textarea>
-
-                    <br>
-                    {% endif %}
                     <script>
                         $(document).ready(function() {
                             {% if task.is_task_completed %}
-                            $('#members_task_type_content').summernote('disable');
+                                $('#members_task_type_content').summernote('disable');
+                                console.log("run")
                             {% endif %}
                         });
                     </script>
+
+                    <br>
+                    {% endif %}
                     
                     <!--                         
                         {% if members_task_type.has_file_upload %}
@@ -947,10 +985,10 @@
                             </div>
 
                         </div> -->
-                        <textarea id="comments" name="comments_details" class="disabled">{{comments|safe}}</textarea>
+                        <textarea id="comments" name="comments_details" class="disable6">{{comments|safe}}</textarea>
                         <script>
                             $(document).ready(function() {
-                                $('.disabled').each(function() {
+                                $('.disable6').each(function() {
                                     $(this).summernote('disable');
                                 });
                             });
@@ -1228,8 +1266,33 @@
                 <!--Messages-->
                 
                 <!-- task page heading-->
-                <h4 style="margin-top: 25px;">See Other's Task Progress</h4>
-                
+                <h4 style="margin-top: 25px;" id="see_other_task">See Other's Task Progress</h4>
+                <button id="scrollToBottomBtn" onclick="scrollToBottom()">Scroll to Down to See Other's Task</button>
+                <script>function scrollToBottom() {
+                    const taskSection = document.getElementById('see_other_task');
+                    taskSection.scrollIntoView({
+                        behavior: "smooth"
+                    });
+    
+                    
+                }
+                function handleScroll() {
+                    const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+                    const taskSection = document.getElementById('see_other_task');
+                    const taskSectionPosition = taskSection.getBoundingClientRect().top + window.scrollY;
+                    const currentScroll = window.scrollY || document.documentElement.scrollTop;
+            
+                    // Check if the user has scrolled past the task section
+                    if (currentScroll >= taskSectionPosition - 10) {
+                        scrollToBottomBtn.style.display = 'none'; // Hide the button
+                    } else {
+                        scrollToBottomBtn.style.display = 'block'; // Show the button
+                    }
+                }
+            
+                window.addEventListener('scroll', handleScroll);
+                window.addEventListener('resize', handleScroll); 
+                </script>
 
             <!-- <div class="name_tab">
                 {% for member,task_type  in task_type_per_member.items %}
@@ -1859,8 +1922,7 @@
             </script>
             <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
             <script>
-                $('.members_task_type_content').summernote({
-                    placeholder: 'Describe the task...',
+                $('#members_task_type_content').summernote({
                     tabsize: 2,
                     height: 250,
                     toolbar: [
@@ -1873,7 +1935,7 @@
                     ['view', ['fullscreen', 'codeview', 'help']]
                     ]
                 });
-                $('.disabled').summernote({
+                $('.disable6').summernote({
                     tabsize: 2,
                     height: 250,
                     toolbar: [

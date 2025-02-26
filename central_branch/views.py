@@ -4104,7 +4104,10 @@ def generateExcelSheet_events_by_year(request,year):
                 sl_num += 1
                 workSheet.write(row_num,0 , sl_num,  center_alignment)
                 workSheet.write(row_num,1 , event.event_name,  center_alignment)
-                workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                if event.event_date:
+                    workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                else:
+                    workSheet.write(row_num,2 , event.start_date.strftime('%Y-%m-%d'),  center_alignment)
                 workSheet.write(row_num,3 , event.event_organiser.group_name,  center_alignment)
                 collaborations_text = ""
                 for collabs in collaborations:
@@ -6281,7 +6284,7 @@ class SendMailAjax(View):
             email_body=request.POST['body']
             email_attachment=request.FILES.getlist('attachments')                       
             email_schedule_date_time = request.POST['dateTime']
-
+            print("HERE COMING")
             response = GmailHandler.send_mail(request, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time)
             
             return response

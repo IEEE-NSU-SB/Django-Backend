@@ -69,18 +69,19 @@
             display: flex;
             flex-direction: column;
             margin: 15px 20px;
-            padding: 20px 20px;
+            padding: 20px 20px 14px 20px;;
             background: #f7f7f7;
         }
 
         .inner_box h6 {
-            margin-bottom: 5px;
+            /* margin-bottom: 5px; */
         }
 
         .adjust_placement {
             color: 	#75787B;
             margin-left: 32px;
             margin-bottom: -2px;
+            font-size: smaller;
         }
 
         .read_more_btn {
@@ -450,6 +451,18 @@
             }
         }
 
+        .box_content::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .box_content::-webkit-scrollbar-thumb{
+            background-color: #002855;
+            transition: all .4s ease-in-out;
+            border-radius: 4px;
+        }
+        .box_content::-webkit-scrollbar-thumb:hover{
+            background-color: #002855;
+        }
     </style>
 </head>
 
@@ -531,13 +544,14 @@
                             <div class="register-bottom-for-pc">
                                 <!--Register Box-->
                                 <div class="box">
-                                    {% if event.event_time and event.start_date == None %}
+                                    <div class="box_content" style="height: 377px; overflow-y: auto;">
+                                        {% if event.event_time and event.start_date == None %}
                                     <div class="inner_box">
                                         <h6><i class="fa-regular fa-clock" style="color: #E87722;"></i><span
-                                                style="margin-left: 10px;">Time</span></h6>
-                                        <h6 class="adjust_placement">{{event.event_time}}</h6>
-                                    </div>
-                                    {% else %}
+                                            style="margin-left: 10px;">Time</span></h6>
+                                            <h6 class="adjust_placement">{{event.event_time}}</h6>
+                                        </div>
+                                        {% else %}
                                         {% if event.start_date %}
                                         <div class="inner_box">
                                             <h6><i class="fa-regular fa-clock" style="color: #E87722;"></i><span
@@ -548,16 +562,16 @@
                                         {% if event.end_date %}
                                         <div class="inner_box">
                                             <h6><i class="fa-regular fa-clock" style="color: #E87722;"></i><span
-                                                    style="margin-left: 10px;">End Time</span></h6>
-                                            <h6 class="adjust_placement">{{event.end_date|date:"g:i A, jS M, Y"}}</h6>
-                                        </div>
-                                        {% endif %}
-                                    {% endif %}
-
-                                    <div class="inner_box">
-                                        <h6><i class="fa-solid fa-wallet" style="color: #E87722;"></i><span
-                                                style="margin-left: 10px;">COST</span></h6>
-                                        {% if event.registration_fee %}
+                                                style="margin-left: 10px;">End Time</span></h6>
+                                                <h6 class="adjust_placement">{{event.end_date|date:"g:i A, jS M, Y"}}</h6>
+                                            </div>
+                                            {% endif %}
+                                            {% endif %}
+                                            
+                                            <div class="inner_box">
+                                                <h6><i class="fa-solid fa-wallet" style="color: #E87722;"></i><span
+                                                    style="margin-left: 10px;">COST</span></h6>
+                                                    {% if event.registration_fee %}
                                         <h6 class="adjust_placement">{{event.registration_fee_amount|safe}}</h6>
                                         {% else %}
                                         <h6 class="adjust_placement" style="color: #5e5e5e;">Free</h6>
@@ -566,15 +580,16 @@
                                     <div class="inner_box">
                                         <h6><i class="fa-solid fa-circle-info" style="color: #E87722;"></i><span
                                                 style="margin-left: 10px;">MORE INFO</span></h6>
-                                        <!--READ MORE LINK-->
-                                        <h6 class="adjust_placement"><a href="{{event.more_info_link}}" class="read_more_btn">Read More</a></h6>
-                                    </div>
-                                    {% if event.form_link %}
-                                    <div class="register">
-                                        <!--Registration button-->
-                                        <a href="{{event.form_link}}" class="register_btn">REGISTER</a>
-                                    </div>
-                                    {% endif %}
+                                                <!--READ MORE LINK-->
+                                                <h6 class="adjust_placement"><a href="{{event.more_info_link}}" class="read_more_btn">Read More</a></h6>
+                                            </div>
+                                        </div>
+                                        {% if event.form_link %}
+                                        <div class="register">
+                                            <!--Registration button-->
+                                            <a href="{{event.form_link}}" class="register_btn">REGISTER</a>
+                                        </div>
+                                        {% endif %}
                                 </div>
                                 <div class="box">
                                     <!--Share event box-->

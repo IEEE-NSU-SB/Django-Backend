@@ -44,7 +44,7 @@
                                 <img src="{% static 'INSB.png' %}" alt="logo" style="width:10%;">
                             </div>
                             <div class="d-flex flex-column justify-content-center">
-                                <h1 class="text-center fw-bold mt-3 text-uppercase text-black">Renewal form for {{ session_name }}</h1>
+                                <h1 class="text-center fw-bold mt-3 text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
                             </div>
                             {% if form_credentials.accepting_response %}
                             <div class="p-2 mb-4">
@@ -82,7 +82,7 @@
                                             <input
                                                 required
                                                 placeholder="Enter Your Name"
-                                                class="form-control w-75"
+                                                class="form-control w-100"
                                                 type="text"
                                                 autocomplete="off"
                                                 required
@@ -92,54 +92,49 @@
                                     </div>
 
                                     <div class="row my-3">
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <div class="col-md-4 mt-1">
-                                                    Contact No.: <span style="color:red;">*</span>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input
-                                                        required placeholder="Enter Your Contact no"
-                                                        class="form-control w-75"
-                                                        type="text"
-                                                        autocomplete="off"
-                                                        name="contact_no" 
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div class="col-md-2 mt-1">
+                                            Contact No.: <span style="color:red;">*</span>
                                         </div>
-                                        <div class="row my-3">
-                                            <div class="col-md-2 mt-1">Email (Associated with your IEEE account): <span style="color:red;">*</span></div>
-                                            <div class="col-md-8">
-                                                <input
-                                                    required
-                                                    class="form-control w-75"
-                                                    type="email"
-                                                    autocomplete="on"
-                                                    id="email_associated" name="email_associated" required placeholder="Enter Email Associated with Your IEEE ID" 
-                                                />
-                                            </div>
-                                        </div>
-                                        <div class="row my-3">
-                                            <div class="col-md-2 mt-1">Email (IEEE):</div>
-                                            <div class="col-md-8">
-                                                <input
-                                                
-                                                    class="form-control w-75"
-                                                    type="email"
-                                                    autocomplete="on"
-                                                    id="email_ieee" name="email_ieee" required placeholder="Enter Your IEEE Email" 
-                                                />
-                                            </div>
+                                        <div class="col-md-8">
+                                            <input
+                                                required placeholder="Enter Your Contact no"
+                                                class="form-control w-100"
+                                                type="text"
+                                                autocomplete="off"
+                                                name="contact_no" 
+                                            />
                                         </div>
                                     </div>
-
+                                    <div class="row my-3">
+                                        <div class="col-md-2 mt-1">Email (Associated with your IEEE account): <span style="color:red;">*</span></div>
+                                        <div class="col-md-8">
+                                            <input
+                                                required
+                                                class="form-control w-100"
+                                                type="email"
+                                                autocomplete="on"
+                                                id="email_associated" name="email_associated" required placeholder="Enter Email Associated with Your IEEE ID" 
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="row my-3">
+                                        <div class="col-md-2 mt-1">Email (IEEE):</div>
+                                        <div class="col-md-8">
+                                            <input
+                                            
+                                                class="form-control w-100"
+                                                type="email"
+                                                autocomplete="on"
+                                                id="email_ieee" name="email_ieee" required placeholder="Enter Your IEEE Email" 
+                                            />
+                                        </div>
+                                    </div>
                                     <div class="row my-3">
                                         <div class="col-md-2 mt-1">IEEE Membership ID: <span style="color:red;">*</span></div>
                                         <div class="col-md-8">
                                             <input
                                                 placeholder="IEEE ID"
-                                                class="form-control w-75"
+                                                class="form-control w-100"
                                                 type="number"
                                                 autocomplete="off"
                                                 required
@@ -152,7 +147,7 @@
                                         <div class="col-md-8">
                                             <input
                                                 placeholder="NSU ID"
-                                                class="form-control w-75"
+                                                class="form-control w-100"
                                                 type="number"
                                                 autocomplete="off"
                                                 required
@@ -161,35 +156,29 @@
                                         </div>
                                     </div>
                                     <div class="row my-3">
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <div class="col-md-4 mt-1">
-                                                    Password: <span style="color:red;">*</span>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input
-                                                        required
-                                                        class="form-control w-80"
-                                                        type="password"
-                                                        name="password" autocomplete="off" required placeholder="Enter the Password For your IEEE Account"
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div class="col-md-2 mt-1">
+                                            Password: <span style="color:red;">*</span>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <div class="col-md-4 mt-1">
-                                                    Confirm Password: <span style="color:red;">*</span>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input
-                                                        required
-                                                        class="form-control w-80"
-                                                        type="password"
-                                                        name="confirm_password" autocomplete="off" required placeholder="Confirm Password"
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div class="col-md-8">
+                                            <input
+                                                required
+                                                class="form-control w-100"
+                                                type="password"
+                                                name="password" autocomplete="off" required placeholder="Enter the Password For your IEEE Account"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="row my-3">
+                                        <div class="col-md-2 mt-1">
+                                            Confirm Password: <span style="color:red;">*</span>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input
+                                                required
+                                                class="form-control w-100"
+                                                type="password"
+                                                name="confirm_password" autocomplete="off" required placeholder="Confirm Password"
+                                            />
                                         </div>
                                     </div>
 
@@ -281,7 +270,7 @@
                                             <div class="col-md-8">
                                                 <input
                                                     required
-                                                    class="form-control w-50"
+                                                    class="form-control w-100"
                                                     type="text"
                                                     name="trx_id" required placeholder="Enter the Transaction ID"
                                                 />
@@ -294,8 +283,7 @@
                                             </div>
                                             <div class="col-md-8">
                                                 <input
-                                                    style="height:100px;"
-                                                    class="form-control w-50"
+                                                    class="form-control w-100"
                                                     type="text"
                                                     id="comment" name="comment"  placeholder="Write a comment if you need to"
                                                 />

@@ -2242,7 +2242,10 @@ def generateExcelSheet_events_by_year_sc_ag(request,primary,year):
                 sl_num += 1
                 workSheet.write(row_num,0 , sl_num,  center_alignment)
                 workSheet.write(row_num,1 , event.event_name,  center_alignment)
-                workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                if event.event_date:
+                    workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                else:
+                    workSheet.write(row_num,2 , event.start_date.strftime('%Y-%m-%d'),  center_alignment)
                 workSheet.write(row_num,3 , event.event_organiser.group_name,  center_alignment)
                 collaborations_text = ""
                 for collabs in collaborations:

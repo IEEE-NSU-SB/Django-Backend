@@ -32,6 +32,7 @@ from media_team.models import Media_Images
 from content_writing_and_publications_team.models import Content_Team_Document
 from recruitment.models import recruited_members
 import re
+from django.db.models import Q
 
 class Branch:
 
@@ -2148,6 +2149,9 @@ class Branch:
                 if event.event_date:
                     if event.event_date.year not in unique_years:
                         unique_years.append(event.event_date.year)
+                elif event.start_date:
+                    if event.start_date.year not in unique_years:
+                        unique_years.append(event.start_date.year)
             #sorting it
             unique_years.sort(reverse=True)
             return unique_years
@@ -2165,9 +2169,9 @@ class Branch:
             dic = {}
             collaborations=[]
             if primary == 1 :
-                final_events = Events.objects.filter(event_date__year = year)
+                final_events = Events.objects.filter(Q(event_date__year=year) | Q(start_date__year=year))
             else:
-                events = Events.objects.filter(event_date__year = year,event_organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary = primary))
+                events = Events.objects.filter(Q(event_date__year=year) | Q(start_date__year=year),event_organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary = primary))
                 collaborations_list = InterBranchCollaborations.objects.filter(collaboration_with=Chapters_Society_and_Affinity_Groups.objects.get(primary=primary)).values_list('event_id')
                 events_with_collaborated_events = events.union(Events.objects.filter(pk__in=collaborations_list,event_date__year = year))
                 final_events = events_with_collaborated_events.order_by('-event_date')

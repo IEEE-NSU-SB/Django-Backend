@@ -822,7 +822,7 @@
           <div class="dropdown-content" id="dropdownContent">
             <a href="#" id="notify_action" name="notify_action" onclick="markAsRead_markAsUnread(this); return false;">{% if notification.is_read %}Mark as unread{% else %}Mark as read{% endif %}</a>
             <input type="hidden" id="member_notification_id" name="member_notification_id" value="{{notification.pk}}"/>
-            <a href="#" onclick="seeMore(this)">See More</a>
+            <a href="#" onclick="seeMore1(this)">See More</a>
           </div>
         </div>
       </div>
@@ -833,16 +833,24 @@
 </div>
 
 <script>
-  //function to display the notification box
   function show_ntfn() {
     var icon = document.querySelector(".bell-icon");
     const ntfn_content = document.getElementById("notification");
+
     if (ntfn_content.style.display === "block") {
-      // icon.classList.remove("wobble-hor-top");
       ntfn_content.style.display = "none";
+      document.removeEventListener("click", handleClickOutside);
     } else {
-      // icon.classList.add("wobble-hor-top");
       ntfn_content.style.display = "block";
+      document.addEventListener("click", handleClickOutside);
+    }
+  }
+
+  function handleClickOutside(event) {
+    const ntfn_content = document.getElementById("notification");
+    if (!ntfn_content.contains(event.target) && !event.target.closest(".bell-icon")) {
+      ntfn_content.style.display = "none";
+      document.removeEventListener("click", handleClickOutside);
     }
   }
 
@@ -1216,11 +1224,7 @@
         });
     });
 
-    document.querySelectorAll('.three_dots').forEach(dot => {
-        dot.addEventListener('click', function(event) {
-            toggleDropdown(event);
-        });
-    });
+
   }
   function updateNotificationCount() {
     const notificationLabel = document.getElementById('nftn_lbl');
@@ -1315,7 +1319,7 @@
       icon.classList.add("wobble-hor-top");
     }
 
-  function seeMore(element){
+  function seeMore1(element){
     var showMore = element.parentElement.parentElement.parentElement.querySelector('.notification_msg');
     var showMore2 = element.parentElement.parentElement.parentElement.querySelector('.sender_title');
     

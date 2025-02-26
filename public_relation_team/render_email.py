@@ -32,7 +32,10 @@ class PRT_Email_System:
         
         # At first seperate the emails of single emails seperated by commas
         single_emails_final_list=[]
-        substrings = single_emails[0].split(',')
+        try:
+            substrings = single_emails[0].split(',')
+        except:
+            substrings=[]
         
         for email in substrings:
             # Trim leading and trailing whitespaces
@@ -115,8 +118,10 @@ class PRT_Email_System:
                     recruit_id = int(email[9:])
                     recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
                     for mem in recruited_mem:
-                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
+                        if mem.email_personal and mem.email_personal != 'None':
                             to_email_final_list.append(mem.email_personal)
+                        if mem.email_nsu and mem.email_nsu != 'None':
+                            to_email_final_list.append(mem.email_nsu)
 
 
         # Removing the mails which are common in single email list and to email list
@@ -189,8 +194,10 @@ class PRT_Email_System:
                     recruit_id = int(email[9:])
                     recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
                     for mem in recruited_mem:
-                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
-                            cc_email_final_list.append(mem.email_personal)
+                        if mem.email_personal and mem.email_personal != 'None':
+                            to_email_final_list.append(mem.email_personal)
+                        if mem.email_nsu and mem.email_nsu != 'None':
+                            to_email_final_list.append(mem.email_nsu)
                 else:
                     if email != 'None':
                         cc_email_final_list.append(email)
@@ -259,8 +266,10 @@ class PRT_Email_System:
                     recruit_id = int(email[9:])
                     recruited_mem = recruited_members.objects.filter(session_id = recruit_id)
                     for mem in recruited_mem:
-                        if mem.email_personal and mem.email_personal != 'None' and Branch.is_valid_email(mem.email_personal):
-                            bcc_email_final_list.append(mem.email_personal)
+                        if mem.email_personal and mem.email_personal != 'None':
+                            to_email_final_list.append(mem.email_personal)
+                        if mem.email_nsu and mem.email_nsu != 'None':
+                            to_email_final_list.append(mem.email_nsu)
                 else:
                     if email != 'None':
                         bcc_email_final_list.append(email)
