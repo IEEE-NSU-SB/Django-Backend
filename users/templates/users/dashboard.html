@@ -986,7 +986,11 @@
 									<div class="text_top_performers">
 										<div style="display: flex; align-items: center;">
 											<h6 class="numbering">#1</h6>
+											{% if performer %}
 											<a href="{% url 'main_website:member_profile' performer.ieee_id %}"><h1>{{performer.name}}</h1></a>
+											{% else %}
+											<a><h1>Waiting...</h1></a>
+											{% endif %}
 										</div>
 										<div>
 											<p>{{performer.team.team_name}}</p>
@@ -1009,7 +1013,11 @@
 									<div class="text_top_performers">
 										<div style="display: flex; align-items: center;">
 											<h6 class="numbering"></h6>
+											{% if team %}
 											<a href="#"><h1>{{team.team_name}}</h1></a>
+											{% else %}
+											<a><h1>Waiting...</h1></a>
+											{% endif %}
 										</div>
 									</div>
 								</div>
