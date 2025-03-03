@@ -549,8 +549,9 @@ def get_top_5_teams(request):
 
     '''This function will return the top 3 teams'''
     
-    teams = Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:3]
+    teams = Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5]
     return teams
+
 class PanelMembersData:
     logger=logging.getLogger(__name__)
 
