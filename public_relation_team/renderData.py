@@ -18,7 +18,7 @@ class PRT_Data:
         
         '''Gets the team id from the database only for Public Relation Team. Not the right approach'''
         
-        team=Teams.objects.get(primary=6)
+        team=Teams.objects.get(primary=0)
         return team.id
     
     def getPublicRelationPromotionTeamID():
@@ -32,7 +32,7 @@ class PRT_Data:
         
         '''This function loads all the team members for the public relation team'''
 
-        load_team_members=Branch.load_team_members(team_primary=6)
+        load_team_members=Branch.load_team_members(team_primary=0)
         team_members=[]
         
         for i in range(len(load_team_members)):
