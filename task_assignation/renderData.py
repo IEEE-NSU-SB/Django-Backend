@@ -1532,6 +1532,9 @@ class Task_Assignation:
 
         '''This function will deduct point according the late duration.. Marks will be decucted every day 5% of current score'''
 
+        if task.task_panel_of != Branch.load_current_panel():
+            return False
+        
         #getting all members of specific task
         all_members_of_task = Member_Task_Point.objects.filter(task=task)
         #getting the deadline
