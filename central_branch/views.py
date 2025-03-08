@@ -4615,7 +4615,7 @@ def create_task(request,team_primary = None):
         #app name for proper redirecting
         app_name = "central_branch"
         permission_for_co_ordinator_and_incharges_to_create_task = None
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
             
@@ -4669,7 +4669,7 @@ def create_task(request,team_primary = None):
             
             task_categories = Task_Category.objects.all().order_by('name')
             
-            #loads central bracnh if none or if is 1
+            #loads central branch if none or if is 1
             if team_primary == None or team_primary == "1":
 
                 #This is for central bracnh where Team or individual task can be created
