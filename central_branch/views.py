@@ -4764,6 +4764,7 @@ def task_home(request,team_primary = None):
         #getting all task categories
         all_task_categories = Task_Category.objects.all().order_by('name')
         all_branch_panels = Branch.load_all_panels()
+        branch_panel = None
 
         if request.method == "POST":
 
@@ -4804,7 +4805,15 @@ def task_home(request,team_primary = None):
         #########
         has_task_create_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task) or Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         #########
-        all_tasks = Task_Assignation.load_task_for_home_page(team_primary)
+        if request.GET.get('panel') and request.GET.get('panel') != '':
+            panel = request.GET.get('panel')
+            branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+        else:
+            branch_panel = Branch.load_current_panel()
+
+        all_tasks = Task_Assignation.load_task_for_home_page(team_primary, branch_panel)
+               
+
         if team_primary == None or team_primary == "1":
 
             
@@ -4816,7 +4825,7 @@ def task_home(request,team_primary = None):
             'all_task_categories':all_task_categories,
             'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
-
+            'branch_panel':branch_panel,
             'app_name':app_name,
             }
 
@@ -5742,15 +5751,31 @@ def task_leaderboard(request):
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
         has_common_access = Branch_View_Access.common_access(username=request.user.username)
+        branch_panel = None
 
-        all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
-        all_teams = Teams.objects.filter(team_of__primary=1).order_by('-completed_task_points')
+        if request.GET.get('panel') and request.GET.get('panel') != '':
+            panel = request.GET.get('panel')
+            branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            if not branch_panel.current:
+                all_members = Member_Task_Points_History.objects.filter(panel_of=branch_panel).exclude(points=0).order_by('-points')
+                all_teams = Team_Task_Points_History.objects.filter(team__team_of__primary=1, panel_of=branch_panel).order_by('-points')
+            else:
+                all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+                all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+        else:
+            branch_panel = Branch.load_current_panel()
+            all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+            all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+
+        all_panels_of_branch = Branch.load_all_panels()
 
         context = {
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_members': all_members,
             'all_teams': all_teams,
+            'all_panels_of_branch': all_panels_of_branch,
+            'branch_panel': branch_panel,
             'has_common_access': has_common_access
         }
 
