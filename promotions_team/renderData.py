@@ -39,20 +39,20 @@ class PromotionTeam:
                      core_volunteers.append(i)
                 else:
                     team_volunteers.append(i)
-        if(len(team_members)==0 or len(team_members)>0):
-            # if there is no members in promotions team, search for member in Public relations and Promotions Team
-            team_members=Branch.load_team_members(team_primary=0)
-            for i in team_members:
-                if i.position.is_officer:
-                    if i.position.is_co_ordinator:
-                        co_ordinators.append(i)
-                    else:
-                        incharges.append(i)
-                elif i.position.is_volunteer:
-                    if i.position.is_core_volunteer:
-                        core_volunteers.append(i)
-                    else:
-                        team_volunteers.append(i)  
+        # if(len(team_members)==0 or len(team_members)>0):
+        #     # if there is no members in promotions team, search for member in Public relations and Promotions Team
+        #     team_members=Branch.load_team_members(team_primary=0)
+        #     for i in team_members:
+        #         if i.position.is_officer:
+        #             if i.position.is_co_ordinator:
+        #                 co_ordinators.append(i)
+        #             else:
+        #                 incharges.append(i)
+        #         elif i.position.is_volunteer:
+        #             if i.position.is_core_volunteer:
+        #                 core_volunteers.append(i)
+        #             else:
+        #                 team_volunteers.append(i)  
         return co_ordinators,incharges,core_volunteers,team_volunteers
     
     
