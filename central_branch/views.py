@@ -4758,7 +4758,7 @@ def task_home(request,team_primary = None):
 
         app_name = "central_branch"
         permission_for_co_ordinator_and_incharges_to_create_task = None
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
@@ -5508,7 +5508,7 @@ def task_edit(request,task_id,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_home_team',team_primary)
 
-            elif '2' in request.POST or '3' in request.POST or '4' in request.POST or '5' in request.POST or '6' in request.POST or '7' in request.POST or '8' in request.POST or '9' in request.POST or '10' in request.POST or '11' in request.POST or 'forward_to_team_incharges' in request.POST:
+            elif '0' in request.POST or '2' in request.POST or '3' in request.POST or '4' in request.POST or '5' in request.POST or '6' in request.POST or '7' in request.POST or '8' in request.POST or '9' in request.POST or '10' in request.POST or '11' in request.POST or 'forward_to_team_incharges' in request.POST:
 
                 team_clicked = request.POST.get('teamclicked')
 
