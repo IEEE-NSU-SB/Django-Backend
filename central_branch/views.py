@@ -4885,7 +4885,7 @@ def upload_task(request, task_id,team_primary = None):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
@@ -5154,7 +5154,7 @@ def add_task(request, task_id,team_primary = None,by_coordinators = 0):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
@@ -5275,7 +5275,7 @@ def forward_to_incharges(request,task_id,team_primary = None):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
