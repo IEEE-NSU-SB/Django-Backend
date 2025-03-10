@@ -237,7 +237,7 @@ class Task_Assignation:
             new_task.members.add(*members)
             new_task.save()
 
-            if team_primary and team_primary != 1:
+            if team_primary is not None and team_primary != 1:
                 team = Teams.objects.get(primary=team_primary)
                 new_task.team.add(team)
                 new_task.save()
