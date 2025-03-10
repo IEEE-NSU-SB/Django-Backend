@@ -5410,7 +5410,7 @@ def task_edit(request,task_id,team_primary = None):
         print("checking")
         #app name for proper redirecting
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #this function will check whether current user is coordinator or not
             team_p = Teams.objects.get(primary = int(team_primary))
