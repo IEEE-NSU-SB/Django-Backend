@@ -54,7 +54,7 @@ class HandleVolunteerAwards:
         
         except Exception as e:
             PortData.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc() + '\n' + ' url:' + request.build_absolute_uri())
             messages.info(request,'Something went wrong while loading award information!')
             return False
     
