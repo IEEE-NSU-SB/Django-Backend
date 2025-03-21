@@ -13,7 +13,7 @@
     <style>
         /* IEEE Brand Color Palette */
         :root {
-            --ieee-blue: #00629B;
+            --ieee-blue: #0f77b3;
             --ieee-light-blue: #0083CA;
             --ieee-teal: #00843D;
             --ieee-light-gray: #E4E4E4;
@@ -70,25 +70,39 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s ease;
-            color: var(--ieee-black);
         }
-        
+
         .budget-btn.primary {
-            background-color: var(--ieee-blue);
+            background-color: var(--ieee-light-blue);
             color: var(--white);
         }
-        
-        .budget-btn:hover {
-            background-color: var(--ieee-medium-gray);
-        }
-        
+
         .budget-btn.primary:hover {
-            background-color: var(--ieee-light-blue);
+           
+            background-color: #333333;
+            color: #ffffff;
         }
         
+
+        .download-btn {
+            background-color: var(--ieee-medium-gray);
+            color: #000000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #333333;
+            color: #ffffff;
+        }
+                
         .budget-input {
-            width: 100%;
-            padding: 12px;
+            width: 40%;
+            padding: 8px 12px;
             border: 1px solid var(--ieee-medium-gray);
             border-radius: 4px;
         }
@@ -96,11 +110,12 @@
         .budget-table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #E4E4E4;
         }
         
         .budget-table th {
             background-color: #333333;
-            padding: 15px;
+            padding: 10px;
             text-align: left;
             border-bottom: 2px solid var(--ieee-medium-gray);
             font-weight: 600;
@@ -113,7 +128,7 @@
         }
         
         .budget-table tr:hover {
-            background-color: var(--ieee-light-gray);
+            background-color: var(--ieee-medium-gray);
         }
         
         /* Responsive design */
@@ -154,7 +169,13 @@
         </div>
         <!--navbar content end-->
 
+
             <!-- ############ PAGE START-->
+            <div ui-view class="app-body" style="justify-content:center; margin-left:15%; margin-right:15%;" id="view">
+                <br>
+                <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;"> <b>The Finance & Corporate Team</b></span>'s <b>Budget Page</b>  </h2>
+                
+            </div>
             <div class="budget-container">
                 <div class="top-actions">
                     <button id="addBudgetBtn" class="budget-btn primary">Add Budget</button>
@@ -162,15 +183,27 @@
                 
                 <div class="search-filter">
                     <div class="search-box">
-                        <input type="text" id="searchInput" class="budget-input" placeholder="Search">
+                        
+                        <input type="text" id="searchInput" class="budget-input" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
                     </div>
-                    <button id="filterBtn" class="budget-btn">Filter</button>
+                    <div class="form-group">
+                        <!--		Show Numbers Of Rows 		-->
+                        <select style="width: 60%" class="form-control" name="state" id="maxRows" >
+                
+                          <option value="10">10</option>
+                          <option value="15">15</option>
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                          <option value="5000">Show ALL Rows</option>
+                        </select>
+                
+                      </div>
                 </div>
                 
                 <table class="budget-table">
                     <thead>
                         <tr>
-                            <th style="width: 20%">Serial</th>
+                            <th style="width: 20%">SL</th>
                             <th style="width: 60%">Sheet Name</th>
                             <th style="width: 20%">Download</th>
                         </tr>
@@ -220,7 +253,7 @@
                 const downloadCell = document.createElement('td');
                 const downloadBtn = document.createElement('button');
                 downloadBtn.textContent = "Download";
-                downloadBtn.className = "budget-btn";
+                downloadBtn.className = "download-btn";
                 downloadBtn.addEventListener('click', () => {
                     alert(`Downloading ${item.sheetName}`);
                 });
