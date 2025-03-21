@@ -5889,7 +5889,12 @@ def mail(request):
                     messagess = response.get('messages', [])
 
                     if messagess:
-                        last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                        if section == 'sent':
+                            # Only get the first message for this section
+                            last_message = messagess[0]
+                        else:
+                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+
                         headers = last_message['payload'].get('headers', [])
                         snippet = last_message.get('snippet', '')
                         labels = last_message.get('labelIds', [])
@@ -6009,7 +6014,12 @@ def mail(request):
                         messagess = response.get('messages', [])
 
                         if messagess:
-                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                            if section == 'sent':
+                                # Only get the first message for this section
+                                last_message = messagess[0]
+                            else:
+                                last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                                
                             headers = last_message['payload'].get('headers', [])
                             snippet = last_message.get('snippet', '')
                             labels = last_message.get('labelIds', [])
