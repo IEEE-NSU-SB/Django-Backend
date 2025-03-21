@@ -10,23 +10,126 @@
         {% include "common_css.html" %}
     {% endblock common_css %}
 
-
     <style>
+        /* IEEE Brand Color Palette */
+        :root {
+            --ieee-blue: #00629B;
+            --ieee-light-blue: #0083CA;
+            --ieee-teal: #00843D;
+            --ieee-light-gray: #E4E4E4;
+            --ieee-medium-gray: #D9D9D9;
+            --ieee-dark-gray: #666666;
+            --ieee-black: #000000;
+            --white: ##F0F0F0;
+        }
+
+        
         body, html {
-        
-        margin: 0;
-        
-        align-items: center;
-        justify-content: center;
+            margin: 0;
+            align-items: center;
+            justify-content: center;
         }
 
         .row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #E4E4E4;
         }
         
+        .budget-container {
+            width: 100%;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .top-actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .search-box {
+            flex-grow: 1;
+        }
+        
+        .budget-btn {
+            background-color: var(--ieee-light-gray);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: var(--ieee-black);
+        }
+        
+        .budget-btn.primary {
+            background-color: var(--ieee-blue);
+            color: var(--white);
+        }
+        
+        .budget-btn:hover {
+            background-color: var(--ieee-medium-gray);
+        }
+        
+        .budget-btn.primary:hover {
+            background-color: var(--ieee-light-blue);
+        }
+        
+        .budget-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--ieee-medium-gray);
+            border-radius: 4px;
+        }
+        
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .budget-table th {
+            background-color: #333333;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid var(--ieee-medium-gray);
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .budget-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--ieee-light-gray);
+        }
+        
+        .budget-table tr:hover {
+            background-color: var(--ieee-light-gray);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                margin-bottom: 10px;
+            }
+            
+            .budget-table th, .budget-table td {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -48,19 +151,39 @@
             {% block navbar %}
                 {% include 'finance_and_corporate_team/finance_navbar.html' %}
             {% endblock navbar %}
-
         </div>
         <!--navbar content end-->
-        
-        <!-- ############ PAGE START-->
-        
-        <!--PAGE END-->
 
-
-
+            <!-- ############ PAGE START-->
+            <div class="budget-container">
+                <div class="top-actions">
+                    <button id="addBudgetBtn" class="budget-btn primary">Add Budget</button>
+                </div>
+                
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="budget-input" placeholder="Search">
+                    </div>
+                    <button id="filterBtn" class="budget-btn">Filter</button>
+                </div>
+                
+                <table class="budget-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Serial</th>
+                            <th style="width: 60%">Sheet Name</th>
+                            <th style="width: 20%">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budgetTableBody">
+                        <!-- Table data will be dynamically loaded -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- ############ PAGE END -->
         
+
         <!--Theme Switcher-->
-
         {% block theme_switcher %}
             {% include "theme_switcher.html" %}
         {% endblock theme_switcher %}
@@ -72,5 +195,69 @@
         {% include "common_js.html" %}
     {% endblock common_js %}
 
+    <script>
+        // Sample data for demonstration
+        const sampleData = [
+            { serial: "001", sheetName: "Q1 2025 Budget Plan" },
+            { serial: "002", sheetName: "Annual Department Budget" },
+            { serial: "003", sheetName: "Project X Expenditure" }
+        ];
+        
+        // Populate table with sample data
+        function populateTable(data) {
+            const tableBody = document.getElementById('budgetTableBody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                const serialCell = document.createElement('td');
+                serialCell.textContent = item.serial;
+                
+                const sheetNameCell = document.createElement('td');
+                sheetNameCell.textContent = item.sheetName;
+                
+                const downloadCell = document.createElement('td');
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = "Download";
+                downloadBtn.className = "budget-btn";
+                downloadBtn.addEventListener('click', () => {
+                    alert(`Downloading ${item.sheetName}`);
+                });
+                downloadCell.appendChild(downloadBtn);
+                
+                row.appendChild(serialCell);
+                row.appendChild(sheetNameCell);
+                row.appendChild(downloadCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Initialize the table
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTable(sampleData);
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = sampleData.filter(item => 
+                    item.serial.toLowerCase().includes(searchTerm) || 
+                    item.sheetName.toLowerCase().includes(searchTerm)
+                );
+                populateTable(filteredData);
+            });
+            
+            // Add budget button functionality
+            document.getElementById('addBudgetBtn').addEventListener('click', () => {
+                alert('Add Budget functionality would open a form here');
+            });
+            
+            // Filter button functionality
+            document.getElementById('filterBtn').addEventListener('click', () => {
+                alert('Filter options would appear here');
+            });
+        });
+    </script>
 </body>
 </html>
