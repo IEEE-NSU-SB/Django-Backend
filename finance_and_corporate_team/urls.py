@@ -9,6 +9,7 @@ urlpatterns = [
     #Manage Team
     path('manage_team/',views.manage_team,name="manage_team"),
     path('budgetHomePage/',views.budgetHomePage,name="budgetHomePage"),
+    path('budgetPage/',views.budgetPage,name="budgetPage"),
 
     #Task
     path('create_task/<int:team_primary>/',create_task,name="create_task_team"),
