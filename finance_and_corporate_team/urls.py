@@ -8,6 +8,7 @@ urlpatterns = [
     path('',views.team_homepage,name="team_homepage"),
     #Manage Team
     path('manage_team/',views.manage_team,name="manage_team"),
+    path('budgetHomePage/',views.budgetHomePage,name="budgetHomePage"),
 
     #Task
     path('create_task/<int:team_primary>/',create_task,name="create_task_team"),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('task/<int:task_id>/upload_task/<int:team_primary>/',upload_task,name="upload_task_team"),
     path('task/<int:task_id>/forward_to_incharges/<int:team_primary>/',forward_to_incharges,name="forward_to_incharges"),
     path('task/<int:task_id>/add_task/<int:team_primary>/<int:by_coordinators>/',add_task,name="add_task_team"),
+    
 ]
