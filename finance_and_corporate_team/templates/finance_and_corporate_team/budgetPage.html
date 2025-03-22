@@ -1,11 +1,709 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Budget Tracker</title>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+    <style>
+        /* IEEE Brand Color Palette */
+        :root {
+            --ieee-blue: #0f77b3;
+            --ieee-light-blue: #0083CA;
+            --ieee-teal: #00843D;
+            --ieee-light-gray: #E4E4E4;
+            --ieee-medium-gray: #D9D9D9;
+            --ieee-dark-gray: #666666;
+            --ieee-black: #000000;
+            --white: ##F0F0F0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .header input {
+            font-size: 24px;
+            border: none;
+            outline: none;
+            font-weight: 600;
+            color: #2c3e50;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            width: 60%;
+        }
+
+        .header input:focus {
+            background-color: #f8f9fa;
+        }
+
+        .save-btn {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .save-btn:hover {
+            background-color: #3a56d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #eaedf3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table td {
+            border: 1px solid #eaedf3;
+            height: 45px;
+            min-width: 120px;
+            background-color: #ffffff;
+            transition: background-color 0.2s;
+        }
+
+        table tr:first-child td {
+            background-color: #f8f9fa;
+        }
+
+        table tr td:first-child {
+            background-color: #f8f9fa;
+        }
+
+        table input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            color: #2c3e50;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        table input:focus {
+            outline: none;
+            background-color: #f0f7ff;
+        }
+
+        .table-actions {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #eaedf3;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #f0f7ff;
+            border-color: #d1e0ff;
+            color: #4361ee;
+        }
+
+        .add-btn i {
+            font-size: 14px;
+        }
+
+        .section-cost {
+            border-top: 4px solid #ef4444;
+        }
+
+        .section-revenue {
+            border-top: 4px solid #10b981;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-cost {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .badge-revenue {
+            background-color: #d1fae5;
+            color: #10b981;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
-    <h2>Hello</h2>
+    <div class="app" id="app">
+
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            {% block navbar %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% endblock navbar %}
+        </div>
+        <!--navbar content end-->
+        <div class="container">
+            <div class="header">
+                <input type="text" id="budget-name" placeholder="Budget Name">
+                <button class="save-btn" id="save-btn"><i class="fas fa-save"></i> Save Budget</button>
+            </div>
+
+            <div class="section section-cost">
+                <div class="section-header">
+                    <h2 class="section-title">Cost Breakdown <span class="badge badge-cost">Expenses</span></h2>
+                    <div class="table-actions">
+                        <button class="add-btn" onclick="addColumn('cost-table')"><i class="fas fa-columns"></i> Add
+                            Column</button>
+                        <button class="add-btn" onclick="addRow('cost-table')"><i class="fas fa-plus"></i> Add
+                            Row</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="cost-table">
+                        <tr>
+                            <td><input type="text" placeholder="Category"></td>
+                            <td><input type="text" placeholder="Jan"></td>
+                            <td><input type="text" placeholder="Feb"></td>
+                            <td><input type="text" placeholder="Mar"></td>
+                            <td><input type="text" placeholder="Apr"></td>
+                            <td><input type="text" placeholder="May"></td>
+                            <td><input type="text" placeholder="Jun"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Refreshments"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Instructor's food"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Food"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Certificate"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Crest"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Framed certificate"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section section-revenue">
+                <div class="section-header">
+                    <h2 class="section-title">Revenue <span class="badge badge-revenue">Income</span></h2>
+                    <div class="table-actions">
+                        <button class="add-btn" onclick="addColumn('revenue-table')"><i class="fas fa-columns"></i> Add
+                            Column</button>
+                        <button class="add-btn" onclick="addRow('revenue-table')"><i class="fas fa-plus"></i> Add
+                            Row</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="revenue-table">
+                        <tr>
+                            <td><input type="text" placeholder="Source"></td>
+                            <td><input type="text" placeholder="Jan"></td>
+                            <td><input type="text" placeholder="Feb"></td>
+                            <td><input type="text" placeholder="Mar"></td>
+                            <td><input type="text" placeholder="Apr"></td>
+                            <td><input type="text" placeholder="May"></td>
+                            <td><input type="text" placeholder="Jun"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="IEEE Members"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Non-IEEE members"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Sponsors"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="x"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="x"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="x"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                            <td><input type="text" placeholder="0.00"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="summary">
+                <div class="summary-item">
+                    <div class="summary-value" id="total-revenue">$0.00</div>
+                    <div class="summary-label">Total Revenue</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="total-cost">$0.00</div>
+                    <div class="summary-label">Total Costs</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="net-income">$0.00</div>
+                    <div class="summary-label">Net Income</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Add a new column to the specified table
+            function addColumn(tableId) {
+                const table = document.getElementById(tableId);
+                const rows = table.getElementsByTagName('tr');
+
+                for (let i = 0; i < rows.length; i++) {
+                    const cell = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+
+                    if (i === 0) {
+                        // For header row, add month placeholder
+                        const lastColIndex = rows[0].cells.length - 1;
+                        const lastColContent = rows[0].cells[lastColIndex].getElementsByTagName('input')[0].placeholder;
+                        if (lastColContent.startsWith('J')) {
+                            input.placeholder = 'Jul';
+                        } else if (lastColContent.startsWith('F')) {
+                            input.placeholder = 'Mar';
+                        } else if (lastColContent.startsWith('M')) {
+                            input.placeholder = 'Apr';
+                        } else if (lastColContent.startsWith('A') && lastColContent.includes('pr')) {
+                            input.placeholder = 'May';
+                        } else if (lastColContent.startsWith('M')) {
+                            input.placeholder = 'Jun';
+                        } else if (lastColContent.startsWith('J') && lastColContent.includes('un')) {
+                            input.placeholder = 'Jul';
+                        } else if (lastColContent.startsWith('J') && lastColContent.includes('ul')) {
+                            input.placeholder = 'Aug';
+                        } else if (lastColContent.startsWith('A') && lastColContent.includes('ug')) {
+                            input.placeholder = 'Sep';
+                        } else if (lastColContent.startsWith('S')) {
+                            input.placeholder = 'Oct';
+                        } else if (lastColContent.startsWith('O')) {
+                            input.placeholder = 'Nov';
+                        } else if (lastColContent.startsWith('N')) {
+                            input.placeholder = 'Dec';
+                        } else {
+                            input.placeholder = 'New Col';
+                        }
+                    } else {
+                        input.placeholder = "0.00";
+                    }
+
+                    input.addEventListener('blur', updateSummary);
+                    cell.appendChild(input);
+                    rows[i].appendChild(cell);
+                }
+
+                updateSummary();
+            }
+
+            // Add a new row to the specified table
+            function addRow(tableId) {
+                const table = document.getElementById(tableId);
+                const columnCount = table.rows[0].cells.length;
+                const newRow = table.insertRow();
+
+                for (let i = 0; i < columnCount; i++) {
+                    const cell = newRow.insertCell();
+                    const input = document.createElement('input');
+                    input.type = 'text';
+
+                    if (i === 0) {
+                        input.placeholder = "New Item";
+                    } else {
+                        input.placeholder = "0.00";
+                        input.addEventListener('blur', updateSummary);
+                    }
+
+                    cell.appendChild(input);
+                }
+
+                updateSummary();
+            }
+
+            // Format a number as currency
+            function formatCurrency(amount) {
+                return '$' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+
+            // Update the summary section
+            function updateSummary() {
+                // Calculate total revenue
+                const revenueTable = document.getElementById('revenue-table');
+                let totalRevenue = 0;
+
+                for (let i = 1; i < revenueTable.rows.length; i++) {
+                    const cells = revenueTable.rows[i].cells;
+                    for (let j = 1; j < cells.length; j++) {
+                        const value = cells[j].getElementsByTagName('input')[0].value;
+                        if (value && !isNaN(value)) {
+                            totalRevenue += parseFloat(value);
+                        }
+                    }
+                }
+
+                // Calculate total costs
+                const costTable = document.getElementById('cost-table');
+                let totalCost = 0;
+
+                for (let i = 1; i < costTable.rows.length; i++) {
+                    const cells = costTable.rows[i].cells;
+                    for (let j = 1; j < cells.length; j++) {
+                        const value = cells[j].getElementsByTagName('input')[0].value;
+                        if (value && !isNaN(value)) {
+                            totalCost += parseFloat(value);
+                        }
+                    }
+                }
+
+                // Calculate net income
+                const netIncome = totalRevenue - totalCost;
+
+                // Update the summary values
+                document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
+                document.getElementById('total-cost').textContent = formatCurrency(totalCost);
+
+                const netIncomeElement = document.getElementById('net-income');
+                netIncomeElement.textContent = formatCurrency(netIncome);
+
+                // Apply color based on value
+                if (netIncome > 0) {
+                    netIncomeElement.className = 'summary-value positive';
+                } else if (netIncome < 0) {
+                    netIncomeElement.className = 'summary-value negative';
+                } else {
+                    netIncomeElement.className = 'summary-value';
+                }
+            }
+
+            // Save functionality
+            document.getElementById('save-btn').addEventListener('click', function () {
+                // Get budget name
+                const budgetName = document.getElementById('budget-name').value || 'Untitled Budget';
+
+                // Collect data from cost table
+                const costData = collectTableData('cost-table');
+
+                // Collect data from revenue table
+                const revenueData = collectTableData('revenue-table');
+
+                // Create data object
+                const budgetData = {
+                    name: budgetName,
+                    costs: costData,
+                    revenue: revenueData,
+                    savedAt: new Date().toISOString()
+                };
+
+                // Convert to JSON and save to localStorage
+                localStorage.setItem('budgetData', JSON.stringify(budgetData));
+
+                // Show save confirmation
+                const saveBtn = document.getElementById('save-btn');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                saveBtn.style.backgroundColor = '#10b981';
+
+                setTimeout(function () {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.backgroundColor = '';
+                }, 2000);
+            });
+
+            // Helper function to collect data from a table
+            function collectTableData(tableId) {
+                const table = document.getElementById(tableId);
+                const rows = table.getElementsByTagName('tr');
+                const data = [];
+
+                for (let i = 0; i < rows.length; i++) {
+                    const rowData = [];
+                    const cells = rows[i].cells;
+
+                    for (let j = 0; j < cells.length; j++) {
+                        const input = cells[j].getElementsByTagName('input')[0];
+                        rowData.push(input.value || input.placeholder);
+                    }
+
+                    data.push(rowData);
+                }
+
+                return data;
+            }
+
+            // Load previously saved data if available
+            window.addEventListener('DOMContentLoaded', function () {
+                const savedData = localStorage.getItem('budgetData');
+
+                if (savedData) {
+                    const budgetData = JSON.parse(savedData);
+
+                    // Set budget name
+                    document.getElementById('budget-name').value = budgetData.name;
+
+                    // Load cost data
+                    loadTableData('cost-table', budgetData.costs);
+
+                    // Load revenue data
+                    loadTableData('revenue-table', budgetData.revenue);
+
+                    // Update summary
+                    updateSummary();
+                }
+
+                // Add event listeners to all input fields to update summary on change
+                addInputListeners('cost-table');
+                addInputListeners('revenue-table');
+            });
+
+            // Add event listeners to all input fields in a table
+            function addInputListeners(tableId) {
+                const table = document.getElementById(tableId);
+                const inputs = table.getElementsByTagName('input');
+
+                for (let i = 0; i < inputs.length; i++) {
+                    // Skip the first row and first column (headers)
+                    const row = inputs[i].parentNode.parentNode.rowIndex;
+                    const col = inputs[i].parentNode.cellIndex;
+
+                    if (row > 0 && col > 0) {
+                        inputs[i].addEventListener('blur', updateSummary);
+                    }
+                }
+            }
+
+            // Helper function to load data into a table
+            function loadTableData(tableId, data) {
+                if (!data || data.length === 0) return;
+
+                const table = document.getElementById(tableId);
+
+                // Ensure we have enough rows
+                while (table.rows.length < data.length) {
+                    addRow(tableId);
+                }
+
+                // Ensure we have enough columns
+                const maxColumns = Math.max(...data.map(row => row.length));
+                while (table.rows[0].cells.length < maxColumns) {
+                    addColumn(tableId);
+                }
+
+                // Fill in the data
+                for (let i = 0; i < data.length; i++) {
+                    const cells = table.rows[i].cells;
+
+                    for (let j = 0; j < data[i].length && j < cells.length; j++) {
+                        const input = cells[j].getElementsByTagName('input')[0];
+                        input.value = data[i][j];
+                    }
+                }
+            }
+        </script>
 </body>
+
 </html>
