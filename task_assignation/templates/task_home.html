@@ -245,6 +245,15 @@
           justify-content: center;
           flex-wrap: wrap;
         }
+        .task-btn {
+        display: flex;
+        flex-direction: column;
+      }
+      .tb_search{
+        width: auto;
+        margin-bottom: 10px;
+        float: none;
+      }
       }
 
       .check-task-button{
@@ -293,6 +302,10 @@
       background: white;
       border-color: #f10e25;
       color: #f10e25;
+  }
+  .filter_box{
+    width: auto;
+    float: right;
   }
     </style>
   </head>
@@ -396,7 +409,7 @@
         >
           <div class="container" style="justify-content: center">
             <div class="header_wrap">
-              <div class="num_rows">
+              <div class="filter_box" style="margin-left: 8px; width: 100px;">
                 <div class="form-group">
                   <!--		Show Numbers Of Rows 		-->
                   <select
@@ -412,7 +425,7 @@
                   </select>
                 </div>
               </div>
-              <div class="num_rows" style="">
+              <div class="filter_box">
                 <div class="form-group">
                     <!--		Show Numbers Of Rows 		-->
                     <form id="panelForm1">
