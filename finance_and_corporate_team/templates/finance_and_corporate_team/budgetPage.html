@@ -20,7 +20,7 @@
             --ieee-medium-gray: #D9D9D9;
             --ieee-dark-gray: #666666;
             --ieee-black: #000000;
-            --white: ##F0F0F0;
+            --white: #F0F0F0;
         }
 
         * {
@@ -70,7 +70,7 @@
         }
 
         .save-btn {
-            background-color: #4361ee;
+            background-color: var(--ieee-blue);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -78,13 +78,13 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 2px 8px rgba(15, 119, 179, 0.3);
         }
 
         .save-btn:hover {
-            background-color: #3a56d4;
+            background-color: #0a5e8f;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+            box-shadow: 0 4px 12px rgba(15, 119, 179, 0.4);
         }
 
         .save-btn:active {
@@ -130,6 +130,7 @@
             min-width: 120px;
             background-color: #ffffff;
             transition: background-color 0.2s;
+            position: relative;
         }
 
         table tr:first-child td {
@@ -179,7 +180,7 @@
         .add-btn:hover {
             background-color: #f0f7ff;
             border-color: #d1e0ff;
-            color: #4361ee;
+            color: var(--ieee-blue);
         }
 
         .add-btn i {
@@ -245,6 +246,64 @@
         .negative {
             color: #ef4444;
         }
+
+        /* Context menu styles */
+        .context-menu {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #eaedf3;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            padding: 5px 0;
+            min-width: 150px;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #2c3e50;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .context-menu-item:hover {
+            background-color: #f0f7ff;
+            color: var(--ieee-blue);
+        }
+
+        .context-menu-item.delete {
+            color: #ef4444;
+        }
+
+        .context-menu-item.delete:hover {
+            background-color: #fee2e2;
+        }
+
+        /* Animation for row deletion */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .row-deleting {
+            animation: fadeOut 0.5s ease-out forwards;
+            background-color: #fee2e2;
+        }
+
+        /* Improvements for input placeholder contrast */
+        ::placeholder {
+            color: #94a3b8;
+            opacity: 0.7;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -279,10 +338,8 @@
                 <div class="section-header">
                     <h2 class="section-title">Cost Breakdown <span class="badge badge-cost">Expenses</span></h2>
                     <div class="table-actions">
-                        <button class="add-btn" onclick="addColumn('cost-table')"><i class="fas fa-columns"></i> Add
-                            Column</button>
-                        <button class="add-btn" onclick="addRow('cost-table')"><i class="fas fa-plus"></i> Add
-                            Row</button>
+                        <button class="add-btn" id="add-column-cost"><i class="fas fa-columns"></i> Add Column</button>
+                        <button class="add-btn" id="add-row-cost"><i class="fas fa-plus"></i> Add Row</button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -332,24 +389,6 @@
                             <td><input type="text" placeholder="0.00"></td>
                             <td><input type="text" placeholder="0.00"></td>
                         </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Crest"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Framed certificate"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
                     </table>
                 </div>
             </div>
@@ -358,10 +397,9 @@
                 <div class="section-header">
                     <h2 class="section-title">Revenue <span class="badge badge-revenue">Income</span></h2>
                     <div class="table-actions">
-                        <button class="add-btn" onclick="addColumn('revenue-table')"><i class="fas fa-columns"></i> Add
+                        <button class="add-btn" id="add-column-revenue"><i class="fas fa-columns"></i> Add
                             Column</button>
-                        <button class="add-btn" onclick="addRow('revenue-table')"><i class="fas fa-plus"></i> Add
-                            Row</button>
+                        <button class="add-btn" id="add-row-revenue"><i class="fas fa-plus"></i> Add Row</button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -402,33 +440,6 @@
                             <td><input type="text" placeholder="0.00"></td>
                             <td><input type="text" placeholder="0.00"></td>
                         </tr>
-                        <tr>
-                            <td><input type="text" placeholder="x"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="x"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="x"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
                     </table>
                 </div>
             </div>
@@ -449,7 +460,120 @@
             </div>
         </div>
 
+        <!-- Context Menu -->
+        <div class="context-menu" id="context-menu" style="display: none;">
+            <div class="context-menu-item delete" id="delete-row">
+                <i class="fas fa-trash"></i> Delete Row
+            </div>
+        </div>
+
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Setup right-click context menu for tables
+                setupContextMenu('cost-table');
+                setupContextMenu('revenue-table');
+
+                // Add click event handlers for buttons
+                document.getElementById('add-column-cost').addEventListener('click', function () {
+                    addColumn('cost-table');
+                });
+
+                document.getElementById('add-row-cost').addEventListener('click', function () {
+                    addRow('cost-table');
+                });
+
+                document.getElementById('add-column-revenue').addEventListener('click', function () {
+                    addColumn('revenue-table');
+                });
+
+                document.getElementById('add-row-revenue').addEventListener('click', function () {
+                    addRow('revenue-table');
+                });
+
+                // Save button handler
+                document.getElementById('save-btn').addEventListener('click', saveData);
+
+                // Initial summary calculation
+                updateSummary();
+
+                // Add input event listeners to all numerical cells
+                setupInputListeners();
+            });
+
+            let activeRow = null;
+
+            // Setup context menu for tables
+            function setupContextMenu(tableId) {
+                const table = document.getElementById(tableId);
+                const contextMenu = document.getElementById('context-menu');
+
+                // Add context menu event for first column cells only
+                const rows = table.getElementsByTagName('tr');
+                for (let i = 1; i < rows.length; i++) { // Skip header row
+                    const firstCell = rows[i].cells[0];
+                    firstCell.addEventListener('contextmenu', function (e) {
+                        e.preventDefault();
+
+                        // Set active row
+                        activeRow = this.parentNode;
+
+                        // Position the context menu
+                        contextMenu.style.display = 'block';
+                        contextMenu.style.left = e.pageX + 'px';
+                        contextMenu.style.top = e.pageY + 'px';
+
+                        // Ensure the menu stays within viewport
+                        const menuRect = contextMenu.getBoundingClientRect();
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+
+                        if (menuRect.right > viewportWidth) {
+                            contextMenu.style.left = (e.pageX - menuRect.width) + 'px';
+                        }
+
+                        if (menuRect.bottom > viewportHeight) {
+                            contextMenu.style.top = (e.pageY - menuRect.height) + 'px';
+                        }
+                    });
+
+                    // Make it visually apparent that the first cell is right-clickable
+                    firstCell.style.cursor = 'context-menu';
+                }
+            }
+
+            // Delete row handler
+            document.getElementById('delete-row').addEventListener('click', function () {
+                if (activeRow) {
+                    // Don't delete header row
+                    if (activeRow.rowIndex === 0) {
+                        hideContextMenu();
+                        return;
+                    }
+
+                    // Add deletion animation class
+                    activeRow.classList.add('row-deleting');
+
+                    // Remove row after animation
+                    setTimeout(() => {
+                        const tableId = activeRow.parentNode.parentNode.id;
+                        activeRow.remove();
+                        updateSummary();
+
+                        // Re-setup context menu if needed
+                        setupContextMenu(tableId);
+                    }, 500);
+                }
+                hideContextMenu();
+            });
+
+            // Hide context menu when clicking elsewhere
+            document.addEventListener('click', hideContextMenu);
+
+            function hideContextMenu() {
+                document.getElementById('context-menu').style.display = 'none';
+                activeRow = null;
+            }
+
             // Add a new column to the specified table
             function addColumn(tableId) {
                 const table = document.getElementById(tableId);
@@ -464,36 +588,22 @@
                         // For header row, add month placeholder
                         const lastColIndex = rows[0].cells.length - 1;
                         const lastColContent = rows[0].cells[lastColIndex].getElementsByTagName('input')[0].placeholder;
-                        if (lastColContent.startsWith('J')) {
-                            input.placeholder = 'Jul';
-                        } else if (lastColContent.startsWith('F')) {
-                            input.placeholder = 'Mar';
-                        } else if (lastColContent.startsWith('M')) {
-                            input.placeholder = 'Apr';
-                        } else if (lastColContent.startsWith('A') && lastColContent.includes('pr')) {
-                            input.placeholder = 'May';
-                        } else if (lastColContent.startsWith('M')) {
-                            input.placeholder = 'Jun';
-                        } else if (lastColContent.startsWith('J') && lastColContent.includes('un')) {
-                            input.placeholder = 'Jul';
-                        } else if (lastColContent.startsWith('J') && lastColContent.includes('ul')) {
-                            input.placeholder = 'Aug';
-                        } else if (lastColContent.startsWith('A') && lastColContent.includes('ug')) {
-                            input.placeholder = 'Sep';
-                        } else if (lastColContent.startsWith('S')) {
-                            input.placeholder = 'Oct';
-                        } else if (lastColContent.startsWith('O')) {
-                            input.placeholder = 'Nov';
-                        } else if (lastColContent.startsWith('N')) {
-                            input.placeholder = 'Dec';
+
+                        // Sequential month logic
+                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const lastMonth = lastColContent;
+                        const lastMonthIndex = months.indexOf(lastMonth);
+
+                        if (lastMonthIndex !== -1 && lastMonthIndex < 11) {
+                            input.placeholder = months[lastMonthIndex + 1];
                         } else {
-                            input.placeholder = 'New Col';
+                            input.placeholder = 'New';
                         }
                     } else {
                         input.placeholder = "0.00";
+                        input.addEventListener('input', updateSummary);
                     }
 
-                    input.addEventListener('blur', updateSummary);
                     cell.appendChild(input);
                     rows[i].appendChild(cell);
                 }
@@ -514,15 +624,46 @@
 
                     if (i === 0) {
                         input.placeholder = "New Item";
+                        // Make first cell right-clickable
+                        cell.addEventListener('contextmenu', function (e) {
+                            e.preventDefault();
+                            activeRow = this.parentNode;
+
+                            const contextMenu = document.getElementById('context-menu');
+                            contextMenu.style.display = 'block';
+                            contextMenu.style.left = e.pageX + 'px';
+                            contextMenu.style.top = e.pageY + 'px';
+                        });
+                        cell.style.cursor = 'context-menu';
                     } else {
                         input.placeholder = "0.00";
-                        input.addEventListener('blur', updateSummary);
+                        input.addEventListener('input', updateSummary);
                     }
 
                     cell.appendChild(input);
                 }
 
                 updateSummary();
+            }
+
+            // Setup input listeners for all cells
+            function setupInputListeners() {
+                const tables = ['cost-table', 'revenue-table'];
+
+                tables.forEach(tableId => {
+                    const table = document.getElementById(tableId);
+                    const inputs = table.getElementsByTagName('input');
+
+                    for (let i = 0; i < inputs.length; i++) {
+                        const cell = inputs[i].parentNode;
+                        const row = cell.parentNode;
+
+                        // Skip header row and first column
+                        if (row.rowIndex > 0 && cell.cellIndex > 0) {
+                            inputs[i].addEventListener('input', updateSummary);
+                        }
+                    }
+                });
             }
 
             // Format a number as currency
@@ -580,8 +721,8 @@
                 }
             }
 
-            // Save functionality
-            document.getElementById('save-btn').addEventListener('click', function () {
+            // Save data function
+            function saveData() {
                 // Get budget name
                 const budgetName = document.getElementById('budget-name').value || 'Untitled Budget';
 
@@ -612,7 +753,7 @@
                     saveBtn.innerHTML = originalText;
                     saveBtn.style.backgroundColor = '';
                 }, 2000);
-            });
+            }
 
             // Helper function to collect data from a table
             function collectTableData(tableId) {
@@ -633,75 +774,6 @@
                 }
 
                 return data;
-            }
-
-            // Load previously saved data if available
-            window.addEventListener('DOMContentLoaded', function () {
-                const savedData = localStorage.getItem('budgetData');
-
-                if (savedData) {
-                    const budgetData = JSON.parse(savedData);
-
-                    // Set budget name
-                    document.getElementById('budget-name').value = budgetData.name;
-
-                    // Load cost data
-                    loadTableData('cost-table', budgetData.costs);
-
-                    // Load revenue data
-                    loadTableData('revenue-table', budgetData.revenue);
-
-                    // Update summary
-                    updateSummary();
-                }
-
-                // Add event listeners to all input fields to update summary on change
-                addInputListeners('cost-table');
-                addInputListeners('revenue-table');
-            });
-
-            // Add event listeners to all input fields in a table
-            function addInputListeners(tableId) {
-                const table = document.getElementById(tableId);
-                const inputs = table.getElementsByTagName('input');
-
-                for (let i = 0; i < inputs.length; i++) {
-                    // Skip the first row and first column (headers)
-                    const row = inputs[i].parentNode.parentNode.rowIndex;
-                    const col = inputs[i].parentNode.cellIndex;
-
-                    if (row > 0 && col > 0) {
-                        inputs[i].addEventListener('blur', updateSummary);
-                    }
-                }
-            }
-
-            // Helper function to load data into a table
-            function loadTableData(tableId, data) {
-                if (!data || data.length === 0) return;
-
-                const table = document.getElementById(tableId);
-
-                // Ensure we have enough rows
-                while (table.rows.length < data.length) {
-                    addRow(tableId);
-                }
-
-                // Ensure we have enough columns
-                const maxColumns = Math.max(...data.map(row => row.length));
-                while (table.rows[0].cells.length < maxColumns) {
-                    addColumn(tableId);
-                }
-
-                // Fill in the data
-                for (let i = 0; i < data.length; i++) {
-                    const cells = table.rows[i].cells;
-
-                    for (let j = 0; j < data[i].length && j < cells.length; j++) {
-                        const input = cells[j].getElementsByTagName('input')[0];
-                        input.value = data[i][j];
-                    }
-                }
             }
         </script>
 </body>
