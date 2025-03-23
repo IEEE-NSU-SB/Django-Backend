@@ -508,7 +508,7 @@ def getMonthlyTopMembers():
     current_year = datetime.datetime.now().year
 
     for member in monthly_members :
-        if member.completion_date and member.completion_date.month == current_month and member.completion_date.year == current_year:
+        if member.task.is_task_completed and member.completion_date and member.completion_date.month == current_month and member.completion_date.year == current_year:
             if (not member.member in monthly_top_members.keys()):
                 monthly_top_members[member.member] = [Members.objects.get(ieee_id=member.member), member.completion_points]
             else:
