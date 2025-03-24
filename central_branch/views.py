@@ -4626,7 +4626,6 @@ def create_task(request,team_primary = None):
         create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         create_team_task_access = Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
 
-
         if create_individual_task_access or create_team_task_access:
             
             if request.method == 'POST':
