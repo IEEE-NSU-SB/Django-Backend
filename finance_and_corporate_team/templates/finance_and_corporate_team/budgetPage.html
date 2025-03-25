@@ -23,14 +23,8 @@
             --white: #F0F0F0;
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
             margin: 0;
-            padding: 20px;
             background-color: #f7f9fc;
             color: #333;
         }
@@ -324,7 +318,7 @@
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
             {% block navbar %}
-            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+                {% include 'finance_and_corporate_team/finance_navbar.html' %}
             {% endblock navbar %}
         </div>
         <!--navbar content end-->
