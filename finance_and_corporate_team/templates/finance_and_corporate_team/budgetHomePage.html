@@ -3,8 +3,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Home | Finance & Corporate Team</title>
+    <title>Budget | Finance & Corporate Team</title>
     <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
 
     {% block common_css %}
         {% include "common_css.html" %}
@@ -28,6 +29,7 @@
             margin: 0;
             align-items: center;
             justify-content: center;
+            background-color: #fff;
         }
 
         .row {
@@ -65,7 +67,7 @@
         .budget-btn {
             background-color: var(--ieee-light-gray);
             border: none;
-            padding: 12px 24px;
+            padding: 8px 24px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
@@ -74,13 +76,14 @@
 
         .budget-btn.primary {
             background-color: var(--ieee-light-blue);
-            color: var(--white);
+            color: #fff;
+            border: 1px solid #00629B;
         }
-
+        
         .budget-btn.primary:hover {
-           
-            background-color: #333333;
-            color: #ffffff;
+            border: 1px solid #00629B;
+            background-color: #fff;
+            color: #00629B;
         }
         
 
@@ -101,10 +104,13 @@
         }
                 
         .budget-input {
-            width: 40%;
-            padding: 8px 12px;
-            border: 1px solid var(--ieee-medium-gray);
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 3px;
+            border: 2px solid #d3d3d3;
+            color: black;
+            transition: 0.4s;
+            box-shadow: 2px 2px 5px 0px #80808054;
+            border: 2px solid white;
         }
         
         .budget-table {
@@ -114,12 +120,7 @@
         }
         
         .budget-table th {
-            background-color: #333333;
             padding: 10px;
-            text-align: left;
-            border-bottom: 2px solid var(--ieee-medium-gray);
-            font-weight: 600;
-            color: #ffffff;
         }
         
         .budget-table td {
@@ -175,10 +176,10 @@
                 <br>
                 <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;"> <b>The Finance & Corporate Team</b></span>'s <b>Budget Page</b>  </h2>
                 
-            </div>
             <div class="budget-container">
                 <div class="top-actions">
-                    <button id="addBudgetBtn" class="budget-btn primary">Add Budget</button>
+                    <!-- <button id="addBudgetBtn" class="budget-btn primary">Add Budget</button> -->
+                    <a href="{% url 'finance_and_corporate_team:budgetPage' %}" id="addBudgetBtn" class="budget-btn primary">Add Budget</a>
                 </div>
                 
                 <div class="search-filter">
@@ -188,7 +189,7 @@
                     </div>
                     <div class="form-group">
                         <!--		Show Numbers Of Rows 		-->
-                        <select style="width: 60%" class="form-control" name="state" id="maxRows" >
+                        <select class="form-control budget-input" name="state" id="maxRows" >
                 
                           <option value="2025">2025</option>
                           <option value="2024">2024</option>
@@ -199,20 +200,22 @@
                 
                       </div>
                 </div>
-                
-                <table class="budget-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%">SL</th>
-                            <th style="width: 60%">Sheet Name</th>
-                            <th style="width: 20%">Download</th>
-                        </tr>
-                    </thead>
-                    <tbody id="budgetTableBody">
-                        <!-- Table data will be dynamically loaded -->
-                    </tbody>
-                </table>
+                <div class="table-responsive"  style="border-radius: 4px 4px 0 0">
+                    <table class="table table-striped table-class">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Event</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetTableBody">
+                            <!-- Table data will be dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+
             <!-- ############ PAGE END -->
         
 
@@ -250,18 +253,18 @@
                 const sheetNameCell = document.createElement('td');
                 sheetNameCell.textContent = item.sheetName;
                 
-                const downloadCell = document.createElement('td');
-                const downloadBtn = document.createElement('button');
-                downloadBtn.textContent = "Download";
-                downloadBtn.className = "download-btn";
-                downloadBtn.addEventListener('click', () => {
-                    alert(`Downloading ${item.sheetName}`);
-                });
-                downloadCell.appendChild(downloadBtn);
+                // const downloadCell = document.createElement('td');
+                // const downloadBtn = document.createElement('button');
+                // downloadBtn.textContent = "Download";
+                // downloadBtn.className = "download-btn";
+                // downloadBtn.addEventListener('click', () => {
+                //     alert(`Downloading ${item.sheetName}`);
+                // });
+                // downloadCell.appendChild(downloadBtn);
                 
                 row.appendChild(serialCell);
                 row.appendChild(sheetNameCell);
-                row.appendChild(downloadCell);
+                // row.appendChild(downloadCell);
                 
                 tableBody.appendChild(row);
             });
@@ -279,16 +282,6 @@
                     item.sheetName.toLowerCase().includes(searchTerm)
                 );
                 populateTable(filteredData);
-            });
-            
-            // Add budget button functionality
-            document.getElementById('addBudgetBtn').addEventListener('click', () => {
-                alert('Add Budget functionality would open a form here');
-            });
-            
-            // Filter button functionality
-            document.getElementById('filterBtn').addEventListener('click', () => {
-                alert('Filter options would appear here');
             });
         });
     </script>
