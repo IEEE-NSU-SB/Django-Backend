@@ -2860,16 +2860,14 @@ This is an automated message. Do not reply
         '''This function will load all the task for central branch and respective
         task for teams home page'''
 
-        if team_primary == None or team_primary == "1":
-            
-            return Task.objects.filter(task_panel_of=branch_panel).order_by('-pk','is_task_completed')
+        if branch_panel:
+            if team_primary == None or team_primary == "1":
+                return Task.objects.filter(task_panel_of=branch_panel).order_by('-pk','is_task_completed')
+            else:
+                team = Teams.objects.get(primary=team_primary)
+                return Task.objects.filter(team=team, task_panel_of=branch_panel).order_by('-pk','is_task_completed')
         else:
-
-            team = Teams.objects.get(primary = int(team_primary))
-            tasks = list(Task.objects.filter(task_type = "Team",team = team, task_panel_of=branch_panel).order_by('-pk','is_task_completed'))
-            tasks += (Task.objects.filter(task_type = "Individuals",team=team, task_panel_of=branch_panel).order_by('-pk','is_task_completed'))
-
-        return tasks
+            return None
                 
     def is_task_started_by_a_coodinator_for_a_team(task,team):
 

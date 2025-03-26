@@ -75,7 +75,7 @@ class Branch_View_Access:
                     return True
                 else:
                     member = Members.objects.get(ieee_id = username)
-                    team = Teams.objects.get(primary=member.team.primary)
+                    team = Teams.objects.get(primary=team_primary)
                     get_current_panel=Branch.load_current_panel()
                     #Get current panel members of branch
                     get_current_panel_member= Panel_Members.objects.filter(member=member, tenure=get_current_panel.pk, team=team).first()
@@ -121,7 +121,7 @@ class Branch_View_Access:
                     return True
                 else:
                     member = Members.objects.get(ieee_id = username)
-                    team = Teams.objects.get(primary=member.team.primary)
+                    team = Teams.objects.get(primary=team_primary)
                     get_current_panel=Branch.load_current_panel()
                     #Get current panel members of branch
                     get_current_panel_member= Panel_Members.objects.filter(member=member, tenure=get_current_panel.pk, team=team).first()

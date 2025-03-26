@@ -1123,6 +1123,10 @@ def panel_members_page(request,year):
 
         get_all_panels=Branch.load_all_panels()
         get_panel=Branch.get_panel_by_year(year)
+        
+        if not get_panel:
+            return redirect('main_website:panel_members')
+        
         get_panel_members=Branch.load_panel_members_by_panel_id(panel_id=get_panel.pk)
         # TODO:add algo to add SC AG Faculty and EB
         branch_counselor=[]

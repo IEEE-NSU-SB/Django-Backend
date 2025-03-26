@@ -4626,7 +4626,6 @@ def create_task(request,team_primary = None):
         create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         create_team_task_access = Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
 
-
         if create_individual_task_access or create_team_task_access:
             
             if request.method == 'POST':
@@ -4805,11 +4804,14 @@ def task_home(request,team_primary = None):
         #########
         has_task_create_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task) or Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         #########
-        if request.GET.get('panel') and request.GET.get('panel') != '':
-            panel = request.GET.get('panel')
-            branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
-        else:
-            branch_panel = Branch.load_current_panel()
+        try:
+            if request.GET.get('panel') and request.GET.get('panel') != '':
+                panel = request.GET.get('panel')
+                branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            else:
+                branch_panel = Branch.load_current_panel()
+        except:
+            branch_panel = None
 
         all_tasks = Task_Assignation.load_task_for_home_page(team_primary, branch_panel)
                
@@ -4833,7 +4835,6 @@ def task_home(request,team_primary = None):
         
         else:
             team = Teams.objects.get(primary=team_primary)
-            all_tasks = Task.objects.filter(team=team).order_by('-pk','is_task_completed')
             desired_team = Task_Assignation.get_team_app_name(team_primary)
             
             #getting nav_bar_name
@@ -4844,7 +4845,9 @@ def task_home(request,team_primary = None):
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
+            'branch_panel':branch_panel,
 
             #loading navbars as per page
             'web_dev_team':nav_bar["web_dev_team"],
@@ -5889,7 +5892,12 @@ def mail(request):
                     messagess = response.get('messages', [])
 
                     if messagess:
-                        last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                        if section == 'sent':
+                            # Only get the first message for this section
+                            last_message = messagess[0]
+                        else:
+                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+
                         headers = last_message['payload'].get('headers', [])
                         snippet = last_message.get('snippet', '')
                         labels = last_message.get('labelIds', [])
@@ -6009,7 +6017,12 @@ def mail(request):
                         messagess = response.get('messages', [])
 
                         if messagess:
-                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                            if section == 'sent':
+                                # Only get the first message for this section
+                                last_message = messagess[0]
+                            else:
+                                last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                                
                             headers = last_message['payload'].get('headers', [])
                             snippet = last_message.get('snippet', '')
                             labels = last_message.get('labelIds', [])
