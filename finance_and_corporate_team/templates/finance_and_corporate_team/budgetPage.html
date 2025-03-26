@@ -13,8 +13,8 @@
     {% endblock common_css %}
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --secondary-color: #10b981;
+            --primary-color: #00629B;
+            --secondary-color: #107a57;
             --background-color: #f3f4f6;
             --text-color: #1f2937;
             --border-color: #e5e7eb;
@@ -37,16 +37,15 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
-            padding: 2rem;
+            /* padding: 2rem; */
         }
 
         .container {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 26px auto;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -67,20 +66,23 @@
         }
 
         .add-row-btn {
-            background-color: var(--primary-color);
-            color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.5rem 2rem;
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            background-color: #fefefe;
+            color: #00629B;
+            border: 1px solid #00629B;
         }
-
+        
         .add-row-btn:hover {
-            background-color: #2563eb;
+            background-color: var(--primary-color);
+            color: white;
+            border: 1px solid #00629B;
         }
 
         table {
@@ -89,13 +91,15 @@
             border-spacing: 0;
             margin-bottom: 1.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
         }
 
         th {
             background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
+            color: #fefefe;
+            /* font-weight: 600; */
+            /* text-transform: uppercase; */
             font-size: 0.875rem;
             padding: 1rem;
             text-align: left;
@@ -124,6 +128,7 @@
         .action-buttons {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
         }
 
         .action-btn {
@@ -135,23 +140,27 @@
         }
 
         .edit-btn {
+            background-color: #fefefe;
+            color: #00629B;
+            border: 1px solid #00629B;
+        }
+        
+        .remove-btn {
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            background-color: white;
+        }
+        
+        .edit-btn:hover {
             background-color: var(--primary-color);
             color: white;
-            border: none;
-        }
-
-        .remove-btn {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-        }
-
-        .edit-btn:hover {
-            background-color: #2563eb;
+            border: 1px solid #00629B;
         }
 
         .remove-btn:hover {
-            background-color: #dc2626;
+            background-color: #ef4444;
+            color: white;
+            border: 1px solid #ef4444;
         }
 
         .total-row {
@@ -209,7 +218,7 @@
         <!--navbar content end-->
         <div class="container">
             <div class="budget-header">
-                <h2>Budget Name</h2>
+                <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>
                 <button class="add-row-btn" onclick="addCostRow()">
                     + Add Row
                 </button>
@@ -220,34 +229,38 @@
                     <tr>
                         <th>Item</th>
                         <th>Quantity</th>
-                        <th>Unit Per Cost</th>
+                        <th>Unit Per Cost (BDT)</th>
                         <th>Total</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="cost-body">
                     <tr>
-                        <td><input type="text" class="item-input"></td>
-                        <td><input type="number" class="quantity-input" oninput="calculateCostTotal(this)"></td>
-                        <td><input type="number" class="unit-cost-input" oninput="calculateCostTotal(this)"></td>
+                        <td><input type="text" class="item-input" placeholder="Food"></td>
+                        <td><input type="number" class="quantity-input" oninput="calculateCostTotal(this)" placeholder="20"></td>
+                        <td><input type="number" class="unit-cost-input" oninput="calculateCostTotal(this)" placeholder="500"></td>
                         <td class="total-cell">0</td>
-                        <td class="action-buttons">
-                            <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
-                            <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                        <td class="action-buttons" style="padding: 18px 4px;">
+                            <div>
+                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr class="total-row">
-                        <td colspan="3">Total Cost</td>
+                        <td>Total Cost</td>
+                        <td></td>
+                        <td></td>
                         <td id="total-cost">0</td>
                         <td></td>
                     </tr>
                 </tfoot>
             </table>
 
-            <div class="budget-header">
-                <h2>Revenue Breakdown</h2>
+            <div class="budget-header" style="margin-top: 4rem;">
+                <h2 style="border-bottom: 2px solid #00629B;">Revenue Breakdown</h2>
                 <button class="add-row-btn" onclick="addRevenueRow()">
                     + Add Row
                 </button>
@@ -258,41 +271,47 @@
                     <tr>
                         <th>Revenue Type</th>
                         <th>Quantity</th>
-                        <th>Unit</th>
-                        <th>Revenue Generated</th>
+                        <th>Revenue/Unit (BDT)</th>
+                        <th>Total</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="revenue-body">
                     <tr>
-                        <td><input type="text" class="revenue-type-input"></td>
-                        <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)">
+                        <td><input type="text" class="revenue-type-input" placeholder="Registered Participants"></td>
+                        <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)" placeholder="50">
                         </td>
-                        <td><input type="text" class="revenue-unit-input"></td>
+                        <td><input type="number" class="revenue-unit-input" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
                         <td class="revenue-total-cell">0</td>
-                        <td class="action-buttons">
-                            <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
-                            <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                        <td class="action-buttons" style="padding: 18px 4px;">
+                            <div>
+                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr class="total-row">
-                        <td colspan="3">Total Revenue</td>
+                        <td>Total Revenue</td>
+                        <td></td>
+                        <td></td>
                         <td id="total-revenue">0</td>
                         <td></td>
                     </tr>
                 </tfoot>
             </table>
 
-            <div class="summary">
+            <div class="summary" style="margin-top: 4rem;">
                 <div>
-                    <strong>Deficit/Surplus:</strong>
-                    <span id="deficit-surplus">-500 to -1400</span>
+                    <strong>Deficit:</strong>
+                    BDT
+                    <span id="deficit-surplus">0</span>
                 </div>
                 <div>
-                    <strong>Net Income:</strong>
-                    <span id="net-income">+900</span>
+                    <strong>Surplus:</strong>
+                    BDT
+                    <span id="net-income">0</span>
                 </div>
                 <!--Theme Switcher-->
                 {% block theme_switcher %}
