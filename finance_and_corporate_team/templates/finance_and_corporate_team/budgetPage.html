@@ -217,115 +217,121 @@
         </div>
         <!--navbar content end-->
         <div class="container">
-            <div class="budget-header">
-                <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>
-                <button class="add-row-btn" onclick="addCostRow()">
-                    + Add Row
-                </button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                        <th>Unit Per Cost (BDT)</th>
-                        <th>Total</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="cost-body">
-                    <tr>
-                        <td><input type="text" class="item-input" placeholder="Food"></td>
-                        <td><input type="number" class="quantity-input" oninput="calculateCostTotal(this)" placeholder="20"></td>
-                        <td><input type="number" class="unit-cost-input" oninput="calculateCostTotal(this)" placeholder="500"></td>
-                        <td class="total-cell">0</td>
-                        <td class="action-buttons" style="padding: 18px 4px;">
-                            <div>
-                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
-                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td>Total Cost</td>
-                        <td></td>
-                        <td></td>
-                        <td id="total-cost">0</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="budget-header" style="margin-top: 4rem;">
-                <h2 style="border-bottom: 2px solid #00629B;">Revenue Breakdown</h2>
-                <button class="add-row-btn" onclick="addRevenueRow()">
-                    + Add Row
-                </button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Revenue Type</th>
-                        <th>Quantity</th>
-                        <th>Revenue/Unit (BDT)</th>
-                        <th>Total</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="revenue-body">
-                    <tr>
-                        <td><input type="text" class="revenue-type-input" placeholder="Registered Participants"></td>
-                        <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)" placeholder="50">
-                        </td>
-                        <td><input type="number" class="revenue-unit-input" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
-                        <td class="revenue-total-cell">0</td>
-                        <td class="action-buttons" style="padding: 18px 4px;">
-                            <div>
-                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
-                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td>Total Revenue</td>
-                        <td></td>
-                        <td></td>
-                        <td id="total-revenue">0</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="summary" style="margin-top: 4rem;">
-                <div>
-                    <strong>Deficit:</strong>
-                    BDT
-                    <span id="deficit-surplus">0</span>
+        <form method="POST">
+                {% csrf_token %}
+                <div class="budget-header">
+                    <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>
+                    <button type="button" class="add-row-btn" onclick="addCostRow()">
+                        + Add Row
+                    </button>
                 </div>
-                <div>
-                    <strong>Surplus:</strong>
-                    BDT
-                    <span id="net-income">0</span>
+    
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Per Cost (BDT)</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-body">
+                        <tr>
+                            <td><input type="text" class="item-input" name="cst_item" placeholder="Food"></td>
+                            <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20"></td>
+                            <td><input type="number" class="unit-cost-input" name="cst_upc_bdt" oninput="calculateCostTotal(this)" placeholder="500"></td>
+                            <td class="total-cell">0<input type="hidden" name="cst_total"></td>
+                            <td class="action-buttons" style="padding: 18px 4px;">
+                                <div>
+                                    <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                    <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td>Total Cost</td>
+                            <td></td>
+                            <td></td>
+                            <td id="total-cost">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+    
+                <div class="budget-header" style="margin-top: 4rem;">
+                    <h2 style="border-bottom: 2px solid #00629B;">Revenue Breakdown</h2>
+                    <button class="add-row-btn" onclick="addRevenueRow()">
+                        + Add Row
+                    </button>
                 </div>
-                <!--Theme Switcher-->
-                {% block theme_switcher %}
-                {% include "theme_switcher.html" %}
-                {% endblock theme_switcher %}
+    
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Revenue Type</th>
+                            <th>Quantity</th>
+                            <th>Revenue/Unit (BDT)</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="revenue-body">
+                        <tr>
+                            <td><input type="text" class="revenue-type-input" placeholder="Registered Participants"></td>
+                            <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)" placeholder="50">
+                            </td>
+                            <td><input type="number" class="revenue-unit-input" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
+                            <td class="revenue-total-cell">0</td>
+                            <td class="action-buttons" style="padding: 18px 4px;">
+                                <div>
+                                    <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                    <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td>Total Revenue</td>
+                            <td></td>
+                            <td></td>
+                            <td id="total-revenue">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+    
+                <div class="summary" style="margin-top: 4rem;">
+                    <div>
+                        <strong>Deficit:</strong>
+                        BDT
+                        <span id="deficit-surplus">0</span>
+                    </div>
+                    <div>
+                        <strong>Surplus:</strong>
+                        BDT
+                        <span id="net-income">0</span>
+                    </div>
+                    
+                </div>
+                
+                <button class="save-btn">Save Budget</button>
+        </form>
 
-            </div>
+            <!--Theme Switcher-->
+            {% block theme_switcher %}
+            {% include "theme_switcher.html" %}
+            {% endblock theme_switcher %}
+
             <!-- app end-->
 
             {% block common_js %}
             {% include "common_js.html" %}
             {% endblock common_js %}
 
-            <button class="save-btn">Save Budget</button>
         </div>
 
         <script>

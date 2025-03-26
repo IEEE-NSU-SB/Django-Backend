@@ -164,6 +164,12 @@ def budgetHomePage(request):
     
 def budgetPage(request):
     try:
+        
+        if request.method == "POST":
+            cst_item = request.POST.getlist('cst_item')
+            cst_quantity = request.POST.getlist('cst_quantity')
+            cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
