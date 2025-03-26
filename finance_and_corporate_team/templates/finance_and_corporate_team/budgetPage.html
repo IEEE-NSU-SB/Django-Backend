@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Tracker</title>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet"> -->
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+    <style>
+        :root {
+            --primary-color: #00629B;
+            --secondary-color: #107a57;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --ieee-blue: #0f77b3;
+            --ieee-light-blue: #0083CA;
+            --ieee-teal: #00843D;
+            --ieee-light-gray: #E4E4E4;
+            --ieee-medium-gray: #D9D9D9;
+            --ieee-dark-gray: #666666;
+            --ieee-black: #000000;
+            --white: ##F0F0F0;
+        }
+
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            /* padding: 2rem; */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 26px auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .budget-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .add-row-btn {
+            border: none;
+            padding: 0.5rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #fefefe;
+            color: #00629B;
+            border: 1px solid #00629B;
+        }
+        
+        .add-row-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border: 1px solid #00629B;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: #fefefe;
+            /* font-weight: 600; */
+            /* text-transform: uppercase; */
+            font-size: 0.875rem;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: white;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: #fefefe;
+            color: #00629B;
+            border: 1px solid #00629B;
+        }
+        
+        .remove-btn {
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            background-color: white;
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border: 1px solid #00629B;
+        }
+
+        .remove-btn:hover {
+            background-color: #ef4444;
+            color: white;
+            border: 1px solid #ef4444;
+        }
+
+        .total-row {
+            font-weight: 600;
+            background-color: #f9fafb;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .save-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .save-btn:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app">
+
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            {% block navbar %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% endblock navbar %}
+        </div>
+        <!--navbar content end-->
+        <div class="container">
+            <div class="budget-header">
+                <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>
+                <button class="add-row-btn" onclick="addCostRow()">
+                    + Add Row
+                </button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Unit Per Cost (BDT)</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cost-body">
+                    <tr>
+                        <td><input type="text" class="item-input" placeholder="Food"></td>
+                        <td><input type="number" class="quantity-input" oninput="calculateCostTotal(this)" placeholder="20"></td>
+                        <td><input type="number" class="unit-cost-input" oninput="calculateCostTotal(this)" placeholder="500"></td>
+                        <td class="total-cell">0</td>
+                        <td class="action-buttons" style="padding: 18px 4px;">
+                            <div>
+                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td>Total Cost</td>
+                        <td></td>
+                        <td></td>
+                        <td id="total-cost">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="budget-header" style="margin-top: 4rem;">
+                <h2 style="border-bottom: 2px solid #00629B;">Revenue Breakdown</h2>
+                <button class="add-row-btn" onclick="addRevenueRow()">
+                    + Add Row
+                </button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Revenue Type</th>
+                        <th>Quantity</th>
+                        <th>Revenue/Unit (BDT)</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="revenue-body">
+                    <tr>
+                        <td><input type="text" class="revenue-type-input" placeholder="Registered Participants"></td>
+                        <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)" placeholder="50">
+                        </td>
+                        <td><input type="number" class="revenue-unit-input" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
+                        <td class="revenue-total-cell">0</td>
+                        <td class="action-buttons" style="padding: 18px 4px;">
+                            <div>
+                                <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                                <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td>Total Revenue</td>
+                        <td></td>
+                        <td></td>
+                        <td id="total-revenue">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="summary" style="margin-top: 4rem;">
+                <div>
+                    <strong>Deficit:</strong>
+                    BDT
+                    <span id="deficit-surplus">0</span>
+                </div>
+                <div>
+                    <strong>Surplus:</strong>
+                    BDT
+                    <span id="net-income">0</span>
+                </div>
+                <!--Theme Switcher-->
+                {% block theme_switcher %}
+                {% include "theme_switcher.html" %}
+                {% endblock theme_switcher %}
+
+            </div>
+            <!-- app end-->
+
+            {% block common_js %}
+            {% include "common_js.html" %}
+            {% endblock common_js %}
+
+            <button class="save-btn">Save Budget</button>
+        </div>
+
+        <script>
+            function calculateCostTotal(input) {
+                const row = input.closest('tr');
+                const quantity = row.querySelector('.quantity-input').value || 0;
+                const unitCost = row.querySelector('.unit-cost-input').value || 0;
+                const totalCell = row.querySelector('.total-cell');
+                const total = quantity * unitCost;
+                totalCell.textContent = total.toFixed(2);
+                updateTotalCost();
+                updateDeficitSurplus();
+            }
+
+            function calculateRevenueTotal(input) {
+                const row = input.closest('tr');
+                const quantity = row.querySelector('.revenue-quantity-input').value || 0;
+                const unitCost = row.querySelector('.revenue-unit-input').value || 0;
+                const totalCell = row.querySelector('.revenue-total-cell');
+                const total = quantity * unitCost;
+                totalCell.textContent = total.toFixed(2);
+                updateTotalRevenue();
+                updateDeficitSurplus();
+            }
+
+            function updateTotalCost() {
+                const rows = document.querySelectorAll('#cost-body tr');
+                const totalCostCell = document.getElementById('total-cost');
+                const totalCost = Array.from(rows).reduce((sum, row) => {
+                    const total = parseFloat(row.querySelector('.total-cell').textContent) || 0;
+                    return sum + total;
+                }, 0);
+                totalCostCell.textContent = totalCost.toFixed(2);
+            }
+
+            function updateTotalRevenue() {
+                const rows = document.querySelectorAll('#revenue-body tr');
+                const totalRevenueCell = document.getElementById('total-revenue');
+                const totalRevenue = Array.from(rows).reduce((sum, row) => {
+                    const total = parseFloat(row.querySelector('.revenue-total-cell').textContent) || 0;
+                    return sum + total;
+                }, 0);
+                totalRevenueCell.textContent = totalRevenue.toFixed(2);
+            }
+
+            function updateDeficitSurplus() {
+                const totalCost = parseFloat(document.getElementById('total-cost').textContent);
+                const totalRevenue = parseFloat(document.getElementById('total-revenue').textContent);
+                const deficitSurplus = document.getElementById('deficit-surplus');
+                const netIncome = document.getElementById('net-income');
+
+                const difference = totalRevenue - totalCost;
+                deficitSurplus.textContent = difference < 0 ? `${difference.toFixed(2)}` : '0';
+                netIncome.textContent = difference > 0 ? `+${difference.toFixed(2)}` : '0';
+            }
+
+            function addCostRow() {
+                const tbody = document.getElementById('cost-body');
+                const newRow = tbody.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelector('.total-cell').textContent = '0';
+                tbody.appendChild(newRow);
+            }
+
+            function addRevenueRow() {
+                const tbody = document.getElementById('revenue-body');
+                const newRow = tbody.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelector('.revenue-total-cell').textContent = '0';
+                tbody.appendChild(newRow);
+            }
+
+            function editRow(button) {
+                const row = button.closest('tr');
+                const inputs = row.querySelectorAll('input');
+                inputs.forEach(input => input.disabled = !input.disabled);
+            }
+
+            function removeRow(button) {
+                const row = button.closest('tr');
+                const tbody = row.closest('tbody');
+                if (tbody.rows.length > 1) {
+                    row.remove();
+                    updateTotalCost();
+                    updateTotalRevenue();
+                    updateDeficitSurplus();
+                }
+            }
+
+            document.getElementById('save-button').addEventListener('click', () => {
+                alert('Budget saved!');
+            });
+        </script>
+</body>
+
+</html>
