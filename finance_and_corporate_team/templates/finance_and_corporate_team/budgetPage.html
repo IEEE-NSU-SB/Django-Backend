@@ -4,15 +4,23 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Budget Tracker</title>
     <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     {% block common_css %}
     {% include "common_css.html" %}
     {% endblock common_css %}
     <style>
-        /* IEEE Brand Color Palette */
         :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        /* :root {
             --ieee-blue: #0f77b3;
             --ieee-light-blue: #0083CA;
             --ieee-teal: #00843D;
@@ -20,13 +28,21 @@
             --ieee-medium-gray: #D9D9D9;
             --ieee-dark-gray: #666666;
             --ieee-black: #000000;
-            --white: #F0F0F0;
+            --white: ##F0F0F0;
+        } */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            background-color: #f7f9fc;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem;
         }
 
         .container {
@@ -34,275 +50,145 @@
             margin: 0 auto;
             background-color: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
         }
 
-        .header {
+        .budget-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 1.5rem;
         }
 
-        .header input {
-            font-size: 24px;
-            border: none;
-            outline: none;
+        .budget-header h2 {
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #2c3e50;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: background-color 0.2s;
-            width: 60%;
+            color: var(--primary-color);
         }
 
-        .header input:focus {
-            background-color: #f8f9fa;
-        }
-
-        .save-btn {
-            background-color: var(--ieee-blue);
+        .add-row-btn {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 0.5rem 1rem;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(15, 119, 179, 0.3);
-        }
-
-        .save-btn:hover {
-            background-color: #0a5e8f;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(15, 119, 179, 0.4);
-        }
-
-        .save-btn:active {
-            transform: translateY(0);
-        }
-
-        .section {
-            margin-bottom: 40px;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .section-header {
+            transition: background-color 0.3s ease;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 0.5rem;
         }
 
-        .section-title {
-            margin: 0;
-            font-size: 20px;
-            color: #2c3e50;
-            font-weight: 600;
-        }
-
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid #eaedf3;
+        .add-row-btn:hover {
+            background-color: #2563eb;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        table td {
-            border: 1px solid #eaedf3;
-            height: 45px;
-            min-width: 120px;
-            background-color: #ffffff;
-            transition: background-color 0.2s;
-            position: relative;
-        }
-
-        table tr:first-child td {
-            background-color: #f8f9fa;
-        }
-
-        table tr td:first-child {
-            background-color: #f8f9fa;
-        }
-
-        table input {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: transparent;
-            padding: 10px;
-            color: #2c3e50;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        table input:focus {
-            outline: none;
-            background-color: #f0f7ff;
-        }
-
-        .table-actions {
-            margin-bottom: 12px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .add-btn {
-            background-color: #f8f9fa;
-            border: 1px solid #eaedf3;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            color: #4b5563;
-            transition: all 0.2s;
-        }
-
-        .add-btn:hover {
-            background-color: #f0f7ff;
-            border-color: #d1e0ff;
-            color: var(--ieee-blue);
-        }
-
-        .add-btn i {
-            font-size: 14px;
-        }
-
-        .section-cost {
-            border-top: 4px solid #ef4444;
-        }
-
-        .section-revenue {
-            border-top: 4px solid #10b981;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
+        th {
+            background-color: var(--primary-color);
+            color: white;
             font-weight: 600;
-            margin-left: 10px;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            padding: 1rem;
+            text-align: left;
         }
 
-        .badge-cost {
-            background-color: #fee2e2;
-            color: #ef4444;
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: white;
         }
 
-        .badge-revenue {
-            background-color: #d1fae5;
-            color: #10b981;
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .remove-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+        }
+
+        .edit-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .remove-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .total-row {
+            font-weight: 600;
+            background-color: #f9fafb;
         }
 
         .summary {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
-            background-color: #f8fafc;
+            background-color: #f9fafb;
+            padding: 1rem;
             border-radius: 8px;
-            margin-top: 30px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
         }
 
-        .summary-item {
-            text-align: center;
-        }
-
-        .summary-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .summary-label {
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .positive {
-            color: #10b981;
-        }
-
-        .negative {
-            color: #ef4444;
-        }
-
-        /* Context menu styles */
-        .context-menu {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #eaedf3;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            padding: 5px 0;
-            min-width: 150px;
-        }
-
-        .context-menu-item {
-            padding: 8px 16px;
+        .save-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
-            color: #2c3e50;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: background-color 0.3s ease;
+            width: 100%;
         }
 
-        .context-menu-item:hover {
-            background-color: #f0f7ff;
-            color: var(--ieee-blue);
-        }
-
-        .context-menu-item.delete {
-            color: #ef4444;
-        }
-
-        .context-menu-item.delete:hover {
-            background-color: #fee2e2;
-        }
-
-        /* Animation for row deletion */
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
-
-        .row-deleting {
-            animation: fadeOut 0.5s ease-out forwards;
-            background-color: #fee2e2;
-        }
-
-        /* Improvements for input placeholder contrast */
-        ::placeholder {
-            color: #94a3b8;
-            opacity: 0.7;
+        .save-btn:hover {
+            background-color: #059669;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
+    <!-- ############ LAYOUT START-->
     <div class="app" id="app">
 
         <!-- aside -->
@@ -318,457 +204,192 @@
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
             {% block navbar %}
-                {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
             {% endblock navbar %}
         </div>
         <!--navbar content end-->
         <div class="container">
-            <div class="header">
-                <input type="text" id="budget-name" placeholder="Budget Name">
-                <button class="save-btn" id="save-btn"><i class="fas fa-save"></i> Save Budget</button>
+            <div class="budget-header">
+                <h2>Budget Name</h2>
+                <button class="add-row-btn" onclick="addCostRow()">
+                    + Add Row
+                </button>
             </div>
 
-            <div class="section section-cost">
-                <div class="section-header">
-                    <h2 class="section-title">Cost Breakdown <span class="badge badge-cost">Expenses</span></h2>
-                    <div class="table-actions">
-                        <button class="add-btn" id="add-column-cost"><i class="fas fa-columns"></i> Add Column</button>
-                        <button class="add-btn" id="add-row-cost"><i class="fas fa-plus"></i> Add Row</button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table id="cost-table">
-                        <tr>
-                            <td><input type="text" placeholder="Category"></td>
-                            <td><input type="text" placeholder="Jan"></td>
-                            <td><input type="text" placeholder="Feb"></td>
-                            <td><input type="text" placeholder="Mar"></td>
-                            <td><input type="text" placeholder="Apr"></td>
-                            <td><input type="text" placeholder="May"></td>
-                            <td><input type="text" placeholder="Jun"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Refreshments"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Instructor's food"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Food"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Certificate"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                    </table>
-                </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Unit Per Cost</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cost-body">
+                    <tr>
+                        <td><input type="text" class="item-input"></td>
+                        <td><input type="number" class="quantity-input" oninput="calculateCostTotal(this)"></td>
+                        <td><input type="number" class="unit-cost-input" oninput="calculateCostTotal(this)"></td>
+                        <td class="total-cell">0</td>
+                        <td class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                            <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3">Total Cost</td>
+                        <td id="total-cost">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="budget-header">
+                <h2>Revenue Breakdown</h2>
+                <button class="add-row-btn" onclick="addRevenueRow()">
+                    + Add Row
+                </button>
             </div>
 
-            <div class="section section-revenue">
-                <div class="section-header">
-                    <h2 class="section-title">Revenue <span class="badge badge-revenue">Income</span></h2>
-                    <div class="table-actions">
-                        <button class="add-btn" id="add-column-revenue"><i class="fas fa-columns"></i> Add
-                            Column</button>
-                        <button class="add-btn" id="add-row-revenue"><i class="fas fa-plus"></i> Add Row</button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table id="revenue-table">
-                        <tr>
-                            <td><input type="text" placeholder="Source"></td>
-                            <td><input type="text" placeholder="Jan"></td>
-                            <td><input type="text" placeholder="Feb"></td>
-                            <td><input type="text" placeholder="Mar"></td>
-                            <td><input type="text" placeholder="Apr"></td>
-                            <td><input type="text" placeholder="May"></td>
-                            <td><input type="text" placeholder="Jun"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="IEEE Members"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Non-IEEE members"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" placeholder="Sponsors"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                            <td><input type="text" placeholder="0.00"></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Revenue Type</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Revenue Generated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="revenue-body">
+                    <tr>
+                        <td><input type="text" class="revenue-type-input"></td>
+                        <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)">
+                        </td>
+                        <td><input type="text" class="revenue-unit-input"></td>
+                        <td class="revenue-total-cell">0</td>
+                        <td class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="editRow(this)">Edit</button>
+                            <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3">Total Revenue</td>
+                        <td id="total-revenue">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
 
             <div class="summary">
-                <div class="summary-item">
-                    <div class="summary-value" id="total-revenue">$0.00</div>
-                    <div class="summary-label">Total Revenue</div>
+                <div>
+                    <strong>Deficit/Surplus:</strong>
+                    <span id="deficit-surplus">-500 to -1400</span>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-value" id="total-cost">$0.00</div>
-                    <div class="summary-label">Total Costs</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-value" id="net-income">$0.00</div>
-                    <div class="summary-label">Net Income</div>
+                <div>
+                    <strong>Net Income:</strong>
+                    <span id="net-income">+900</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Context Menu -->
-        <div class="context-menu" id="context-menu" style="display: none;">
-            <div class="context-menu-item delete" id="delete-row">
-                <i class="fas fa-trash"></i> Delete Row
-            </div>
+            <button class="save-btn">Save Budget</button>
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Setup right-click context menu for tables
-                setupContextMenu('cost-table');
-                setupContextMenu('revenue-table');
+            function calculateCostTotal(input) {
+                const row = input.closest('tr');
+                const quantity = row.querySelector('.quantity-input').value || 0;
+                const unitCost = row.querySelector('.unit-cost-input').value || 0;
+                const totalCell = row.querySelector('.total-cell');
+                const total = quantity * unitCost;
+                totalCell.textContent = total.toFixed(2);
+                updateTotalCost();
+                updateDeficitSurplus();
+            }
 
-                // Add click event handlers for buttons
-                document.getElementById('add-column-cost').addEventListener('click', function () {
-                    addColumn('cost-table');
-                });
+            function calculateRevenueTotal(input) {
+                const row = input.closest('tr');
+                const quantity = row.querySelector('.revenue-quantity-input').value || 0;
+                const unitCost = row.querySelector('.revenue-unit-input').value || 0;
+                const totalCell = row.querySelector('.revenue-total-cell');
+                const total = quantity * unitCost;
+                totalCell.textContent = total.toFixed(2);
+                updateTotalRevenue();
+                updateDeficitSurplus();
+            }
 
-                document.getElementById('add-row-cost').addEventListener('click', function () {
-                    addRow('cost-table');
-                });
+            function updateTotalCost() {
+                const rows = document.querySelectorAll('#cost-body tr');
+                const totalCostCell = document.getElementById('total-cost');
+                const totalCost = Array.from(rows).reduce((sum, row) => {
+                    const total = parseFloat(row.querySelector('.total-cell').textContent) || 0;
+                    return sum + total;
+                }, 0);
+                totalCostCell.textContent = totalCost.toFixed(2);
+            }
 
-                document.getElementById('add-column-revenue').addEventListener('click', function () {
-                    addColumn('revenue-table');
-                });
+            function updateTotalRevenue() {
+                const rows = document.querySelectorAll('#revenue-body tr');
+                const totalRevenueCell = document.getElementById('total-revenue');
+                const totalRevenue = Array.from(rows).reduce((sum, row) => {
+                    const total = parseFloat(row.querySelector('.revenue-total-cell').textContent) || 0;
+                    return sum + total;
+                }, 0);
+                totalRevenueCell.textContent = totalRevenue.toFixed(2);
+            }
 
-                document.getElementById('add-row-revenue').addEventListener('click', function () {
-                    addRow('revenue-table');
-                });
+            function updateDeficitSurplus() {
+                const totalCost = parseFloat(document.getElementById('total-cost').textContent);
+                const totalRevenue = parseFloat(document.getElementById('total-revenue').textContent);
+                const deficitSurplus = document.getElementById('deficit-surplus');
+                const netIncome = document.getElementById('net-income');
 
-                // Save button handler
-                document.getElementById('save-btn').addEventListener('click', saveData);
+                const difference = totalRevenue - totalCost;
+                deficitSurplus.textContent = difference < 0 ? `${difference.toFixed(2)}` : '0';
+                netIncome.textContent = difference > 0 ? `+${difference.toFixed(2)}` : '0';
+            }
 
-                // Initial summary calculation
-                updateSummary();
+            function addCostRow() {
+                const tbody = document.getElementById('cost-body');
+                const newRow = tbody.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelector('.total-cell').textContent = '0';
+                tbody.appendChild(newRow);
+            }
 
-                // Add input event listeners to all numerical cells
-                setupInputListeners();
+            function addRevenueRow() {
+                const tbody = document.getElementById('revenue-body');
+                const newRow = tbody.rows[0].cloneNode(true);
+                newRow.querySelectorAll('input').forEach(input => input.value = '');
+                newRow.querySelector('.revenue-total-cell').textContent = '0';
+                tbody.appendChild(newRow);
+            }
+
+            function editRow(button) {
+                const row = button.closest('tr');
+                const inputs = row.querySelectorAll('input');
+                inputs.forEach(input => input.disabled = !input.disabled);
+            }
+
+            function removeRow(button) {
+                const row = button.closest('tr');
+                const tbody = row.closest('tbody');
+                if (tbody.rows.length > 1) {
+                    row.remove();
+                    updateTotalCost();
+                    updateTotalRevenue();
+                    updateDeficitSurplus();
+                }
+            }
+
+            document.getElementById('save-button').addEventListener('click', () => {
+                alert('Budget saved!');
             });
-
-            let activeRow = null;
-
-            // Setup context menu for tables
-            function setupContextMenu(tableId) {
-                const table = document.getElementById(tableId);
-                const contextMenu = document.getElementById('context-menu');
-
-                // Add context menu event for first column cells only
-                const rows = table.getElementsByTagName('tr');
-                for (let i = 1; i < rows.length; i++) { // Skip header row
-                    const firstCell = rows[i].cells[0];
-                    firstCell.addEventListener('contextmenu', function (e) {
-                        e.preventDefault();
-
-                        // Set active row
-                        activeRow = this.parentNode;
-
-                        // Position the context menu
-                        contextMenu.style.display = 'block';
-                        contextMenu.style.left = e.pageX + 'px';
-                        contextMenu.style.top = e.pageY + 'px';
-
-                        // Ensure the menu stays within viewport
-                        const menuRect = contextMenu.getBoundingClientRect();
-                        const viewportWidth = window.innerWidth;
-                        const viewportHeight = window.innerHeight;
-
-                        if (menuRect.right > viewportWidth) {
-                            contextMenu.style.left = (e.pageX - menuRect.width) + 'px';
-                        }
-
-                        if (menuRect.bottom > viewportHeight) {
-                            contextMenu.style.top = (e.pageY - menuRect.height) + 'px';
-                        }
-                    });
-
-                    // Make it visually apparent that the first cell is right-clickable
-                    firstCell.style.cursor = 'context-menu';
-                }
-            }
-
-            // Delete row handler
-            document.getElementById('delete-row').addEventListener('click', function () {
-                if (activeRow) {
-                    // Don't delete header row
-                    if (activeRow.rowIndex === 0) {
-                        hideContextMenu();
-                        return;
-                    }
-
-                    // Add deletion animation class
-                    activeRow.classList.add('row-deleting');
-
-                    // Remove row after animation
-                    setTimeout(() => {
-                        const tableId = activeRow.parentNode.parentNode.id;
-                        activeRow.remove();
-                        updateSummary();
-
-                        // Re-setup context menu if needed
-                        setupContextMenu(tableId);
-                    }, 500);
-                }
-                hideContextMenu();
-            });
-
-            // Hide context menu when clicking elsewhere
-            document.addEventListener('click', hideContextMenu);
-
-            function hideContextMenu() {
-                document.getElementById('context-menu').style.display = 'none';
-                activeRow = null;
-            }
-
-            // Add a new column to the specified table
-            function addColumn(tableId) {
-                const table = document.getElementById(tableId);
-                const rows = table.getElementsByTagName('tr');
-
-                for (let i = 0; i < rows.length; i++) {
-                    const cell = document.createElement('td');
-                    const input = document.createElement('input');
-                    input.type = 'text';
-
-                    if (i === 0) {
-                        // For header row, add month placeholder
-                        const lastColIndex = rows[0].cells.length - 1;
-                        const lastColContent = rows[0].cells[lastColIndex].getElementsByTagName('input')[0].placeholder;
-
-                        // Sequential month logic
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const lastMonth = lastColContent;
-                        const lastMonthIndex = months.indexOf(lastMonth);
-
-                        if (lastMonthIndex !== -1 && lastMonthIndex < 11) {
-                            input.placeholder = months[lastMonthIndex + 1];
-                        } else {
-                            input.placeholder = 'New';
-                        }
-                    } else {
-                        input.placeholder = "0.00";
-                        input.addEventListener('input', updateSummary);
-                    }
-
-                    cell.appendChild(input);
-                    rows[i].appendChild(cell);
-                }
-
-                updateSummary();
-            }
-
-            // Add a new row to the specified table
-            function addRow(tableId) {
-                const table = document.getElementById(tableId);
-                const columnCount = table.rows[0].cells.length;
-                const newRow = table.insertRow();
-
-                for (let i = 0; i < columnCount; i++) {
-                    const cell = newRow.insertCell();
-                    const input = document.createElement('input');
-                    input.type = 'text';
-
-                    if (i === 0) {
-                        input.placeholder = "New Item";
-                        // Make first cell right-clickable
-                        cell.addEventListener('contextmenu', function (e) {
-                            e.preventDefault();
-                            activeRow = this.parentNode;
-
-                            const contextMenu = document.getElementById('context-menu');
-                            contextMenu.style.display = 'block';
-                            contextMenu.style.left = e.pageX + 'px';
-                            contextMenu.style.top = e.pageY + 'px';
-                        });
-                        cell.style.cursor = 'context-menu';
-                    } else {
-                        input.placeholder = "0.00";
-                        input.addEventListener('input', updateSummary);
-                    }
-
-                    cell.appendChild(input);
-                }
-
-                updateSummary();
-            }
-
-            // Setup input listeners for all cells
-            function setupInputListeners() {
-                const tables = ['cost-table', 'revenue-table'];
-
-                tables.forEach(tableId => {
-                    const table = document.getElementById(tableId);
-                    const inputs = table.getElementsByTagName('input');
-
-                    for (let i = 0; i < inputs.length; i++) {
-                        const cell = inputs[i].parentNode;
-                        const row = cell.parentNode;
-
-                        // Skip header row and first column
-                        if (row.rowIndex > 0 && cell.cellIndex > 0) {
-                            inputs[i].addEventListener('input', updateSummary);
-                        }
-                    }
-                });
-            }
-
-            // Format a number as currency
-            function formatCurrency(amount) {
-                return '$' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-            }
-
-            // Update the summary section
-            function updateSummary() {
-                // Calculate total revenue
-                const revenueTable = document.getElementById('revenue-table');
-                let totalRevenue = 0;
-
-                for (let i = 1; i < revenueTable.rows.length; i++) {
-                    const cells = revenueTable.rows[i].cells;
-                    for (let j = 1; j < cells.length; j++) {
-                        const value = cells[j].getElementsByTagName('input')[0].value;
-                        if (value && !isNaN(value)) {
-                            totalRevenue += parseFloat(value);
-                        }
-                    }
-                }
-
-                // Calculate total costs
-                const costTable = document.getElementById('cost-table');
-                let totalCost = 0;
-
-                for (let i = 1; i < costTable.rows.length; i++) {
-                    const cells = costTable.rows[i].cells;
-                    for (let j = 1; j < cells.length; j++) {
-                        const value = cells[j].getElementsByTagName('input')[0].value;
-                        if (value && !isNaN(value)) {
-                            totalCost += parseFloat(value);
-                        }
-                    }
-                }
-
-                // Calculate net income
-                const netIncome = totalRevenue - totalCost;
-
-                // Update the summary values
-                document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
-                document.getElementById('total-cost').textContent = formatCurrency(totalCost);
-
-                const netIncomeElement = document.getElementById('net-income');
-                netIncomeElement.textContent = formatCurrency(netIncome);
-
-                // Apply color based on value
-                if (netIncome > 0) {
-                    netIncomeElement.className = 'summary-value positive';
-                } else if (netIncome < 0) {
-                    netIncomeElement.className = 'summary-value negative';
-                } else {
-                    netIncomeElement.className = 'summary-value';
-                }
-            }
-
-            // Save data function
-            function saveData() {
-                // Get budget name
-                const budgetName = document.getElementById('budget-name').value || 'Untitled Budget';
-
-                // Collect data from cost table
-                const costData = collectTableData('cost-table');
-
-                // Collect data from revenue table
-                const revenueData = collectTableData('revenue-table');
-
-                // Create data object
-                const budgetData = {
-                    name: budgetName,
-                    costs: costData,
-                    revenue: revenueData,
-                    savedAt: new Date().toISOString()
-                };
-
-                // Convert to JSON and save to localStorage
-                localStorage.setItem('budgetData', JSON.stringify(budgetData));
-
-                // Show save confirmation
-                const saveBtn = document.getElementById('save-btn');
-                const originalText = saveBtn.innerHTML;
-                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                saveBtn.style.backgroundColor = '#10b981';
-
-                setTimeout(function () {
-                    saveBtn.innerHTML = originalText;
-                    saveBtn.style.backgroundColor = '';
-                }, 2000);
-            }
-
-            // Helper function to collect data from a table
-            function collectTableData(tableId) {
-                const table = document.getElementById(tableId);
-                const rows = table.getElementsByTagName('tr');
-                const data = [];
-
-                for (let i = 0; i < rows.length; i++) {
-                    const rowData = [];
-                    const cells = rows[i].cells;
-
-                    for (let j = 0; j < cells.length; j++) {
-                        const input = cells[j].getElementsByTagName('input')[0];
-                        rowData.push(input.value || input.placeholder);
-                    }
-
-                    data.push(rowData);
-                }
-
-                return data;
-            }
         </script>
 </body>
 
