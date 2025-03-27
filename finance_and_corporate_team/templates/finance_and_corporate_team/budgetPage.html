@@ -224,6 +224,7 @@
             {% endblock navbar %}
         </div>
         <!--navbar content end-->
+        <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">XYZ</span> event</h2>
         <div class="container">
             <div style="display: flex;
                  justify-content: flex-end;">
@@ -438,72 +439,83 @@
                 alert('Budget saved!');
             });
         </script>
-        <script>
-document.querySelector('.convert-usd-bdt').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const rateInput = document.querySelector('.conversion_rate');
-    let rate = parseFloat(rateInput.value);
-
-    if (!rate || rate <= 0) {
-        alert('Please enter a valid USD rate.');
-        return;
-    }
-
-    // Get table headers
-    const costTable = document.querySelectorAll('table')[0];
-    const revenueTable = document.querySelectorAll('table')[1];
-    const costHeader = costTable.querySelector('thead tr').children[2];
-    const revenueHeader = revenueTable.querySelector('thead tr').children[2];
-
-    // Determine current state (USD or BDT)
-    let isUSD = costHeader.textContent.includes("USD");
-
-    if (isUSD) {
-        // Convert back to BDT
-        costHeader.textContent = "Unit Per Cost (BDT)";
-        revenueHeader.textContent = "Revenue/Unit (BDT)";
-
-        document.querySelectorAll('.unit-cost-input').forEach(function (input) {
-            let value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                input.value = (value * rate).toFixed(4); // Convert back to BDT
+        <script>document.querySelector('.convert-usd-bdt').addEventListener('click', function (e) {
+            e.preventDefault();
+        
+            const rateInput = document.querySelector('.conversion_rate');
+            let rate = parseFloat(rateInput.value);
+        
+            if (!rate || rate <= 0) {
+                alert('Please enter a valid USD rate.');
+                return;
             }
-        });
-
-        document.querySelectorAll('.revenue-unit-input').forEach(function (input) {
-            let value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                input.value = (value * rate).toFixed(4); // Convert back to BDT
+        
+            const costTable = document.querySelectorAll('table')[0];
+            const revenueTable = document.querySelectorAll('table')[1];
+            const costHeader = costTable.querySelector('thead tr').children[2];
+            const revenueHeader = revenueTable.querySelector('thead tr').children[2];
+        
+            let isUSD = costHeader.textContent.includes("USD");
+        
+            if (isUSD) {
+                // Convert back to BDT
+                costHeader.textContent = "Unit Per Cost (BDT)";
+                revenueHeader.textContent = "Revenue/Unit (BDT)";
+        
+                document.querySelectorAll('.unit-cost-input').forEach(input => {
+                    let value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        input.value = (value * rate).toFixed(4);
+                    }
+                });
+        
+                document.querySelectorAll('.revenue-unit-input').forEach(input => {
+                    let value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        input.value = (value * rate).toFixed(4);
+                    }
+                });
+        
+                // Change deficit and surplus text back to BDT
+                document.getElementById('deficit-surplus').previousSibling.textContent = " BDT ";
+                document.getElementById('net-income').previousSibling.textContent = " BDT ";
+        
+                this.textContent = "Convert to USD";
+            } else {
+                // Convert to USD
+                costHeader.textContent = "Unit Per Cost (USD)";
+                revenueHeader.textContent = "Revenue/Unit (USD)";
+        
+                document.querySelectorAll('.unit-cost-input').forEach(input => {
+                    let value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        input.value = (value / rate).toFixed(4);
+                    }
+                });
+        
+                document.querySelectorAll('.revenue-unit-input').forEach(input => {
+                    let value = parseFloat(input.value);
+                    if (!isNaN(value)) {
+                        input.value = (value / rate).toFixed(4);
+                    }
+                });
+        
+                // Change deficit and surplus text to USD
+                document.getElementById('deficit-surplus').previousSibling.textContent = " USD ";
+                document.getElementById('net-income').previousSibling.textContent = " USD ";
+        
+                this.textContent = "Convert to BDT";
             }
+        
+            // Recalculate totals after conversion
+            document.querySelectorAll('.quantity-input').forEach(input => calculateCostTotal(input));
+            document.querySelectorAll('.revenue-quantity-input').forEach(input => calculateRevenueTotal(input));
+        
+            updateTotalCost();
+            updateTotalRevenue();
+            updateDeficitSurplus();
         });
-
-        this.textContent = "Convert to USD"; // Change button text
-    } else {
-        // Convert to USD
-        costHeader.textContent = "Unit Per Cost (USD)";
-        revenueHeader.textContent = "Revenue/Unit (USD)";
-
-        document.querySelectorAll('.unit-cost-input').forEach(function (input) {
-            let value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                input.value = (value / rate).toFixed(4); // Convert to USD
-            }
-        });
-
-        document.querySelectorAll('.revenue-unit-input').forEach(function (input) {
-            let value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                input.value = (value / rate).toFixed(4); // Convert to USD
-            }
-        });
-
-        this.textContent = "Convert to BDT"; // Change button text
-    }
-    updateTotalCost();
-    updateTotalRevenue();
-    updateDeficitSurplus();
-});
+        
 </script>
 
 </body>
