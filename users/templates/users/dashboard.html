@@ -313,6 +313,33 @@
 	.profile a{
 		text-align: center;
 	}
+	.wallet{
+		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+		padding: 12px 14px;
+		margin: 0px 0 20px 0px;
+	}
+	.treasurer_container{
+		/* box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px; */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		/* padding: 20px; */
+		gap: 16px;
+	}
+	.outer_box{
+		width: 24%;
+		padding: 10px 14px;
+		border-radius: 4px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+		/* border: 1px solid rgba(120, 130, 140, 0.13); */
+		/* box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px; */
+		/* background-color: rgba(120, 130, 140, 0.13); */
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
   </style>
 </head>
 {% block preloader %}
@@ -377,6 +404,28 @@
 			</div>
 		</div>
 	</div>
+	<div class="wallet">
+		<h3>Treasurer's Wallet</h3>
+		<div class="treasurer_container">
+			<div class="outer_box">
+				<p style="font-weight: bold;">Total Balance</p>
+				<h2 style="color: #002855;">BDT 10000</h2>
+			</div>
+			<div class="outer_box">
+				<p style="font-weight: bold;">Monthly Expense</p>
+				<h2 style="color: #002855;">BDT 10000</h2>
+			</div>
+			<div class="outer_box">
+				<p style="font-weight: bold;">Total Events</p>
+				<h2 style="color: #002855;">BDT 10000</h2>
+			</div>
+			<div class="outer_box">
+				<p style="font-weight: bold;">Total Balance</p>
+				<h2 style="color: #002855;">BDT 10000</h2>
+			</div>
+		</div>
+	</div>
+
 	<div class="row">
 		<div class="col-xl-6">
 			<div class="card">
