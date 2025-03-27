@@ -27,7 +27,7 @@ class BudgetSheetAccess(models.Model):
 
     sheet = models.ForeignKey(BudgetSheet, null=False, blank=False, on_delete=models.CASCADE)
     member = models.ForeignKey(Members, null=False, blank=False, on_delete=models.CASCADE)
-    access_type = models.CharField(null=False, blank=False, max_length=20, default='Restricted')
+    access_type = models.CharField(null=False, blank=False, max_length=20, choices=(('ViewOnly','ViewOnly'), ('Edit','Edit'), ('Restricted','Restricted')), default='Restricted')
 
     class Meta:
         verbose_name = 'Budget Sheet Access'

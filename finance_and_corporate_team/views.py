@@ -174,7 +174,7 @@ def budgetPage(request):
 
             total_cost = 0
             for cost in cst_total:
-                total_cost += int(cost)
+                total_cost += float(cost)
 
             rev_item = request.POST.getlist('rev_item')
             rev_quantity = request.POST.getlist('rev_quantity')
@@ -183,7 +183,7 @@ def budgetPage(request):
 
             total_revenue = 0
             for revenue in rev_total:
-                total_revenue += int(revenue)
+                total_revenue += float(revenue)
 
             cost_data = [
                 ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
