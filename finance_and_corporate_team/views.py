@@ -174,7 +174,6 @@ def budgetPage(request):
 
             cost_data = [
                 ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
-                ["Executive Crest", "5", "750", "3,750"],
             ]
 
             for i in range(len(cst_item)):
