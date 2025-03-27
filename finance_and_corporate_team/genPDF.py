@@ -8,7 +8,7 @@ from reportlab.platypus import Paragraph
 
 class BudgetPDF:
 
-    def create_pdf(file_name):
+    def create_pdf(file_name, cost_data=None, revenue_data=None):
         c = canvas.Canvas(file_name, pagesize=A4)
         width, height = A4
 
@@ -16,9 +16,17 @@ class BudgetPDF:
         c.setFont("Helvetica-Bold", 16)
         c.drawCentredString(width / 2, height - 50, "Succession-25 Budget")
 
-        # Revenue Breakdown
+        # Cost Breakdown (First)
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(50, height - 90, "Total Revenue")
+        c.drawString(50, height - 90, "Cost Breakdown")
+
+        # Draw cost table and get final Y position
+        new_y = BudgetPDF.draw_table(c, cost_data, x=50, y=height - 120, col_widths=[180, 80, 120, 120])
+
+        # Revenue Breakdown (Positioned Below Cost Breakdown)
+        c.setFont("Helvetica-Bold", 12)
+        revenue_y = new_y - 50  # Provide extra space
+        c.drawString(50, revenue_y, "Total Revenue")
 
         revenue_data = [
             ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"],
@@ -27,30 +35,7 @@ class BudgetPDF:
             ["Deficit (To Be Collected From Fund)", "", "", "4,500"]
         ]
 
-        BudgetPDF.draw_table(c, revenue_data, x=50, y=height - 120, col_widths=[200, 80, 120, 120])
-
-        # Cost Breakdown
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(50, height - 250, "Cost Breakdown")
-
-        cost_data = [
-            ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
-            ["Executive Crest", "5", "750", "3,750"],
-            ["Executive Certificate", "5", "60", "300"],
-            ["Leads Crest", "3", "750", "2,250"],
-            ["Leads Certificate", "19", "60", "1,140"],
-            ["Shining Stars", "13", "220", "2,860"],
-            ["Mug for Faculty", "5", "300", "1,500"],
-            ["X Banner", "2", "300", "600"],
-            ["Name Plate", "9", "80", "720"],
-            ["Framed Certificatesdgbsdgbdebgdebgdegbedbgesbgewstgestfgjdenkbgjdenmgkdjngdekjgnektjgnek", "14", "230", "3,220"],
-            ["PoshFumes Banner", "3", "300", "900"],
-            ["Logistics Cost", "", "", "840"],
-            ["Food", "42", "510", "21,420"],
-            ["Total Cost", "", "", "39,500"]
-        ]
-
-        BudgetPDF.draw_table(c, cost_data, x=50, y=height - 280, col_widths=[180, 80, 120, 120])
+        BudgetPDF.draw_table(c, revenue_data, x=50, y=revenue_y - 30, col_widths=[180, 80, 120, 120])
 
         # Signatures
         c.line(50, 100, 250, 100)
@@ -71,17 +56,16 @@ class BudgetPDF:
 
     def draw_table(canvas, data, x, y, col_widths):
         styles = getSampleStyleSheet()
-        styleN = styles["Normal"]  # Use a normal style for wrapping text
+        styleN = styles["Normal"]
 
-        # Convert long text cells to Paragraph objects
+        # Convert long text cells to Paragraph objects for wrapping
         wrapped_data = [[Paragraph(str(cell), styleN) for cell in row] for row in data]
 
         table = Table(wrapped_data, colWidths=col_widths)
         table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-            #("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Horizontal centering
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),  # Vertical centering
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
             ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
@@ -90,3 +74,6 @@ class BudgetPDF:
 
         table.wrapOn(canvas, x, y)
         table.drawOn(canvas, x, y - (len(data) * 20))
+
+        # Return new Y position after drawing the table
+        return y - (len(data) * 20) - 20  # Adding extra spacing

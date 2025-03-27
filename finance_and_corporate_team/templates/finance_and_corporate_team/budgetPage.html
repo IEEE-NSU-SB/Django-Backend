@@ -255,7 +255,8 @@
                             <td><input type="text" class="item-input" name="cst_item" placeholder="Food"></td>
                             <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20"></td>
                             <td><input type="number" class="unit-cost-input" name="cst_upc_bdt" oninput="calculateCostTotal(this)" placeholder="500"></td>
-                            <td class="total-cell">0<input type="hidden" name="cst_total"></td>
+                            <td class="total-cell">0</td>
+                            <input type="hidden" class="totalinput" name="cst_total">
                             <td class="action-buttons" style="padding: 18px 4px;">
                                 <div>
                                     <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
@@ -348,12 +349,6 @@
             {% block common_js %}
             {% include "common_js.html" %}
             {% endblock common_js %}
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <button class="add-row-btn">
-                    Download
-                </button>
-                <button class="save-btn">Save Budget</button>
-            </div>
         </div>
 
         <script>
@@ -362,8 +357,10 @@
                 const quantity = row.querySelector('.quantity-input').value || 0;
                 const unitCost = row.querySelector('.unit-cost-input').value || 0;
                 const totalCell = row.querySelector('.total-cell');
+                const totalinput = row.querySelector('.totalinput');
                 const total = quantity * unitCost;
                 totalCell.textContent = total.toFixed(2);
+                totalinput.value = total.toFixed(2);
                 updateTotalCost();
                 updateDeficitSurplus();
             }

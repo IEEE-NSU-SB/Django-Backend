@@ -15,6 +15,7 @@ from datetime import datetime
 import logging
 from system_administration.system_error_handling import ErrorHandling
 from central_branch import views as cv
+from .genPDF import BudgetPDF
 
 logger=logging.getLogger(__name__)
 # Create your views here.
@@ -169,6 +170,17 @@ def budgetPage(request):
             cst_item = request.POST.getlist('cst_item')
             cst_quantity = request.POST.getlist('cst_quantity')
             cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+            cst_total = request.POST.getlist('cst_total')
+
+            cost_data = [
+                ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
+                ["Executive Crest", "5", "750", "3,750"],
+            ]
+
+            for i in range(len(cst_item)):
+                cost_data.append([cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]])
+
+            BudgetPDF.create_pdf('test.pdf', cost_data)
 
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
