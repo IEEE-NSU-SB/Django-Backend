@@ -295,14 +295,15 @@
                     </thead>
                     <tbody id="revenue-body">
                         <tr>
-                            <td><input type="text" class="revenue-type-input" placeholder="Registered Participants"></td>
-                            <td><input type="number" class="revenue-quantity-input" oninput="calculateRevenueTotal(this)" placeholder="50">
+                            <td><input type="text" class="revenue-type-input" name="rev_item" placeholder="Registered Participants"></td>
+                            <td><input type="number" class="revenue-quantity-input" name="rev_quantity" oninput="calculateRevenueTotal(this)" placeholder="50">
                             </td>
-                            <td><input type="number" class="revenue-unit-input" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
+                            <td><input type="number" class="revenue-unit-input" name="rev_upc_bdt" oninput="calculateRevenueTotal(this)" placeholder="500"></td>
                             <td class="revenue-total-cell">0</td>
+                            <input type="hidden" class="revenue-totalinput" name="rev_total">
                             <td class="action-buttons" style="padding: 18px 4px;">
                                 <div>
-                                    <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                                    <button type="button" class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
                                 </div>
                             </td>
                         </tr>
@@ -371,8 +372,10 @@
                 const quantity = row.querySelector('.revenue-quantity-input').value || 0;
                 const unitCost = row.querySelector('.revenue-unit-input').value || 0;
                 const totalCell = row.querySelector('.revenue-total-cell');
+                const totalinput = row.querySelector('.revenue-totalinput');
                 const total = quantity * unitCost;
                 totalCell.textContent = total.toFixed(2);
+                totalinput.value = total.toFixed(2);
                 updateTotalRevenue();
                 updateDeficitSurplus();
             }
