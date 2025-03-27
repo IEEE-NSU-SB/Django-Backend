@@ -8,7 +8,7 @@ from reportlab.platypus import Paragraph
 
 class BudgetPDF:
 
-    def create_pdf(file_name, cost_data=None, revenue_data=None):
+    def create_pdf(file_name, cost_data, revenue_data):
         c = canvas.Canvas(file_name, pagesize=A4)
         width, height = A4
 
@@ -27,13 +27,6 @@ class BudgetPDF:
         c.setFont("Helvetica-Bold", 12)
         revenue_y = new_y - 50  # Provide extra space
         c.drawString(50, revenue_y, "Total Revenue")
-
-        revenue_data = [
-            ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"],
-            ["Registered Participants", "30", "500", "15,000"],
-            ["Sponsor (PoshFumes)", "", "", "20,000"],
-            ["Deficit (To Be Collected From Fund)", "", "", "4,500"]
-        ]
 
         BudgetPDF.draw_table(c, revenue_data, x=50, y=revenue_y - 30, col_widths=[180, 80, 120, 120])
 

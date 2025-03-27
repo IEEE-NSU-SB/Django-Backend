@@ -172,6 +172,19 @@ def budgetPage(request):
             cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
             cst_total = request.POST.getlist('cst_total')
 
+            total_cost = 0
+            for cost in cst_total:
+                total_cost += float(cost)
+
+            rev_item = request.POST.getlist('rev_item')
+            rev_quantity = request.POST.getlist('rev_quantity')
+            rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+            rev_total = request.POST.getlist('rev_total')
+
+            total_revenue = 0
+            for revenue in rev_total:
+                total_revenue += float(revenue)
+
             cost_data = [
                 ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
             ]
@@ -179,7 +192,14 @@ def budgetPage(request):
             for i in range(len(cst_item)):
                 cost_data.append([cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]])
 
-            BudgetPDF.create_pdf('test.pdf', cost_data)
+            revenue_data = [
+                ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]
+            ]
+
+            for i in range(len(rev_item)):
+                revenue_data.append([rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]])
+
+            BudgetPDF.create_pdf('test.pdf', cost_data, revenue_data)
 
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
