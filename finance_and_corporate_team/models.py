@@ -15,7 +15,7 @@ class BudgetSheet(models.Model):
     revenueBreakdownData = models.JSONField(default=dict)
     total_cost = models.FloatField(null=False, blank=False, default=0.0)
     total_revenue = models.FloatField(null=False, blank=False, default=0.0)
-    created_on = models.DateTimeField(null=False, blank=False, auto_now_add=True)
+    approval_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Budget Sheet'

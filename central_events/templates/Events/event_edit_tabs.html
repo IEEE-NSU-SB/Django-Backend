@@ -83,8 +83,8 @@
         <li class="tab"><a href="{% url 'central_branch:event_edit_media_form_tab' event_id%}">Media</a></li>
         <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_edit_graphics_form_tab' event_id%}">Graphics</a></li>
         <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_edit_content_form_tab' event_id%}">Content</a></li>
+        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'finance_and_corporate_team:edit_event_budget' event_id%}">Budget</a></li>
         <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_feedback' event_id%}">Feedbacks</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="#">Budget</a></li>
         <div style="border-left: 10px solid transparent;"></div>
         <p class="google_calendar_btn"><a href="{% url 'central_branch:google_calendar' event_id %}">Google Calendar</a></p>
         {% else %}

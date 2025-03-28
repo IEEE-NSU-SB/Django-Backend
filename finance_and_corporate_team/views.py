@@ -1,9 +1,11 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from central_events.models import Events
+from finance_and_corporate_team.models import BudgetSheet
 from system_administration.render_access import Access_Render
 from users.models import Members
 from central_branch.renderData import Branch
-from port.models import Roles_and_Position
+from port.models import Chapters_Society_and_Affinity_Groups, Roles_and_Position
 from django.contrib import messages
 from .renderData import FinanceAndCorporateTeam
 from system_administration.models import FCT_Data_Access
@@ -162,6 +164,78 @@ def budgetHomePage(request):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_page(request):
+
+    try:
+
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        '''Only events organised by INSB would be shown on the event page of Graphics Team
+        So, only those events are being retrieved from database'''
+        insb_organised_events = Branch.load_insb_organised_events()
+    
+        context = {
+            'all_sc_ag':sc_ag,
+            'events_of_insb_only':insb_organised_events,
+            'user_data':user_data,
+        }
+
+
+        return render(request,"Events/finance_and_corporate_team_events.html",context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
+    
+@login_required
+@member_login_permission
+def create_budget(request, event_id=None):
+
+    if event_id:
+        if BudgetSheet.objects.filter(event=event_id).count() > 0:
+            budget_sheet = BudgetSheet.objects.get(event=event_id)
+            return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+        
+        elif Events.objects.filter(id=event_id).count() == 0:
+            return redirect('finance_and_corporate_team:event_page')
+        
+        
+        # event = Events.objects.get(id=event_id)
+        # budget_sheet = BudgetSheet.objects.create(name=f'Budget Of {event.event_name}', sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1), event=event)
+            
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
+    context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
+    }
+
+    return render(request,"finance_and_corporate_team/budgetPage.html", context)
+
+
+@login_required
+@member_login_permission
+def edit_budget(request, sheet_id):
+
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
+    budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+
+    context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
+    }
+
+    return render(request,"finance_and_corporate_team/budgetPage.html", context)
     
 def budgetPage(request):
     try:
