@@ -252,6 +252,22 @@
                         </tr>
                     </thead>
                     <tbody id="cost-body">
+                        {% if budget_sheet.costBreakdownData %}
+                        {% for row, data in budget_sheet.costBreakdownData.items %}
+                        <tr>
+                            <td><input type="text" class="item-input" name="cst_item" placeholder="Food" value="{{data.0}}"></td>
+                            <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20" value="{{data.1}}"></td>
+                            <td><input type="number" class="unit-cost-input" name="cst_upc_bdt" oninput="calculateCostTotal(this)" placeholder="500" value="{{data.2}}"></td>
+                            <td class="total-cell">{{data.3}}</td>
+                            <input type="hidden" class="totalinput" name="cst_total" value="{{data.3}}">
+                            <td class="action-buttons" style="padding: 18px 4px;">
+                                <div>
+                                    <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
                         <tr>
                             <td><input type="text" class="item-input" name="cst_item" placeholder="Food"></td>
                             <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20"></td>
@@ -264,13 +280,14 @@
                                 </div>
                             </td>
                         </tr>
+                        {% endif %}
                     </tbody>
                     <tfoot>
                         <tr class="total-row">
                             <td>Total Cost</td>
                             <td></td>
                             <td></td>
-                            <td id="total-cost">0</td>
+                            <td id="total-cost">{{budget_sheet.total_cost}}</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -294,6 +311,23 @@
                         </tr>
                     </thead>
                     <tbody id="revenue-body">
+                        {% if budget_sheet.revenueBreakdownData %}
+                        {% for row, data in budget_sheet.revenueBreakdownData.items %}
+                        <tr>
+                            <td><input type="text" class="revenue-type-input" name="rev_item" placeholder="Registered Participants" value="{{data.0}}"></td>
+                            <td><input type="number" class="revenue-quantity-input" name="rev_quantity" oninput="calculateRevenueTotal(this)" placeholder="50" value="{{data.1}}">
+                            </td>
+                            <td><input type="number" class="revenue-unit-input" name="rev_upc_bdt" oninput="calculateRevenueTotal(this)" placeholder="500" value="{{data.2}}"></td>
+                            <td class="revenue-total-cell">{{data.3}}</td>
+                            <input type="hidden" class="revenue-totalinput" name="rev_total" value="{{data.3}}">
+                            <td class="action-buttons" style="padding: 18px 4px;">
+                                <div>
+                                    <button type="button" class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
                         <tr>
                             <td><input type="text" class="revenue-type-input" name="rev_item" placeholder="Registered Participants"></td>
                             <td><input type="number" class="revenue-quantity-input" name="rev_quantity" oninput="calculateRevenueTotal(this)" placeholder="50">
@@ -307,13 +341,14 @@
                                 </div>
                             </td>
                         </tr>
+                        {% endif %}
                     </tbody>
                     <tfoot>
                         <tr class="total-row">
                             <td>Total Revenue</td>
                             <td></td>
                             <td></td>
-                            <td id="total-revenue">0</td>
+                            <td id="total-revenue">{{budget_sheet.total_revenue}}</td>
                             <td></td>
                         </tr>
                     </tfoot>

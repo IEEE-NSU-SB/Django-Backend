@@ -196,6 +196,49 @@ def event_page(request):
 @member_login_permission
 def create_budget(request, event_id=None):
 
+    if request.method == "POST":
+        cst_item = request.POST.getlist('cst_item')
+        cst_quantity = request.POST.getlist('cst_quantity')
+        cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+        cst_total = request.POST.getlist('cst_total')
+
+        total_cost = 0
+        for cost in cst_total:
+            total_cost += float(cost)
+
+        rev_item = request.POST.getlist('rev_item')
+        rev_quantity = request.POST.getlist('rev_quantity')
+        rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+        rev_total = request.POST.getlist('rev_total')
+
+        total_revenue = 0
+        for revenue in rev_total:
+            total_revenue += float(revenue)
+
+        # cost_data = [
+        #     ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
+        # ]
+        cost_data =  {}
+        for i in range(len(cst_item)):
+            cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+        # revenue_data = [
+        #     ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]
+        # ]
+        revenue_data = {}
+        for i in range(len(rev_item)):
+            revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+        event = Events.objects.get(id=event_id)
+        BudgetSheet.objects.create(name=f'Budget Of {event.event_name}',
+                                   sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
+                                   event=event,
+                                   costBreakdownData=cost_data,
+                                   revenueBreakdownData=revenue_data,
+                                   total_cost=total_cost,
+                                   total_revenue=total_revenue
+                                   )
+
     if event_id:
         if BudgetSheet.objects.filter(event=event_id).count() > 0:
             budget_sheet = BudgetSheet.objects.get(event=event_id)
@@ -203,6 +246,8 @@ def create_budget(request, event_id=None):
         
         elif Events.objects.filter(id=event_id).count() == 0:
             return redirect('finance_and_corporate_team:event_page')
+    else:
+        pass
         
         
         # event = Events.objects.get(id=event_id)
@@ -233,6 +278,7 @@ def edit_budget(request, sheet_id):
     context = {
         'all_sc_ag':sc_ag,
         'user_data':user_data,
+        'budget_sheet':budget_sheet
     }
 
     return render(request,"finance_and_corporate_team/budgetPage.html", context)
