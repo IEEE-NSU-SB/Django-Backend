@@ -287,7 +287,7 @@
                             <td>Total Cost</td>
                             <td></td>
                             <td></td>
-                            <td id="total-cost">{{budget_sheet.total_cost}}</td>
+                            <td id="total-cost">{{budget_sheet.total_cost|floatformat:2}}</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -348,7 +348,7 @@
                             <td>Total Revenue</td>
                             <td></td>
                             <td></td>
-                            <td id="total-revenue">{{budget_sheet.total_revenue}}</td>
+                            <td id="total-revenue">{{budget_sheet.total_revenue|floatformat:2}}</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -358,12 +358,12 @@
                     <div>
                         <strong>Deficit:</strong>
                         BDT
-                        <span id="deficit-surplus">0</span>
+                        <span id="deficit-surplus">{% if deficit %}{{deficit|floatformat:2}}{% else %}0{% endif %}</span>
                     </div>
                     <div>
                         <strong>Surplus:</strong>
                         BDT
-                        <span id="net-income">0</span>
+                        <span id="net-income">{% if surplus %}{{surplus|floatformat:2}}{% else %}0{% endif %}</span>
                     </div>
                     
                 </div>

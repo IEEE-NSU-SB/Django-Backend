@@ -21,8 +21,7 @@ urlpatterns = [
     path('task/<int:task_id>/add_task/<int:team_primary>/<int:by_coordinators>/',add_task,name="add_task_team"),
     
     #Budget
-    path('budgetHomePage/',views.budgetHomePage,name="budgetHomePage"),
-    path('budgetPage/',views.budgetPage,name="budgetPage"),
+    path('budget/',views.budgetHomePage,name="budgetHomePage"),    
     path('budget/create_budget/',views.create_budget,name="create_budget"),
     path('budget/event_budget/<int:event_id>/',views.create_budget,name="edit_event_budget"),
     path('budget/edit/<int:sheet_id>/',views.edit_budget,name="edit_budget"),
