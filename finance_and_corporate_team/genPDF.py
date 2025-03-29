@@ -9,24 +9,29 @@ from reportlab.platypus import Paragraph
 
 class BudgetPDF:
 
-    def create_pdf(title, cost_data, revenue_data):
+    def create_pdf(sc_ag_primary, title, cost_data, revenue_data):
         # Create a BytesIO buffer to hold the PDF data
         buffer = BytesIO()
 
         c = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
-        print(A4)
 
-        # Watermark Logo (Behind the Text)
-        c.setFillAlpha(0.1)  # Make watermark logo faint
-        # c.drawImage('WIE.png', 40, 230, width=470, height=470, mask='auto')     
+        # if sc_ag_primary == 1:
+        #     # Watermark Logo (Behind the Text)
+        #     c.setFillAlpha(0.1)  # Make watermark logo faint
+        #     c.drawImage('INSB.png', 50, 230, width=470, height=470, mask='auto')
+        # else:
+        #     # Watermark Logo (Behind the Text)
+        #     c.setFillAlpha(0.1)  # Make watermark logo faint
+        #     c.drawImage('WIE.png', 40, 230, width=470, height=470, mask='auto')
         
-         # Top Left Logo
-        c.setFillAlpha(1)  # Ensure logos are fully opaque
+        #  # Top Left Logo
+        # c.setFillAlpha(1)  # Ensure logos are fully opaque
         # c.drawImage('INSB.png', 50, height - 70, width=40, height=40, mask='auto')
 
-        # Top Right Logo
-        # c.drawImage('WIE.png', width - 90, height - 70, width=40, height=40, mask='auto')
+        # if sc_ag_primary != 1:
+        #     # Top Right Logo
+        #     c.drawImage('WIE.png', width - 90, height - 70, width=40, height=40, mask='auto')
 
         # Title
         c.setFont("Helvetica-Bold", 16)

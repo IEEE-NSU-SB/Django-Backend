@@ -1,5 +1,7 @@
+from central_events.models import Events
+from finance_and_corporate_team.models import BudgetSheet
 from users.models import Members
-from port.models import Teams,Roles_and_Position
+from port.models import Chapters_Society_and_Affinity_Groups, Teams,Roles_and_Position
 from system_administration.models import FCT_Data_Access
 from central_branch.renderData import Branch
 class FinanceAndCorporateTeam:
@@ -80,5 +82,79 @@ class FinanceAndCorporateTeam:
                 return True
             else:
                 return False
+        except:
+            return False
+        
+    def create_budget(event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+        
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                total_cost += float(cost)
+
+            total_revenue = 0
+            for revenue in rev_total:
+                total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            if event_id:
+                event = Events.objects.get(id=event_id)
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
+                                        sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
+                                        event=event,
+                                        costBreakdownData=cost_data,
+                                        revenueBreakdownData=revenue_data,
+                                        total_cost=total_cost,
+                                        total_revenue=total_revenue)           
+            else:
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget Of XYZ',
+                                                        sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
+                                                        costBreakdownData=cost_data,
+                                                        revenueBreakdownData=revenue_data,
+                                                        total_cost=total_cost,
+                                                        total_revenue=total_revenue)
+                
+            return budget_sheet
+        
+        except:
+            return False
+        
+    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                if cost:
+                    total_cost += float(cost)
+
+            total_revenue = 0
+            for revenue in rev_total:
+                if revenue:
+                    total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+            budget_sheet.costBreakdownData = cost_data
+            budget_sheet.revenueBreakdownData = revenue_data
+            budget_sheet.total_cost = total_cost
+            budget_sheet.total_revenue = total_revenue
+            budget_sheet.save()
+
+            return True
+        
         except:
             return False

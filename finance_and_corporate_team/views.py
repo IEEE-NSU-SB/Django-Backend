@@ -200,70 +200,48 @@ def event_page(request):
 @member_login_permission
 def create_budget(request, event_id=None):
 
-    if request.method == "POST":
-        cst_item = request.POST.getlist('cst_item')
-        cst_quantity = request.POST.getlist('cst_quantity')
-        cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-        cst_total = request.POST.getlist('cst_total')
+    try:
+        if request.method == "POST":
+            cst_item = request.POST.getlist('cst_item')
+            cst_quantity = request.POST.getlist('cst_quantity')
+            cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+            cst_total = request.POST.getlist('cst_total')
 
-        total_cost = 0
-        for cost in cst_total:
-            total_cost += float(cost)
+            rev_item = request.POST.getlist('rev_item')
+            rev_quantity = request.POST.getlist('rev_quantity')
+            rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+            rev_total = request.POST.getlist('rev_total')
 
-        rev_item = request.POST.getlist('rev_item')
-        rev_quantity = request.POST.getlist('rev_quantity')
-        rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-        rev_total = request.POST.getlist('rev_total')
-
-        total_revenue = 0
-        for revenue in rev_total:
-            total_revenue += float(revenue)
-
-        cost_data =  {}
-        for i in range(len(cst_item)):
-            cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
-
-        revenue_data = {}
-        for i in range(len(rev_item)):
-            revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+            budget_sheet = FinanceAndCorporateTeam.create_budget(event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+            
+            if budget_sheet:
+                return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+            else:
+                return redirect('finance_and_corporate_team:event_page')
 
         if event_id:
-            event = Events.objects.get(id=event_id)
-            BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
-                                    sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
-                                    event=event,
-                                    costBreakdownData=cost_data,
-                                    revenueBreakdownData=revenue_data,
-                                    total_cost=total_cost,
-                                    total_revenue=total_revenue)
-        else:
-            budget_sheet = BudgetSheet.objects.create(name=f'Budget Of XYZ',
-                                                    sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
-                                                    costBreakdownData=cost_data,
-                                                    revenueBreakdownData=revenue_data,
-                                                    total_cost=total_cost,
-                                                    total_revenue=total_revenue)
-            return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+                return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+            
+            elif Events.objects.filter(id=event_id).count() == 0:
+                return redirect('finance_and_corporate_team:event_page')
+                                
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
 
-    if event_id:
-        if BudgetSheet.objects.filter(event=event_id).count() > 0:
-            budget_sheet = BudgetSheet.objects.get(event=event_id)
-            return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
-        
-        elif Events.objects.filter(id=event_id).count() == 0:
-            return redirect('finance_and_corporate_team:event_page')
-                            
-    sc_ag=PortData.get_all_sc_ag(request=request)
-    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
-    user_data=current_user.getUserData() #getting user data as dictionary file
+        context = {
+            'all_sc_ag':sc_ag,
+            'user_data':user_data,
+        }
 
-    context = {
-        'all_sc_ag':sc_ag,
-        'user_data':user_data,
-    }
+        return render(request,"finance_and_corporate_team/budgetPage.html", context)
 
-    return render(request,"finance_and_corporate_team/budgetPage.html", context)
-
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
 
 @login_required
 @member_login_permission
@@ -275,37 +253,15 @@ def edit_budget(request, sheet_id):
         cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
         cst_total = request.POST.getlist('cst_total')
 
-        total_cost = 0
-        for cost in cst_total:
-            if cost:
-                total_cost += float(cost)
-
         rev_item = request.POST.getlist('rev_item')
         rev_quantity = request.POST.getlist('rev_quantity')
         rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
         rev_total = request.POST.getlist('rev_total')
 
-        total_revenue = 0
-        for revenue in rev_total:
-            if revenue:
-                total_revenue += float(revenue)
-
-        cost_data =  {}
-        for i in range(len(cst_item)):
-            cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
-
-        revenue_data = {}
-        for i in range(len(rev_item)):
-            revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
-
-        budget_sheet = BudgetSheet.objects.get(id=sheet_id)
-        budget_sheet.costBreakdownData = cost_data
-        budget_sheet.revenueBreakdownData = revenue_data
-        budget_sheet.total_cost = total_cost
-        budget_sheet.total_revenue = total_revenue
-        budget_sheet.save()
-        
-        return redirect('finance_and_corporate_team:edit_budget', budget_sheet)
+        if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+            return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+        else:
+            return redirect('finance_and_corporate_team:edit_budget', sheet_id)
 
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -340,7 +296,7 @@ def download_budget(request):
             if request.GET.get('pdf'):
                 sheet_id = request.GET.get('sheet_id')
                 budget_sheet = BudgetSheet.objects.get(id=sheet_id)
-                file = BudgetPDF.create_pdf(budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
+                file = BudgetPDF.create_pdf(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
                 
                 # Create response with PDF as attachment
                 response = HttpResponse(file, content_type='application/pdf')
