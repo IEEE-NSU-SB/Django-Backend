@@ -67,7 +67,24 @@
 
         .add-row-btn {
             border: none;
-            padding: 0.5rem 2rem;
+            padding: 2px -5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            /* display: flex; */
+            /* align-items: center; */
+            gap: 0.5rem;
+            background-color: #fefefe;
+            color: #00629B;
+            /* border: 1px solid #00629B;*/
+        }
+        
+        .add-row-btn:hover {
+            color: #0083CA;
+        }
+        .download-btn {
+            border: none;
+            padding: .5rem 2rem;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -79,10 +96,9 @@
             border: 1px solid #00629B;
         }
         
-        .add-row-btn:hover {
-            background-color: var(--primary-color);
+        .download-btn:hover {
             color: white;
-            border: 1px solid #00629B;
+            background-color: #00629B;
         }
 
         table {
@@ -129,6 +145,7 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+            justify-content: center;
         }
 
         .action-btn {
@@ -200,6 +217,99 @@
             height: 31px;
             margin-right: 4px;
         }
+        .modal-1-content::-webkit-scrollbar{
+            width: 6px;
+            height: 6px;
+        }
+        .modal-1-content::-webkit-scrollbar-thumb{
+            background-color: #e7eeef;
+            transition: all .4s ease-in-out;
+            border-radius: 4px;
+        }
+        .modal-1-content::-webkit-scrollbar-thumb:hover{
+            background-color: rgb(169, 170, 170);
+        }
+        .modal-1-content{
+            background-color: #fefefe;
+            margin: auto 35%;
+            padding: 20px;
+            border: 1px solid rgb(136, 136, 136);
+            width: 40%;
+        }
+        .download_modal{
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 50px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.5);
+        transition: all .3s ease-in-out;
+        transform: translateY(-20px);
+        overflow: auto;
+        }
+        .close_1{
+            color: #000;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close_1:hover,
+        .close_1:focus{
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 1024px) {
+            .modal-1-content{
+                left: 0px;
+                margin: auto;
+            }
+        }
+        @media screen and (max-width: 650px) {
+            .modal-1-content{
+                width: auto;
+            }
+        }
+        @media screen and (max-width: 900px) {
+            .budget_container{
+                margin: 5%;
+            }
+        }
+        .cancel_download{
+            padding: 2px 26px;
+            color: #0000008f;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #0000004f;
+            transition: all ease-in-out .3s;
+        }
+        .cancel_download:hover{
+            color: white;
+            background: #0000004f;
+            border-color: transparent;
+        }
+        .confirm_download{
+            padding: 2px 26px;
+            border-radius: 4px;
+            border: 1px solid #d33838;
+            transition: all ease-in-out .3s;
+            background: white;
+            color: #d33838;
+        }
+        .confirm_download:hover{
+            color: white;
+            background: #d33838;
+            border-color: #d33838;
+        }
+        .modal-1-content input{
+            width: auto;
+        }
     </style>
 </head>
 
@@ -226,19 +336,17 @@
         <!--navbar content end-->
         <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">XYZ</span> event</h2>
         <div class="container">
+            <div class="budget_container">
             <div style="display: flex;
                  justify-content: flex-end;">
                  <input type="number" name="" id="" class="conversion_rate" placeholder="USD rate today">
-                 <a href="#" class="convert-usd-bdt">Convert to USD</a>
+                 <a href="#" class="convert-usd-bdt">Show USD</a>
              </div>
 
         <form method="POST">
                 {% csrf_token %}
                 <div class="budget-header">
-                    <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>
-                    <button type="button" class="add-row-btn" onclick="addCostRow()">
-                        + Add Row
-                    </button>
+                    <h2 style="border-bottom: 2px solid #00629B;">Cost Breakdown</h2>   
                 </div>
     
                 <table>
@@ -271,16 +379,17 @@
                             <td></td>
                             <td></td>
                             <td id="total-cost">0</td>
-                            <td></td>
+                            <td>
+                                <button type="button" class="add-row-btn" onclick="addCostRow()">
+                                    + Add Row
+                                </button>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
     
                 <div class="budget-header" style="margin-top: 4rem;">
                     <h2 style="border-bottom: 2px solid #00629B;">Revenue Breakdown</h2>
-                    <button class="add-row-btn" onclick="addRevenueRow()">
-                        + Add Row
-                    </button>
                 </div>
     
                 <table>
@@ -314,7 +423,9 @@
                             <td></td>
                             <td></td>
                             <td id="total-revenue">0</td>
-                            <td></td>
+                            <td><button class="add-row-btn" onclick="addRevenueRow()">
+                                + Add Row
+                            </button></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -334,13 +445,26 @@
                 </div>
                 
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <button class="add-row-btn">
-                        Download
-                    </button>
+                    <a href="#" class="download-btn">Download</a>
                     <button class="save-btn">Save Budget</button>
                 </div>
         </form>
-
+        <div id="modal_1" class="download_modal">
+            <!-- Modal content -->
+            <div class="modal-1-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                <h5>Download</h5>
+                <span class="close_1">&times;</span>
+            </div>
+            <h6 style="margin-bottom: 20px;">Select download format</h6>
+                <input type="radio" id="pdf" name="pdf">
+                <label for="pdf">PDF</label>
+            <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
+                <a href="#" class="cancel_download">Cancel</a>
+                <button type="submit" class="confirm_download" name="confirm_download">Confirm</button>
+        </div>
+        </div>
+        </div>
             <!--Theme Switcher-->
             {% block theme_switcher %}
             {% include "theme_switcher.html" %}
@@ -350,7 +474,8 @@
 
             {% block common_js %}
             {% include "common_js.html" %}
-            {% endblock common_js %}
+            {% endblock common_js %}                
+            </div>
         </div>
 
         <script>
@@ -520,6 +645,50 @@
         });
         
 </script>
+<script>
+    // Get the modal
+    var modal_1 = document.getElementById("modal_1");
+    
+    // Get the button that opens the modal
+    var btn_1 = document.querySelector(".download-btn");
+    
+    // Get the <span> element that closes the modal
+    var span_1 = document.getElementsByClassName("close_1")[0];
+
+    var cancel = document.getElementsByClassName('cancel_download')[0];
+
+    
+    // When the user clicks the button, open the modal 
+    btn_1.onclick = function() {
+    modal_1.style.transform = 'translateY(0px)';
+    modal_1.style.zIndex = '103100';
+    modal_1.style.opacity = '1';
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span_1.onclick = function() {
+    modal_1.style.transform = 'translateY(-50px)';
+    modal_1.style.zIndex = '-100';
+    modal_1.style.opacity = '0';
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    cancel.onclick = function() {
+    //   modal.style.display = "none";
+    modal_1.style.transform = 'translateY(-50px)';
+    modal_1.style.zIndex = '-100';
+    modal_1.style.opacity = '0';
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+     if (event.target == modal_1) {
+        modal_1.style.transform = 'translateY(-50px)';
+        modal_1.style.zIndex = '-100';
+        modal_1.style.opacity = '0';
+      }
+    }
+    </script>
 
 </body>
 
