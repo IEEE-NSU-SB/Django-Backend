@@ -481,24 +481,27 @@
                 
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <a href="#" class="download-btn">Download</a>
-                    <button class="save-btn">Save Budget</button>
+                    <button type="submit" name="save_budget" class="save-btn">Save Budget</button>
                 </div>
         </form>
         <div id="modal_1" class="download_modal">
             <!-- Modal content -->
             <div class="modal-1-content">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
-                <h5>Download</h5>
-                <span class="close_1">&times;</span>
+                <form method="GET" action="{% url 'finance_and_corporate_team:download_budget_sheet' %}">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                        <h5>Download</h5>
+                        <span class="close_1">&times;</span>
+                    </div>
+                    <h6 style="margin-bottom: 20px;">Select download format</h6>
+                    <input type="radio" id="pdf" name="pdf">
+                    <input type="hidden" name="sheet_id" value="{{budget_sheet.pk}}">
+                    <label for="pdf">PDF</label>
+                    <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
+                        <a href="#" class="cancel_download">Cancel</a>
+                        <button type="submit" class="confirm_download" name="confirm_download">Confirm</button>
+                    </div>
+                </form>
             </div>
-            <h6 style="margin-bottom: 20px;">Select download format</h6>
-                <input type="radio" id="pdf" name="pdf">
-                <label for="pdf">PDF</label>
-            <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
-                <a href="#" class="cancel_download">Cancel</a>
-                <button type="submit" class="confirm_download" name="confirm_download">Confirm</button>
-        </div>
-        </div>
         </div>
             <!--Theme Switcher-->
             {% block theme_switcher %}

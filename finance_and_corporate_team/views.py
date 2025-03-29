@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from central_events.models import Events
@@ -228,7 +229,7 @@ def create_budget(request, event_id=None):
 
         if event_id:
             event = Events.objects.get(id=event_id)
-            BudgetSheet.objects.create(name=f'Budget Of {event.event_name}',
+            BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
                                     sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1),
                                     event=event,
                                     costBreakdownData=cost_data,
@@ -329,62 +330,22 @@ def edit_budget(request, sheet_id):
     }
 
     return render(request,"finance_and_corporate_team/budgetPage.html", context)
+
+@login_required
+@member_login_permission
+def download_budget(request):
     
-def budgetPage(request):
-    try:
-        
-        if request.method == "POST":
-            cst_item = request.POST.getlist('cst_item')
-            cst_quantity = request.POST.getlist('cst_quantity')
-            cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-            cst_total = request.POST.getlist('cst_total')
+    if request.method == 'GET':
+        if request.GET.get('sheet_id'):
+            if request.GET.get('pdf'):
+                sheet_id = request.GET.get('sheet_id')
+                budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+                file = BudgetPDF.create_pdf(budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
+                
+                # Create response with PDF as attachment
+                response = HttpResponse(file, content_type='application/pdf')
+                response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.pdf"'
 
-            total_cost = 0
-            for cost in cst_total:
-                total_cost += float(cost)
-
-            rev_item = request.POST.getlist('rev_item')
-            rev_quantity = request.POST.getlist('rev_quantity')
-            rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-            rev_total = request.POST.getlist('rev_total')
-
-            total_revenue = 0
-            for revenue in rev_total:
-                total_revenue += float(revenue)
-
-            cost_data = [
-                ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"],
-            ]
-
-            for i in range(len(cst_item)):
-                cost_data.append([cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]])
-
-            revenue_data = [
-                ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]
-            ]
-
-            for i in range(len(rev_item)):
-                revenue_data.append([rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]])
-
-            BudgetPDF.create_pdf('test.pdf', cost_data, revenue_data)
-
-        sc_ag=PortData.get_all_sc_ag(request=request)
-        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
-        user_data=current_user.getUserData() #getting user data as dictionary file
-        context={
-                'user_data':user_data,
-                'all_sc_ag':sc_ag,
-            }
-        return render(request,"finance_and_corporate_team/budgetPage.html",context=context)
-    except Exception as e:
-        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
-        return cv.custom_500(request)
-
-
-
-
-
-
+                return response
 
 

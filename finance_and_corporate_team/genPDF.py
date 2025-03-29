@@ -1,3 +1,4 @@
+from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -8,27 +9,35 @@ from reportlab.platypus import Paragraph
 
 class BudgetPDF:
 
-    def create_pdf(file_name, cost_data, revenue_data):
-        c = canvas.Canvas(file_name, pagesize=A4)
+    def create_pdf(title, cost_data, revenue_data):
+        # Create a BytesIO buffer to hold the PDF data
+        buffer = BytesIO()
+
+        c = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
         # Title
         c.setFont("Helvetica-Bold", 16)
-        c.drawCentredString(width / 2, height - 50, "Succession-25 Budget")
+        c.drawCentredString(width / 2, height - 50, title)
+        c.setTitle(title)
 
         # Cost Breakdown (First)
         c.setFont("Helvetica-Bold", 12)
         c.drawString(50, height - 90, "Cost Breakdown")
 
+        cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"]}
+        cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_data, x=50, y=height - 120, col_widths=[180, 80, 120, 120])
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=height - 120, col_widths=[180, 80, 120, 120])
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
         revenue_y = new_y - 50  # Provide extra space
         c.drawString(50, revenue_y, "Total Revenue")
 
-        BudgetPDF.draw_table(c, revenue_data, x=50, y=revenue_y - 30, col_widths=[180, 80, 120, 120])
+        revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
+        revenue_header.update(revenue_data)
+        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 30, col_widths=[180, 80, 120, 120])
 
         # Signatures
         c.line(50, 100, 250, 100)
@@ -47,12 +56,17 @@ class BudgetPDF:
         # Save the PDF
         c.save()
 
+        # Move buffer cursor to the beginning
+        buffer.seek(0)
+
+        return buffer
+
     def draw_table(canvas, data, x, y, col_widths):
         styles = getSampleStyleSheet()
         styleN = styles["Normal"]
 
         # Convert long text cells to Paragraph objects for wrapping
-        wrapped_data = [[Paragraph(str(cell), styleN) for cell in row] for row in data]
+        wrapped_data = [[Paragraph(str(cell), styleN) for cell in columns] for row, columns in data.items()]
 
         table = Table(wrapped_data, colWidths=col_widths)
         table.setStyle(TableStyle([

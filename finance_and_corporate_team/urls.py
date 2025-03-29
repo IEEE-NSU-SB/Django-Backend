@@ -25,4 +25,5 @@ urlpatterns = [
     # path('budget/create_budget/',views.create_budget,name="create_budget"),
     path('budget/event_budget/<int:event_id>/',views.create_budget,name="edit_event_budget"),
     path('budget/edit/<int:sheet_id>/',views.edit_budget,name="edit_budget"),
+    path('budget/download/', views.download_budget, name='download_budget_sheet')
 ]
