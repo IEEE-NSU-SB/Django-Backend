@@ -177,10 +177,10 @@
                 <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;"> <b>The Finance & Corporate Team</b></span>'s <b>Budget Page</b>  </h2>
                 
             <div class="budget-container">
-                <div class="top-actions">
+                {% comment %} <div class="top-actions">
                     <!-- <button id="addBudgetBtn" class="budget-btn primary">Add Budget</button> -->
                     <a href="{% url 'finance_and_corporate_team:create_budget' %}" id="addBudgetBtn" class="budget-btn primary">Add Budget</a>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="search-filter">
                     <div class="search-box">
@@ -210,6 +210,14 @@
                         </thead>
                         <tbody id="budgetTableBody">
                             <!-- Table data will be dynamically loaded -->
+                             {% for budget_sheet in all_budget_sheets %}
+                             <tr>
+                                 <td>{{forloop.counter}}</td>
+                                 <td style="color:blue;">
+                                    <a href="{% url 'finance_and_corporate_team:edit_budget' budget_sheet.pk %}">{{budget_sheet.name}}</a>                                 
+                                </td>
+                             </tr>
+                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -232,13 +240,7 @@
     {% endblock common_js %}
 
     <script>
-        // Sample data for demonstration
-        const sampleData = [
-            { serial: "001", sheetName: "Q1 2025 Budget Plan" },
-            { serial: "002", sheetName: "Annual Department Budget" },
-            { serial: "003", sheetName: "Project X Expenditure" }
-        ];
-        
+
         // Populate table with sample data
         function populateTable(data) {
             const tableBody = document.getElementById('budgetTableBody');
@@ -272,7 +274,6 @@
         
         // Initialize the table
         document.addEventListener('DOMContentLoaded', () => {
-            populateTable(sampleData);
             
             // Search functionality
             document.getElementById('searchInput').addEventListener('input', (e) => {

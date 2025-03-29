@@ -155,9 +155,12 @@ def budgetHomePage(request):
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
+        all_budget_sheets = BudgetSheet.objects.all()
+
         context={
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
+                'all_budget_sheets':all_budget_sheets
             }
         return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
     except Exception as e:
