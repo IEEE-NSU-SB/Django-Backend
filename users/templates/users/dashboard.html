@@ -32,6 +32,8 @@
   <!-- endbuild -->
   <link rel="stylesheet" href="{% static '/assets/styles/font.css'%}" type="text/css" />
 
+  <script src="path/to/chartjs/dist/chart.umd.js"></script>
+
   <style>
 	.card{
 		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
@@ -313,6 +315,44 @@
 	.profile a{
 		text-align: center;
 	}
+	.wallet{
+		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+	}
+	.treasurer_container{
+		margin: 0px 0 20px 0px;
+		/* padding: 12px 14px; */
+		/* box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px; */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		/* padding: 20px; */
+		gap: 16px;
+		color: rgb(85, 85, 85);
+	}
+	.outer_box{
+		width: 18.9%;
+		padding: 12px 10px;
+		border-radius: 8px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+		/* border: 1px solid rgba(120, 130, 140, 0.13); */
+		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 8px;
+		/* background-color: rgba(120, 130, 140, 0.13); */
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		background-color: #fff;
+	}
+	.outer_box h3{
+		color: #0076ae;
+		margin: 0;
+	}
+	@media screen and (max-width:700px){
+		.outer_box{
+			width: 100%;
+		}
+	}
   </style>
 </head>
 {% block preloader %}
@@ -338,7 +378,7 @@
 	  {% endblock %}
 	  <!-- NAVIGATION BAR END -->
 	</div>
-<div ui-view class="app-body" id="view" style="background-color: #fff;">
+<div ui-view class="app-body" id="view" style="background-color: #f5f6f8;">
 
 <!-- ############ Main Content of PAGE START-->
 <!-- <div class="p-a white lt box-shadow">
@@ -377,6 +417,32 @@
 			</div>
 		</div>
 	</div>
+		<div class="treasurer_container">
+			<div class="outer_box">
+				<h6>Total Balance</h6>
+				<!-- <div style="display: flex; width: 100px; height: 50px;"> -->
+					<h3>৳ 10000</h3>
+					<!-- <canvas id="total_balance" width="70" height="150"></canvas> -->
+				<!-- </div> -->
+			</div>
+			<div class="outer_box">
+				<h6>Monthly Expense</h6>
+				<h3>৳ 10000</h3>
+			</div>
+			<div class="outer_box">
+				<h6>Event Budget</h6>
+				<h3>৳ 10000</h3>
+			</div>
+			<div class="outer_box">
+				<h6>Avg Cost</h6>
+				<h3>৳ 10000</h3>
+			</div>
+			<div class="outer_box">
+				<h6>Yearly Cost</h6>
+				<h3>৳ 10000</h3>
+			</div>
+		</div>
+
 	<div class="row">
 		<div class="col-xl-6">
 			<div class="card">
@@ -2403,6 +2469,51 @@ async function initializeCircleChart2(){
 		initializeCircleChart2();
 
 
+		const config = {
+
+		};
+		const labels = Utils.months({count: 7});
+		const data = {
+		labels: labels,
+		datasets: [{
+			label: 'My First Dataset',
+			data: [65, 59, 80, 81, 56, 55, 40],
+			fill: true,
+			borderColor: 'rgb(255 209 0)',
+			backgroundColor: 'rgb(255 209 0 / 37%)',
+			tension: 0.1
+		}]
+		};
 </script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		// Get the canvas element
+		var ctx = document.getElementById("total_balance").getContext("2d");
+		
+		// Create a chart
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+				datasets: [{
+					label: '',
+					data: [12, 19, 3, 5, 2, 3],
+					fill: true,
+					borderColor: 'rgb(255 209 0)',
+					backgroundColor: 'rgb(255 209 0 / 37%)',
+					tension: 0.1
+				}]
+			},
+			options: {
+				responsive: true,
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				}
+			}
+		});
+	});
+	</script>	
 </body>
 </html>
