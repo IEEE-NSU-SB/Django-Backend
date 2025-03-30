@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from central_events.models import Events
+from finance_and_corporate_team.manage_access import FCT_Render_Access
 from finance_and_corporate_team.models import BudgetSheet
 from system_administration.render_access import Access_Render
 from users.models import Members
@@ -59,11 +60,8 @@ def manage_team(request):
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-        '''This function loads the manage team page for finance and corporate team and is accessable
-        by the co-ordinatior only, unless the co-ordinators gives access to others as well'''
-        user = request.user
-        has_access=(Access_Render.team_co_ordinator_access(team_id=FinanceAndCorporateTeam.get_team_id(),username=user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username)
-        or FinanceAndCorporateTeam.fct_manage_team_access(user.username))
+
+        has_access = FCT_Render_Access.access_for_manage_team(request)
 
         if has_access:
             data_access = FinanceAndCorporateTeam.load_manage_team_access()
@@ -101,8 +99,11 @@ def manage_team(request):
                     manage_team_access = False
                     if(request.POST.get('manage_team_access')):
                         manage_team_access=True
+                    create_budget_access = False
+                    if(request.POST.get('create_budget_access')):
+                        create_budget_access=True
                     ieee_id=request.POST['access_ieee_id']
-                    if (FinanceAndCorporateTeam.fct_manage_team_access_modifications(manage_team_access,ieee_id)):
+                    if (FinanceAndCorporateTeam.fct_manage_team_access_modifications(manage_team_access, create_budget_access, ieee_id)):
                         permission_updated_for=Members.objects.get(ieee_id=ieee_id)
                         messages.info(request,f"Permission Details Was Updated for {permission_updated_for.name}")
                     else:
@@ -156,14 +157,21 @@ def budgetHomePage(request):
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-        all_budget_sheets = BudgetSheet.objects.all()
 
-        context={
-                'user_data':user_data,
-                'all_sc_ag':sc_ag,
-                'all_budget_sheets':all_budget_sheets
-            }
-        return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
+        has_access = FCT_Render_Access.get_common_access(request)
+
+        if has_access:      
+            all_budget_sheets = BudgetSheet.objects.all()
+
+            context={
+                    'user_data':user_data,
+                    'all_sc_ag':sc_ag,
+                    'all_budget_sheets':all_budget_sheets
+                }
+            return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
+        else:
+            return render(request,"finance_and_corporate_team/access_denied.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())

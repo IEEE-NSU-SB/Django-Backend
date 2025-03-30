@@ -218,7 +218,8 @@ class Graphics_Data_Access(models.Model):
 class FCT_Data_Access(models.Model):
 
     ieee_id = models.ForeignKey(Members,null=False,blank=False,on_delete=models.CASCADE,verbose_name="IEEE ID")
-    manage_team_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Access")
+    manage_team_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Manage Team Permission")
+    create_budget_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Create Budget Access")
 
     class Meta:
 

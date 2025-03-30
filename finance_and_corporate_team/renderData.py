@@ -40,16 +40,14 @@ class FinanceAndCorporateTeam:
                     core_volunteers.append(i)
                 else:
                     team_volunteers.append(i)
-        return co_ordinators,incharges,core_volunteers,team_volunteers
-                    
-        
+        return co_ordinators,incharges,core_volunteers,team_volunteers      
     
     def add_member_to_team(ieee_id,position):
         Branch.add_member_to_team(ieee_id=ieee_id,position=position,team_primary=11)
 
-    def fct_manage_team_access_modifications(manage_team_access,ieee_id):
+    def fct_manage_team_access_modifications(manage_team_access, create_budget_access, ieee_id):
         try:
-            FCT_Data_Access.objects.filter(ieee_id=ieee_id).update(manage_team_access=manage_team_access)
+            FCT_Data_Access.objects.filter(ieee_id=ieee_id).update(manage_team_access=manage_team_access, create_budget_access=create_budget_access)
             return True
         except FCT_Data_Access.DoesNotExist:
             return False
@@ -72,16 +70,6 @@ class FinanceAndCorporateTeam:
                 )
                 new_access.save()
             return True
-        except:
-            return False
-        
-    def fct_manage_team_access(ieee_id):
-        try:
-            user = FCT_Data_Access.objects.get(ieee_id = ieee_id)
-            if(user.manage_team_access):
-                return True
-            else:
-                return False
         except:
             return False
         
