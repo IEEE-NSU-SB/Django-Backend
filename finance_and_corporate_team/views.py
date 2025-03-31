@@ -209,42 +209,48 @@ def event_page(request):
 def create_budget(request, event_id=None):
 
     try:
-        if request.method == "POST":
-            cst_item = request.POST.getlist('cst_item')
-            cst_quantity = request.POST.getlist('cst_quantity')
-            cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-            cst_total = request.POST.getlist('cst_total')
-
-            rev_item = request.POST.getlist('rev_item')
-            rev_quantity = request.POST.getlist('rev_quantity')
-            rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-            rev_total = request.POST.getlist('rev_total')
-
-            budget_sheet = FinanceAndCorporateTeam.create_budget(event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
-            
-            if budget_sheet:
-                return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
-            else:
-                return redirect('finance_and_corporate_team:event_page')
-
-        if event_id:
-            if BudgetSheet.objects.filter(event=event_id).count() > 0:
-                budget_sheet = BudgetSheet.objects.get(event=event_id)
-                return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
-            
-            elif Events.objects.filter(id=event_id).count() == 0:
-                return redirect('finance_and_corporate_team:event_page')
-                                
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
+    
+        has_access = FCT_Render_Access.access_for_create_budget(request)
 
-        context = {
-            'all_sc_ag':sc_ag,
-            'user_data':user_data,
-        }
+        if has_access:
+            if request.method == "POST":
+                cst_item = request.POST.getlist('cst_item')
+                cst_quantity = request.POST.getlist('cst_quantity')
+                cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+                cst_total = request.POST.getlist('cst_total')
 
-        return render(request,"finance_and_corporate_team/budgetPage.html", context)
+                rev_item = request.POST.getlist('rev_item')
+                rev_quantity = request.POST.getlist('rev_quantity')
+                rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+                rev_total = request.POST.getlist('rev_total')
+
+                budget_sheet = FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                
+                if budget_sheet:
+                    return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+                else:
+                    return redirect('finance_and_corporate_team:event_page')
+
+            if event_id:
+                if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                    budget_sheet = BudgetSheet.objects.get(event=event_id)
+                    return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
+                
+                elif Events.objects.filter(id=event_id).count() == 0:
+                    return redirect('finance_and_corporate_team:event_page')
+
+            context = {
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'access_type':'Edit'
+            }
+
+            return render(request,"finance_and_corporate_team/budgetPage.html", context)
+        else:
+            return render(request,"finance_and_corporate_team/access_denied.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
 
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
@@ -255,45 +261,62 @@ def create_budget(request, event_id=None):
 @member_login_permission
 def edit_budget(request, sheet_id):
 
-    if request.method == "POST":
-        cst_item = request.POST.getlist('cst_item')
-        cst_quantity = request.POST.getlist('cst_quantity')
-        cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-        cst_total = request.POST.getlist('cst_total')
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        
+        access_type = FCT_Render_Access.access_for_budget(request, sheet_id)
 
-        rev_item = request.POST.getlist('rev_item')
-        rev_quantity = request.POST.getlist('rev_quantity')
-        rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-        rev_total = request.POST.getlist('rev_total')
+        if access_type == 'Edit':
+            if request.method == "POST":
+                cst_item = request.POST.getlist('cst_item')
+                cst_quantity = request.POST.getlist('cst_quantity')
+                cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+                cst_total = request.POST.getlist('cst_total')
 
-        if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
-            return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                rev_item = request.POST.getlist('rev_item')
+                rev_quantity = request.POST.getlist('rev_quantity')
+                rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+                rev_total = request.POST.getlist('rev_total')
+
+                if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                    return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                else:
+                    return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                
+        if access_type == 'Edit' or access_type == 'ViewOnly':
+            
+            try:
+                budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+            except:
+                return redirect('finance_and_corporate_team:event_page')
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            if budget_sheet.total_cost > budget_sheet.total_revenue:
+                deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+            elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+
+            context = {
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type':access_type,
+                'deficit':deficit,
+                'surplus':surplus
+            }
+
+            return render(request,"finance_and_corporate_team/budgetPage.html", context)
         else:
-            return redirect('finance_and_corporate_team:edit_budget', sheet_id)
-
-    sc_ag=PortData.get_all_sc_ag(request=request)
-    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
-    user_data=current_user.getUserData() #getting user data as dictionary file
-
-    budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+            return render(request,"finance_and_corporate_team/access_denied.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
     
-    deficit = 0.0
-    surplus = 0.0
-
-    if budget_sheet.total_cost > budget_sheet.total_revenue:
-        deficit = budget_sheet.total_revenue - budget_sheet.total_cost
-    elif budget_sheet.total_cost < budget_sheet.total_revenue:
-        surplus = budget_sheet.total_revenue - budget_sheet.total_cost
-
-    context = {
-        'all_sc_ag':sc_ag,
-        'user_data':user_data,
-        'budget_sheet':budget_sheet,
-        'deficit':deficit,
-        'surplus':surplus
-    }
-
-    return render(request,"finance_and_corporate_team/budgetPage.html", context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
 
 @login_required
 @member_login_permission

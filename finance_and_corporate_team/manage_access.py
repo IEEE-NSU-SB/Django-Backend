@@ -2,6 +2,7 @@
 from datetime import datetime
 import logging
 import traceback
+from finance_and_corporate_team.models import BudgetSheetAccess
 from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from system_administration.models import FCT_Data_Access
 from system_administration.render_access import Access_Render
@@ -90,7 +91,7 @@ class FCT_Render_Access:
             get_member = FCT_Data_Access.objects.filter(ieee_id=username)
             #Check if the member exits
             if(get_member.exists()):
-                #The member exists. Now check if it has events access
+                #The member exists. Now check if it has budget creation access
                 if(get_member[0].create_budget_access or FCT_Render_Access.get_common_access(request)):
                     return True
                 else:
@@ -108,3 +109,33 @@ class FCT_Render_Access:
                 FCT_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
                 ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
                 return False
+            
+    def access_for_budget(request, sheet_id):
+        # ''' This function checks if the requested user has access to edit a budget. Will return True if it has access permission '''
+        try:
+            # get the user and username. Username will work as IEEE ID and Developer username both
+            user=request.user
+            username=user.username
+
+            #Get member from graphics data access table
+            get_member = BudgetSheetAccess.objects.filter(member=username, sheet=sheet_id)
+            #Check if the member exits
+            if(get_member.exists()):
+                #The member exists. Now check if it has budget access
+                if(FCT_Render_Access.get_common_access(request)):
+                    return 'Edit'
+                else:
+                    return get_member[0].access_type
+            else:
+                #The member does not exist in the permissions table
+                if(FCT_Render_Access.get_common_access(request)):
+                    return 'Edit'
+                else:
+                    return 'Restricted'
+        except Exception as e:
+            if(FCT_Render_Access.get_common_access(request)):
+                return 'Edit'
+            else:
+                FCT_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+                ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+                return 'Restricted'

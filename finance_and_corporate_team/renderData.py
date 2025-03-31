@@ -1,5 +1,5 @@
 from central_events.models import Events
-from finance_and_corporate_team.models import BudgetSheet
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from users.models import Members
 from port.models import Chapters_Society_and_Affinity_Groups, Teams,Roles_and_Position
 from system_administration.models import FCT_Data_Access
@@ -73,16 +73,18 @@ class FinanceAndCorporateTeam:
         except:
             return False
         
-    def create_budget(event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+    def create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
         
         try:
             total_cost = 0
             for cost in cst_total:
-                total_cost += float(cost)
+                if cost:
+                    total_cost += float(cost)
 
             total_revenue = 0
             for revenue in rev_total:
-                total_revenue += float(revenue)
+                if revenue:
+                    total_revenue += float(revenue)
 
             cost_data =  {}
             for i in range(len(cst_item)):
@@ -108,6 +110,11 @@ class FinanceAndCorporateTeam:
                                                         revenueBreakdownData=revenue_data,
                                                         total_cost=total_cost,
                                                         total_revenue=total_revenue)
+                
+            username = request.user.username
+            member = Members.objects.get(ieee_id=username)
+
+            BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
                 
             return budget_sheet
         

@@ -337,11 +337,13 @@
         <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">XYZ</span> event</h2>
         <div class="container">
             <div class="budget_container">
-            <div style="display: flex;
-                 justify-content: flex-end;">
-                 <input type="number" name="" id="" class="conversion_rate" placeholder="USD rate today">
-                 <a href="#" class="convert-usd-bdt">Show USD</a>
-             </div>
+                {% if access_type == 'Edit' %}
+                <div style="display: flex;
+                     justify-content: flex-end;">
+                     <input type="number" name="" id="" class="conversion_rate" placeholder="USD rate today">
+                     <a href="#" class="convert-usd-bdt">Show USD</a>
+                 </div>
+                {% endif %}
 
         <form method="POST">
                 {% csrf_token %}
@@ -356,23 +358,25 @@
                             <th>Quantity</th>
                             <th>Unit Per Cost (BDT)</th>
                             <th>Total</th>
-                            <th>Actions</th>
+                            {% if access_type == 'Edit' %}<th>Actions</th>{% endif %}
                         </tr>
                     </thead>
                     <tbody id="cost-body">
                         {% if budget_sheet.costBreakdownData %}
                         {% for row, data in budget_sheet.costBreakdownData.items %}
                         <tr>
-                            <td><input type="text" class="item-input" name="cst_item" placeholder="Food" value="{{data.0}}"></td>
-                            <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20" value="{{data.1}}"></td>
-                            <td><input type="number" class="unit-cost-input" name="cst_upc_bdt" oninput="calculateCostTotal(this)" placeholder="500" value="{{data.2}}"></td>
+                            <td><input type="text" class="item-input" name="cst_item" placeholder="Food" value="{{data.0}}" {% if access_type != 'Edit' %}disabled{% endif %}></td>
+                            <td><input type="number" class="quantity-input" name="cst_quantity" oninput="calculateCostTotal(this)" placeholder="20" value="{{data.1}}" {% if access_type != 'Edit' %}disabled{% endif %}></td>
+                            <td><input type="number" class="unit-cost-input" name="cst_upc_bdt" oninput="calculateCostTotal(this)" placeholder="500" value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}></td>
                             <td class="total-cell">{{data.3}}</td>
-                            <input type="hidden" class="totalinput" name="cst_total" value="{{data.3}}">
+                            <input type="hidden" class="totalinput" name="cst_total" value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}>
+                            {% if access_type == 'Edit' %}
                             <td class="action-buttons" style="padding: 18px 4px;">
                                 <div>
                                     <button class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
                                 </div>
                             </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                         {% else %}
@@ -396,11 +400,13 @@
                             <td></td>
                             <td></td>
                             <td id="total-cost">{{budget_sheet.total_cost|floatformat:2}}</td>
+                            {% if access_type == 'Edit' %}
                             <td>
                                 <button type="button" class="add-row-btn" onclick="addCostRow()">
                                     + Add Row
                                 </button>
                             </td>
+                            {% endif %}
                         </tr>
                     </tfoot>
                 </table>
@@ -416,24 +422,26 @@
                             <th>Quantity</th>
                             <th>Revenue/Unit (BDT)</th>
                             <th>Total</th>
-                            <th>Actions</th>
+                            {% if access_type == 'Edit' %}<th>Actions</th>{% endif %}
                         </tr>
                     </thead>
                     <tbody id="revenue-body">
                         {% if budget_sheet.revenueBreakdownData %}
                         {% for row, data in budget_sheet.revenueBreakdownData.items %}
                         <tr>
-                            <td><input type="text" class="revenue-type-input" name="rev_item" placeholder="Registered Participants" value="{{data.0}}"></td>
-                            <td><input type="number" class="revenue-quantity-input" name="rev_quantity" oninput="calculateRevenueTotal(this)" placeholder="50" value="{{data.1}}">
+                            <td><input type="text" class="revenue-type-input" name="rev_item" placeholder="Registered Participants" value="{{data.0}}" {% if access_type != 'Edit' %}disabled{% endif %}></td>
+                            <td><input type="number" class="revenue-quantity-input" name="rev_quantity" oninput="calculateRevenueTotal(this)" placeholder="50" value="{{data.1}}" {% if access_type != 'Edit' %}disabled{% endif %}>
                             </td>
-                            <td><input type="number" class="revenue-unit-input" name="rev_upc_bdt" oninput="calculateRevenueTotal(this)" placeholder="500" value="{{data.2}}"></td>
+                            <td><input type="number" class="revenue-unit-input" name="rev_upc_bdt" oninput="calculateRevenueTotal(this)" placeholder="500" value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}></td>
                             <td class="revenue-total-cell">{{data.3}}</td>
-                            <input type="hidden" class="revenue-totalinput" name="rev_total" value="{{data.3}}">
+                            <input type="hidden" class="revenue-totalinput" name="rev_total" value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}>
+                            {% if access_type == 'Edit' %}
                             <td class="action-buttons" style="padding: 18px 4px;">
                                 <div>
                                     <button type="button" class="action-btn remove-btn" onclick="removeRow(this)">Remove</button>
                                 </div>
                             </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                         {% else %}
@@ -458,9 +466,11 @@
                             <td></td>
                             <td></td>
                             <td id="total-revenue">{{budget_sheet.total_revenue|floatformat:2}}</td>
+                            {% if access_type == 'Edit' %}
                             <td><button type="button" class="add-row-btn" onclick="addRevenueRow()">
                                 + Add Row
                             </button></td>
+                            {% endif %}
                         </tr>
                     </tfoot>
                 </table>
@@ -481,7 +491,9 @@
                 
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <a href="#" class="download-btn">Download</a>
+                    {% if access_type == 'Edit' %}
                     <button type="submit" name="save_budget" class="save-btn">Save Budget</button>
+                    {% endif %}
                 </div>
         </form>
         <div id="modal_1" class="download_modal">
