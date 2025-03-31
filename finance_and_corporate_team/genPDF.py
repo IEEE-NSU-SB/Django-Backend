@@ -6,6 +6,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph
+import xlwt
 
 class BudgetPDF:
 
@@ -115,3 +116,77 @@ class BudgetPDF:
 
         # Return new Y position after drawing the table
         return y - (len(data) * 20) - 20  # Adding extra spacing
+
+    def export_budget_sheet_to_excel(sc_ag_primary, title, cost_data, revenue_data):
+
+        # Create a workbook and add a worksheet
+        wb = xlwt.Workbook()
+        ws = wb.add_sheet("Budget Sheet")
+
+        # Define styles
+        header_style = xlwt.easyxf(
+            "font: bold on; align: horiz center, vert center; borders: bottom medium"
+        )
+        subheader_style = xlwt.easyxf("font: bold on; align: horiz left")
+        data_style = xlwt.easyxf(
+            "align: wrap on, horiz center, vert center; borders: left thin, right thin, top thin, bottom thin"
+        )
+        
+        # Set column widths
+        ws.col(0).width = 7500  # "ITEM" column (wider for better readability)
+        ws.col(1).width = 4000  # "QUANTITY" column
+        ws.col(2).width = 6000  # "PRICE PER UNIT (BDT)" column
+        ws.col(3).width = 6000  # "TOTAL PRICE (BDT)" column
+
+        # Write sheet title
+        ws.write_merge(0, 0, 0, 3, title, header_style)
+
+        # Section: Revenue Breakdown
+        ws.write(2, 0, "Cost Breakdown", subheader_style)
+        ws.write(3, 0, "ITEM", header_style)
+        ws.write(3, 1, "QUANTITY", header_style)
+        ws.write(3, 2, "PRICE PER UNIT (BDT)", header_style)
+        ws.write(3, 3, "TOTAL PRICE (BDT)", header_style)
+
+        row = 4
+        for data in cost_data.values():
+            ws.write(row, 0, data[0], data_style)
+            ws.write(row, 1, data[1], data_style)
+            ws.write(row, 2, data[2], data_style)
+            ws.write(row, 3, data[3], data_style)
+            row += 1
+        
+        ws.write(row, 2, "Total Cost:", subheader_style)
+        # ws.write(row, 3, budget_data.get("total_revenue", 0.0), data_style)
+
+        # Section: Cost Breakdown
+        row += 2
+        ws.write(row, 0, "Revenue Breakdown", subheader_style)
+        row += 1
+        ws.write(row, 0, "Revenue Type", header_style)
+        ws.write(row, 1, "QUANTITY", header_style)
+        ws.write(row, 2, "Revenue / Unit (BDT)", header_style)
+        ws.write(row, 3, "Revenue Generated (BDT)", header_style)
+
+        row += 1
+        for data in revenue_data.values():
+            ws.write(row, 0, data[0], data_style)
+            ws.write(row, 1, data[1], data_style)
+            ws.write(row, 2, data[2], data_style)
+            ws.write(row, 3, data[3], data_style)
+            row += 1
+        
+        ws.write(row, 2, "Total Revenue:", subheader_style)
+        # ws.write(row, 3, budget_data.get("total_cost", 0.0), data_style)
+
+        # Approval Section
+        row += 3
+        ws.write(row, 0, "Approved by:", subheader_style)
+        # ws.write(row + 1, 0, budget_data.get("approval", ""), data_style)
+        
+        # Save the file to a buffer instead of disk
+        buffer = BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)  # Move the cursor to the beginning of the buffer
+
+        return buffer

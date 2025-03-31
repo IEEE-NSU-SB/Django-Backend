@@ -505,9 +505,12 @@
                         <span class="close_1">&times;</span>
                     </div>
                     <h6 style="margin-bottom: 20px;">Select download format</h6>
-                    <input type="radio" id="pdf" name="pdf">
-                    <input type="hidden" name="sheet_id" value="{{budget_sheet.pk}}">
+                    <input type="radio" name="download_type" value="pdf">
                     <label for="pdf">PDF</label>
+                    <br>
+                    <input type="radio" name="download_type" value="excel">
+                    <label for="pdf">Excel</label>
+                    <input type="hidden" name="sheet_id" value="{{budget_sheet.pk}}">
                     <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
                         <a href="#" class="cancel_download">Cancel</a>
                         <button type="submit" class="confirm_download" name="confirm_download">Confirm</button>

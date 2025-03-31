@@ -329,13 +329,26 @@ def download_budget(request):
                 has_access = FCT_Render_Access.access_for_budget(request, sheet_id)
 
                 if has_access == 'Edit' or has_access == 'ViewOnly':
-                    if request.GET.get('pdf'):
-                        budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+                    budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+                    if request.GET.get('download_type') == 'pdf':
                         file = BudgetPDF.create_pdf(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
                         
                         # Create response with PDF as attachment
                         response = HttpResponse(file, content_type='application/pdf')
                         response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.pdf"'
+
+                        return response
+                    elif request.GET.get('download_type') == 'excel':
+                        # Example dummy data to test
+                        # budget_data_example = {
+                        #     "approval": "Dr. Fariah Mahzabeen & Shaira Imtiaz Aurchi",
+                        # }
+
+                        file = BudgetPDF.export_budget_sheet_to_excel(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
+
+                        # Create response with PDF as attachment
+                        response = HttpResponse(file, content_type='application/vnd.ms-excel')
+                        response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.xls"'
 
                         return response
                 else:
