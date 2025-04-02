@@ -8,6 +8,9 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph
 import xlwt
 
+from insb_port import settings
+from main_website.models import Toolkit
+
 class BudgetPDF:
 
     def create_pdf(sc_ag_primary, title, cost_data, revenue_data):
@@ -17,22 +20,28 @@ class BudgetPDF:
         c = canvas.Canvas(buffer, pagesize=A4)
         width, height = A4
 
-        # if sc_ag_primary == 1:
-        #     # Watermark Logo (Behind the Text)
-        #     c.setFillAlpha(0.1)  # Make watermark logo faint
-        #     c.drawImage('INSB.png', 50, 230, width=470, height=470, mask='auto')
-        # else:
-        #     # Watermark Logo (Behind the Text)
-        #     c.setFillAlpha(0.1)  # Make watermark logo faint
-        #     c.drawImage('WIE.png', 40, 230, width=470, height=470, mask='auto')
-        
-        #  # Top Left Logo
-        # c.setFillAlpha(1)  # Ensure logos are fully opaque
-        # c.drawImage('INSB.png', 50, height - 70, width=40, height=40, mask='auto')
+        branch_logo = Toolkit.objects.get(title=BudgetPDF.get_sc_ag_logo_name(1)).picture
+        branch_logo_path = settings.MEDIA_ROOT+str(branch_logo)
+        sc_ag_logo_path = None
 
-        # if sc_ag_primary != 1:
-        #     # Top Right Logo
-        #     c.drawImage('WIE.png', width - 90, height - 70, width=40, height=40, mask='auto')
+        if sc_ag_primary == 1:
+            # Watermark Logo (Behind the Text)
+            c.setFillAlpha(0.1)  # Make watermark logo faint
+            c.drawImage(branch_logo_path, 60, 230, width=470, height=470, mask='auto')
+        else:
+            sc_ag_logo = Toolkit.objects.get(title=BudgetPDF.get_sc_ag_logo_name(sc_ag_primary)).picture
+            sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
+            # Watermark Logo (Behind the Text)
+            c.setFillAlpha(0.1)  # Make watermark logo faint
+            c.drawImage(sc_ag_logo_path, 70, 230, width=470, height=470, mask='auto')
+        
+        # Top Left Logo
+        c.setFillAlpha(1)  # Ensure logos are fully opaque
+        c.drawImage(branch_logo_path, 50, height - 70, width=40, height=40, mask='auto')
+
+        if sc_ag_primary != 1:
+            # Top Right Logo
+            c.drawImage(sc_ag_logo_path, width - 90, height - 70, width=40, height=40, mask='auto')
 
         # Title
         c.setFont("Helvetica-Bold", 16)
@@ -190,3 +199,15 @@ class BudgetPDF:
         buffer.seek(0)  # Move the cursor to the beginning of the buffer
 
         return buffer
+    
+    def get_sc_ag_logo_name(primary):
+        if primary == 1:
+            return 'IEEE NSU SB Logo'
+        elif primary == 2:
+            return 'IEEE NSU PES SBC Logo'
+        elif primary == 3:
+            return 'IEEE NSU RAS SBC Logo'
+        elif primary == 4:
+            return 'IEEE NSU IAS SBC Logo'
+        elif primary == 5:
+            return 'IEEE NSU SB WIE AG Logo'

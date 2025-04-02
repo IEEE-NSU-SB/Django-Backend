@@ -334,7 +334,11 @@
             {% endblock navbar %}
         </div>
         <!--navbar content end-->
-        <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">XYZ</span> event</h2>
+        {% if budget_sheet.event %}
+        <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">{{budget_sheet.event.event_name}}</span> event</h2>
+        {% else %}
+        <h2 style="text-align: center; margin-top: 30px;">{{budget_sheet.name}}</h2>
+        {% endif %}
         <div class="container">
             <div class="budget_container">
                 {% if access_type == 'Edit' %}
