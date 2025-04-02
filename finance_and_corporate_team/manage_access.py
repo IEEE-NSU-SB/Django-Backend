@@ -2,7 +2,7 @@
 from datetime import datetime
 import logging
 import traceback
-from finance_and_corporate_team.models import BudgetSheetAccess
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from system_administration.models import FCT_Data_Access
 from system_administration.render_access import Access_Render
@@ -110,15 +110,20 @@ class FCT_Render_Access:
                 ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
                 return False
             
-    def access_for_budget(request, sheet_id):
+    def access_for_budget(request, sheet_id=None, event_id=None):
         # ''' This function checks if the requested user has access to edit a budget. Will return True if it has access permission '''
         try:
             # get the user and username. Username will work as IEEE ID and Developer username both
             user=request.user
             username=user.username
 
-            #Get member from graphics data access table
-            get_member = BudgetSheetAccess.objects.filter(member=username, sheet=sheet_id)
+            if sheet_id:
+                #Get member from budget sheet access table
+                get_member = BudgetSheetAccess.objects.filter(member=username, sheet=sheet_id)
+            else:
+                #Get member from budget sheet access table
+                budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                get_member = BudgetSheetAccess.objects.filter(member=username, sheet_id=budget_sheet_id)
             #Check if the member exits
             if(get_member.exists()):
                 #The member exists. Now check if it has budget access

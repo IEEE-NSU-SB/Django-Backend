@@ -148,7 +148,6 @@ class FinanceAndCorporateTeam:
             budget_sheet.total_cost = total_cost
             budget_sheet.total_revenue = total_revenue
             budget_sheet.save()
-
             return True
         
         except:
