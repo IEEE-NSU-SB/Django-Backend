@@ -5,7 +5,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import Paragraph
+from reportlab.platypus import Paragraph, Image
 import xlwt
 
 from insb_port import settings
@@ -44,22 +44,41 @@ class BudgetPDF:
             c.drawImage(sc_ag_logo_path, width - 90, height - 70, width=40, height=40, mask='auto')
 
         # Title
-        c.setFont("Helvetica-Bold", 16)
-        c.drawCentredString(width / 2, height - 90, title)
+        # c.setFont("Helvetica-Bold", 16)
+        style = getSampleStyleSheet()["Normal"]
+        style = ParagraphStyle(style, leading=17, fontName='Helvetica-Bold', fontSize=16, alignment=1)
+
+        # Create a Paragraph with the given text
+        para = Paragraph(title, style)
+
+        # Wrap the text to fit within max_width
+        text_width = min(500, width - 20)  # Limit width
+        wrapped_width, wrapped_height = para.wrap(text_width, 0)  # Get required height
+
+        # Adjust Y so the first line stays in place
+        adjusted_y_position = height - 90 - wrapped_height  # Shift down
+
+        # Center X calculation
+        x_position = (width - wrapped_width) / 2
+
+        # Draw the wrapped text
+        para.drawOn(c, x_position, adjusted_y_position)
+
+        # c.drawCentredString(width / 2, height - 90, title)
         c.setTitle(title)
 
         # Cost Breakdown (First)
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(50, height - 130, "Cost Breakdown")
+        c.drawString(50, adjusted_y_position - 30, "Cost Breakdown")
 
         cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"]}
         cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=height - 160, col_widths=[180, 80, 120, 120])
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 60, col_widths=[180, 80, 120, 120])
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
-        revenue_y = new_y - 50  # Provide extra space
+        revenue_y = new_y - 30  # Provide extra space
         c.drawString(50, revenue_y, "Total Revenue")
 
         revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
@@ -90,49 +109,81 @@ class BudgetPDF:
 
     def draw_table(canvas, data, x, y, col_widths):
 
-        styles = getSampleStyleSheet()   
+        styles = getSampleStyleSheet()  
+
         
         # Convert long text cells to Paragraph objects for wrapping
         wrapped_data = []
         for i, row in enumerate(data.values()):
             if i == 0:
                 # Bold style for the first row
-                style = ParagraphStyle(name="Header", parent=styles["Normal"])
-                style.fontName = 'Helvetica-Bold'
+                style = ParagraphStyle(name="Header", parent=styles["Normal"], fontName='Helvetica-Bold')
                 # style.textColor = colors.black
                 # style.alignment = 1
 
             else:
                 # Default style for normal text
-                style = ParagraphStyle(name="Normal", parent=styles["Normal"])
-                style.fontName = 'Helvetica'
+                style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica')
                 # style.textColor = colors.black
 
             wrapped_row = [Paragraph(str(cell), style) for cell in row]
             wrapped_data.append(wrapped_row)
 
-        table = Table(wrapped_data, colWidths=col_widths)
-        table.setStyle(TableStyle([
+        # **Calculate Totals (assuming numerical columns except first)**
+        total_row = []
+        total_row.append(Paragraph("Total", ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold")))
+
+        for col_idx in range(1, len(wrapped_data[0])):  # Skip first column
+            try:
+                if col_idx == 3:
+                    total_value = sum(float(row[col_idx].text) for row in wrapped_data[1:] if row[col_idx].text.replace('.', '', 1).isdigit())
+                else:
+                    total_value = ''
+            except ValueError:
+                total_value = "--"  # Non-numeric column
+
+            total_row.append(Paragraph(str(total_value), ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold")))
+
+        wrapped_data.append(total_row)  # Append total row
+
+        table_style = TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+            # ("BACKGROUND", (0, 1), (-1, -1), None),
             ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),
-        ]))
+            # ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            # Remove INNER grid lines for the total row
+            ("LINEABOVE", (0, -2), (-1, -2), 1, colors.black),  # Add a line above the total row
+            ("LINEBELOW", (0, -1), (-1, -1), 1, colors.black),  # Keep bottom border for total row
+            ("LINEBEFORE", (0, -1), (0, -1), 1, colors.black),  # Left outer border
+            ("LINEBEFORE", (-1, -1), (-1, -1), 1, colors.black),  # Left outer border
+            ("LINEAFTER", (-1, -1), (-1, -1), 1, colors.black),  # Right outer border
+            ("GRID", (0, 0), (-1, -2), 1, colors.black),  # Keep grid for all except last row
+        ])
+        table = Table(wrapped_data, colWidths=col_widths)
 
-        table.wrapOn(canvas, x, y)
-        table.drawOn(canvas, x, y - (len(data) * 20))
+        table_width, table_height = table.wrapOn(canvas, x, y)
+        # Load the background image (semi-transparent image)
+        # bg_image = Image("Untitled-1.png", width=table_width, height=table_height)  # Adjust size as needed
+        # bg_image.drawOn(canvas, x, y - (len(wrapped_data) * 20))  # Position the image on the canvas
+
+        table.setStyle(table_style)
+        table.drawOn(canvas, x, y - table_height)
 
         # Return new Y position after drawing the table
-        return y - (len(data) * 20) - 20  # Adding extra spacing
+        return y - (len(wrapped_data) * 20) - 20  # Adding extra spacing
 
-    def export_budget_sheet_to_excel(sc_ag_primary, title, cost_data, revenue_data):
+    def export_budget_sheet_to_excel(sc_ag_primary, title, cost_data, revenue_data, total_cost, total_revenue):
 
         # Create a workbook and add a worksheet
         wb = xlwt.Workbook()
         ws = wb.add_sheet("Budget Sheet")
 
         # Define styles
+        title_style = xlwt.easyxf(
+            "font: bold on, height 280; align: wrap on,horiz center, vert center; borders: bottom medium"
+        )
         header_style = xlwt.easyxf(
             "font: bold on; align: horiz center, vert center; borders: bottom medium"
         )
@@ -148,7 +199,12 @@ class BudgetPDF:
         ws.col(3).width = 6000  # "TOTAL PRICE (BDT)" column
 
         # Write sheet title
-        ws.write_merge(0, 0, 0, 3, title, header_style)
+        ws.write_merge(0, 0, 0, 3, title, title_style)
+
+        # Adjust row height based on number of lines (approximation)
+        num_lines = (len(title) // 30) + 1  # Adjust the divisor based on column width
+        ws.row(0).height_mismatch = True
+        ws.row(0).height = 256 * num_lines  # Each line is roughly 256 units high
 
         # Section: Revenue Breakdown
         ws.write(2, 0, "Cost Breakdown", subheader_style)
@@ -166,7 +222,7 @@ class BudgetPDF:
             row += 1
         
         ws.write(row, 2, "Total Cost:", subheader_style)
-        # ws.write(row, 3, budget_data.get("total_revenue", 0.0), data_style)
+        ws.write(row, 3, total_cost, data_style)
 
         # Section: Cost Breakdown
         row += 2
@@ -186,7 +242,7 @@ class BudgetPDF:
             row += 1
         
         ws.write(row, 2, "Total Revenue:", subheader_style)
-        # ws.write(row, 3, budget_data.get("total_cost", 0.0), data_style)
+        ws.write(row, 3, total_revenue, data_style)
 
         # Approval Section
         row += 3

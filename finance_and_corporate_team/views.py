@@ -344,7 +344,7 @@ def download_budget(request):
                         #     "approval": "Dr. Fariah Mahzabeen & Shaira Imtiaz Aurchi",
                         # }
 
-                        file = BudgetPDF.export_budget_sheet_to_excel(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
+                        file = BudgetPDF.export_budget_sheet_to_excel(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.total_cost, budget_sheet.total_revenue)
 
                         # Create response with PDF as attachment
                         response = HttpResponse(file, content_type='application/vnd.ms-excel')
