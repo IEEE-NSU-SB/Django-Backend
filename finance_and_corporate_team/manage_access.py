@@ -111,7 +111,7 @@ class FCT_Render_Access:
                 return False
             
     def access_for_budget(request, sheet_id=None, event_id=None):
-        # ''' This function checks if the requested user has access to edit a budget. Will return True if it has access permission '''
+        ''' This function checks if the requested user has access to edit or view a budget. Will return True if it has access permission '''
         try:
             # get the user and username. Username will work as IEEE ID and Developer username both
             user=request.user

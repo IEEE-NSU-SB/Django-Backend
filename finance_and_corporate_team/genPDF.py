@@ -7,6 +7,7 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, Image
 import xlwt
+from reportlab.lib.colors import Color
 
 from insb_port import settings
 from main_website.models import Toolkit
@@ -150,8 +151,6 @@ class BudgetPDF:
             ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
-            # ("BACKGROUND", (0, 1), (-1, -1), None),
-            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
             # ("GRID", (0, 0), (-1, -1), 1, colors.black),
             # Remove INNER grid lines for the total row
             ("LINEABOVE", (0, -2), (-1, -2), 1, colors.black),  # Add a line above the total row
@@ -163,12 +162,20 @@ class BudgetPDF:
         ])
         table = Table(wrapped_data, colWidths=col_widths)
 
-        table_width, table_height = table.wrapOn(canvas, x, y)
-        # Load the background image (semi-transparent image)
-        # bg_image = Image("Untitled-1.png", width=table_width, height=table_height)  # Adjust size as needed
-        # bg_image.drawOn(canvas, x, y - (len(wrapped_data) * 20))  # Position the image on the canvas
-
+        table_width, table_height = table.wrapOn(canvas, 0, 0)
         table.setStyle(table_style)
+
+        # Draw semi-transparent beige rectangles behind data rows (excluding header and total)
+        row_heights = table._rowHeights
+        for row_index in range(1, len(wrapped_data)):  # skip header
+            row_y = y - sum(row_heights[:row_index])
+            row_height = row_heights[row_index]
+
+            canvas.saveState()
+            canvas.setFillAlpha(0.3)
+            canvas.setFillColor(Color(0.96, 0.96, 0.86, 0.5))  # beige
+            canvas.rect(x, row_y - row_height, table_width, row_height, stroke=0, fill=1)
+            canvas.restoreState()
         table.drawOn(canvas, x, y - table_height)
 
         # Return new Y position after drawing the table
