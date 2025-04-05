@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8" />
     {% if is_branch %}
-    <title>Update Event | IEEE NSU Student Branch</title>
+    <title>Update Budget | IEEE NSU Student Branch</title>
     {% else %}
-    <title>Update Event | {{sc_ag_info.group_name}}</title>
+    <title>Update Budget | {{sc_ag_info.group_name}}</title>
     {% endif %}
     <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
     
@@ -187,7 +187,7 @@
 
       
       {% block budget_form %}
-          {% comment %} {% include "finance_and_corporate_team/budgetPage.html" %} {% endcomment %}
+          {% include "finance_and_corporate_team/budgetPage.html" %}
       {% endblock budget_form %}
                             
                             
