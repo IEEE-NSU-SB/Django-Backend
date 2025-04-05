@@ -27,13 +27,13 @@ class BudgetPDF:
 
         if sc_ag_primary == 1:
             # Watermark Logo (Behind the Text)
-            c.setFillAlpha(0.1)  # Make watermark logo faint
+            c.setFillAlpha(0.2)  # Make watermark logo faint
             c.drawImage(branch_logo_path, 60, 230, width=470, height=470, mask='auto')
         else:
             sc_ag_logo = Toolkit.objects.get(title=BudgetPDF.get_sc_ag_logo_name(sc_ag_primary)).picture
             sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
             # Watermark Logo (Behind the Text)
-            c.setFillAlpha(0.1)  # Make watermark logo faint
+            c.setFillAlpha(0.2)  # Make watermark logo faint
             c.drawImage(sc_ag_logo_path, 70, 230, width=470, height=470, mask='auto')
         
         # Top Left Logo
