@@ -1918,6 +1918,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
 
     try:
         sc_ag=PortData.get_all_sc_ag(request=request)
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
     
@@ -1959,9 +1960,11 @@ def event_edit_budget_form_tab(request, primary, event_id):
                     surplus = budget_sheet.total_revenue - budget_sheet.total_cost
 
             context = {
-                'is_branch' : True,
+                'is_branch' : False,
+                'primary' : primary,
                 'event_id' : event_id,
                 'all_sc_ag':sc_ag,
+                'sc_ag_info':get_sc_ag_info,
                 'user_data':user_data,
                 'budget_sheet':budget_sheet,
                 'access_type':has_access,
@@ -1969,8 +1972,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 'surplus':surplus
             }
 
-            # return render(request,"Events/event_edit_budget_form_tab.html", context)
-            return render(request,"finance_and_corporate_team/BudgetPage.html", context)
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
         else:
             return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
 
