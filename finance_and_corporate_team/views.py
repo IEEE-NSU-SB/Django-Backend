@@ -162,11 +162,13 @@ def budgetHomePage(request):
 
         if has_access:      
             all_budget_sheets = BudgetSheet.objects.all()
+            fct_team_members = Branch.load_team_members(team_primary=11)
 
             context={
                     'user_data':user_data,
                     'all_sc_ag':sc_ag,
-                    'all_budget_sheets':all_budget_sheets
+                    'all_budget_sheets':all_budget_sheets,
+                    'fct_team_members':fct_team_members
                 }
             return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
         else:

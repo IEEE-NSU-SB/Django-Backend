@@ -330,9 +330,9 @@
                 <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;"> <b>The Finance & Corporate Team</b></span>'s <b>Budget Page</b>  </h2>
                 
             <div class="budget-container">
-                <div class="top-actions">
+                {% comment %} <div class="top-actions">
                     <a href="{% url 'finance_and_corporate_team:create_budget' %}" id="addBudgetBtn" class="budget-btn primary">Add Budget</a>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="search-filter">
                     <div class="search-box">
@@ -418,15 +418,19 @@
                                 <tr>
                                     <th>SL</th>
                                     <th>Name</th>
+                                    <th>Position</th>
                                     <th>Action</th> <!-- Updated header title -->
                                 </tr>
                             </thead>
                             <tbody id="budgetTableBody">
                                 <!-- Table data will be dynamically loaded -->
+                                {% for fct_team_member in fct_team_members %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>John Doe</td>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{fct_team_member.name}}</td>
+                                    <td>{{fct_team_member.position}}</td>
                                     <td>
+                                        <input type="hidden" name="ieee_id" value={{fct_team_member.ieee_id}}>
                                         <select name="action" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
                                             <option value="">Select</option>
                                             <option value="view">View</option>
@@ -434,6 +438,7 @@
                                         </select>
                                     </td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                 
