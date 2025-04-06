@@ -1,9 +1,11 @@
-from django.http import HttpResponse
+import json
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.views import View
 from central_events.models import Events
 from finance_and_corporate_team.manage_access import FCT_Render_Access
-from finance_and_corporate_team.models import BudgetSheet
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from system_administration.render_access import Access_Render
 from users.models import Members
 from central_branch.renderData import Branch
@@ -162,13 +164,11 @@ def budgetHomePage(request):
 
         if has_access:      
             all_budget_sheets = BudgetSheet.objects.all()
-            fct_team_members = Branch.load_team_members(team_primary=11)
 
             context={
                     'user_data':user_data,
                     'all_sc_ag':sc_ag,
                     'all_budget_sheets':all_budget_sheets,
-                    'fct_team_members':fct_team_members
                 }
             return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
         else:
@@ -360,3 +360,25 @@ def download_budget(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
 
+class GetBudgetSheetAcessDataAjax(View):
+    def get(self, request):
+        if request.GET.get('sheet_id'):
+            sheet_id = request.GET.get('sheet_id')
+            fct_team_members = Branch.load_team_members(team_primary=11)
+            fct_team_member_accesses = []
+
+            for member in fct_team_members:
+                access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=member)
+                access_type = access[0].access_type if access.exists() else None
+
+                fct_team_member_accesses.append({
+                    'member': {
+                        'name': member.name,
+                        'position': member.position.role
+                    },
+                    'access_type': access_type
+                })
+            
+            return JsonResponse({'data':fct_team_member_accesses})
+        else:
+            return JsonResponse({'message':'error'})
