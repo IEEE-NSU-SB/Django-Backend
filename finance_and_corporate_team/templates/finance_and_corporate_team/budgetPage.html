@@ -334,13 +334,13 @@
             {% include 'finance_and_corporate_team/finance_navbar.html' %}
             {% endblock navbar %}
         </div>
-        <!--navbar content end-->
-        {% if budget_sheet.event %}
-        <h2 style="text-align: center; margin-top: 30px;">Budget of <span style="color: #00629B; font-weight: bold;">{{budget_sheet.event.event_name}}</span> event</h2>
-        {% else %}
-        <h2 style="text-align: center; margin-top: 30px;">{{budget_sheet.name}}</h2>
-        {% endif %}
         <div class="container">
+            <!--navbar content end-->
+            {% if budget_sheet.event %}
+            <h2 style="text-align: center; margin-top: 30px; margin-bottom: 12px;">Budget of <span style="color: #00629B; font-weight: bold;">{{budget_sheet.event.event_name}}</span> event</h2>
+            {% else %}
+            <h2 style="text-align: center; margin-top: 30px; margin-bottom: 12px;">{{budget_sheet.name}}</h2>
+            {% endif %}
             <div class="budget_container">
                 {% if access_type == 'Edit' %}
                 <div style="display: flex;
