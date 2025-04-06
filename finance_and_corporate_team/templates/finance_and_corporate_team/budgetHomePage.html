@@ -437,8 +437,8 @@
                     <h5>Manage Access</h5>
                     <span class="close_2">&times;</span>
                 </div>
-                <form action="">
-
+                <form method="POST">
+                    {% csrf_token %}
                     <div class="table-responsive" style="border-radius: 4px 4px 0 0">
                         <table class="table table-striped table-class">
                             <thead>
@@ -620,27 +620,26 @@
             success: function(response) {
                 // Handle success response from the backend
                 response_data = response.data;
-                access_table_body.innerHTML = "";
-                var counter = 1;
-                response_data.forEach((data) => {
+                access_table_body.innerHTML = `<input type="hidden" name="sheet_id" value=${response_data[0].sheet_id}>`;
+                
+                for (let i = 1; i < response_data.length; i++) {
                     access_table_body.innerHTML += `
                     <tr>
-                        <td>${counter}</td>
-                        <td>${data.member.name}</td>
-                        <td>${data.member.position}</td>
+                        <td>${i}</td>
+                        <td>${response_data[i].member.name}</td>
+                        <td>${response_data[i].member.position}</td>
                         <td>
-                            <input type="hidden" name="ieee_id" value={{fct_team_member.ieee_id}}>
-                            <select name="action" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
-                                <option value="" ${data.access_type === null? "selected" : ""}>Select</option>
-                                <option value="view" ${data.access_type === 'ViewOnly'? "selected" : ""}>ViewOnly</option>
-                                <option value="edit" ${data.access_type === 'Edit'? "selected" : ""}>Edit</option>
-                                <option value="edit" ${data.access_type === 'Restricted'? "selected" : ""}>Restricted</option>
+                            <input type="hidden" name="ieee_id" value=${response_data[i].member.ieee_id}>
+                            <select name="access_type" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
+                                <option value="" ${response_data[i].access_type === null? "selected" : ""}>Select</option>
+                                <option value="ViewOnly" ${response_data[i].access_type === 'ViewOnly'? "selected" : ""}>ViewOnly</option>
+                                <option value="Edit" ${response_data[i].access_type === 'Edit'? "selected" : ""}>Edit</option>
+                                <option value="Restricted" ${response_data[i].access_type === 'Restricted'? "selected" : ""}>Restricted</option>
                             </select>
                         </td>
                     </tr>
                     `;
-                    counter += 1;
-                });
+                }
 
                 {% comment %} showMessage(response.message); {% endcomment %}
             },
