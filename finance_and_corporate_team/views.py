@@ -162,7 +162,17 @@ def budgetHomePage(request):
 
         has_access = FCT_Render_Access.get_common_access(request)
 
+
         if has_access:      
+            if request.method == 'POST':
+                ieee_ids = request.POST.getlist('ieee_id')
+                access_types = request.POST.getlist('access_type')
+                sheet_id = request.POST.get('sheet_id')
+
+                FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
+
+                return redirect('finance_and_corporate_team:budgetHomePage')
+
             all_budget_sheets = BudgetSheet.objects.all()
 
             context={
@@ -367,12 +377,15 @@ class GetBudgetSheetAcessDataAjax(View):
             fct_team_members = Branch.load_team_members(team_primary=11)
             fct_team_member_accesses = []
 
+            fct_team_member_accesses.append({'sheet_id':sheet_id})
+
             for member in fct_team_members:
                 access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=member)
                 access_type = access[0].access_type if access.exists() else None
 
                 fct_team_member_accesses.append({
                     'member': {
+                        'ieee_id':member.ieee_id,
                         'name': member.name,
                         'position': member.position.role
                     },
