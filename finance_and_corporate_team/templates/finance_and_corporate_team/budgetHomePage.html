@@ -372,7 +372,7 @@
                                 </td>
                                 <td><i class="fa fa-users user-btn" aria-hidden="true"></i></td>
                             </td>
-                                <td><i class="fa fa-download download-btn" aria-hidden="true"></i></td>
+                                <td><i class="fa fa-download download-btn" aria-hidden="true" data-sid={{budget_sheet.pk}}></i></td>
                             </td>
                              </tr>
                              {% endfor %}
@@ -395,7 +395,7 @@
                     <br>
                     <input type="radio" name="download_type" value="excel">
                     <label for="pdf">Excel</label>
-                    <input type="hidden" name="sheet_id" value="{{budget_sheet.pk}}">
+                    <input type="hidden" id="sheet_id" name="sheet_id" value="{{budget_sheet.pk}}">
                     <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
                         <a href="#" class="cancel_download">Cancel</a>
                         <button type="submit" class="confirm_download" name="confirm_download">Confirm</button>
@@ -513,6 +513,7 @@
 <script>
     // Get all modal buttons
     var btns = document.querySelectorAll(".download-btn");
+    var download_sheet_id = document.getElementById('sheet_id');
 
     // Loop through each button
     btns.forEach(function(btn) {
@@ -525,6 +526,7 @@
             modal_1.style.transform = 'translateY(0px)';
             modal_1.style.zIndex = '103100';
             modal_1.style.opacity = '1';
+            download_sheet_id.value = btn.dataset.sid;
         }
 
         // Close modal on span click

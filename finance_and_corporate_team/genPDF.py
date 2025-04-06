@@ -72,10 +72,10 @@ class BudgetPDF:
         c.setFont("Helvetica-Bold", 12)
         c.drawString(50, adjusted_y_position - 30, "Cost Breakdown")
 
-        cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE PER UNIT (BDT)", "TOTAL PRICE (BDT)"]}
+        cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE / UNIT (BDT)", "TOTAL PRICE (BDT)"]}
         cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 60, col_widths=[180, 80, 120, 120])
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 60, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
@@ -84,7 +84,7 @@ class BudgetPDF:
 
         revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
         revenue_header.update(revenue_data)
-        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 30, col_widths=[180, 80, 120, 120])
+        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 30, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
         # Signatures
         c.line(50, 100, 250, 100)
@@ -108,24 +108,23 @@ class BudgetPDF:
 
         return buffer
 
-    def draw_table(canvas, data, x, y, col_widths):
+    def draw_table(canvas, data, x, y, col_widths, primary):
 
         styles = getSampleStyleSheet()  
-
-        
+      
         # Convert long text cells to Paragraph objects for wrapping
         wrapped_data = []
         for i, row in enumerate(data.values()):
             if i == 0:
                 # Bold style for the first row
-                style = ParagraphStyle(name="Header", parent=styles["Normal"], fontName='Helvetica-Bold')
-                # style.textColor = colors.black
-                # style.alignment = 1
+                style = ParagraphStyle(name="Header", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=1)
+                # style.textColor = BudgetPDF.get_sc_ag_header_color(primary)
 
             else:
                 # Default style for normal text
                 style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica')
                 # style.textColor = colors.black
+                style.alignment = 1
 
             wrapped_row = [Paragraph(str(cell), style) for cell in row]
             wrapped_data.append(wrapped_row)
@@ -148,34 +147,34 @@ class BudgetPDF:
         wrapped_data.append(total_row)  # Append total row
 
         table_style = TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+            ("BACKGROUND", (0, 0), (-1, 0), BudgetPDF.get_sc_ag_header_color(primary)),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
             # ("GRID", (0, 0), (-1, -1), 1, colors.black),
             # Remove INNER grid lines for the total row
-            ("LINEABOVE", (0, -2), (-1, -2), 1, colors.black),  # Add a line above the total row
-            ("LINEBELOW", (0, -1), (-1, -1), 1, colors.black),  # Keep bottom border for total row
+            ("LINEABOVE", (0, -1), (-1, -1), 1, colors.black),  # Add a line above the total row
+            # ("LINEBELOW", (0, -1), (-1, -1), 1, colors.black),  # Keep bottom border for total row
             ("LINEBEFORE", (0, -1), (0, -1), 1, colors.black),  # Left outer border
             ("LINEBEFORE", (-1, -1), (-1, -1), 1, colors.black),  # Left outer border
-            ("LINEAFTER", (-1, -1), (-1, -1), 1, colors.black),  # Right outer border
-            ("GRID", (0, 0), (-1, -2), 1, colors.black),  # Keep grid for all except last row
+            # ("LINEAFTER", (-1, -1), (-1, -1), 1, colors.black),  # Right outer border
+            # ("GRID", (0, 0), (-1, -2), 1, colors.black),  # Keep grid for all except last row
         ])
         table = Table(wrapped_data, colWidths=col_widths)
 
         table_width, table_height = table.wrapOn(canvas, 0, 0)
         table.setStyle(table_style)
 
-        # Draw semi-transparent beige rectangles behind data rows (excluding header and total)
-        row_heights = table._rowHeights
-        for row_index in range(1, len(wrapped_data)):  # skip header
-            row_y = y - sum(row_heights[:row_index])
-            row_height = row_heights[row_index]
+        # # Draw semi-transparent beige rectangles behind data rows (excluding header and total)
+        # row_heights = table._rowHeights
+        # for row_index in range(1, len(wrapped_data)):  # skip header
+        #     row_y = y - sum(row_heights[:row_index])
+        #     row_height = row_heights[row_index]
 
-            canvas.saveState()
-            canvas.setFillAlpha(0.3)
-            canvas.setFillColor(Color(0.96, 0.96, 0.86, 0.5))  # beige
-            canvas.rect(x, row_y - row_height, table_width, row_height, stroke=0, fill=1)
-            canvas.restoreState()
+        #     canvas.saveState()
+        #     canvas.setFillAlpha(0.3)
+        #     canvas.setFillColor(Color(0.96, 0.96, 0.86, 0.5))  # beige
+        #     canvas.rect(x, row_y - row_height, table_width, row_height, stroke=0, fill=1)
+        #     canvas.restoreState()
         table.drawOn(canvas, x, y - table_height)
 
         # Return new Y position after drawing the table
@@ -274,3 +273,15 @@ class BudgetPDF:
             return 'IEEE NSU IAS SBC Logo'
         elif primary == 5:
             return 'IEEE NSU SB WIE AG Logo'
+        
+    def get_sc_ag_header_color(primary):
+        if primary == 1:
+            return '#137AAC'
+        elif primary == 2:
+            return '#659941'
+        elif primary == 3:
+            return '#602569'
+        elif primary == 4:
+            return '#008bC2'
+        elif primary == 5:
+            return '#006699'
