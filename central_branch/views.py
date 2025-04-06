@@ -3567,8 +3567,8 @@ def event_edit_budget_form_tab(request, event_id):
                 'surplus':surplus
             }
 
-            # return render(request,"Events/event_edit_budget_form_tab.html", context)
-            return render(request,"finance_and_corporate_team/BudgetPage.html", context)
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+            # return render(request,"finance_and_corporate_team/BudgetPage.html", context)
         else:
             return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
 
