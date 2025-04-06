@@ -357,9 +357,9 @@
                 <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;"> <b>The Finance & Corporate Team</b></span>'s <b>Budget Page</b>  </h2>
                 
             <div class="budget-container">
-                <div class="top-actions">
+                {% comment %} <div class="top-actions">
                     <a href="{% url 'finance_and_corporate_team:create_budget' %}" id="addBudgetBtn" class="budget-btn primary">Add Budget</a>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="search-filter">
                     <div class="search-box">
@@ -397,7 +397,7 @@
                                  <td style="color:blue;">
                                     <a href="{% url 'finance_and_corporate_team:edit_budget' budget_sheet.pk %}">{{budget_sheet.name}}</a>                                 
                                 </td>
-                                <td><i class="fa fa-users user-btn" aria-hidden="true"></i></td>
+                                <td><i class="fa fa-users user-btn" aria-hidden="true" data-sid={{budget_sheet.pk}}></i></td>
                             </td>
                                 <td><i class="fa fa-download download-btn" aria-hidden="true" data-sid={{budget_sheet.pk}}></i></td>
                             </td>
@@ -445,22 +445,12 @@
                                 <tr>
                                     <th>SL</th>
                                     <th>Name</th>
+                                    <th>Position</th>
                                     <th>Action</th> <!-- Updated header title -->
                                 </tr>
                             </thead>
-                            <tbody id="budgetTableBody">
+                            <tbody id="manageAccessTableBody">
                                 <!-- Table data will be dynamically loaded -->
-                                <tr>
-                                    <td>1</td>
-                                    <td>John Doe</td>
-                                    <td>
-                                        <select name="action" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
-                                            <option value="">Select</option>
-                                            <option value="view">View</option>
-                                            <option value="edit">Edit</option>
-                                        </select>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
                 
@@ -589,6 +579,7 @@
     userBtn.forEach(function(btn) {
 
         btn.onclick = function () {
+        load_sheet_access_data(btn.dataset.sid);
         modal_2.style.transform = 'translateY(0px)';
         modal_2.style.zIndex = '103100';
         modal_2.style.opacity = '1';
@@ -613,8 +604,54 @@
             modal_2.style.opacity = '0';
         }
     });
-});
-</script>    
+}); 
+
+    var access_table_body = document.getElementById('manageAccessTableBody');
+
+    function load_sheet_access_data(sheet_id) {
+
+        // Send AJAX request to the backend
+        $.ajax({
+            url: "{% url 'finance_and_corporate_team:load_budget_sheet_access' %}",
+            type: 'GET',
+            data: {
+                'sheet_id': sheet_id,
+            },
+            success: function(response) {
+                // Handle success response from the backend
+                response_data = response.data;
+                access_table_body.innerHTML = "";
+                var counter = 1;
+                response_data.forEach((data) => {
+                    access_table_body.innerHTML += `
+                    <tr>
+                        <td>${counter}</td>
+                        <td>${data.member.name}</td>
+                        <td>${data.member.position}</td>
+                        <td>
+                            <input type="hidden" name="ieee_id" value={{fct_team_member.ieee_id}}>
+                            <select name="action" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
+                                <option value="" ${data.access_type === null? "selected" : ""}>Select</option>
+                                <option value="view" ${data.access_type === 'ViewOnly'? "selected" : ""}>ViewOnly</option>
+                                <option value="edit" ${data.access_type === 'Edit'? "selected" : ""}>Edit</option>
+                                <option value="edit" ${data.access_type === 'Restricted'? "selected" : ""}>Restricted</option>
+                            </select>
+                        </td>
+                    </tr>
+                    `;
+                    counter += 1;
+                });
+
+                {% comment %} showMessage(response.message); {% endcomment %}
+            },
+            error: function(xhr, status, error) {
+                // Handle error response from the backend
+                console.error('AJAX request error:', error);
+            }
+        });
+    }
+</script>  
+  
 <!-- <script>
     {% for message in messages %}
 
