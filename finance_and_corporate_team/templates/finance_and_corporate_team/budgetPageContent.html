@@ -455,6 +455,14 @@
     >
     event
   </h2>
+  {% elif event %}
+  <h2 style="text-align: center; margin-top: 30px; margin-bottom: 24px">
+    Budget of
+    <span style="color: var(--primary-color); font-weight: bold"
+      >{{event.event_name}}</span
+    >
+    event
+  </h2>
   {% else %}
   <h2 style="text-align: center; margin-top: 30px; margin-bottom: 24px">
     {{budget_sheet.name}}
@@ -478,7 +486,9 @@
             align-items: center;
           "
         >
+        {% if access_type == 'Edit' %}
           <i class="fa fa-users user-btn" aria-hidden="true"></i>
+        {% endif %}
           <i
             class="fa fa-download download-btn"
             aria-hidden="true"
@@ -493,8 +503,8 @@
             placeholder="USD rate today"
           />
           <a href="#" class="convert-usd-bdt">Show USD</a>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
 
       <table>

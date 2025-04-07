@@ -225,7 +225,7 @@ def create_budget(request, event_id=None):
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
     
-        has_access = FCT_Render_Access.access_for_create_budget(request)
+        has_access = FCT_Render_Access.access_for_create_budget(request) or FCT_Render_Access.access_for_budget(request, event_id=event_id)
 
         if has_access:
             if request.method == "POST":
@@ -246,6 +246,7 @@ def create_budget(request, event_id=None):
                 else:
                     return redirect('finance_and_corporate_team:event_page')
 
+            event = None
             if event_id:
                 if BudgetSheet.objects.filter(event=event_id).count() > 0:
                     budget_sheet = BudgetSheet.objects.get(event=event_id)
@@ -253,11 +254,15 @@ def create_budget(request, event_id=None):
                 
                 elif Events.objects.filter(id=event_id).count() == 0:
                     return redirect('finance_and_corporate_team:event_page')
+                
+                else:
+                    event = Events.objects.get(id=event_id)
 
             context = {
                 'all_sc_ag':sc_ag,
                 'user_data':user_data,
-                'access_type':'Edit'
+                'access_type':'Edit',
+                'event':event
             }
 
             return render(request,"finance_and_corporate_team/budgetPage.html", context)
