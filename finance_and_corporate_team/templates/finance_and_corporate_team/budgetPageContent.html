@@ -1,10 +1,5 @@
-{% load static %} {% block budget_form_content %}
-<head>
-  <link rel="icon" href="{% static 'logos/logo.gif' %}" />
-  <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
-  {% block common_css %} 
-  {% include "common_css.html" %} 
-  {% endblock common_css %}
+{% load static %} 
+{% block budget_form_content %}
   <style>
     :root {
       --primary-color: #00629b;
@@ -450,7 +445,6 @@
       border: none;
     }
   </style>
-</head>
 <div class="container_1">
   <!--budget name-->
   {% if budget_sheet.event %}
@@ -901,10 +895,6 @@
     </div>
 
     <!-- app end-->
-
-    {% block common_js %} 
-    {% include "common_js.html" %} 
-    {% endblock common_js %}
   </div>
 </div>
 <script>
