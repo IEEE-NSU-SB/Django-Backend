@@ -307,20 +307,25 @@
                   <div class="form-group">
                     <label>Skillsets:</label>
                     {% for i in skill_of_member %}
-                      <span style="display: inline-block; padding: 5px 10px; border-radius: 5px; background-color: #A3F9A2; color: #333;">{{ i.skill_type }}</span>
+                        <span style="display: inline-block; padding: 5px 10px; border-radius: 5px; background-color: #A3F9A2; color: #333;">
+                            {{ i.skill_type }}
+                        </span>
                     {% endfor %}
-                    <br>
-                    <br>
+                
+                    <br><br>
+                
                     <label>Edit Skillsets:</label>
-                    <select multiple class="form-control" name="skill_sets">
-                        <option value="null" {% if not member_skills.skills.exists %}selected{% endif %}>--------------------</option>
-                        {% for skill in all_skills %}
-                            <option value="{{ skill.id }}" {% if skill in member_skills.skills.all %}selected{% endif %}> 
-                                {{ skill.skill_type }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                  </div>
+                
+                    <!-- All skill options -->
+                    {% for skill in all_skills %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="skill_sets" value="{{ skill.id }}" id="skill-{{ skill.id }}"
+                                   {% if skill in member_skills.skills.all %}checked{% endif %}>
+                            <label class="form-check-label" for="skill-{{ skill.id }}">{{ skill.skill_type }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                
                   <div class="box-header" style="text-align:center;">
                     <h1>Academic Details</h1>
                   </div>
