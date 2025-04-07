@@ -2,6 +2,7 @@
 from datetime import datetime
 import logging
 import traceback
+from central_branch.view_access import Branch_View_Access
 from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from system_administration.models import FCT_Data_Access
@@ -127,18 +128,18 @@ class FCT_Render_Access:
             #Check if the member exits
             if(get_member.exists()):
                 #The member exists. Now check if it has budget access
-                if(FCT_Render_Access.get_common_access(request)):
+                if(Branch_View_Access.common_access(request.user.username)):
                     return 'Edit'
                 else:
                     return get_member[0].access_type
             else:
                 #The member does not exist in the permissions table
-                if(FCT_Render_Access.get_common_access(request)):
+                if(Branch_View_Access.common_access(request.user.username)):
                     return 'Edit'
                 else:
                     return 'Restricted'
         except Exception as e:
-            if(FCT_Render_Access.get_common_access(request)):
+            if(Branch_View_Access.common_access(request.user.username)):
                 return 'Edit'
             else:
                 FCT_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)

@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.views import View
+from central_branch.view_access import Branch_View_Access
 from central_events.models import Events
 from finance_and_corporate_team.manage_access import FCT_Render_Access
 from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
@@ -160,6 +161,7 @@ def budgetHomePage(request):
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
 
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
         has_access = FCT_Render_Access.get_common_access(request)
 
 
@@ -179,6 +181,7 @@ def budgetHomePage(request):
                     'user_data':user_data,
                     'all_sc_ag':sc_ag,
                     'all_budget_sheets':all_budget_sheets,
+                    'eb_common_access':eb_common_access
                 }
             return render(request,"finance_and_corporate_team/budgetHomePage.html",context=context)
         else:
@@ -262,7 +265,8 @@ def create_budget(request, event_id=None):
                 'all_sc_ag':sc_ag,
                 'user_data':user_data,
                 'access_type':'Edit',
-                'event':event
+                'event':event,
+                'eb_common_access':False
             }
 
             return render(request,"finance_and_corporate_team/budgetPage.html", context)
@@ -283,24 +287,50 @@ def edit_budget(request, sheet_id):
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
         
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
         access_type = FCT_Render_Access.access_for_budget(request, sheet_id)
 
         if access_type == 'Edit':
             if request.method == "POST":
-                cst_item = request.POST.getlist('cst_item')
-                cst_quantity = request.POST.getlist('cst_quantity')
-                cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-                cst_total = request.POST.getlist('cst_total')
+                if 'save_budget' in request.POST:
+                    cst_item = request.POST.getlist('cst_item')
+                    cst_quantity = request.POST.getlist('cst_quantity')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+                    cst_total = request.POST.getlist('cst_total')
 
-                rev_item = request.POST.getlist('rev_item')
-                rev_quantity = request.POST.getlist('rev_quantity')
-                rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-                rev_total = request.POST.getlist('rev_total')
+                    rev_item = request.POST.getlist('rev_item')
+                    rev_quantity = request.POST.getlist('rev_quantity')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+                    rev_total = request.POST.getlist('rev_total')
 
-                if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                    if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                        return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                    else:
+                        return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                    
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+
+                    FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
                     return redirect('finance_and_corporate_team:edit_budget', sheet_id)
-                else:
-                    return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+        
+        fct_team_member_accesses = []
+        if eb_common_access:
+            fct_team_members = Branch.load_team_members(team_primary=11)
+
+            for member in fct_team_members:
+                access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=member)
+                member_access_type = access[0].access_type if access.exists() else None
+
+                fct_team_member_accesses.append({
+                    'member': {
+                        'ieee_id':member.ieee_id,
+                        'name': member.name,
+                        'position': member.position.role
+                    },
+                    'access_type': member_access_type
+                })
                 
         if access_type == 'Edit' or access_type == 'ViewOnly':
             
@@ -323,7 +353,9 @@ def edit_budget(request, sheet_id):
                 'budget_sheet':budget_sheet,
                 'access_type':access_type,
                 'deficit':deficit,
-                'surplus':surplus
+                'surplus':surplus,
+                'eb_common_access':eb_common_access,
+                'fct_team_member_accesses':fct_team_member_accesses
             }
 
             return render(request,"finance_and_corporate_team/budgetPage.html", context)

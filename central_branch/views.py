@@ -22,7 +22,7 @@ from content_writing_and_publications_team.renderData import ContentWritingTeam
 from events_and_management_team.renderData import Events_And_Management_Team
 from googleapiclient.http import BatchHttpRequest
 from finance_and_corporate_team.manage_access import FCT_Render_Access
-from finance_and_corporate_team.models import BudgetSheet
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
 from django_celery_beat.models import PeriodicTask
@@ -3519,32 +3519,57 @@ def event_edit_budget_form_tab(request, event_id):
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
     
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
         has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
 
         if has_access != 'Restricted':
             if request.method == "POST":
-                cst_item = request.POST.getlist('cst_item')
-                cst_quantity = request.POST.getlist('cst_quantity')
-                cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-                cst_total = request.POST.getlist('cst_total')
+                if 'save_budget' in request.POST:
+                    cst_item = request.POST.getlist('cst_item')
+                    cst_quantity = request.POST.getlist('cst_quantity')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+                    cst_total = request.POST.getlist('cst_total')
 
-                rev_item = request.POST.getlist('rev_item')
-                rev_quantity = request.POST.getlist('rev_quantity')
-                rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-                rev_total = request.POST.getlist('rev_total')
+                    rev_item = request.POST.getlist('rev_item')
+                    rev_quantity = request.POST.getlist('rev_quantity')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+                    rev_total = request.POST.getlist('rev_total')
+                    
+                    if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                        FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                    else:
+                        budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                        FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                    
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
                 
-                if BudgetSheet.objects.filter(event=event_id).count() == 0:
-                    FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
-                else:
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
                     budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                    FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                    FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types)
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
                 
-                return redirect('central_branch:event_edit_budget_form_tab', event_id)
-                
+            fct_team_member_accesses = []
             if BudgetSheet.objects.filter(event=event_id).count() > 0:
                 budget_sheet = BudgetSheet.objects.get(event=event_id)
+                if eb_common_access:
+                    fct_team_members = Branch.load_team_members(team_primary=11)
+
+                    for member in fct_team_members:
+                        access = BudgetSheetAccess.objects.filter(sheet_id=budget_sheet.id, member=member)
+                        member_access_type = access[0].access_type if access.exists() else None
+
+                        fct_team_member_accesses.append({
+                            'member': {
+                                'ieee_id':member.ieee_id,
+                                'name': member.name,
+                                'position': member.position.role
+                            },
+                            'access_type': member_access_type
+                        })
             else:
-                budget_sheet = None
+                budget_sheet = None               
             
             deficit = 0.0
             surplus = 0.0
@@ -3555,6 +3580,8 @@ def event_edit_budget_form_tab(request, event_id):
                     deficit = budget_sheet.total_revenue - budget_sheet.total_cost
                 elif budget_sheet.total_cost < budget_sheet.total_revenue:
                     surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+            
+            event = Events.objects.get(id=event_id)
 
             context = {
                 'is_branch' : True,
@@ -3563,8 +3590,11 @@ def event_edit_budget_form_tab(request, event_id):
                 'user_data':user_data,
                 'budget_sheet':budget_sheet,
                 'access_type':has_access,
+                'eb_common_access':eb_common_access,
+                'fct_team_member_accesses':fct_team_member_accesses,
                 'deficit':deficit,
-                'surplus':surplus
+                'surplus':surplus,
+                'event':event
             }
 
             return render(request,"Events/event_edit_budget_form_tab.html", context)

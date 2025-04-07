@@ -1921,8 +1921,8 @@ def event_edit_budget_form_tab(request, primary, event_id):
         get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-    
-        has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
+        
+        has_access = SC_Ag_Render_Access.access_for_sc_ag_budget(request, event_id, primary)
 
         if has_access != 'Restricted':
             if request.method == "POST":
