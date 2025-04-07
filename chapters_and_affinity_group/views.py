@@ -1959,6 +1959,8 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 elif budget_sheet.total_cost < budget_sheet.total_revenue:
                     surplus = budget_sheet.total_revenue - budget_sheet.total_cost
 
+            event = Events.objects.get(id=event_id)
+
             context = {
                 'is_branch' : False,
                 'primary' : primary,
@@ -1969,7 +1971,8 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 'budget_sheet':budget_sheet,
                 'access_type':has_access,
                 'deficit':deficit,
-                'surplus':surplus
+                'surplus':surplus,
+                'event':event
             }
 
             return render(request,"Events/event_edit_budget_form_tab.html", context)
