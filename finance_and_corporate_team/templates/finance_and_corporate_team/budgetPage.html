@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Budget Tracker</title>
+    <title>Budget</title>
     <link rel="icon" href="{% static 'logos/logo.gif' %}" />
     <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
     <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet"> -->
@@ -43,4 +43,7 @@
     </div>
 </body>
 
+{% block common_js %} 
+{% include "common_js.html" %} 
+{% endblock common_js %}
 </html>
