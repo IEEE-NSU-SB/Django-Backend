@@ -157,7 +157,7 @@
             padding: 20px;
             border: 1px solid rgb(136, 136, 136);
             width: 250px;
-            border-radius: 20px;
+            border-radius: 6px;
         }
         .modal-2-content::-webkit-scrollbar{
             width: 6px;
@@ -177,7 +177,7 @@
             padding: 20px;
             border: 1px solid rgb(136, 136, 136);
             width: 40%;
-            border-radius: 20px;
+            border-radius: 6px;
         }
         .download_modal{
         opacity: 0;
@@ -197,9 +197,10 @@
         .close_1 , .close_2{
             color: #000;
             font-size: 28px;
-            font-weight: bold;
             display: flex;
             justify-content: flex-end;
+            position: relative;
+            bottom: 4px;
         }
 
         .close_1:hover, .close_2:hover,
@@ -255,28 +256,28 @@
         .confirm_download{
             padding: 2px 26px;
             border-radius: 4px;
-            border: 1px solid #00C9A7;
+            border: 1px solid #059669;
             transition: all ease-in-out .3s;
             background: white;
-            color: #00C9A7;
+            color: #059669;
         }
         .confirm_download:hover{
             color: white;
-            background: #00C9A7;
-            border-color: #00C9A7;
+            background: #059669;
+            border-color: #059669;
         }
         .submit{
             padding: 2px 26px;
             border-radius: 4px;
-            border: 1px solid #6C63FF;
+            border: 1px solid #059669;
             transition: all ease-in-out .3s;
             background: white;
-            color: #6C63FF;
+            color: #059669;
         }
         .submit:hover{
             color: white;
-            background: #6C63FF;
-            border-color: #6C63FF;
+            background: #059669;
+            border-color: #059669;
         }
         .modal-1-content input, .modal-2-content input{
             width: auto;
@@ -285,37 +286,37 @@
             border: none;
             padding: .5rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease-in-out;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
             background-color: transparent;
-            color: #2d5ea2;
+            color: #00629B;
             border-radius: 50%;
 
         }
         
         .download-btn:hover {
             color: white;
-            background-color: #2d5ea2;
+            background-color:rgba(0, 98, 155, 0.75);
         }
 
         .user-btn{
             border: none;
             padding: .5rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease-in-out;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
             background-color: transparent;
-            color: #2d5ea2;
+            color: #00629B;
             border-radius: 50%;
         }
 
         .user-btn:hover{
             color: white;
-            background-color: #2d5ea2;
+            background-color:rgba(0, 98, 155, 0.75);
         }
         td a{
             color: #2d5ea2;
@@ -324,7 +325,7 @@
             color: #1d5db6;
         }
         th{
-            background-color: #2d5ea2;
+            background-color: #00629B;
         }
     </style>
 </head>
@@ -416,12 +417,13 @@
                         <h5>Download</h5>
                         <span class="close_1">&times;</span>
                     </div>
-                    <h6 style="margin-bottom: 20px;">Select download format</h6>
-                    <input type="radio" name="download_type" value="pdf">
-                    <label for="pdf">PDF</label>
-                    <br>
-                    <input type="radio" name="download_type" value="excel">
-                    <label for="pdf">Excel</label>
+                    <div style="font-size: larger;">
+                        <input type="radio" name="download_type" value="pdf" id="pdf">
+                        <label for="pdf">PDF</label>
+                        <br>
+                        <input type="radio" name="download_type" value="excel" id="excel">
+                        <label for="excel">Excel</label>
+                    </div>
                     <input type="hidden" id="sheet_id" name="sheet_id" value="{{budget_sheet.pk}}">
                     <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
                         <a href="#" class="cancel_download">Cancel</a>
