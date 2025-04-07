@@ -9,6 +9,7 @@ from reportlab.platypus import Paragraph, Image
 import xlwt
 from reportlab.lib.colors import Color
 
+from finance_and_corporate_team.models import BudgetSheetSignature
 from insb_port import settings
 from main_website.models import Toolkit
 
@@ -87,19 +88,25 @@ class BudgetPDF:
         revenue_header.update(revenue_data)
         BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 20, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
-        # Signatures
-        c.line(50, 90, 250, 90)
-        c.line(350, 90, 500, 90)
 
-        c.setFont("Times-Roman", 12)
-        c.drawString(50, 75, "Dr. Fariah Mahzabeen")
-        c.drawString(50, 60, "Assistant Professor")
-        c.drawString(50, 45, "Dept. of ECE, North South University")
-        c.drawString(50, 30, "Faculty Advisor, IEEE NSU SB WIE AG")
+        signatures = BudgetSheetSignature.objects.filter(sc_ag__primary=sc_ag_primary)
 
-        c.drawString(350, 75, "Shaira Imtiaz Aurchi")
-        c.drawString(350, 60, "Chair, IEEE NSU SB WIE AG")
-        c.drawString(350, 45, "North South University")
+        if signatures.exists():
+            # Signatures
+            c.line(50, 90, 250, 90)
+            c.line(350, 90, 500, 90)
+
+            c.setFont("Times-Roman", 12)
+
+            y = 75
+            for line in signatures[0].left_signature.splitlines():
+                c.drawString(50, y, line)
+                y -= 15
+
+            y = 75
+            for line in signatures[0].right_signature.splitlines():
+                c.drawString(350, y, line)
+                y -= 15
 
         # Save the PDF
         c.save()
@@ -123,12 +130,13 @@ class BudgetPDF:
 
             else:
                 # Default style for normal text
-                style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica')
-                style.alignment = 1
+                style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=1)
 
             wrapped_row = []
             for j in range(len(row)):
-                if j == 0:
+                if j == 0 and i == 0:
+                    wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=0)))
+                elif j == 0:
                     wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=0)))
                 else:
                     wrapped_row.append(Paragraph(str(row[j]), style))

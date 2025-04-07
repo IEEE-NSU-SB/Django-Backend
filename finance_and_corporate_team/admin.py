@@ -6,3 +6,5 @@ from .models import *
 admin.site.register(BudgetSheet)
 
 admin.site.register(BudgetSheetAccess)
+
+admin.site.register(BudgetSheetSignature)

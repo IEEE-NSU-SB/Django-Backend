@@ -34,3 +34,15 @@ class BudgetSheetAccess(models.Model):
 
     def __str__(self):
         return self.member.name
+    
+class BudgetSheetSignature(models.Model):
+
+    left_signature = models.TextField()
+    right_signature = models.TextField()
+    sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Budget Sheet Signature'
+
+    def __str__(self):
+        return str(self.pk)
