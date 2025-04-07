@@ -3536,10 +3536,16 @@ def event_edit_budget_form_tab(request, event_id):
                     rev_total = request.POST.getlist('rev_total')
                     
                     if BudgetSheet.objects.filter(event=event_id).count() == 0:
-                        FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                        if FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                            messages.success(request, 'Budget created successfully!')
+                        else:
+                            messages.warning(request, 'Could not create budget!')
                     else:
                         budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                        FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
+                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                            messages.success(request, 'Budget edited successfully!')
+                        else:
+                            messages.warning(request, 'Could not update budget!')
                     
                     return redirect('central_branch:event_edit_budget_form_tab', event_id)
                 
@@ -3598,7 +3604,6 @@ def event_edit_budget_form_tab(request, event_id):
             }
 
             return render(request,"Events/event_edit_budget_form_tab.html", context)
-            # return render(request,"finance_and_corporate_team/BudgetPage.html", context)
         else:
             return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
 

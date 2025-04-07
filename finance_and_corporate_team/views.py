@@ -245,8 +245,10 @@ def create_budget(request, event_id=None):
                 budget_sheet = FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
                 
                 if budget_sheet:
+                    messages.success(request, 'Budget created successfully!')
                     return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
                 else:
+                    messages.warning(request, 'Could not create the budget!')
                     return redirect('finance_and_corporate_team:event_page')
 
             event = None
@@ -256,6 +258,7 @@ def create_budget(request, event_id=None):
                     return redirect('finance_and_corporate_team:edit_budget', budget_sheet.pk)
                 
                 elif Events.objects.filter(id=event_id).count() == 0:
+                    messages.warning(request, 'Event does not exist!')
                     return redirect('finance_and_corporate_team:event_page')
                 
                 else:
@@ -304,8 +307,10 @@ def edit_budget(request, sheet_id):
                     rev_total = request.POST.getlist('rev_total')
 
                     if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                        messages.success(request, 'Budget updated successfully!')
                         return redirect('finance_and_corporate_team:edit_budget', sheet_id)
                     else:
+                        messages.warning(request, 'Could not update budget!')
                         return redirect('finance_and_corporate_team:edit_budget', sheet_id)
                     
                 elif 'save_access' in request.POST:
@@ -337,6 +342,7 @@ def edit_budget(request, sheet_id):
             try:
                 budget_sheet = BudgetSheet.objects.get(id=sheet_id)
             except:
+                messages.warning(request, 'Budget sheet does not exist!')
                 return redirect('finance_and_corporate_team:event_page')
             
             deficit = 0.0
