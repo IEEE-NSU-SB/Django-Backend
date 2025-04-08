@@ -225,6 +225,7 @@ def recruitee_details(request,session_id,nsu_id):
                             'facebook_url': request.POST['facebook_url'],
                             'facebook_username':request.POST['facebook_username'],
                             'home_address': request.POST['home_address'],
+                            'gender':request.POST['gender'],
                             'school':request.POST['school'],
                             'department':request.POST['department'],
                             'major': request.POST['major'], 'graduating_year': request.POST['graduating_year'],
