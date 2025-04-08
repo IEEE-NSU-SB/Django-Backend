@@ -124,7 +124,7 @@ class FinanceAndCorporateTeam:
         except:
             return False
         
-    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):
+    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
 
         try:
             total_cost = 0
@@ -155,6 +155,11 @@ class FinanceAndCorporateTeam:
                 budget_sheet.usd_rate = saved_rate
             else:
                 budget_sheet.usd_rate = None
+
+            if show_usd_rates:
+                budget_sheet.show_usd_rates = True
+            else:
+                budget_sheet.show_usd_rates = False
 
             budget_sheet.save()
             return True

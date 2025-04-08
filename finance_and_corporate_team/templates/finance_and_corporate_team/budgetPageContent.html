@@ -505,6 +505,7 @@
             value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
           />
           <a href="#" class="convert-usd-bdt">Show USD</a>
+          <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% endif %}" name="show_usd_rates">
           {% endif %}
         </div>
       </div>
@@ -1059,6 +1060,7 @@
           " BDT ";
 
         this.textContent = "Convert to USD";
+        document.getElementById('show_usd_rates').value = 'off';
       } else {
         // Convert to USD
         costHeader.textContent = "Unit Per Cost (USD)";
@@ -1085,6 +1087,7 @@
           " USD ";
 
         this.textContent = "Convert to BDT";
+        document.getElementById('show_usd_rates').value = 'on';
       }
 
       // Recalculate totals after conversion
