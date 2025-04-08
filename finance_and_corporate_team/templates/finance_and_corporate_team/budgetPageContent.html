@@ -182,7 +182,6 @@
       width: 130px;
       height: 31px;
       margin-right: 4px;
-      display: none;
     }
     .download_modal {
       opacity: 0;
@@ -497,6 +496,7 @@
           ></i>
         {% endif %}
           {% if access_type == 'Edit' %}
+          <p>Current USD rate</p>
           <input
             type="number"
             name=""
