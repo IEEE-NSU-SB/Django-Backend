@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import requests
 from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
@@ -3581,17 +3582,26 @@ def event_edit_budget_form_tab(request, event_id):
                             'access_type': member_access_type
                         })
             else:
-                budget_sheet = None               
+                budget_sheet = None  
+
             
             deficit = 0.0
             surplus = 0.0
 
+            usd_rate = None
             if budget_sheet:
 
                 if budget_sheet.total_cost > budget_sheet.total_revenue:
                     deficit = budget_sheet.total_revenue - budget_sheet.total_cost
                 elif budget_sheet.total_cost < budget_sheet.total_revenue:
                     surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+                else:
+                    usd_rate = None             
             
             event = Events.objects.get(id=event_id)
 
@@ -3606,7 +3616,8 @@ def event_edit_budget_form_tab(request, event_id):
                 'fct_team_member_accesses':fct_team_member_accesses,
                 'deficit':deficit,
                 'surplus':surplus,
-                'event':event
+                'event':event,
+                'usd_rate':usd_rate
             }
 
             return render(request,"Events/event_edit_budget_form_tab.html", context)
