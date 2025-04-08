@@ -1935,6 +1935,8 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 rev_quantity = request.POST.getlist('rev_quantity')
                 rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
                 rev_total = request.POST.getlist('rev_total')
+
+                saved_rate = request.POST.get('saved_rate')
                 
                 if BudgetSheet.objects.filter(event=event_id).count() == 0:
                     if Sc_Ag.create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
@@ -1943,7 +1945,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
                         messages.warning(request, 'Could not create budget!')
                 else:
                     budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):
                         messages.success(request, 'Budget updated successfully!')
                     else:
                         messages.warning(request, 'Could not update budget!')
@@ -1975,7 +1977,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 'sc_ag_info':get_sc_ag_info,
                 'user_data':user_data,
                 'budget_sheet':budget_sheet,
-                'access_type':has_access,
+                'access_type': has_access if has_access == 'ViewOnly' else 'Edit',
                 'deficit':deficit,
                 'surplus':surplus,
                 'event':event

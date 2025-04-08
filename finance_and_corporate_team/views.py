@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.views import View
+import requests
 from central_branch.view_access import Branch_View_Access
 from central_events.models import Events
 from finance_and_corporate_team.manage_access import FCT_Render_Access
@@ -171,11 +172,13 @@ def budgetHomePage(request):
                 access_types = request.POST.getlist('access_type')
                 sheet_id = request.POST.get('sheet_id')
 
-                FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
-
+                if FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types):
+                    messages.success(request, 'Budget sheet access updated!')
+                else:
+                    messages.warning(request, 'Could not update budget sheet access!')
                 return redirect('finance_and_corporate_team:budgetHomePage')
 
-            all_budget_sheets = BudgetSheet.objects.all()
+            all_budget_sheets = BudgetSheet.objects.filter(sheet_of__primary=1)
 
             context={
                     'user_data':user_data,
@@ -293,6 +296,7 @@ def edit_budget(request, sheet_id):
         eb_common_access = Branch_View_Access.common_access(request.user.username)
         access_type = FCT_Render_Access.access_for_budget(request, sheet_id)
 
+        usd_rate = None
         if access_type == 'Edit':
             if request.method == "POST":
                 if 'save_budget' in request.POST:
@@ -306,7 +310,9 @@ def edit_budget(request, sheet_id):
                     rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
                     rev_total = request.POST.getlist('rev_total')
 
-                    if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                    saved_rate = request.POST.get('saved_rate')
+
+                    if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):           
                         messages.success(request, 'Budget updated successfully!')
                         return redirect('finance_and_corporate_team:edit_budget', sheet_id)
                     else:
@@ -317,8 +323,20 @@ def edit_budget(request, sheet_id):
                     ieee_ids = request.POST.getlist('ieee_id')
                     access_types = request.POST.getlist('access_type')
 
-                    FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
                     return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                
+            
+            currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+            if(currency_data_response.status_code==200):
+                # if response is okay then load data
+                usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+            else:
+                usd_rate = None
+
         
         fct_team_member_accesses = []
         if eb_common_access:
@@ -361,7 +379,8 @@ def edit_budget(request, sheet_id):
                 'deficit':deficit,
                 'surplus':surplus,
                 'eb_common_access':eb_common_access,
-                'fct_team_member_accesses':fct_team_member_accesses
+                'fct_team_member_accesses':fct_team_member_accesses,
+                'usd_rate':usd_rate
             }
 
             return render(request,"finance_and_corporate_team/budgetPage.html", context)

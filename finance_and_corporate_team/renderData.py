@@ -110,18 +110,21 @@ class FinanceAndCorporateTeam:
                                                         revenueBreakdownData=revenue_data,
                                                         total_cost=total_cost,
                                                         total_revenue=total_revenue)
-                
-            username = request.user.username
-            member = Members.objects.get(ieee_id=username)
 
-            BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+            try: 
+                username = request.user.username
+                member = Members.objects.get(ieee_id=username)
+
+                BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+            except:
+                pass
                 
             return budget_sheet
         
         except:
             return False
         
-    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):
 
         try:
             total_cost = 0
@@ -147,6 +150,12 @@ class FinanceAndCorporateTeam:
             budget_sheet.revenueBreakdownData = revenue_data
             budget_sheet.total_cost = total_cost
             budget_sheet.total_revenue = total_revenue
+
+            if saved_rate:
+                budget_sheet.usd_rate = saved_rate
+            else:
+                budget_sheet.usd_rate = None
+
             budget_sheet.save()
             return True
         
@@ -155,16 +164,19 @@ class FinanceAndCorporateTeam:
         
     def update_budget_sheet_access(sheet_id, ieee_ids, access_types):
 
-        for i in range(len(ieee_ids)):
-            access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=ieee_ids[i])
-            if access.exists():
-                if access_types[i] != '':
-                    access.update(access_type=access_types[i])
+        try:
+            for i in range(len(ieee_ids)):
+                access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=ieee_ids[i])
+                if access.exists():
+                    if access_types[i] != '':
+                        access.update(access_type=access_types[i])
+                    else:
+                        access.delete()
                 else:
-                    access.delete()
-            else:
-                if access_types[i] != '':
-                    BudgetSheetAccess.objects.create(sheet_id=sheet_id, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
-                else:
-                    print('NAI')
+                    if access_types[i] != '':
+                        BudgetSheetAccess.objects.create(sheet_id=sheet_id, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
+
+            return True
+        except:
+            return False
 

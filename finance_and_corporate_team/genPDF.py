@@ -77,7 +77,7 @@ class BudgetPDF:
         cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE / UNIT (BDT)", "TOTAL PRICE (BDT)"]}
         cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 60, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 55, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
@@ -86,7 +86,7 @@ class BudgetPDF:
 
         revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
         revenue_header.update(revenue_data)
-        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 20, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 15, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
 
         signatures = BudgetSheetSignature.objects.filter(sc_ag__primary=sc_ag_primary)
@@ -94,7 +94,7 @@ class BudgetPDF:
         if signatures.exists():
             # Signatures
             c.line(50, 90, 250, 90)
-            c.line(350, 90, 500, 90)
+            c.line(350, 90, 510, 90)
 
             c.setFont("Times-Roman", 12)
 
@@ -119,7 +119,8 @@ class BudgetPDF:
     def draw_table(canvas, data, x, y, col_widths, primary):
 
         styles = getSampleStyleSheet()  
-      
+
+        fontSize = 11
         # Convert long text cells to Paragraph objects for wrapping
         wrapped_data = []
         for i, row in enumerate(data.values()):
@@ -130,14 +131,14 @@ class BudgetPDF:
 
             else:
                 # Default style for normal text
-                style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=1)
+                style = ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=1, fontSize=fontSize)
 
             wrapped_row = []
             for j in range(len(row)):
                 if j == 0 and i == 0:
                     wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=0)))
                 elif j == 0:
-                    wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=0)))
+                    wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=0, fontSize=fontSize, leading=fontSize+2)))
                 else:
                     wrapped_row.append(Paragraph(str(row[j]), style))
 
@@ -145,7 +146,7 @@ class BudgetPDF:
 
         # **Calculate Totals (assuming numerical columns except first)**
         total_row = []
-        total_row.append(Paragraph("Total", ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold")))
+        total_row.append(Paragraph("Total", ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=fontSize, leading=fontSize+5)))
 
         for col_idx in range(1, len(wrapped_data[0])):  # Skip first column
             try:
@@ -156,7 +157,7 @@ class BudgetPDF:
             except ValueError:
                 total_value = "--"  # Non-numeric column
 
-            total_row.append(Paragraph(str(total_value), ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold")))
+            total_row.append(Paragraph(str(total_value), ParagraphStyle(name="Total", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=fontSize, leading=fontSize+5)))
 
         wrapped_data.append(total_row)  # Append total row
 
@@ -164,6 +165,7 @@ class BudgetPDF:
             ("BACKGROUND", (0, 0), (-1, 0), BudgetPDF.get_sc_ag_header_color(primary)),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+            ("TOPPADDING", (0, 0), (-1, 0), 5),
             # ("GRID", (0, 0), (-1, -1), 1, colors.black),
             # Remove INNER grid lines for the total row
             ("LINEABOVE", (0, -1), (-1, -1), 1, colors.black),  # Add a line above the total row
@@ -192,7 +194,7 @@ class BudgetPDF:
         table.drawOn(canvas, x, y - table_height)
 
         # Return new Y position after drawing the table
-        return y - (len(wrapped_data) * 20) - 20  # Adding extra spacing
+        return y - table_height - 15  # Adding extra spacing
 
     def export_budget_sheet_to_excel(sc_ag_primary, title, cost_data, revenue_data, total_cost, total_revenue):
 

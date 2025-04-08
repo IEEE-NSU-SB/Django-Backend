@@ -495,14 +495,14 @@
             data-sid="{{budget_sheet.pk}}"
           ></i>
         {% endif %}
-          {% if access_type == 'Edit' %}
-          <p style="margin: 0;">Current USD rate</p>
+        {% if access_type == 'Edit' and budget_sheet %}
+          <p style="margin: 0;">{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
           <input
-            type="number"
-            name=""
-            id=""
+            type="decimal"
+            name="saved_rate"
             class="conversion_rate"
-            placeholder="USD rate today"
+            placeholder="Set USD Rate"
+            value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
           />
           <a href="#" class="convert-usd-bdt">Show USD</a>
           {% endif %}
@@ -535,7 +535,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="quantity-input"
                 name="cst_quantity"
                 oninput="calculateCostTotal(this)"
@@ -545,7 +545,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="unit-cost-input"
                 name="cst_upc_bdt"
                 oninput="calculateCostTotal(this)"
@@ -585,7 +585,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="quantity-input"
                 name="cst_quantity"
                 oninput="calculateCostTotal(this)"
@@ -594,7 +594,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="unit-cost-input"
                 name="cst_upc_bdt"
                 oninput="calculateCostTotal(this)"
@@ -664,7 +664,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-quantity-input"
                 name="rev_quantity"
                 oninput="calculateRevenueTotal(this)"
@@ -674,7 +674,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-unit-input"
                 name="rev_upc_bdt"
                 oninput="calculateRevenueTotal(this)"
@@ -714,7 +714,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-quantity-input"
                 name="rev_quantity"
                 oninput="calculateRevenueTotal(this)"
@@ -723,7 +723,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-unit-input"
                 name="rev_upc_bdt"
                 oninput="calculateRevenueTotal(this)"

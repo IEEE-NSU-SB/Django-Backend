@@ -3534,6 +3534,8 @@ def event_edit_budget_form_tab(request, event_id):
                     rev_quantity = request.POST.getlist('rev_quantity')
                     rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
                     rev_total = request.POST.getlist('rev_total')
+
+                    saved_rate = request.POST.get('saved_rate')
                     
                     if BudgetSheet.objects.filter(event=event_id).count() == 0:
                         if FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
@@ -3542,7 +3544,7 @@ def event_edit_budget_form_tab(request, event_id):
                             messages.warning(request, 'Could not create budget!')
                     else:
                         budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):
                             messages.success(request, 'Budget edited successfully!')
                         else:
                             messages.warning(request, 'Could not update budget!')
@@ -3553,7 +3555,10 @@ def event_edit_budget_form_tab(request, event_id):
                     ieee_ids = request.POST.getlist('ieee_id')
                     access_types = request.POST.getlist('access_type')
                     budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                    FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types)
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
                     return redirect('central_branch:event_edit_budget_form_tab', event_id)
                 
             fct_team_member_accesses = []
