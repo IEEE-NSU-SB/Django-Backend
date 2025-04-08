@@ -182,7 +182,6 @@
       width: 130px;
       height: 31px;
       margin-right: 4px;
-      display: none;
     }
     .download_modal {
       opacity: 0;
@@ -496,7 +495,8 @@
             data-sid="{{budget_sheet.pk}}"
           ></i>
         {% endif %}
-          {% if access_type == 'Edit' and budget_sheet %}
+        {% if access_type == 'Edit' and budget_sheet %}
+          <p>Current USD rate</p>
           <input
             type="number"
             name=""
