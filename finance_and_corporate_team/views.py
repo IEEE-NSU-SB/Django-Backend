@@ -404,28 +404,33 @@ def download_budget(request):
                 has_access = FCT_Render_Access.access_for_budget(request, sheet_id)
 
                 if has_access == 'Edit' or has_access == 'ViewOnly':
-                    budget_sheet = BudgetSheet.objects.get(id=sheet_id)
-                    if request.GET.get('download_type') == 'pdf':
-                        file = BudgetPDF.create_pdf(budget_sheet.sheet_of.primary, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.show_usd_rates)
-                        
-                        # Create response with PDF as attachment
-                        response = HttpResponse(file, content_type='application/pdf')
-                        response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.pdf"'
+                    budget_sheet = BudgetSheet.objects.filter(id=sheet_id)
+                    if budget_sheet.exists():
+                        budget_sheet = budget_sheet[0]
+                        if request.GET.get('download_type') == 'pdf':
+                            file = BudgetPDF.create_pdf(budget_sheet.sheet_of.primary, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.show_usd_rates)
+                            
+                            # Create response with PDF as attachment
+                            response = HttpResponse(file, content_type='application/pdf')
+                            response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.pdf"'
 
-                        return response
-                    elif request.GET.get('download_type') == 'excel':
-                        # Example dummy data to test
-                        # budget_data_example = {
-                        #     "approval": "Dr. Fariah Mahzabeen & Shaira Imtiaz Aurchi",
-                        # }
+                            return response
+                        elif request.GET.get('download_type') == 'excel':
+                            # Example dummy data to test
+                            # budget_data_example = {
+                            #     "approval": "Dr. Fariah Mahzabeen & Shaira Imtiaz Aurchi",
+                            # }
 
-                        file = BudgetPDF.export_budget_sheet_to_excel(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.total_cost, budget_sheet.total_revenue)
+                            file = BudgetPDF.export_budget_sheet_to_excel(1, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.total_cost, budget_sheet.total_revenue)
 
-                        # Create response with PDF as attachment
-                        response = HttpResponse(file, content_type='application/vnd.ms-excel')
-                        response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.xls"'
+                            # Create response with PDF as attachment
+                            response = HttpResponse(file, content_type='application/vnd.ms-excel')
+                            response['Content-Disposition'] = f'inline; filename="{budget_sheet.name}.xls"'
 
-                        return response
+                            return response
+                    else:
+                        messages.warning(request, 'Budget Sheet does not Exist')
+                        return redirect('finance_and_corporate_team:event_page')
                 else:
                     return redirect('finance_and_corporate_team:edit_budget', sheet_id)
     except Exception as e:
