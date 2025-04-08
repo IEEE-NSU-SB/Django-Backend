@@ -1937,6 +1937,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
                 rev_total = request.POST.getlist('rev_total')
 
                 saved_rate = request.POST.get('saved_rate')
+                show_usd_rates = request.POST.get('show_usd_rates')
                 
                 if BudgetSheet.objects.filter(event=event_id).count() == 0:
                     if Sc_Ag.create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
@@ -1945,7 +1946,7 @@ def event_edit_budget_form_tab(request, primary, event_id):
                         messages.warning(request, 'Could not create budget!')
                 else:
                     budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):
+                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
                         messages.success(request, 'Budget updated successfully!')
                     else:
                         messages.warning(request, 'Could not update budget!')

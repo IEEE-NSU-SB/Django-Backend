@@ -406,7 +406,7 @@ def download_budget(request):
                 if has_access == 'Edit' or has_access == 'ViewOnly':
                     budget_sheet = BudgetSheet.objects.get(id=sheet_id)
                     if request.GET.get('download_type') == 'pdf':
-                        file = BudgetPDF.create_pdf(budget_sheet.sheet_of.primary, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData)
+                        file = BudgetPDF.create_pdf(budget_sheet.sheet_of.primary, budget_sheet.name, budget_sheet.costBreakdownData, budget_sheet.revenueBreakdownData, budget_sheet.show_usd_rates)
                         
                         # Create response with PDF as attachment
                         response = HttpResponse(file, content_type='application/pdf')

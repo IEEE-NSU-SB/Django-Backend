@@ -504,8 +504,8 @@
             placeholder="Set USD Rate"
             value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
           />
-          <a href="#" class="convert-usd-bdt">Show USD</a>
-          <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% endif %}" name="show_usd_rates">
+          <a href="#" class="convert-usd-bdt">{% if budget_sheet.show_usd_rates %}Convert to BDT{% else %}Convert to USD{% endif %}</a>
+          <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% else %}off{% endif %}" name="show_usd_rates">
           {% endif %}
         </div>
       </div>
@@ -515,7 +515,7 @@
           <tr>
             <th>Item</th>
             <th>Quantity</th>
-            <th>Unit Per Cost (BDT)</th>
+            <th>{% if budget_sheet.show_usd_rates %}Unit Per Cost (USD){% else %}Unit Per Cost (BDT){% endif %}</th>
             <th>Total</th>
             {% if access_type == 'Edit' %}
             <th>Actions</th>
@@ -644,7 +644,7 @@
           <tr>
             <th>Revenue Type</th>
             <th>Quantity</th>
-            <th>Revenue/Unit (BDT)</th>
+            <th>{% if budget_sheet.show_usd_rates %}Revenue/Unit (USD){% else %}Revenue/Unit (BDT){% endif %}</th>
             <th>Total</th>
             {% if access_type == 'Edit' %}
             <th>Actions</th>

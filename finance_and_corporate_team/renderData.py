@@ -156,7 +156,7 @@ class FinanceAndCorporateTeam:
             else:
                 budget_sheet.usd_rate = None
 
-            if show_usd_rates:
+            if show_usd_rates == 'on':
                 budget_sheet.show_usd_rates = True
             else:
                 budget_sheet.show_usd_rates = False

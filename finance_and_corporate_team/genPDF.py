@@ -15,7 +15,7 @@ from main_website.models import Toolkit
 
 class BudgetPDF:
 
-    def create_pdf(sc_ag_primary, title, cost_data, revenue_data):
+    def create_pdf(sc_ag_primary, title, cost_data, revenue_data, show_usd_rates):
         # Create a BytesIO buffer to hold the PDF data
         buffer = BytesIO()
 
@@ -59,7 +59,7 @@ class BudgetPDF:
         wrapped_width, wrapped_height = para.wrap(text_width, 0)  # Get required height
 
         # Adjust Y so the first line stays in place
-        adjusted_y_position = height - 90 - wrapped_height  # Shift down
+        adjusted_y_position = height - 100 - wrapped_height  # Shift down
 
         # Center X calculation
         x_position = (width - wrapped_width) / 2
@@ -74,36 +74,36 @@ class BudgetPDF:
         c.setFont("Helvetica-Bold", 12)
         c.drawString(50, adjusted_y_position - 40, "Cost Breakdown")
 
-        cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE / UNIT (BDT)", "TOTAL PRICE (BDT)"]}
+        cost_header = {-1 : ["Item", "Quantity", ("Price / Unit (BDT)" if show_usd_rates == False else "Price / Unit (USD)"), ("Total Price (BDT)" if show_usd_rates == False else "Total Price (USD)")]}
         cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 55, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 55, col_widths=[180, 65, 115, 140], primary=sc_ag_primary)
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
         revenue_y = new_y - 30  # Provide extra space
         c.drawString(50, revenue_y, "Total Revenue")
 
-        revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
+        revenue_header = {-1 : ["Revenue Type", "Quantity", ("Revenue / Unit (BDT)" if show_usd_rates == False else "Revenue / Unit (USD)"), ("Revenue Generated (BDT)" if show_usd_rates == False else "Revenue Generated (USD)")]}
         revenue_header.update(revenue_data)
-        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 15, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 15, col_widths=[170, 65, 115, 150], primary=sc_ag_primary)
 
 
         signatures = BudgetSheetSignature.objects.filter(sc_ag__primary=sc_ag_primary)
 
         if signatures.exists():
             # Signatures
-            c.line(50, 90, 250, 90)
-            c.line(350, 90, 510, 90)
+            c.line(50, 75, 250, 75)
+            c.line(350, 75, 510, 75)
 
             c.setFont("Times-Roman", 12)
 
-            y = 75
+            y = 60
             for line in signatures[0].left_signature.splitlines():
                 c.drawString(50, y, line)
                 y -= 15
 
-            y = 75
+            y = 60
             for line in signatures[0].right_signature.splitlines():
                 c.drawString(350, y, line)
                 y -= 15
@@ -126,8 +126,7 @@ class BudgetPDF:
         for i, row in enumerate(data.values()):
             if i == 0:
                 # Bold style for the first row
-                style = ParagraphStyle(name="Header", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=1)
-                # style.textColor = BudgetPDF.get_sc_ag_header_color(primary)
+                style = ParagraphStyle(name="Header", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=1, textColor=colors.white, leading=18)
 
             else:
                 # Default style for normal text
@@ -136,7 +135,7 @@ class BudgetPDF:
             wrapped_row = []
             for j in range(len(row)):
                 if j == 0 and i == 0:
-                    wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=0)))
+                    wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica-Bold', alignment=0, textColor=colors.white, leading=18)))
                 elif j == 0:
                     wrapped_row.append(Paragraph(str(row[j]), ParagraphStyle(name="Normal", parent=styles["Normal"], fontName='Helvetica', alignment=0, fontSize=fontSize, leading=fontSize+2)))
                 else:
@@ -165,7 +164,7 @@ class BudgetPDF:
             ("BACKGROUND", (0, 0), (-1, 0), BudgetPDF.get_sc_ag_header_color(primary)),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
-            ("TOPPADDING", (0, 0), (-1, 0), 5),
+            ("TOPPADDING", (0, 0), (-1, 0), 10),
             # ("GRID", (0, 0), (-1, -1), 1, colors.black),
             # Remove INNER grid lines for the total row
             ("LINEABOVE", (0, -1), (-1, -1), 1, colors.black),  # Add a line above the total row
