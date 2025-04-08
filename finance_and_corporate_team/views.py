@@ -310,7 +310,9 @@ def edit_budget(request, sheet_id):
                     rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
                     rev_total = request.POST.getlist('rev_total')
 
-                    if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):           
+                    saved_rate = request.POST.get('saved_rate')
+
+                    if FinanceAndCorporateTeam.edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate):           
                         messages.success(request, 'Budget updated successfully!')
                         return redirect('finance_and_corporate_team:edit_budget', sheet_id)
                     else:

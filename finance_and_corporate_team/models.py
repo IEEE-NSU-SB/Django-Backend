@@ -16,6 +16,7 @@ class BudgetSheet(models.Model):
     total_cost = models.FloatField(null=False, blank=False, default=0.0)
     total_revenue = models.FloatField(null=False, blank=False, default=0.0)
     usd_rate = models.FloatField(null=True, blank=True, default=None)
+    show_usd_rates = models.BooleanField(null=False, blank=False, default=False)
     approval_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
