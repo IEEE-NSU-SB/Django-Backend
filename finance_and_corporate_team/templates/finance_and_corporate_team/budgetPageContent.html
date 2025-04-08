@@ -496,9 +496,9 @@
           ></i>
         {% endif %}
         {% if access_type == 'Edit' and budget_sheet %}
-          <p>{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
+          <p style="margin: 0;">{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
           <input
-            type="number"
+            type="decimal"
             name="saved_rate"
             class="conversion_rate"
             placeholder="Set USD Rate"
@@ -536,7 +536,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="quantity-input"
                 name="cst_quantity"
                 oninput="calculateCostTotal(this)"
@@ -546,7 +546,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="unit-cost-input"
                 name="cst_upc_bdt"
                 oninput="calculateCostTotal(this)"
@@ -586,7 +586,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="quantity-input"
                 name="cst_quantity"
                 oninput="calculateCostTotal(this)"
@@ -595,7 +595,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="unit-cost-input"
                 name="cst_upc_bdt"
                 oninput="calculateCostTotal(this)"
@@ -665,7 +665,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-quantity-input"
                 name="rev_quantity"
                 oninput="calculateRevenueTotal(this)"
@@ -675,7 +675,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-unit-input"
                 name="rev_upc_bdt"
                 oninput="calculateRevenueTotal(this)"
@@ -715,7 +715,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-quantity-input"
                 name="rev_quantity"
                 oninput="calculateRevenueTotal(this)"
@@ -724,7 +724,7 @@
             </td>
             <td>
               <input
-                type="number"
+                type="decimal"
                 class="revenue-unit-input"
                 name="rev_upc_bdt"
                 oninput="calculateRevenueTotal(this)"
@@ -770,14 +770,14 @@
 
       <div class="summary" style="margin-top: 4rem">
         <div>
-          <strong>Deficit:</strong>
+          <strong>Fund use:</strong>
           BDT
           <span id="deficit-surplus"
             >{% if deficit %}{{deficit|floatformat:2}}{% else %}0{% endif %}</span
           >
         </div>
         <div>
-          <strong>Surplus:</strong>
+          <strong>Fund Collection:</strong>
           BDT
           <span id="net-income"
             >{% if surplus %}{{surplus|floatformat:2}}{% else %}0{% endif %}</span
