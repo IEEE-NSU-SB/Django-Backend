@@ -178,7 +178,7 @@ def budgetHomePage(request):
                     messages.warning(request, 'Could not update budget sheet access!')
                 return redirect('finance_and_corporate_team:budgetHomePage')
 
-            all_budget_sheets = BudgetSheet.objects.all()
+            all_budget_sheets = BudgetSheet.objects.filter(sheet_of__primary=1)
 
             context={
                     'user_data':user_data,
