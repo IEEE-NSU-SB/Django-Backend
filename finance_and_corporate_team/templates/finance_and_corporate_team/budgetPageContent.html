@@ -496,7 +496,7 @@
           ></i>
         {% endif %}
           {% if access_type == 'Edit' %}
-          <p>Current USD rate</p>
+          <p style="margin: 0;">Current USD rate</p>
           <input
             type="number"
             name=""
@@ -769,14 +769,14 @@
 
       <div class="summary" style="margin-top: 4rem">
         <div>
-          <strong>Deficit:</strong>
+          <strong>Fund use:</strong>
           BDT
           <span id="deficit-surplus"
             >{% if deficit %}{{deficit|floatformat:2}}{% else %}0{% endif %}</span
           >
         </div>
         <div>
-          <strong>Surplus:</strong>
+          <strong>Fund Collection:</strong>
           BDT
           <span id="net-income"
             >{% if surplus %}{{surplus|floatformat:2}}{% else %}0{% endif %}</span
