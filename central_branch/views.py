@@ -3553,7 +3553,10 @@ def event_edit_budget_form_tab(request, event_id):
                     ieee_ids = request.POST.getlist('ieee_id')
                     access_types = request.POST.getlist('access_type')
                     budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
-                    FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types)
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
                     return redirect('central_branch:event_edit_budget_form_tab', event_id)
                 
             fct_team_member_accesses = []

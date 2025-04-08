@@ -155,16 +155,19 @@ class FinanceAndCorporateTeam:
         
     def update_budget_sheet_access(sheet_id, ieee_ids, access_types):
 
-        for i in range(len(ieee_ids)):
-            access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=ieee_ids[i])
-            if access.exists():
-                if access_types[i] != '':
-                    access.update(access_type=access_types[i])
+        try:
+            for i in range(len(ieee_ids)):
+                access = BudgetSheetAccess.objects.filter(sheet_id=sheet_id, member=ieee_ids[i])
+                if access.exists():
+                    if access_types[i] != '':
+                        access.update(access_type=access_types[i])
+                    else:
+                        access.delete()
                 else:
-                    access.delete()
-            else:
-                if access_types[i] != '':
-                    BudgetSheetAccess.objects.create(sheet_id=sheet_id, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
-                else:
-                    print('NAI')
+                    if access_types[i] != '':
+                        BudgetSheetAccess.objects.create(sheet_id=sheet_id, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
+
+            return True
+        except:
+            return False
 

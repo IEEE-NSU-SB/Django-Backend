@@ -172,8 +172,10 @@ def budgetHomePage(request):
                 access_types = request.POST.getlist('access_type')
                 sheet_id = request.POST.get('sheet_id')
 
-                FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
-
+                if FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types):
+                    messages.success(request, 'Budget sheet access updated!')
+                else:
+                    messages.warning(request, 'Could not update budget sheet access!')
                 return redirect('finance_and_corporate_team:budgetHomePage')
 
             all_budget_sheets = BudgetSheet.objects.all()
@@ -319,7 +321,10 @@ def edit_budget(request, sheet_id):
                     ieee_ids = request.POST.getlist('ieee_id')
                     access_types = request.POST.getlist('access_type')
 
-                    FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
                     return redirect('finance_and_corporate_team:edit_budget', sheet_id)
                 
             
