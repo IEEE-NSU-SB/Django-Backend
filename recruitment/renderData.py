@@ -74,9 +74,10 @@ class Recruitment:
                 #Clear the previous skills, if there are any
                 member.skills.clear()
                 #Check if any skills were selected
-                if values['skill_set_list'][0] != 'null':
-                    #If yes then add them
-                    member.skills.add(*values['skill_set_list'])
+                if len(values['skill_set_list']) > 0:
+                    if values['skill_set_list'][0] != 'null':
+                        #If yes then add them
+                        member.skills.add(*values['skill_set_list'])
                 member.save() #Updating member data
                 return True
         except IntegrityError:
