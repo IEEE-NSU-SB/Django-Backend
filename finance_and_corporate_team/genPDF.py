@@ -77,7 +77,7 @@ class BudgetPDF:
         cost_header = {-1 : ["ITEM", "QUANTITY", "PRICE / UNIT (BDT)", "TOTAL PRICE (BDT)"]}
         cost_header.update(cost_data)
         # Draw cost table and get final Y position
-        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 60, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        new_y = BudgetPDF.draw_table(c, cost_header, x=50, y=adjusted_y_position - 55, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
         # Revenue Breakdown (Positioned Below Cost Breakdown)
         c.setFont("Helvetica-Bold", 12)
@@ -86,7 +86,7 @@ class BudgetPDF:
 
         revenue_header = {-1 : ["Revenue Type", "Quantity", "Revenue / Unit (BDT)", "Revenue Generated (BDT)"]}
         revenue_header.update(revenue_data)
-        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 20, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
+        BudgetPDF.draw_table(c, revenue_header, x=50, y=revenue_y - 15, col_widths=[180, 65, 120, 135], primary=sc_ag_primary)
 
 
         signatures = BudgetSheetSignature.objects.filter(sc_ag__primary=sc_ag_primary)
