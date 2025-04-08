@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.views import View
+import requests
 from central_branch.view_access import Branch_View_Access
 from central_events.models import Events
 from finance_and_corporate_team.manage_access import FCT_Render_Access
@@ -293,6 +294,7 @@ def edit_budget(request, sheet_id):
         eb_common_access = Branch_View_Access.common_access(request.user.username)
         access_type = FCT_Render_Access.access_for_budget(request, sheet_id)
 
+        usd_rate = None
         if access_type == 'Edit':
             if request.method == "POST":
                 if 'save_budget' in request.POST:
@@ -319,6 +321,15 @@ def edit_budget(request, sheet_id):
 
                     FinanceAndCorporateTeam.update_budget_sheet_access(sheet_id, ieee_ids, access_types)
                     return redirect('finance_and_corporate_team:edit_budget', sheet_id)
+                
+            
+            currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+            if(currency_data_response.status_code==200):
+                # if response is okay then load data
+                usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+            else:
+                usd_rate = None
+
         
         fct_team_member_accesses = []
         if eb_common_access:
@@ -361,7 +372,8 @@ def edit_budget(request, sheet_id):
                 'deficit':deficit,
                 'surplus':surplus,
                 'eb_common_access':eb_common_access,
-                'fct_team_member_accesses':fct_team_member_accesses
+                'fct_team_member_accesses':fct_team_member_accesses,
+                'usd_rate':usd_rate
             }
 
             return render(request,"finance_and_corporate_team/budgetPage.html", context)

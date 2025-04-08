@@ -496,13 +496,14 @@
             data-sid="{{budget_sheet.pk}}"
           ></i>
         {% endif %}
-          {% if access_type == 'Edit' %}
+          {% if access_type == 'Edit' and budget_sheet %}
           <input
             type="number"
             name=""
             id=""
             class="conversion_rate"
             placeholder="USD rate today"
+            value={% if usd_rate %}{{usd_rate}}{% else %}""{% endif %}
           />
           <a href="#" class="convert-usd-bdt">Show USD</a>
           {% endif %}
