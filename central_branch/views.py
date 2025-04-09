@@ -3522,6 +3522,11 @@ def event_edit_budget_form_tab(request, event_id):
     
         eb_common_access = Branch_View_Access.common_access(request.user.username)
         has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
+        event = Events.objects.get(id=event_id)
+
+        # Not good fix!!!
+        if event.event_organiser.primary != 1:
+            has_access = 'Restricted'
 
         if has_access != 'Restricted':
             if request.method == "POST":
@@ -3603,8 +3608,6 @@ def event_edit_budget_form_tab(request, event_id):
                 else:
                     usd_rate = None             
             
-            event = Events.objects.get(id=event_id)
-
             context = {
                 'is_branch' : True,
                 'event_id' : event_id,
