@@ -3599,7 +3599,7 @@ def event_edit_budget_form_tab(request, event_id):
                 currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
                 if(currency_data_response.status_code==200):
                     # if response is okay then load data
-                    usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+                    usd_rate = round(json.loads(currency_data_response.text)['usd']['bdt'],2)
                 else:
                     usd_rate = None             
             

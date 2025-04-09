@@ -168,9 +168,9 @@
       color: white;
     }
     .convert-usd-bdt {
-      padding: 6px 20px;
+      padding: 7px 20px;
       /* border: 1px solid var(--green); */
-      border-radius: 32px;
+      border-radius: 0 0 4px 0px;
       color: var(--green);
       background-color: #54cca68f;
       transition: all 0.3s ease-in-out;
@@ -179,9 +179,8 @@
       color: white;
     }
     .conversion_rate {
-      width: 130px;
+      width: 86px;
       height: 31px;
-      margin-right: 4px;
     }
     .download_modal {
       opacity: 0;
@@ -470,6 +469,23 @@
 
   <div class="budget_container">
     <form method="POST">
+      <div style="display: flex;justify-content: right; align-items: flex-end; flex-direction: column; margin-bottom: 16px;">
+        {% if access_type == 'Edit' and budget_sheet %}
+        <p style="margin: 0; font-weight: bold; text-align: center; border-radius: 4px 4px 0 0;padding: 5px 35px;background-color: #ffd10073;">Current USD rate{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
+        <div>
+        <input
+          type="decimal"
+          name="saved_rate"
+          class="conversion_rate"
+          placeholder="USD Rate"
+          style="border-radius: 0px 0 0 4px; position: relative; left: 4px;"
+          value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
+        />
+        <a href="#" class="convert-usd-bdt">{% if budget_sheet.show_usd_rates %}Convert to BDT{% else %}Convert to USD{% endif %}</a>
+        <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% else %}off{% endif %}" name="show_usd_rates">
+        {% endif %}
+        </div>
+        </div>
       {% csrf_token %}
       <div style="display: flex; justify-content: space-between">
         <div class="budget-header">
@@ -495,18 +511,6 @@
             data-sid="{{budget_sheet.pk}}"
           ></i>
         {% endif %}
-        {% if access_type == 'Edit' and budget_sheet %}
-          <p style="margin: 0;">{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
-          <input
-            type="decimal"
-            name="saved_rate"
-            class="conversion_rate"
-            placeholder="Set USD Rate"
-            value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
-          />
-          <a href="#" class="convert-usd-bdt">{% if budget_sheet.show_usd_rates %}Convert to BDT{% else %}Convert to USD{% endif %}</a>
-          <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% else %}off{% endif %}" name="show_usd_rates">
-          {% endif %}
         </div>
       </div>
 
@@ -768,6 +772,9 @@
         </tfoot>
       </table>
 
+      <div style="background-color: white;position: sticky;
+      bottom: 0px;
+      z-index: 1000;">
       <div class="summary" style="margin-top: 4rem">
         <div>
           <strong>Fund use:</strong>
@@ -793,6 +800,8 @@
         </button>
         {% endif %}
       </div>
+    </div>
+
     </form>
     <div id="modal_1" class="download_modal">
       <!-- Modal content -->
@@ -1042,14 +1051,14 @@
         document.querySelectorAll(".unit-cost-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value * rate).toFixed(4);
+            input.value = (value * rate).toFixed(0);
           }
         });
 
         document.querySelectorAll(".revenue-unit-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value * rate).toFixed(4);
+            input.value = (value * rate).toFixed(0);
           }
         });
 
@@ -1069,14 +1078,14 @@
         document.querySelectorAll(".unit-cost-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value / rate).toFixed(4);
+            input.value = (value / rate).toFixed(2);
           }
         });
 
         document.querySelectorAll(".revenue-unit-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value / rate).toFixed(4);
+            input.value = (value / rate).toFixed(2);
           }
         });
 
