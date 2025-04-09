@@ -471,7 +471,7 @@
     <form method="POST">
       <div style="display: flex;justify-content: right; align-items: flex-end; flex-direction: column; margin-bottom: 16px;">
         {% if access_type == 'Edit' and budget_sheet %}
-        <p style="margin: 0; font-weight: bold; text-align: center; border-radius: 4px 4px 0 0;padding: 5px 35px;background-color: #ffd10073;">Current USD rate{% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
+        <p style="margin: 0; font-weight: bold; text-align: center; border-radius: 4px 4px 0 0;padding: 5px 35px;background-color: #ffd10073;">Current USD rate: {% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
         <div>
         <input
           type="decimal"

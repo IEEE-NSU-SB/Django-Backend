@@ -652,7 +652,7 @@ class Sc_Ag:
             if event_id:
                 event = Events.objects.get(id=event_id)
                 budget_sheet = BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
-                                        sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=primary),
+                                        sheet_of=event.event_organiser,
                                         event=event,
                                         costBreakdownData=cost_data,
                                         revenueBreakdownData=revenue_data,

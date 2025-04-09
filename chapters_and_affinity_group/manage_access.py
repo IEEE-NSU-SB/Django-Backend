@@ -299,7 +299,10 @@ class SC_Ag_Render_Access:
             budget_sheet = BudgetSheet.objects.filter(event=event_id)
             get_member = None
             if budget_sheet.exists():
-                get_member = BudgetSheetAccess.objects.filter(member=username, sheet_id=budget_sheet.id)
+                if budget_sheet[0].sheet_of.primary == primary:
+                    get_member = BudgetSheetAccess.objects.filter(member=username, sheet_id=budget_sheet[0].id)
+                else:
+                    return False
                 
             #Check if the member exits
             if(get_member):
