@@ -264,7 +264,6 @@ def recruitee_details(request,session_id,nsu_id):
                     ##Resending recruitment mail
                     if request.POST.get('resend_email'):
                         name=request.POST['first_name']
-                        nsu_id=request.POST['nsu_id']
                         recruited_member_email=request.POST['email_personal']
                         recruitment_session_name=recruitment_session.objects.get(id=session_id)
                         
