@@ -1042,14 +1042,14 @@
         document.querySelectorAll(".unit-cost-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value * rate).toFixed(4);
+            input.value = (value * rate).toFixed(0);
           }
         });
 
         document.querySelectorAll(".revenue-unit-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value * rate).toFixed(4);
+            input.value = (value * rate).toFixed(0);
           }
         });
 
@@ -1069,14 +1069,14 @@
         document.querySelectorAll(".unit-cost-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value / rate).toFixed(4);
+            input.value = (value / rate).toFixed(2);
           }
         });
 
         document.querySelectorAll(".revenue-unit-input").forEach((input) => {
           let value = parseFloat(input.value);
           if (!isNaN(value)) {
-            input.value = (value / rate).toFixed(4);
+            input.value = (value / rate).toFixed(2);
           }
         });
 
