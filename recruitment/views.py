@@ -264,7 +264,6 @@ def recruitee_details(request,session_id,nsu_id):
                     ##Resending recruitment mail
                     if request.POST.get('resend_email'):
                         name=request.POST['first_name']
-                        nsu_id=request.POST['nsu_id']
                         recruited_member_email=request.POST['email_personal']
                         recruitment_session_name=recruitment_session.objects.get(id=session_id)
                         
@@ -444,10 +443,11 @@ def recruit_member(request, session_id):
                             recruited_member.save()  # Saving the member to the database
 
                             #Check if any skills were selected
-                            if skill_set_list[0] != 'null':
-                                #If yes then add them
-                                recruited_member.skills.add(*skill_set_list)
-                                recruited_member.save()  # Saving the member to the database
+                            if len(skill_set_list) > 0:
+                                if skill_set_list[0] != 'null':
+                                    #If yes then add them
+                                    recruited_member.skills.add(*skill_set_list)
+                                    recruited_member.save()  # Saving the member to the database
                             
                             #send an email now to the recruited member
                             email_status=email_sending.send_email_to_recruitees_upon_recruitment(
