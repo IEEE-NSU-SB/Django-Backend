@@ -3525,7 +3525,7 @@ def event_edit_budget_form_tab(request, event_id):
         event = Events.objects.get(id=event_id)
 
         # Not good fix!!!
-        if event.event_organiser.primary != 1:
+        if event.event_organiser.primary != 1 and not Access_Render.system_administrator_superuser_access(username=request.user.username) and not Access_Render.system_administrator_staffuser_access(username=request.user.username):
             has_access = 'Restricted'
 
         if has_access != 'Restricted':
