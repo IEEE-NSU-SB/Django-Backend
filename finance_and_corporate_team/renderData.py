@@ -1,6 +1,6 @@
 from central_events.models import Events
 from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
-from users.models import Members
+from users.models import Members, Panel_Members
 from port.models import Chapters_Society_and_Affinity_Groups, Teams,Roles_and_Position
 from system_administration.models import FCT_Data_Access
 from central_branch.renderData import Branch
@@ -114,8 +114,10 @@ class FinanceAndCorporateTeam:
             try: 
                 username = request.user.username
                 member = Members.objects.get(ieee_id=username)
-
-                BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+                panel_member = Panel_Members.objects.filter(tenure__current=True, tenure__panel_of__primary=1, member=member)
+                if panel_member.exists():
+                    if not panel_member[0].position.is_eb_member:
+                        BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
             except:
                 pass
                 

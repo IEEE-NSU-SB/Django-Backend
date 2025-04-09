@@ -669,8 +669,10 @@ class Sc_Ag:
             try:   
                 username = request.user.username
                 member = Members.objects.get(ieee_id=username)
-
-                BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+                panel_member = Panel_Members.objects.filter(tenure__current=True, tenure__panel_of__primary=primary, member=member)
+                if panel_member.exists():
+                    if not panel_member[0].position.is_eb_member:
+                        BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
             except:
                 pass
                 
