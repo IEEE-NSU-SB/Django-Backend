@@ -1,3 +1,4 @@
+from central_events.models import Events
 from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from system_administration.render_access import Access_Render
 from system_administration.models import SC_AG_Data_Access
@@ -297,30 +298,44 @@ class SC_Ag_Render_Access:
 
             #Get member from budget sheet access table
             budget_sheet = BudgetSheet.objects.filter(event=event_id)
+            event = Events.objects.get(id=event_id)
+
             get_member = None
             if budget_sheet.exists():
                 get_member = BudgetSheetAccess.objects.filter(member=username, sheet_id=budget_sheet[0].id)
-                
-            #Check if the member exits
-            if(get_member):
-                if get_member.exists():
-                    #The member exists. Now check if it has budget access
-                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
-                        return 'Edit'
+
+            if event.event_organiser.primary == int(primary):
+                #Check if the member exits
+                if(get_member):
+                    if get_member.exists():
+                        #The member exists. Now check if it has budget access
+                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
+                            return 'Edit'
+                        else:
+                            return get_member[0].access_type
                     else:
-                        return get_member[0].access_type
+                        #The member does not exist in the permissions table
+                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
+                            return 'Edit'
+                        else:
+                            return 'Restricted'
                 else:
                     #The member does not exist in the permissions table
                     if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
                         return 'Edit'
                     else:
                         return 'Restricted'
-        except Exception as e:
-            if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
-                return 'Edit'
             else:
-                SC_Ag_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-                ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+                return 'Restricted'
+        except Exception as e:
+            if event.event_organiser.primary == int(primary):
+                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary)):
+                    return 'Edit'
+                else:
+                    SC_Ag_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+                    ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+                    return 'Restricted'
+            else:
                 return 'Restricted'
     
     
