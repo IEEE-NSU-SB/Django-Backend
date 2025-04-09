@@ -3518,7 +3518,7 @@ def event_edit_budget_form_tab(request, event_id):
     try:
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
-        user_data=current_user.getUserData() #getting user data as dictionary file
+        user_data=current_user.getUserData() #getting user data as dictionary filee
     
         eb_common_access = Branch_View_Access.common_access(request.user.username)
         has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
