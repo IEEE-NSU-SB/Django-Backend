@@ -302,7 +302,7 @@ class SC_Ag_Render_Access:
                 if budget_sheet[0].sheet_of.primary == primary:
                     get_member = BudgetSheetAccess.objects.filter(member=username, sheet_id=budget_sheet[0].id)
                 else:
-                    return False
+                    return 'Restricted'
                 
             #Check if the member exits
             if(get_member):
