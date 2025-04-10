@@ -523,7 +523,7 @@ def generateExcelSheet(request, session_id):
             font_style = xlwt.XFStyle()
 
             # getting all the values of members as rows with same session
-            rows = recruited_members.objects.filter(session_id=session_id).values_list('nsu_id',
+            rows = recruited_members.objects.filter(session_id=session_id).order_by('recruitment_time').values_list('nsu_id',
                                                                                                         'first_name', 'middle_name', 'last_name',
                                                                                                         'email_personal','email_nsu', 'blood_group',
                                                                                                         'contact_no',
