@@ -4794,7 +4794,7 @@ def create_task(request,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_home_team',team_primary)
             
-            task_categories = Task_Category.objects.all().order_by('name')
+            task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
             
             #loads central branch if none or if is 1
             if team_primary == None or team_primary == "1":
@@ -4889,7 +4889,7 @@ def task_home(request,team_primary = None):
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
-        all_task_categories = Task_Category.objects.all().order_by('name')
+        all_task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         all_branch_panels = Branch.load_all_panels()
         branch_panel = None
 
@@ -5653,7 +5653,7 @@ def task_edit(request,task_id,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_edit_team',task_id,team_primary)
                 
-        task_categories = Task_Category.objects.all()
+        task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         #getting all task logs for this task
         task_logs = Task_Log.objects.get(task_number = task)
 
@@ -5775,8 +5775,11 @@ class GetTaskCategoryPointsAjax(View):
     def get(self,request):
         task_category_name = request.GET.get('selectedTaskCategory')
         try:
-            points = Task_Category.objects.get(name=task_category_name).points
-            return JsonResponse({'points':points})
+            category = Task_Category.objects.get(name=task_category_name)
+            if category.enabled:
+                return JsonResponse({'points':category.points})
+            else:
+                return JsonResponse({'points':0})
         except:
             return JsonResponse('Something went wrong!',safe=False)
 

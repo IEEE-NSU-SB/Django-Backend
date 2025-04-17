@@ -4,7 +4,8 @@ from .models import *
 # Register your models here.
 @admin.register(Task_Category)
 class Task_Category(admin.ModelAdmin):
-    list_display = ['name', 'points']
+    list_display = ['name', 'points', 'enabled']
+    search_fields = ['name']
 
 @admin.register(Task)
 class Task(admin.ModelAdmin):
