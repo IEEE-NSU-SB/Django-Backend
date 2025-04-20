@@ -70,7 +70,7 @@ class Branch_View_Access:
             username=request.user.username
             if(Branch_View_Access.common_access(username=username)):
                 return True           
-            elif(team_primary and task_type == "Team"):
+            elif(team_primary != None and task_type == "Team"):
                 if (team_primary == "1"):
                     return True
                 else:
@@ -85,7 +85,7 @@ class Branch_View_Access:
                             return True
                         elif not get_current_panel_member.position.is_co_ordinator and get_current_panel_member.position.is_officer:
                             return True
-            elif(team_primary and task_type == "Individuals" and len(task.team.all()) == 1):
+            elif(team_primary != None and task_type == "Individuals" and len(task.team.all()) == 1):
                 if (team_primary == "1"):
                     return True
                 else:

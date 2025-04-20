@@ -16,11 +16,15 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import requests
 from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
 from events_and_management_team.renderData import Events_And_Management_Team
 from googleapiclient.http import BatchHttpRequest
+from finance_and_corporate_team.manage_access import FCT_Render_Access
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
+from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
 from django_celery_beat.models import PeriodicTask
 from graphics_team.renderData import GraphicsTeam
@@ -3506,6 +3510,130 @@ def event_preview(request, event_id):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_edit_budget_form_tab(request, event_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary filee
+    
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
+        has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
+        event = Events.objects.get(id=event_id)
+
+        # Not good fix!!!
+        if Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username):
+            has_access = 'Edit'
+        else:
+            if event.event_organiser.primary != 1:
+                has_access = 'Restricted'
+
+        if has_access != 'Restricted':
+            if request.method == "POST":
+                if 'save_budget' in request.POST:
+                    cst_item = request.POST.getlist('cst_item')
+                    cst_quantity = request.POST.getlist('cst_quantity')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
+                    cst_total = request.POST.getlist('cst_total')
+
+                    rev_item = request.POST.getlist('rev_item')
+                    rev_quantity = request.POST.getlist('rev_quantity')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
+                    rev_total = request.POST.getlist('rev_total')
+
+                    saved_rate = request.POST.get('saved_rate')
+                    show_usd_rates = request.POST.get('show_usd_rates')
+                    
+                    if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                        if FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                            messages.success(request, 'Budget created successfully!')
+                        else:
+                            messages.warning(request, 'Could not create budget!')
+                    else:
+                        budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+                            messages.success(request, 'Budget edited successfully!')
+                        else:
+                            messages.warning(request, 'Could not update budget!')
+                    
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+                    budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+            fct_team_member_accesses = []
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+                if eb_common_access:
+                    fct_team_members = Branch.load_team_members(team_primary=11)
+
+                    for member in fct_team_members:
+                        access = BudgetSheetAccess.objects.filter(sheet_id=budget_sheet.id, member=member)
+                        member_access_type = access[0].access_type if access.exists() else None
+
+                        fct_team_member_accesses.append({
+                            'member': {
+                                'ieee_id':member.ieee_id,
+                                'name': member.name,
+                                'position': member.position.role
+                            },
+                            'access_type': member_access_type
+                        })
+            else:
+                budget_sheet = None  
+
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            usd_rate = None
+            if budget_sheet:
+
+                if budget_sheet.total_cost > budget_sheet.total_revenue:
+                    deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+                elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                    surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = round(json.loads(currency_data_response.text)['usd']['bdt'],2)
+                else:
+                    usd_rate = None             
+            
+            context = {
+                'is_branch' : True,
+                'event_id' : event_id,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type':has_access,
+                'eb_common_access':eb_common_access,
+                'fct_team_member_accesses':fct_team_member_accesses,
+                'deficit':deficit,
+                'surplus':surplus,
+                'event':event,
+                'usd_rate':usd_rate
+            }
+
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission
@@ -4666,7 +4794,7 @@ def create_task(request,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_home_team',team_primary)
             
-            task_categories = Task_Category.objects.all().order_by('name')
+            task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
             
             #loads central branch if none or if is 1
             if team_primary == None or team_primary == "1":
@@ -4761,7 +4889,7 @@ def task_home(request,team_primary = None):
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
-        all_task_categories = Task_Category.objects.all().order_by('name')
+        all_task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         all_branch_panels = Branch.load_all_panels()
         branch_panel = None
 
@@ -5525,7 +5653,7 @@ def task_edit(request,task_id,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_edit_team',task_id,team_primary)
                 
-        task_categories = Task_Category.objects.all()
+        task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         #getting all task logs for this task
         task_logs = Task_Log.objects.get(task_number = task)
 
@@ -5647,8 +5775,11 @@ class GetTaskCategoryPointsAjax(View):
     def get(self,request):
         task_category_name = request.GET.get('selectedTaskCategory')
         try:
-            points = Task_Category.objects.get(name=task_category_name).points
-            return JsonResponse({'points':points})
+            category = Task_Category.objects.get(name=task_category_name)
+            if category.enabled:
+                return JsonResponse({'points':category.points})
+            else:
+                return JsonResponse({'points':0})
         except:
             return JsonResponse('Something went wrong!',safe=False)
 

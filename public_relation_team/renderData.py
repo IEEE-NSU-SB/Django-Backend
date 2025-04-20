@@ -69,7 +69,7 @@ class PRT_Data:
         return recruitment_session.objects.all().order_by('-id')
     
     def add_member_to_team(ieee_id,position):
-        Branch.add_member_to_team(ieee_id=ieee_id,position=position,team_primary=6) 
+        Branch.add_member_to_team(ieee_id=ieee_id,position=position,team_primary=0) 
 
     def prt_manage_team_access_modifications(manage_email_access,manage_team_access,ieee_id):
         try:

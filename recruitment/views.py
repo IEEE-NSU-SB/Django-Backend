@@ -225,6 +225,7 @@ def recruitee_details(request,session_id,nsu_id):
                             'facebook_url': request.POST['facebook_url'],
                             'facebook_username':request.POST['facebook_username'],
                             'home_address': request.POST['home_address'],
+                            'gender':request.POST['gender'],
                             'school':request.POST['school'],
                             'department':request.POST['department'],
                             'major': request.POST['major'], 'graduating_year': request.POST['graduating_year'],
@@ -263,7 +264,6 @@ def recruitee_details(request,session_id,nsu_id):
                     ##Resending recruitment mail
                     if request.POST.get('resend_email'):
                         name=request.POST['first_name']
-                        nsu_id=request.POST['nsu_id']
                         recruited_member_email=request.POST['email_personal']
                         recruitment_session_name=recruitment_session.objects.get(id=session_id)
                         
@@ -443,10 +443,11 @@ def recruit_member(request, session_id):
                             recruited_member.save()  # Saving the member to the database
 
                             #Check if any skills were selected
-                            if skill_set_list[0] != 'null':
-                                #If yes then add them
-                                recruited_member.skills.add(*skill_set_list)
-                                recruited_member.save()  # Saving the member to the database
+                            if len(skill_set_list) > 0:
+                                if skill_set_list[0] != 'null':
+                                    #If yes then add them
+                                    recruited_member.skills.add(*skill_set_list)
+                                    recruited_member.save()  # Saving the member to the database
                             
                             #send an email now to the recruited member
                             email_status=email_sending.send_email_to_recruitees_upon_recruitment(
@@ -522,7 +523,7 @@ def generateExcelSheet(request, session_id):
             font_style = xlwt.XFStyle()
 
             # getting all the values of members as rows with same session
-            rows = recruited_members.objects.filter(session_id=session_id).values_list('nsu_id',
+            rows = recruited_members.objects.filter(session_id=session_id).order_by('recruitment_time').values_list('nsu_id',
                                                                                                         'first_name', 'middle_name', 'last_name',
                                                                                                         'email_personal','email_nsu', 'blood_group',
                                                                                                         'contact_no',

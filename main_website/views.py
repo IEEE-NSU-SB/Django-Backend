@@ -103,13 +103,35 @@ class LoadAwards(View):
             # get the highest ranked award
             highest_ranked_award_in_the_panel=VolunteerAwards.objects.filter(panel=Panels.objects.get(pk=current_panel_pk)).first()
             if(highest_ranked_award_in_the_panel is None):
-                
+                topFivePerformers = HomepageItems.get_top_5_performers()
+
+                data = []
+                for performer in topFivePerformers:
+                    data.append({
+                        "picture":str(performer.user_profile_picture),
+                        "name":performer.name,
+                        "team":str(performer.team),
+                        "position":str(performer.position),
+                        "points":str(performer.completed_task_points)
+                    })
+
+                json_data = {
+                    'award_name':'Top Five Performers',
+                    'winners':data
+                }
+
                 return JsonResponse(
-                    {
-                    'message':message,
-                    }
-                    ,status=200,safe=False
+                    data=json_data,
+                    status=200,
+                    safe=False
                 )
+                
+                # return JsonResponse(
+                #     {
+                #     'message':message,
+                #     }
+                #     ,status=200,safe=False
+                # )
             else:
                 award_winners=HandleVolunteerAwards.load_award_winners(award_pk=highest_ranked_award_in_the_panel.pk,request=request)
                 if(award_winners==False):

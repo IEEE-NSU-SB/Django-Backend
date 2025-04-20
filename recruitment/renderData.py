@@ -61,6 +61,7 @@ class Recruitment:
             member.school = values['school']
             member.department = values['department']
             member.major = values['major']
+            member.gender = values['gender']
             member.graduating_year = values['graduating_year']
             member.recruited_by = values['recruited_by']
             member.cash_payment_status = values['cash_payment_status']
@@ -73,9 +74,10 @@ class Recruitment:
                 #Clear the previous skills, if there are any
                 member.skills.clear()
                 #Check if any skills were selected
-                if values['skill_set_list'][0] != 'null':
-                    #If yes then add them
-                    member.skills.add(*values['skill_set_list'])
+                if len(values['skill_set_list']) > 0:
+                    if values['skill_set_list'][0] != 'null':
+                        #If yes then add them
+                        member.skills.add(*values['skill_set_list'])
                 member.save() #Updating member data
                 return True
         except IntegrityError:
