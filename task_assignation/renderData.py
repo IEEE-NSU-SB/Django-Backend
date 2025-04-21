@@ -2845,7 +2845,7 @@ This is an automated message. Do not reply
 
                 if len(task_team) == 1 and task.task_type == "Individuals":
                     if task_team[0] == team:
-                        if member.position.is_officer and member not in task.members.all():
+                        if member.position.is_officer and member.team == team and member not in task.members.all():
                             return True
                         else:
                             return False
