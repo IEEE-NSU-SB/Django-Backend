@@ -235,15 +235,15 @@ def create_budget(request, event_id=None):
 
         if has_access:
             if request.method == "POST":
-                cst_item = request.POST.getlist('cst_item')
-                cst_quantity = request.POST.getlist('cst_quantity')
-                cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-                cst_total = request.POST.getlist('cst_total')
+                cst_item = request.POST.getlist('cst_item[]')
+                cst_quantity = request.POST.getlist('cst_quantity[]')
+                cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                cst_total = request.POST.getlist('cst_total[]')
 
-                rev_item = request.POST.getlist('rev_item')
-                rev_quantity = request.POST.getlist('rev_quantity')
-                rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-                rev_total = request.POST.getlist('rev_total')
+                rev_item = request.POST.getlist('rev_item[]')
+                rev_quantity = request.POST.getlist('rev_quantity[]')
+                rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                rev_total = request.POST.getlist('rev_total[]')
 
                 budget_sheet = FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total)
                 
@@ -300,15 +300,15 @@ def edit_budget(request, sheet_id):
         if access_type == 'Edit':
             if request.method == "POST":
                 if 'save_budget' in request.POST:
-                    cst_item = request.POST.getlist('cst_item')
-                    cst_quantity = request.POST.getlist('cst_quantity')
-                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-                    cst_total = request.POST.getlist('cst_total')
+                    cst_item = request.POST.getlist('cst_item[]')
+                    cst_quantity = request.POST.getlist('cst_quantity[]')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                    cst_total = request.POST.getlist('cst_total[]')
 
-                    rev_item = request.POST.getlist('rev_item')
-                    rev_quantity = request.POST.getlist('rev_quantity')
-                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-                    rev_total = request.POST.getlist('rev_total')
+                    rev_item = request.POST.getlist('rev_item[]')
+                    rev_quantity = request.POST.getlist('rev_quantity[]')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                    rev_total = request.POST.getlist('rev_total[]')
 
                     saved_rate = request.POST.get('saved_rate')
                     show_usd_rates = request.POST.get('show_usd_rates')

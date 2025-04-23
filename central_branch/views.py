@@ -3534,15 +3534,15 @@ def event_edit_budget_form_tab(request, event_id):
         if has_access != 'Restricted':
             if request.method == "POST":
                 if 'save_budget' in request.POST:
-                    cst_item = request.POST.getlist('cst_item')
-                    cst_quantity = request.POST.getlist('cst_quantity')
-                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt')
-                    cst_total = request.POST.getlist('cst_total')
+                    cst_item = request.POST.getlist('cst_item[]')
+                    cst_quantity = request.POST.getlist('cst_quantity[]')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                    cst_total = request.POST.getlist('cst_total[]')
 
-                    rev_item = request.POST.getlist('rev_item')
-                    rev_quantity = request.POST.getlist('rev_quantity')
-                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt')
-                    rev_total = request.POST.getlist('rev_total')
+                    rev_item = request.POST.getlist('rev_item[]')
+                    rev_quantity = request.POST.getlist('rev_quantity[]')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                    rev_total = request.POST.getlist('rev_total[]')
 
                     saved_rate = request.POST.get('saved_rate')
                     show_usd_rates = request.POST.get('show_usd_rates')

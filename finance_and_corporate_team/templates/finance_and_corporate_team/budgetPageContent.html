@@ -483,8 +483,8 @@
         />
         <a href="#" class="convert-usd-bdt">{% if budget_sheet.show_usd_rates %}Convert to BDT{% else %}Convert to USD{% endif %}</a>
         <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% else %}off{% endif %}" name="show_usd_rates">
-        {% endif %}
-        </div>
+      </div>
+      {% endif %}
         </div>
       {% csrf_token %}
       <div style="display: flex; justify-content: space-between">
@@ -533,7 +533,7 @@
               <input
                 type="text"
                 class="item-input"
-                name="cst_item"
+                name="cst_item[]"
                 placeholder="Item"
                 value="{{data.0}}" {% if access_type != 'Edit' %} disabled {% endif %}
               />
@@ -542,7 +542,7 @@
               <input
                 type="decimal"
                 class="quantity-input"
-                name="cst_quantity"
+                name="cst_quantity[]"
                 oninput="calculateCostTotal(this)"
                 placeholder="20"
                 value="{{data.1}}" {% if access_type != 'Edit' %} disabled {% endif %}
@@ -552,7 +552,7 @@
               <input
                 type="decimal"
                 class="unit-cost-input"
-                name="cst_upc_bdt"
+                name="cst_upc_bdt[]"
                 oninput="calculateCostTotal(this)"
                 placeholder="500"
                 value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}
@@ -562,7 +562,7 @@
             <input
               type="hidden"
               class="totalinput"
-              name="cst_total"
+              name="cst_total[]"
               value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}
             />
             {% if access_type == 'Edit' %}
@@ -584,7 +584,7 @@
               <input
                 type="text"
                 class="item-input"
-                name="cst_item"
+                name="cst_item[]"
                 placeholder="Item"
               />
             </td>
@@ -592,7 +592,7 @@
               <input
                 type="decimal"
                 class="quantity-input"
-                name="cst_quantity"
+                name="cst_quantity[]"
                 oninput="calculateCostTotal(this)"
                 placeholder="20"
               />
@@ -601,13 +601,13 @@
               <input
                 type="decimal"
                 class="unit-cost-input"
-                name="cst_upc_bdt"
+                name="cst_upc_bdt[]"
                 oninput="calculateCostTotal(this)"
                 placeholder="500"
               />
             </td>
             <td class="total-cell">0</td>
-            <input type="hidden" class="totalinput" name="cst_total" />
+            <input type="hidden" class="totalinput" name="cst_total[]" />
             <td class="action-buttons">
               <div>
                 <i
@@ -662,7 +662,7 @@
               <input
                 type="text"
                 class="revenue-type-input"
-                name="rev_item"
+                name="rev_item[]"
                 placeholder="Revenue"
                 value="{{data.0}}" {% if access_type != 'Edit' %}disabled{% endif %}
               />
@@ -671,7 +671,7 @@
               <input
                 type="decimal"
                 class="revenue-quantity-input"
-                name="rev_quantity"
+                name="rev_quantity[]"
                 oninput="calculateRevenueTotal(this)"
                 placeholder="50"
                 value="{{data.1}}" {% if access_type != 'Edit' %}disabled{% endif %}
@@ -681,7 +681,7 @@
               <input
                 type="decimal"
                 class="revenue-unit-input"
-                name="rev_upc_bdt"
+                name="rev_upc_bdt[]"
                 oninput="calculateRevenueTotal(this)"
                 placeholder="500"
                 value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}
@@ -691,7 +691,7 @@
             <input
               type="hidden"
               class="revenue-totalinput"
-              name="rev_total"
+              name="rev_total[]"
               value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}
             />
             {% if access_type == 'Edit' %}
@@ -713,7 +713,7 @@
               <input
                 type="text"
                 class="revenue-type-input"
-                name="rev_item"
+                name="rev_item[]"
                 placeholder="Registered Participants"
               />
             </td>
@@ -721,7 +721,7 @@
               <input
                 type="decimal"
                 class="revenue-quantity-input"
-                name="rev_quantity"
+                name="rev_quantity[]"
                 oninput="calculateRevenueTotal(this)"
                 placeholder="50"
               />
@@ -730,13 +730,13 @@
               <input
                 type="decimal"
                 class="revenue-unit-input"
-                name="rev_upc_bdt"
+                name="rev_upc_bdt[]"
                 oninput="calculateRevenueTotal(this)"
                 placeholder="500"
               />
             </td>
             <td class="revenue-total-cell">0</td>
-            <input type="hidden" class="revenue-totalinput" name="rev_total" />
+            <input type="hidden" class="revenue-totalinput" name="rev_total[]" />
             <td class="action-buttons">
               <div>
                 <i
