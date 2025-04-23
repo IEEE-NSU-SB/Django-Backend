@@ -6,11 +6,16 @@ from system_administration.system_error_handling import ErrorHandling
 from datetime import datetime
 import traceback
 from central_branch import views as cv
+from .signals import set_current_user
+
 # Create your views here.
 
 logger=logging.getLogger(__name__)
 
 def main_website_update_view(request):
+
+    # Set current user for logging
+    set_current_user(request.user)
 
     try:
 
