@@ -2,14 +2,13 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
 from .models import General_Log
-from django.contrib.auth.models import User
 import threading
 
 # Thread-local storage for request information
 _thread_local = threading.local()
 
 # Models to exclude from logging
-EXCLUDED_MODELS = ['General_Log', 'Log', 'ContentType']
+EXCLUDED_MODELS = ['General_Log', 'ContentType']
 
 def create_general_log(instance, action):
     # Check if model should be excluded from logging

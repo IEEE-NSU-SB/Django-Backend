@@ -72,15 +72,9 @@ class SC_AG_Data_Access(admin.ModelAdmin):
 
 # code for logging models in the admin interface.
 
-from .models import General_Log, Log
+from .models import General_Log
 @admin.register(General_Log)
 class General_LogAdmin(admin.ModelAdmin):
     list_display = ['id', 'content_type', 'object_id', 'update_number']
     list_filter = ['content_type']
     search_fields = ['object_id']
-
-@admin.register(Log)
-class LogAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'action', 'model_name', 'object_id', 'timestamp']
-    list_filter = ['action', 'model_name', 'timestamp']
-    search_fields = ['user__username', 'message', 'object_id']
