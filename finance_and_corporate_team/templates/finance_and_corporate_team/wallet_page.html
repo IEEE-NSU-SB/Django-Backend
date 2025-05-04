@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+    <style>
+        .search_filter{
+            display: flex;
+            justify-content: space-between;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 25px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+        }
+        .filter{
+            border-radius: 6px;
+            border: 1px solid rgb(76 76 171);
+            color: rgb(76 76 171);
+            background-color: rgb(196 196 239);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+        }
+        .filter:hover{
+            background-color: rgb(76 76 171);
+            color: rgb(196 196 239);
+        }
+        .net_total{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .net_total_box{
+            padding: 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+        }
+        .flex_space_between{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .category{
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
+            padding: 0px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+        <!-- ############ LAYOUT START-->
+        <div class="app" id="app" style="background-color: white;">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+              {% block sidebar %} 
+              {% include 'users/sidebar.html' %} 
+              {% endblock %}
+            </div>
+            <!-- aside end -->
+      
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+              {% block navbar %} 
+              {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+              {% endblock navbar %}
+            </div>
+            <!--navbar content end-->
+      
+            <!-- ############ PAGE START-->
+            <div
+              ui-view
+              class="app-body"
+              style="justify-content: center; margin-left: 15%; margin-right: 15% ;"
+              id="view"
+            >
+            <div style="margin-top: 45px;">
+                <h4>< <a href="">Back</a></h4>
+            </div>
+            <h3 style="text-align: center; color: #002855;">Title</h3>
+            <div class="search_filter">
+                <input class="search_bar" type="text" name="" id="" placeholder="Search...">
+                <p class="filter">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
+            </div>
+
+
+            <div class="net_total">
+                <div class="net_total_box" style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Net Balance</p>
+                        <p>175</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Cash In</p>
+                        <p style="color: #EB5132;">275</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Cash Out</p>
+                        <p style="color: #1B971F;">100</p>
+                    </div>
+                </div>
+                <div class="net_total_box"  style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Net Balance</p>
+                        <p>175</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Cash In</p>
+                        <p style="color: #EB5132;">275</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Cash Out</p>
+                        <p style="color: #1B971F;">100</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; margin-top: 26px;">
+                <hr style="width: 100%;">
+                <p style="color: #4D4D4D;">Showing 48 entries</p>
+                <hr style="width: 100%;">
+            </div>
+
+            <p style="font-weight: bold; color: #4D4D4D;">03 May 2025</p>
+            <div class="net_total_box">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">Rahiq</h5>
+                    <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div>
+                        <p class="category">Travel</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 100</p>
+                </div>
+                <div class="flex_space_between">
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <p style="color: #4D4D4D;">Payment : Online</p>
+                </div>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                </div>
+            </div>
+            <div class="net_total_box">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">Rahiq</h5>
+                    <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div>
+                        <p class="category">Travel</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 100</p>
+                </div>
+                <div class="flex_space_between">
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <p style="color: #4D4D4D;">Payment : Online</p>
+                </div>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                </div>
+            </div>
+            <div class="net_total_box">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">Rahiq</h5>
+                    <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div>
+                        <p class="category">Travel</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 100</p>
+                </div>
+                <div class="flex_space_between">
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <p style="color: #4D4D4D;">Payment : Online</p>
+                </div>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                </div>
+            </div>
+        </div>
+</body>
+</html>
