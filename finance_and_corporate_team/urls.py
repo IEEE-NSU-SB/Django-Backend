@@ -29,5 +29,6 @@ urlpatterns = [
     path('budget/load_budget_sheet_access/', views.GetBudgetSheetAcessDataAjax.as_view(), name='load_budget_sheet_access'),
 
 
-    path('wallet/', views.wallet_homepage, name='wallet_homepage')
+    path('wallet/', views.wallet_homepage, name='wallet_homepage'),
+    path('add_cash/', views.add_cash, name='add_cash')
 ]
