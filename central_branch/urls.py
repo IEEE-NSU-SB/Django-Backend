@@ -93,6 +93,8 @@ urlpatterns = [
     path('event_details/<int:event_id>/edit/graphics/links/',views.event_edit_graphics_form_links_sub_tab,name='event_edit_graphics_form_links_sub_tab'),
     #Event content tab page
     path('event_details/<int:event_id>/edit/content/',views.event_edit_content_form_tab,name='event_edit_content_form_tab'),
+    #Event budget tab page
+    path('event_details/<int:event_id>/edit/budget/',views.event_edit_budget_form_tab,name='event_edit_budget_form_tab'),
     #Mega Event Creation Form
     path('events/create_mega_event/',views.mega_event_creation,name="mega_event_creation"), 
     #Mega Events homepage

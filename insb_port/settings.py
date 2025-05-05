@@ -36,7 +36,7 @@ else:
 if(os.environ.get('SETTINGS')=='dev'):
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['ieeensusb.org','portal.ieeensusb.org']
+    ALLOWED_HOSTS = ['ieeensusb.org','sandbox.ieeensusb.org']
 
 
 LOGIN_URL='/portal/users/login'

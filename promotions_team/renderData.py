@@ -8,7 +8,7 @@ class PromotionTeam:
     def get_team_id():
         '''Gets the team id from the database only for Promotions Team. Not the right approach'''
         team=Teams.objects.get(primary=5)
-        return team
+        return team.id
     
     def load_manage_team_access():
         return Promotions_Data_Access.objects.all()

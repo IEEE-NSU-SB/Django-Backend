@@ -1252,12 +1252,11 @@ class Task_Assignation:
             else:
                 members = Members.objects.filter(position__rank__gt=requesting_member.position.rank)
         else:
-            if team_primary != None and team_primary != "1":
+            #Admin user so load all members
+            members = Members.objects.all()
+            if team_primary and team_primary != "1":
                 team_of = Teams.objects.get(primary = int(team_primary))
                 members = Members.objects.filter(team = team_of)#.exclude(position__is_officer=True)
-            else:
-                #Admin user so load all members
-                members = Members.objects.all()
         
         dic = {}
         for member in members:
@@ -2846,7 +2845,7 @@ This is an automated message. Do not reply
 
                 if len(task_team) == 1 and task.task_type == "Individuals":
                     if task_team[0] == team:
-                        if member.position.is_officer and member not in task.members.all():
+                        if member.position.is_officer and member.team == team and member not in task.members.all():
                             return True
                         else:
                             return False

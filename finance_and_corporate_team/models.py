@@ -15,7 +15,9 @@ class BudgetSheet(models.Model):
     revenueBreakdownData = models.JSONField(default=dict)
     total_cost = models.FloatField(null=False, blank=False, default=0.0)
     total_revenue = models.FloatField(null=False, blank=False, default=0.0)
-    created_on = models.DateTimeField(null=False, blank=False, auto_now_add=True)
+    usd_rate = models.FloatField(null=True, blank=True, default=None)
+    show_usd_rates = models.BooleanField(null=False, blank=False, default=False)
+    approval_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Budget Sheet'
@@ -34,3 +36,15 @@ class BudgetSheetAccess(models.Model):
 
     def __str__(self):
         return self.member.name
+    
+class BudgetSheetSignature(models.Model):
+
+    left_signature = models.TextField()
+    right_signature = models.TextField()
+    sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Budget Sheet Signature'
+
+    def __str__(self):
+        return str(self.pk)
