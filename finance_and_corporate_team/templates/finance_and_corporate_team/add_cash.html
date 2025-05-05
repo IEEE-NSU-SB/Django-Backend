@@ -1,11 +1,599 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Add Cash in Entry</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            /* max-width: 560px; */
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f2f2f2;
+        }
+
+        .back-button {
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .title {
+            color: #33b679;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+
+        .wallet-balance {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .form-container {
+            padding: 16px;
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .required {
+            color: #ff5722;
+            font-size: 12px;
+            position: absolute;
+            top: -20px;
+            right: 0;
+        }
+
+        .file-upload {
+            border: 1px dashed #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            margin-right: 5px;
+        }
+
+        .file-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ddd;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .categories-container {
+            margin-top: 10px;
+        }
+
+        /* Improved dropdown styles */
+        .custom-selectC {
+            position: relative;
+            margin-top: 8px;
+        }
+
+        #categoryInput {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        #categoryDropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Selected tags styles */
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .tag-close {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .payment-mode {
+            margin-top: 24px;
+        }
+
+        .payment-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 16px;
+        }
+
+        .payment-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .payment-option.cash {
+            background-color: #33b679;
+            color: white;
+        }
+
+        .payment-option.online,
+        .payment-option.card {
+            background-color: #f1f1f1;
+            color: #666;
+        }
+
+        .save-button {
+            background-color: #33b679;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        .label-text {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .default-note {
+            font-size: 12px;
+            color: #ff5722;
+        }
+    </style>
 </head>
+
 <body>
-    <h3>HIIII</h3>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app" style="background-color: white;">
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            {% block navbar %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% endblock navbar %}
+        </div>
+        <!--navbar content end-->
+
+        <!-- ############ PAGE START-->
+        <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
+            <div style="margin-top: 45px;">
+
+            </div>
+
+            <div class="container">
+                <div class="header">
+                    <a href="#" class="back-button">
+                        Back</a>
+                    <div class="title">Add Cash In Entry</div>
+                    <div class="wallet-balance">Wallet Balance: 100000</div>
+                </div>
+
+                <div class="form-container">
+                    <form id="cashEntryForm">
+                        <div class="form-row input-group">
+                            <div class="input-container">
+                                <input type="number" placeholder="Amount" id="amount" required>
+                            </div>
+
+                            <div class="input-container">
+                                <input type="datetime-local" id="datetime" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row input-group">
+                            <div class="input-container">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
+                            </div>
+
+                            <div class="input-container">
+                                <input type="text" placeholder="Contact" id="contact">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-container">
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
+                                    required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="file-upload" id="uploadButton">
+                                <i>📎</i> Attach Image or PDF
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
+
+                            <div class="file-preview" id="filePreviewContainer">
+                                <div class="preview-item" id="addMoreFiles">+</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-container">
+                                <div class="label-text">Select Category</div>
+                                <div class="custom-selectC">
+                                    <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
+                                    <div class="select-dropdownC" id="categoryDropdown">
+                                        <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
+                                        <div class="dropdown-item" data-value="Registration">Registration</div>
+                                        <!-- <div class="dropdown-item" data-value="Food">Food</div>
+                                        <div class="dropdown-item" data-value="Entertainment">Entertainment</div>
+                                        <div class="dropdown-item" data-value="Transport">Transport</div>
+                                        <div class="dropdown-item" data-value="Utilities">Utilities</div> -->
+                                    </div>
+                                </div>
+                                <input type="hidden" id="category" required>
+
+                                <div class="selected-tags" id="selectedTags">
+                                    <!-- Selected tags will appear here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-mode">
+                            <span class="payment-label">Payment Mode</span>
+                            <div class="payment-options">
+                                <div class="payment-option cash" data-payment="Cash">Cash</div>
+                                <div class="payment-option online" data-payment="Online">Online</div>
+                                <div class="payment-option card" data-payment="Card">Card</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="save-button">Save</button>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+        <script>
+            // Handle category tag selection
+            // Handle custom category dropdown
+            const categoryInput = document.getElementById('categoryInput');
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const hiddenCategoryInput = document.getElementById('category');
+            const selectedTags = document.getElementById('selectedTags');
+            const selectedCategories = new Set();
+
+            // Color map for categories
+            const categoryColors = {
+                'Sponsor': '#73a580',
+                'Registration': '#ffd166',
+                // 'Food': '#f9aa74',
+                // 'Entertainment': '#ff6b6b',
+                // 'Transport': '#4ecdc4',
+                // 'Utilities': '#73a580'
+            };
+
+            // Toggle dropdown
+            categoryInput.addEventListener('click', function () {
+                const isOpen = categoryDropdown.style.display === 'block';
+                categoryDropdown.style.display = isOpen ? 'none' : 'block';
+
+                // Close other open dropdowns if any
+                document.querySelectorAll('.select-dropdownC').forEach(dropdown => {
+                    if (dropdown !== categoryDropdown) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!categoryInput.contains(e.target)) {
+                    categoryDropdown.style.display = 'none';
+                }
+            });
+
+            // Add a hover effect to dropdown items
+            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                const category = item.dataset.value;
+
+                // Add a color indicator to each dropdown item
+                if (categoryColors[category]) {
+                    item.style.borderLeft = `4px solid ${categoryColors[category]}`;
+                    item.style.paddingLeft = '11px'; // Compensate for the border
+                }
+
+                item.addEventListener('mouseenter', function () {
+                    this.style.backgroundColor = '#f5f5f5';
+                });
+
+                item.addEventListener('mouseleave', function () {
+                    this.style.backgroundColor = '';
+                });
+            });
+
+            // Select category from dropdown
+            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.stopPropagation(); // Prevent closing the dropdown
+
+                    const category = this.dataset.value;
+
+                    // Only add if not already selected
+                    if (!selectedCategories.has(category)) {
+                        selectedCategories.add(category);
+                        createTag(category);
+                        updateCategoryInput();
+                    }
+                });
+            });
+
+            // Create category tag
+            function createTag(category) {
+                const tag = document.createElement('div');
+                tag.className = 'tag';
+
+                // Use the color from the map
+                if (categoryColors[category]) {
+                    tag.style.backgroundColor = categoryColors[category];
+                }
+
+                tag.innerHTML = `${category} <span class="tag-close">×</span>`;
+
+                // Remove tag when clicking close button
+                tag.querySelector('.tag-close').addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    selectedCategories.delete(category);
+                    tag.remove();
+                    updateCategoryInput();
+                });
+
+                selectedTags.appendChild(tag);
+            }
+
+            // Update hidden input with selected categories
+            function updateCategoryInput() {
+                hiddenCategoryInput.value = Array.from(selectedCategories).join(', ');
+                // If there are categories, clear the placeholder
+                if (selectedCategories.size > 0) {
+                    categoryInput.placeholder = '';
+                } else {
+                    categoryInput.placeholder = 'Select categories...';
+                }
+            }
+
+            // Handle payment mode selection
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            let selectedPayment = 'Cash'; // Default selected
+
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    paymentOptions.forEach(opt => {
+                        opt.style.backgroundColor = '#f1f1f1';
+                        opt.style.color = '#666';
+                    });
+
+                    option.style.backgroundColor = '#33b679';
+                    option.style.color = 'white';
+                    selectedPayment = option.dataset.payment;
+                });
+            });
+
+            // Handle file input
+            const fileInput = document.getElementById('fileInput');
+            const uploadButton = document.getElementById('uploadButton');
+            const addMoreFiles = document.getElementById('addMoreFiles');
+            const filePreviewContainer = document.getElementById('filePreviewContainer');
+
+            // Function to handle file selection
+            function handleFileSelect(e) {
+                const files = e.target.files;
+
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        createFilePreview(file);
+                    }
+                }
+            }
+
+            // Function to create file preview
+            function createFilePreview(file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+
+                    if (file.type.startsWith('image/')) {
+                        // Create image preview
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        previewItem.appendChild(img);
+                    } else if (file.type === 'application/pdf') {
+                        // Create PDF icon
+                        previewItem.textContent = 'PDF';
+                        previewItem.style.fontSize = '12px';
+                        previewItem.style.display = 'flex';
+                        previewItem.style.alignItems = 'center';
+                        previewItem.style.justifyContent = 'center';
+                    }
+
+                    // Insert the new preview before the "+" button
+                    filePreviewContainer.insertBefore(previewItem, addMoreFiles);
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            // Event listener for file input change
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Open file dialog when clicking the upload button
+            uploadButton.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Open file dialog when clicking the "+" button
+            addMoreFiles.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Handle form submission
+            const form = document.getElementById('cashEntryForm');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Check if required fields are filled
+                const amount = document.getElementById('amount').value;
+                const datetime = document.getElementById('datetime').value;
+                const remark = document.getElementById('remark').value;
+                const category = document.getElementById('category').value;
+
+                if (!amount || !datetime || !remark || !category) {
+                    alert('Please fill all required fields!');
+                    return;
+                }
+
+                // In a real app, you would send the form data to a server here
+                alert('Form submitted successfully!');
+            });
+        </script>
 </body>
+{% block common_js %}
+{% include "common_js.html" %}
+{% endblock common_js %}
+
 </html>
