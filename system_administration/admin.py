@@ -69,3 +69,12 @@ from .models import SC_AG_Data_Access
 class SC_AG_Data_Access(admin.ModelAdmin):
     list_display=['member','data_access_of']
 
+
+# code for logging models in the admin interface.
+
+from .models import General_Log
+@admin.register(General_Log)
+class General_LogAdmin(admin.ModelAdmin):
+    list_display = ['id', 'content_type', 'object_id', 'update_number']
+    list_filter = ['content_type']
+    search_fields = ['object_id']

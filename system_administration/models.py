@@ -11,6 +11,7 @@ from insb_port import settings
 from PIL import Image
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -321,3 +322,6 @@ class General_Log(models.Model):
 
     def __str__(self) ->str:
         return str(self.pk)
+    
+
+  
