@@ -88,7 +88,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'main_website.middleware.BlockMainWebMiddleWare',
+    'insb_port.middleware.BlockSiteMiddleWare',
 ]
 
 ROOT_URLCONF = 'insb_port.urls'
