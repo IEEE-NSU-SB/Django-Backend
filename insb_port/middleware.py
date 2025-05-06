@@ -36,8 +36,7 @@ class BlockSiteMiddleWare:
                     
                     if not any(request.path == url or request.path == (url + '/') for url in allowed_urls):
                         if (path[1] != 'admin'):
-                            if path[1] == 'portal':
-                                print('sfdgvdegf')
+                            if path[1] == 'portal' and not path[1] == 'media_files' and not path[1] == 'static':
                                 return render(request, 'main_portal_update_view.html')
                             
                 if get_system.main_website_under_maintenance:
