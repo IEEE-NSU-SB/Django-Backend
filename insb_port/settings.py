@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'notification',
     'django_celery_beat',
     'django_celery_results',
+    'django_json_widget',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +90,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'insb_port.middleware.BlockSiteMiddleWare',
+    'system_administration.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'insb_port.urls'
