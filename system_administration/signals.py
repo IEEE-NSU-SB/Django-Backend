@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from system_administration.system_logs import System_Logs
 
 # Models to exclude from logging
-EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','migration']
+EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','migration', 'auth', 'Session']
 
 def create_general_log(instance, action):
     # Check if model should be excluded from logging

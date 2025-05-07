@@ -13,6 +13,7 @@ class System_Logs:
         
         # Get current user using thread local storage
         user = get_current_user()
+        print(user)
 
         log_details = {
             'action': action,
@@ -27,7 +28,7 @@ class System_Logs:
 
             General_Log.objects.create(
                 log_of=instance,
-                log_details=log_details,
+                log_details={current_time+"_0":log_details},
             )
         elif action == 'update' or action == 'delete':
             # Calculate update number (for tracking task updates)
