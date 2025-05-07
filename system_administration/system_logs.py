@@ -1,8 +1,11 @@
 from datetime import datetime
+import traceback
 
 from system_administration.middleware import get_current_user
 from system_administration.models import General_Log
 from django.contrib.contenttypes.models import ContentType
+
+from system_administration.system_error_handling import ErrorHandling
 
 
 class System_Logs:
@@ -44,4 +47,4 @@ class System_Logs:
                     log[0].save()
         
         except:
-            print("Failed")
+            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
