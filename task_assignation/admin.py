@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import *
+from django.db import models
+from django_json_widget.widgets import JSONEditorWidget
 
 # Register your models here.
 @admin.register(Task_Category)
@@ -32,6 +34,10 @@ class Task_Log(admin.ModelAdmin):
     list_display=[
         'task_number','task_log_details','update_task_number'
     ]
+
+    formfield_overrides = {
+        models.JSONField: {'widget': JSONEditorWidget(options={'mode': 'view'})},
+    }
 
 @admin.register(Member_Task_Point)
 class Member_Task_Point(admin.ModelAdmin):
