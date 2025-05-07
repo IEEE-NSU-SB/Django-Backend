@@ -46,5 +46,5 @@ class System_Logs:
                     log[0].log_details[current_time+f"_{log[0].update_number}"] = log_details
                     log[0].save()
         
-        except:
+        except Exception as e:
             ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
