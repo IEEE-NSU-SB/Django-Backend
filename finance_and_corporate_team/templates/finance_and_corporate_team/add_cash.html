@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Cash in Entry</title>
+    <title>Wallet</title>
 
     <!--Sweet Alert-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -13,6 +13,7 @@
     {% block common_css %}
     {% include "common_css.html" %}
     {% endblock common_css %}
+
     <style>
         * {
             margin: 0;
@@ -26,7 +27,7 @@
         }
 
         .container {
-            /* max-width: 560px; */
+            max-width: 100%;
             margin: 0 auto;
             background-color: white;
             min-height: 100vh;
@@ -101,6 +102,13 @@
             right: 0;
         }
 
+        .required-text {
+            color: #FF5722;
+            font-size: 12px;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
         .file-upload {
             border: 1px dashed #ddd;
             padding: 10px;
@@ -135,6 +143,24 @@
             color: #ddd;
             overflow: hidden;
             cursor: pointer;
+            position: relative;
+        }
+
+        .preview-item-close {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #ff5722;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
         }
 
         .categories-container {
@@ -193,11 +219,30 @@
         .tag {
             display: inline-flex;
             align-items: center;
-            padding: 4px 10px;
+            padding: 4px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 14px;
             color: white;
-            margin-right: 5px;
+            margin-right: 8px;
+            background-color: #7986CB;
+        }
+
+        /* Specific category tag colors */
+        .tag[data-category="Sponsor"] {
+            background-color: #7986CB;
+            /* Blue */
+        }
+
+        .tag[data-category="Registration"] {
+            background-color: #FFD54F;
+            /* Yellow */
+            color: #333;
+            /* Darker text for better contrast on yellow */
+        }
+
+        .tag[data-category="Food"] {
+            background-color: #FF9E80;
+            /* Orange */
         }
 
         .tag-close {
@@ -218,20 +263,22 @@
 
         .payment-options {
             display: flex;
-            gap: 16px;
+            gap: 10px;
+            margin-top: 8px;
         }
 
         .payment-option {
-            flex: 1;
             text-align: center;
-            padding: 8px;
-            border-radius: 4px;
+            padding: 8px 20px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
+            border: none;
+            transition: all 0.2s ease;
         }
 
         .payment-option.cash {
-            background-color: #33b679;
+            background-color: #4CAF50;
             color: white;
         }
 
@@ -241,17 +288,35 @@
             color: #666;
         }
 
+        .payment-option:hover {
+            opacity: 0.9;
+        }
+
+        .save-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
         .save-button {
-            background-color: #33b679;
+            background-color: #4CAF50;
             color: white;
-            width: 100%;
-            padding: 14px;
+            width: auto;
+            min-width: 200px;
+            padding: 14px 40px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: 20px;
             text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .save-button:hover {
+            background-color: #43A047;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .label-text {
@@ -292,10 +357,6 @@
 
         <!-- ############ PAGE START-->
         <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
-            <div style="margin-top: 45px;">
-
-            </div>
-
             <div class="container">
                 <div class="header">
                     <a href="#" class="back-button">
@@ -346,16 +407,14 @@
 
                         <div class="form-row">
                             <div class="input-container">
-                                <div class="label-text">Select Category</div>
+
                                 <div class="custom-selectC">
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
                                         <div class="dropdown-item" data-value="Registration">Registration</div>
-                                        <!-- <div class="dropdown-item" data-value="Food">Food</div>
-                                        <div class="dropdown-item" data-value="Entertainment">Entertainment</div>
-                                        <div class="dropdown-item" data-value="Transport">Transport</div>
-                                        <div class="dropdown-item" data-value="Utilities">Utilities</div> -->
+                                        <div class="dropdown-item" data-value="Food">Food</div>
+                                        <div class="dropdown-item" data-value="Travel">Travel</div>
                                     </div>
                                 </div>
                                 <input type="hidden" id="category" required>
@@ -367,7 +426,7 @@
                         </div>
 
                         <div class="payment-mode">
-                            <span class="payment-label">Payment Mode</span>
+                            <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
                                 <div class="payment-option cash" data-payment="Cash">Cash</div>
                                 <div class="payment-option online" data-payment="Online">Online</div>
@@ -375,13 +434,24 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="save-button">Save</button>
+                        <div class="save-button-container">
+                            <button type="submit" class="save-button">SAVE</button>
+                        </div>
                     </form>
                 </div>
             </div>
 
 
+
+
+
+
+
+
+
+
         </div>
+
         <script>
             // Handle category tag selection
             // Handle custom category dropdown
@@ -393,12 +463,10 @@
 
             // Color map for categories
             const categoryColors = {
-                'Sponsor': '#73a580',
-                'Registration': '#ffd166',
-                // 'Food': '#f9aa74',
-                // 'Entertainment': '#ff6b6b',
-                // 'Transport': '#4ecdc4',
-                // 'Utilities': '#73a580'
+                'Sponsor': '#7986CB',  // Blue
+                'Registration': '#FFD54F',  // Yellow
+                'Food': '#FF9E80',  // Orange
+                'Travel': '#FFE082'  // Light Yellow
             };
 
             // Toggle dropdown
@@ -452,6 +520,9 @@
                         selectedCategories.add(category);
                         createTag(category);
                         updateCategoryInput();
+
+                        // Close the dropdown after selecting a tag
+                        categoryDropdown.style.display = 'none';
                     }
                 });
             });
@@ -460,11 +531,9 @@
             function createTag(category) {
                 const tag = document.createElement('div');
                 tag.className = 'tag';
+                tag.setAttribute('data-category', category);
 
-                // Use the color from the map
-                if (categoryColors[category]) {
-                    tag.style.backgroundColor = categoryColors[category];
-                }
+                // Color is now set via CSS based on data-category attribute
 
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
@@ -513,6 +582,10 @@
             const addMoreFiles = document.getElementById('addMoreFiles');
             const filePreviewContainer = document.getElementById('filePreviewContainer');
 
+            // Store references to uploaded files
+            const uploadedFiles = new Map();
+            let fileCounter = 0;
+
             // Function to handle file selection
             function handleFileSelect(e) {
                 const files = e.target.files;
@@ -520,18 +593,34 @@
                 if (files.length > 0) {
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
-                        createFilePreview(file);
+                        const fileId = 'file-' + fileCounter++;
+                        uploadedFiles.set(fileId, file);
+                        createFilePreview(file, fileId);
                     }
                 }
             }
 
             // Function to create file preview
-            function createFilePreview(file) {
+            function createFilePreview(file, fileId) {
                 const reader = new FileReader();
 
                 reader.onload = function (e) {
                     const previewItem = document.createElement('div');
                     previewItem.className = 'preview-item';
+                    previewItem.dataset.fileId = fileId;
+
+                    // Add close button
+                    const closeBtn = document.createElement('div');
+                    closeBtn.className = 'preview-item-close';
+                    closeBtn.innerHTML = '×';
+                    closeBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        // Remove from DOM
+                        previewItem.remove();
+                        // Remove from stored files
+                        uploadedFiles.delete(fileId);
+                    });
+                    previewItem.appendChild(closeBtn);
 
                     if (file.type.startsWith('image/')) {
                         // Create image preview
