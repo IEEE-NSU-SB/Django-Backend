@@ -1,0 +1,545 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+    <style>
+        .search_filter{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+        }
+        .filter{
+            border-radius: 6px;
+            border: 1px solid rgb(76 76 171);
+            color: rgb(76 76 171);
+            background-color: rgb(196 196 239);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter:hover{
+            background-color: rgb(76 76 171);
+            color: rgb(196 196 239);
+        }
+        .net_total{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .net_total_box{
+            padding: 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .flex_space_between{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .category{
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
+            padding: 0px 6px;
+            border-radius: 3px;
+        }
+        /* Filter Menu Styles */
+        .filter_menu {
+            /* position: absolute; */
+            top: 100%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            z-index: 100;
+            margin-top: 10px;
+            transition: all .5s ease-in-out;
+            opacity: 0%;
+        }
+        
+        .filter_menu.open {
+            max-height: 400px;
+        }
+        
+        .filter_options {
+            width: 30%;
+            border-right: 1px solid #D9D9D9;
+            padding: 15px;
+        }
+        
+        .filter_content {
+            width: 70%;
+            padding: 15px;
+            height: 240px;
+        }
+        
+        .filter_option {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .filter_option:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .filter_option.active {
+            background-color: #f0f0f0;
+        }
+        
+        .option_content {
+            display: none;
+        }
+        
+        .option_content.active {
+            display: block;
+            height: 149px;
+            overflow: auto;
+        }
+        
+        .radio_group {
+            margin: 10px 0;
+        }
+        
+        .radio_group label {
+            display: block;
+            margin: 8px 0;
+        }
+        
+        .apply_button {
+            background-color: #6c7ae0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            float: right;
+            margin-top: 20px;
+            position: relative;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .apply_button:hover {
+            background-color: #5663c7;
+        }
+        
+        .close_button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .show{
+            opacity: 100%;
+        }
+        .cash_in_btn{
+            background-color: #31AE70;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
+        }
+        .cash_in_btn:hover{
+            color: #31AE70;
+            background-color: white;
+        }
+        .cash_out_btn{
+            background-color: #EB5132;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #EB5132;
+        }
+        .cash_out_btn:hover{
+            color: #EB5132;
+            background-color: white;
+        }
+        .cash_in_cash_out_div{
+            display: grid;
+            gap: 6px;
+            grid-template-columns: 1fr 1fr;
+            justify-items: stretch;
+            align-items: center;
+            text-align: center;
+            padding: 16px 0;
+        }
+    </style>
+</head>
+<body>
+        <!-- ############ LAYOUT START-->
+        <div class="app" id="app" style="background-color: white;">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+              {% block sidebar %} 
+              {% include 'users/sidebar.html' %} 
+              {% endblock %}
+            </div>
+            <!-- aside end -->
+      
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+              {% block navbar %} 
+              {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+              {% endblock navbar %}
+            </div>
+            <!--navbar content end-->
+      
+            <!-- ############ PAGE START-->
+            <div
+              ui-view
+              class="app-body"
+              style="justify-content: center; margin-left: 15%; margin-right: 15% ;"
+              id="view"
+            >
+            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Title</h3>
+            <div class="flex_space_between" style="margin-bottom: 16px;">
+                <h4>< <a href="">Back</a></h4>
+                <p style="color: #4D4D4D;">Wallet Balance: 100000</p>
+            </div>
+            <div class="search_filter">
+                <input class="search_bar net_total_box" type="text" name="" id="" placeholder="Search...">
+                <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
+            </div>
+
+            <!-- Filter Menu -->
+            <div class="filter_menu" id="filterMenu">
+                <div class="filter_options">
+                    <div class="filter_option active" data-option="entry-type">Entry Type</div>
+                    <div class="filter_option" data-option="date">Date</div>
+                    <div class="filter_option" data-option="category">Category</div>
+                    <div class="filter_option" data-option="name">Name</div>
+                    <div class="filter_option" data-option="payment-mode" style="border: none;">Payment Mode</div>
+                </div>
+                <div class="filter_content">
+                    <!-- Entry Type Options -->
+                    <div class="option_content active" id="entry-type-content">
+                        <div class="radio_group">
+                            <label><input type="radio" name="entry-type" value="all"> All</label>
+                            <label><input type="radio" name="entry-type" value="cash-in"> Cash In</label>
+                            <label><input type="radio" name="entry-type" value="cash-out"> Cash Out</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Date Options -->
+                    <div class="option_content" id="date-content">
+                        <div class="radio_group">
+                            <label><input type="radio" name="date" value="all-time"> All Time</label>
+                            <label><input type="radio" name="date" value="yesterday"> Yesterday</label>
+                            <label><input type="radio" name="date" value="this-week"> This Week</label>
+                            <label><input type="radio" name="date" value="this-month"> This Month</label>
+                            <label><input type="radio" name="date" value="last-month"> Last Month</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Options -->
+                    <div class="option_content" id="category-content">
+                        <div class="radio_group">
+                            <label><input type="radio" name="category" value="all"> All</label>
+                            <label><input type="radio" name="category" value="travel"> Travel</label>
+                            <label><input type="radio" name="category" value="food"> Food</label>
+                            <label><input type="radio" name="category" value="entertainment"> Entertainment</label>
+                            <label><input type="radio" name="category" value="utilities"> Utilities</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Name Options -->
+                    <div class="option_content" id="name-content">
+                        <div class="radio_group" id="namesList">
+                            <label><input type="checkbox" name="name" value="all"> All</label>
+                            <label><input type="checkbox" name="name" value="rahiq"> Rahiq</label>
+                            <label><input type="checkbox" name="name" value="john"> John</label>
+                            <label><input type="checkbox" name="name" value="sarah"> Sarah</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Mode Options -->
+                    <div class="option_content" id="payment-mode-content">
+                        <div class="radio_group">
+                            <label><input type="radio" name="payment-mode" value="all"> All</label>
+                            <label><input type="radio" name="payment-mode" value="online"> Online</label>
+                            <label><input type="radio" name="payment-mode" value="cash"> Cash</label>
+                            <label><input type="radio" name="payment-mode" value="card"> Card</label>
+                        </div>
+                    </div>
+                    
+                    <button class="apply_button" id="applyFilter">Apply</button>
+                </div>
+            </div>
+
+            <div class="net_total">
+                <div class="net_total_box" style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Cash In</p>
+                        <p style="color: #EB5132;">275</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Cash Out</p>
+                        <p style="color: #1B971F;">100</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Net Balance</p>
+                        <p>175</p>
+                    </div>
+                </div>
+                <div class="net_total_box"  style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Budget</p>
+                        <p>175</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Wallet</p>
+                        <p>275</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Difference</p>
+                        <p style="color: #1B971F;">100</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; margin-top: 12px;">
+                <hr style="width: 100%;">
+                <p style="color: #4D4D4D;">Showing 48 entries</p>
+                <hr style="width: 100%;">
+            </div>
+
+            <div id="entriesContainer">
+                <p style="font-weight: bold; color: #4D4D4D;">03 May 2025</p>
+                <div class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online">
+                    <div class="flex_space_between">
+                        <h5 style="font-weight: bold;">Rahiq</h5>
+                        <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                    </div>
+                    <div class="flex_space_between">
+                        <div>
+                            <p class="category">Travel</p>
+                        </div>
+                        <p style="color: #4D4D4D;">Balance : 100</p>
+                    </div>
+                    <div class="flex_space_between">
+                    <p><i>📎</i>2 attachments</p>
+                    <p style="color: #4D4D4D;">Payment : Online</p>
+                </div>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <div>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                    </div>
+                </div>
+                
+                <div class="net_total_box entry" data-name="john" data-category="food" data-payment="cash">
+                    <div class="flex_space_between">
+                        <h5 style="font-weight: bold;">John</h5>
+                        <h5 style="color: #EB5132; font-weight: bold;">75</h5>
+                    </div>
+                    <div class="flex_space_between">
+                        <div>
+                            <p class="category" style="background-color: #FFD6A5; color: #FF9500; border-color: #FF9500;">Food</p>
+                        </div>
+                        <p style="color: #4D4D4D;">Balance : 175</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Weekly food expense for team lunch.</p>
+                        <p style="color: #4D4D4D;">Payment : Cash</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
+                    </div>
+                </div>
+                
+                <div class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card">
+                    <div class="flex_space_between">
+                        <h5 style="font-weight: bold;">Sarah</h5>
+                        <h5 style="color: #1B971F; font-weight: bold;">50</h5>
+                    </div>
+                    <div class="flex_space_between">
+                        <div>
+                            <p class="category" style="background-color: #D4E5FF; color: #2D7FF9; border-color: #2D7FF9;">Utilities</p>
+                        </div>
+                        <p style="color: #4D4D4D;">Balance : 225</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Monthly office utility payment processed.</p>
+                        <p style="color: #4D4D4D;">Payment : Card</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cash_in_cash_out_div">
+                <a href="#" class="cash_in_btn">CASH IN</a>
+                <a href="#" class="cash_out_btn">CASH OUT</a>
+            </div>
+        </div>
+</body>
+    {% block common_js %} 
+    {% include "common_js.html" %} 
+    {% endblock common_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButton = document.getElementById('filterButton');
+        const filterMenu = document.getElementById('filterMenu');
+        const applyFilter = document.getElementById('applyFilter');
+        const filterOptions = document.querySelectorAll('.filter_option');
+        const optionContents = document.querySelectorAll('.option_content');
+        const entries = document.querySelectorAll('.entry');
+
+        // Toggle filter menu
+        filterButton.addEventListener('click', function() {
+            filterMenu.classList.toggle('open');
+            filterMenu.classList.toggle('show');
+        });
+
+        // Apply filter button
+        applyFilter.addEventListener('click', function() {
+            filterMenu.classList.remove('open');
+            filterMenu.classList.remove('show');
+            // Here you would add your filter logic
+            // For demo, we'll just close the menu
+        });
+
+        // Switch between filter options
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                // Show corresponding content
+                const optionId = this.getAttribute('data-option');
+                optionContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${optionId}-content`).classList.add('active');
+            });
+        });
+
+
+        // Close filter menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterMenu.contains(event.target) && event.target !== filterButton) {
+                filterMenu.classList.remove('show');
+                filterMenu.classList.remove('open');
+            }
+        });
+    });
+</script>
+<script>
+        const searchInput = document.querySelector(".search_bar");
+    
+        searchInput.addEventListener("input", function () {
+            const searchTerm = this.value.toLowerCase();
+            const entries = document.querySelectorAll(".net_total_box .entry");
+    
+            entries.forEach(entry => {
+                const name = entry.getAttribute("data-name").toLowerCase();
+                const category = entry.getAttribute("data-category").toLowerCase();
+                const payment = entry.getAttribute("data-payment").toLowerCase();
+                const textContent = entry.textContent.toLowerCase();
+                if (
+                    name.includes(searchTerm) ||
+                    category.includes(searchTerm) ||
+                    payment.includes(searchTerm) ||
+                    textContent.includes(searchTerm)
+                ) {
+                    entry.style.display = "block";
+                } else {
+                    entry.style.display = "none";
+                }
+            });
+        });
+    </script>
+<script>
+    // Handle filter tab switching
+    document.querySelectorAll('.filter_option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.filter_option').forEach(opt => opt.classList.remove('active'));
+            option.classList.add('active');
+    
+            document.querySelectorAll('.option_content').forEach(content => content.classList.remove('active'));
+            const selectedId = option.dataset.option + '-content';
+            document.getElementById(selectedId).classList.add('active');
+        });
+    });
+    
+    // Handle dynamic name checkbox behavior
+    document.querySelectorAll('input[name="name"]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const allCheckbox = document.querySelector('input[name="name"][value="all"]');
+            const otherCheckboxes = Array.from(document.querySelectorAll('input[name="name"]:not([value="all"])'));
+    
+            if (checkbox.value === 'all') {
+                const checkAll = checkbox.checked;
+                otherCheckboxes.forEach(cb => cb.checked = checkAll);
+            } else {
+                const allChecked = otherCheckboxes.every(cb => cb.checked);
+                allCheckbox.checked = allChecked;
+            }
+        });
+    });
+    
+    // Apply filter logic
+    document.getElementById('applyFilter').addEventListener('click', () => {
+        const entries = document.querySelectorAll('.entry');
+    
+        const entryType = document.querySelector('input[name="entry-type"]:checked')?.value || 'all';
+        const category = document.querySelector('input[name="category"]:checked')?.value || 'all';
+        let names = Array.from(document.querySelectorAll('input[name="name"]:checked')).map(cb => cb.value);
+        if (names.length === 0 || names.includes('all')) {
+            names = ['rahiq', 'john', 'sarah']; // fallback to all
+        }
+        const payment = document.querySelector('input[name="payment-mode"]:checked')?.value || 'all';
+    
+        entries.forEach(entry => {
+            const entryColor = entry.querySelector('h5:last-child')?.style.color || '';
+            const matchesEntryType = (
+                entryType === 'all' ||
+                (entryType === 'cash-in' && entryColor === 'rgb(27, 151, 31)') ||
+                (entryType === 'cash-out' && entryColor === 'rgb(235, 81, 50)')
+            );
+    
+            const matchesCategory = category === 'all' || entry.dataset.category === category;
+            const matchesName = names.includes(entry.dataset.name);
+            const matchesPayment = payment === 'all' || entry.dataset.payment === payment;
+    
+            const visible = matchesEntryType && matchesCategory && matchesName && matchesPayment;
+            entry.style.display = visible ? 'block' : 'none';
+        });
+    });
+    </script>
+    
+    
+</html>

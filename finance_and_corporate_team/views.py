@@ -463,3 +463,10 @@ class GetBudgetSheetAcessDataAjax(View):
             return JsonResponse({'data':fct_team_member_accesses})
         else:
             return JsonResponse({'message':'error'})
+        
+
+def wallet_homepage(request):
+    return render(request, "finance_and_corporate_team/wallet_page.html")
+
+def add_cash(request):
+    return render(request, "finance_and_corporate_team/add_cash.html")

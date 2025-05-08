@@ -26,5 +26,9 @@ urlpatterns = [
     path('budget/event_budget/<int:event_id>/',views.create_budget,name="edit_event_budget"),
     path('budget/edit/<int:sheet_id>/',views.edit_budget,name="edit_budget"),
     path('budget/download/', views.download_budget, name='download_budget_sheet'),
-    path('budget/load_budget_sheet_access/', views.GetBudgetSheetAcessDataAjax.as_view(), name='load_budget_sheet_access')
+    path('budget/load_budget_sheet_access/', views.GetBudgetSheetAcessDataAjax.as_view(), name='load_budget_sheet_access'),
+
+
+    path('wallet/', views.wallet_homepage, name='wallet_homepage'),
+    path('add_cash/', views.add_cash, name='add_cash')
 ]
