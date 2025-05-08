@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'central_events',
     'task_assignation',
     'notification',
+    'wallet',
     'django_celery_beat',
     'django_celery_results',
     'django_json_widget',

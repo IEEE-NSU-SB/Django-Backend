@@ -3,6 +3,7 @@ from django.urls import path,include
 from . import views
 from .views import GetTaskCategoryPointsAjax, SaveMemberTaskPointsAjax, UpdatePositionAjax,UpdateAwardAjax
 from .views import UpdatePositionAjax,UpdateRestrictionAjax,AwardRanking
+from wallet import views as walletViews
 
 app_name='central_branch'
 
@@ -163,4 +164,7 @@ urlpatterns = [
     path('mail/request_update_schedule/',views.UpdateScheduledEmailOptionsAjax.as_view(),name='request_update_email_schedule'),
     path('navigate/', views.PaginationAjax.as_view(),name='navigate'),
     path('mail/view/attachments/<str:message_id>/<str:attachment_id>/', views.get_attachment, name='get_attachment'),
+
+    # Wallet Urls
+    path('wallet/', include('wallet.urls'), name='wallet'),
 ]
