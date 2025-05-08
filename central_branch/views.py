@@ -5578,6 +5578,11 @@ def task_edit(request,task_id,team_primary = None):
         except:
             logged_in_user = adminUsers.objects.get(username=user)
 
+        # if not team_primary:
+        #     if task.task_type == 'Team' and type(logged_in_user) == Members:
+        #         app_name = Task_Assignation.get_team_app_name(team_primary=logged_in_user.team.primary)
+        #         return redirect(f'{app_name}:task_edit_team', team_primary=logged_in_user.team.primary,task_id=task.pk)
+
         print("before post")
         
         if request.method == 'POST':
