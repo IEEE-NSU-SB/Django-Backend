@@ -29,10 +29,12 @@ class WalletEntryCategory(models.Model):
 
 class WalletEntry(models.Model):
 
-    date_time = models.DateTimeField(null=False, blank=False, default=timezone.now())
+    creation_date_time = models.DateTimeField(null=False, blank=False, auto_now_add=True)
+    update_date_time = models.DateTimeField(null=False, blank=False, auto_now=True)
+    entry_date_time = models.DateTimeField(null=False, blank=False, default=timezone.now)
     amount = models.DecimalField(null=False, blank=False, max_digits=7, decimal_places=2, default=0.0)
-    name = models.CharField(null=True, blank=True, max_length=60)
-    contact = models.CharField(null=True, blank=True, max_length=60)
+    name = models.CharField(null=True, blank=True, max_length=40)
+    contact = models.CharField(null=True, blank=True, max_length=40)
     remarks = models.TextField(null=True, blank=True)
     categories = models.ManyToManyField(WalletEntryCategory, related_name='wallet_entries')
     payment_mode = models.CharField(null=True, blank=True, max_length=20, choices=[
@@ -41,6 +43,9 @@ class WalletEntry(models.Model):
         ('BKASH', 'Bkash'),
         ('NAGAD', 'Nagad'),
     ])
+
+    # tenure
+    # status
 
     class Meta:
         verbose_name = 'Wallet Entry'
