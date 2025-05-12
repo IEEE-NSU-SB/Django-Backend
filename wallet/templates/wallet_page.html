@@ -52,6 +52,7 @@
             border-radius: 6px;
             margin: 6px 0px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
         }
         .flex_space_between{
             display: flex;
@@ -64,6 +65,23 @@
             border: 1px solid #31AE70;
             padding: 0px 6px;
             border-radius: 3px;
+        }
+        .travel{
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
+            padding: 0px 6px;
+            border-radius: 3px;
+        }
+        .food{
+            background-color: #FFD6A5;
+            color: #FF9500; 
+            border-color: #FF9500;
+        }
+        .utilities{
+            background-color: #D4E5FF; 
+            color: #2D7FF9; 
+            border-color: #2D7FF9;
         }
         /* Filter Menu Styles */
         .filter_menu {
@@ -219,6 +237,8 @@
         font-weight: bold;
         color: #4D4D4D;
         margin-top: 42px;
+        position: relative;
+        left: 4px;
       }
       .total_entries{
         display: grid;
@@ -227,6 +247,10 @@
         margin-top: 12px; 
         margin-bottom: -40px;
       }
+      .app-body{
+                margin: 0 15%;
+      }
+
         @media screen and (max-width: 500px) {
             .image-button img {
                 width: 32px;
@@ -237,13 +261,30 @@
             .net_total{
                 grid-template-columns: 1fr;
             }
-            .flex_space_between{
+            .entry .flex_space_between{
                 flex-direction: column;
                 align-items: flex-start;
             }
             .search_filter{
                 align-items: flex-start;
                 flex-direction: column-reverse;
+            }
+            .total_entries {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .total_entries hr {
+                display: none;
+            }
+            .search_bar{
+                width: 100%;
+            }
+            .filter-bar select{
+                width: 100%;
+            }
+            .app-body{
+                margin: 5%;
             }
         }
     </style>
@@ -271,10 +312,10 @@
             <div
               ui-view
               class="app-body"
-              style="justify-content: center; margin-left: 15%; margin-right: 15% ;"
+              style="justify-content: center;"
               id="view"
             >
-            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Title</h3>
+            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Book Name</h3>
             <div class="flex_space_between" style="margin-bottom: 16px;">
                 <div class="tooltip-container">
                     <a href="#" class="image-button">
@@ -282,7 +323,7 @@
                     </a>
                     <span class="tooltip-text">Go back</span>
                 </div>
-                <p style="color: #4D4D4D;">Wallet Balance: 100000</p>
+                <!-- <p style="color: #4D4D4D;">Wallet Balance: 100000</p> -->
             </div>
             <div class="search_filter">
                 <input class="search_bar net_total_box" type="text" name="" id="" placeholder="Search...">
@@ -377,14 +418,14 @@
 
             <div class="entriesContainer">
                 <p class="entry_date">03 May 2025</p>
-                <div class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
+                <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Rahiq</h5>
                         <h5 style="color: #1B971F; font-weight: bold;">100</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category">Travel</p>
+                            <p class="category travel">Travel</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 100</p>
                     </div>
@@ -396,16 +437,15 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
                     </div>
-                </div>
-                
-                <div class="net_total_box entry" data-name="joe" data-category="food" data-payment="cash" data-entryType="cashout">
+                </a>                
+                <a href="" class="net_total_box entry" data-name="joe" data-category="food" data-payment="cash" data-entryType="cashout">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Joe</h5>
                         <h5 style="color: #EB5132; font-weight: bold;">75</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category" style="background-color: #FFD6A5; color: #FF9500; border-color: #FF9500;">Food</p>
+                            <p class="category food">Food</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 175</p>
                     </div>
@@ -416,16 +456,16 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
                     </div>
-                </div>
+                </a>
                 
-                <div class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
+                <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Sarah</h5>
                         <h5 style="color: #1B971F; font-weight: bold;">50</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category" style="background-color: #D4E5FF; color: #2D7FF9; border-color: #2D7FF9;">Utilities</p>
+                            <p class="category utilities">Utilities</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 225</p>
                     </div>
@@ -436,18 +476,18 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="entriesContainer">
             <p class="entry_date">03 May 2025</p>
-            <div class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
+            <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
                 <div class="flex_space_between">
                     <h5 style="font-weight: bold;">Rahiq</h5>
                     <h5 style="color: #1B971F; font-weight: bold;">100</h5>
                 </div>
                 <div class="flex_space_between">
                     <div>
-                        <p class="category">Travel</p>
+                        <p class="category travel">Travel</p>
                     </div>
                     <p style="color: #4D4D4D;">Balance : 100</p>
                 </div>
@@ -459,17 +499,17 @@
                 <div>
                     <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
                 </div>
-            </div>
+            </a>
             
-            <div class="net_total_box entry" data-name="john" data-category="food travel" data-payment="cash" data-entryType="cashout">
+            <a href="" class="net_total_box entry" data-name="john" data-category="food travel" data-payment="cash" data-entryType="cashout">
                 <div class="flex_space_between">
                     <h5 style="font-weight: bold;">John</h5>
                     <h5 style="color: #EB5132; font-weight: bold;">75</h5>
                 </div>
                 <div class="flex_space_between">
                     <div class="category_container">
-                        <p class="category" style="background-color: #FFD6A5; color: #FF9500; border-color: #FF9500;">Food</p>
-                        <p class="category">Travel</p>
+                        <p class="category food">Food</p>
+                        <p class="category travel">Travel</p>
                     </div>
                     <p style="color: #4D4D4D;">Balance : 175</p>
                 </div>
@@ -480,16 +520,16 @@
                 <div>
                     <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
                 </div>
-            </div>
+            </a>
             
-            <div class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
+            <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
                 <div class="flex_space_between">
                     <h5 style="font-weight: bold;">Sarah</h5>
                     <h5 style="color: #1B971F; font-weight: bold;">50</h5>
                 </div>
                 <div class="flex_space_between">
                     <div>
-                        <p class="category" style="background-color: #D4E5FF; color: #2D7FF9; border-color: #2D7FF9;">Utilities</p>
+                        <p class="category utilities">Utilities</p>
                     </div>
                     <p style="color: #4D4D4D;">Balance : 225</p>
                 </div>
@@ -500,7 +540,7 @@
                 <div>
                     <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
                 </div>
-            </div>
+            </a>
         </div>
 
 
