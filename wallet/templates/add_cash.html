@@ -562,19 +562,16 @@
 
         <script>
             // Handle category tag selection
-            // Handle custom category dropdown
             const categoryInput = document.getElementById('categoryInput');
             const categoryDropdown = document.getElementById('categoryDropdown');
-            const hiddenCategoryInput = document.getElementById('category');
             const selectedTags = document.getElementById('selectedTags');
-            const selectedCategories = new Set();
+            const selectedCategories = []; // Array to store selected categories
 
             // Color map for categories
             const categoryColors = {
                 'Sponsor': '#FF9500',  // Blue
                 'Registration': '#FFE082',  // Yellow
                 'NSU_Fund': '#2D7FF9',  // Blue
-
             };
 
             // Toggle dropdown
@@ -597,14 +594,13 @@
                 }
             });
 
-            // Add a hover effect to dropdown items
+            // Style dropdown items
             categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
                 const category = item.dataset.value;
 
-                // Add a color indicator to each dropdown item
                 if (categoryColors[category]) {
                     item.style.borderLeft = `4px solid ${categoryColors[category]}`;
-                    item.style.paddingLeft = '11px'; // Compensate for the border
+                    item.style.paddingLeft = '11px';
                 }
 
                 item.addEventListener('mouseenter', function () {
@@ -619,18 +615,16 @@
             // Select category from dropdown
             categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
                 item.addEventListener('click', function (e) {
-                    e.stopPropagation(); // Prevent closing the dropdown
-
+                    e.stopPropagation();
                     const category = this.dataset.value;
 
                     // Only add if not already selected
-                    if (!selectedCategories.has(category)) {
-                        selectedCategories.add(category);
+                    if (!selectedCategories.includes(category)) {
+                        selectedCategories.push(category);
                         createTag(category);
-                        updateCategoryInput();
-
-                        // Close the dropdown after selecting a tag
                         categoryDropdown.style.display = 'none';
+
+                        console.log("Selected categories:", selectedCategories);
                     }
                 });
             });
@@ -640,28 +634,21 @@
                 const tag = document.createElement('div');
                 tag.className = 'tag';
                 tag.setAttribute('data-category', category);
-
-                // Color is now set via CSS based on data-category attribute
-
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
                 // Remove tag when clicking close button
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
                     e.stopPropagation();
-                    selectedCategories.delete(category);
+                    const index = selectedCategories.indexOf(category);
+                    if (index > -1) {
+                        selectedCategories.splice(index, 1);
+                    }
                     tag.remove();
-                    updateCategoryInput();
+                    console.log("Selected categories:", selectedCategories);
                 });
 
                 selectedTags.appendChild(tag);
             }
-
-            // Update hidden input with selected categories
-            function updateCategoryInput() {
-                hiddenCategoryInput.value = Array.from(selectedCategories).join(', ');
-
-            }
-
             // Handle payment mode selection
             const paymentOptions = document.querySelectorAll('.payment-option');
             let selectedPayment = 'Cash'; // Default selected
@@ -682,7 +669,6 @@
                 });
             });
 
-            // Handle file input
             // Handle file input
             const fileInput = document.getElementById('fileInput');
             const uploadButton = document.getElementById('uploadButton');
