@@ -229,23 +229,19 @@
 
         /* Specific category tag colors */
         .tag[data-category="Sponsor"] {
-            background-color: #FFD6A5;
-            color: #FF9500;
-            border-color: #FF9500;
+            background-color: #7986CB;
             /* Blue */
         }
 
         .tag[data-category="Registration"] {
-            background-color: #FFFACD;
-            color: #FFA500;
-
+            background-color: #FFD54F;
+            /* Yellow */
+            color: #FFFFFF;
             /* Darker text for better contrast on yellow */
         }
 
-        .tag[data-category="NSU_Fund"] {
-            background-color: #D4E5FF;
-            color: #2D7FF9;
-            border-color: #2D7FF9;
+        .tag[data-category="Food"] {
+            background-color: #FF9E80;
             /* Orange */
         }
 
@@ -273,7 +269,7 @@
 
         .payment-option {
             text-align: center;
-            padding: 2px 14px;
+            padding: 2px 8px;
             border-radius: 16px;
             cursor: pointer;
             font-size: 14px;
@@ -366,35 +362,35 @@
                     <a href="#" class="back-button">
                         Back</a>
                     <div class="title">Add Cash In Entry</div>
-                    <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div>
+
                 </div>
 
                 <div class="form-container">
-                    <form method='PUT' id="cashEntryForm">
-                        {% csrf_token %}
+                    <form id="cashEntryForm">
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" name="entry_amount" required>
+                                <input type="number" placeholder="Amount" id="amount" required>
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" name="entry_date_time" required>
+                                <input type="datetime-local" id="datetime" required>
                             </div>
                         </div>
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact" name="contact">
+                                <input type="text" placeholder="Contact" id="contact">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
-                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required></textarea>
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
+                                    required></textarea>
                             </div>
                         </div>
 
@@ -402,7 +398,7 @@
                             <div class="file-upload" id="uploadButton">
                                 <i>📎</i> Attach Image or PDF
                             </div>
-                            <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
+                            <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
                                 <div class="preview-item" id="addMoreFiles">+</div>
@@ -417,11 +413,11 @@
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
                                         <div class="dropdown-item" data-value="Registration">Registration</div>
-                                        <div class="dropdown-item" data-value="NSU_Fund">NSU Fund</div>
-
+                                        <div class="dropdown-item" data-value="Food">Food</div>
+                                        <div class="dropdown-item" data-value="Travel">Travel</div>
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" name="entry_categories" required>
+                                <input type="hidden" id="category" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
@@ -467,10 +463,10 @@
 
             // Color map for categories
             const categoryColors = {
-                'Sponsor': '#FF9500',  // Blue
-                'Registration': '#FFE082',  // Yellow
-                'NSU_Fund': '#2D7FF9',  // Blue
-
+                'Sponsor': '#506CC0',  // Blue
+                'Registration': '#D2C557',  // Yellow
+                'Food': '#D9994F',  // Orange
+                'Travel': '#FFE082'  // Light Yellow
             };
 
             // Toggle dropdown
@@ -555,7 +551,12 @@
             // Update hidden input with selected categories
             function updateCategoryInput() {
                 hiddenCategoryInput.value = Array.from(selectedCategories).join(', ');
-
+                // If there are categories, clear the placeholder
+                if (selectedCategories.size > 0) {
+                    categoryInput.placeholder = '';
+                } else {
+                    categoryInput.placeholder = 'Select categories...';
+                }
             }
 
             // Handle payment mode selection
@@ -575,7 +576,6 @@
                 });
             });
 
-            // Handle file input
             // Handle file input
             const fileInput = document.getElementById('fileInput');
             const uploadButton = document.getElementById('uploadButton');
@@ -631,14 +631,12 @@
                         img.style.objectFit = 'cover';
                         previewItem.appendChild(img);
                     } else if (file.type === 'application/pdf') {
-                        // Create PDF icon/label without overwriting the close button
-                        const pdfLabel = document.createElement('span');
-                        pdfLabel.textContent = 'PDF';
-                        pdfLabel.style.fontSize = '12px';
+                        // Create PDF icon
+                        previewItem.textContent = 'PDF';
+                        previewItem.style.fontSize = '12px';
                         previewItem.style.display = 'flex';
                         previewItem.style.alignItems = 'center';
                         previewItem.style.justifyContent = 'center';
-                        previewItem.appendChild(pdfLabel);
                     }
 
                     // Insert the new preview before the "+" button
@@ -659,6 +657,27 @@
             // Open file dialog when clicking the "+" button
             addMoreFiles.addEventListener('click', () => {
                 fileInput.click();
+            });
+
+            // Handle form submission
+            const form = document.getElementById('cashEntryForm');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Check if required fields are filled
+                const amount = document.getElementById('amount').value;
+                const datetime = document.getElementById('datetime').value;
+                const remark = document.getElementById('remark').value;
+                const category = document.getElementById('category').value;
+
+                if (!amount || !datetime || !remark || !category) {
+                    alert('Please fill all required fields!');
+                    return;
+                }
+
+                // In a real app, you would send the form data to a server here
+                alert('Form submitted successfully!');
             });
         </script>
 </body>
