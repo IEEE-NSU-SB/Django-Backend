@@ -100,7 +100,7 @@
             font-weight: 500;
             flex-grow: 1;
 
-            color: #FF0000;
+            color: #000000;
 
         }
 
@@ -275,21 +275,21 @@
         }
 
         /* Specific category tag colors */
-        .tag[data-category="food"] {
+        .tag[data-category="Sponsor"] {
             background-color: #FFD6A5;
             color: #FF9500;
             border-color: #FF9500;
             /* Blue */
         }
 
-        .tag[data-category="logistics"] {
+        .tag[data-category="Registration"] {
             background-color: #FFFACD;
             color: #FFA500;
 
             /* Darker text for better contrast on yellow */
         }
 
-        .tag[data-category="Goodies"] {
+        .tag[data-category="NSU_Fund"] {
             background-color: #D4E5FF;
             color: #2D7FF9;
             border-color: #2D7FF9;
@@ -461,7 +461,7 @@
         <!-- ############ PAGE START-->
         <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
             <div class="container">
-                <div class="title">Add Cash In Entry</div>
+                <div class="title">Edit Cash In Entry</div>
                 <div class="header">
                     <div class="tooltip-container">
                         <a href="#" class="image-button">
@@ -519,9 +519,9 @@
                                 <div class="custom-selectC">
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
-                                        <div class="dropdown-item" data-value="food">Food</div>
-                                        <div class="dropdown-item" data-value="logistics">Logistics</div>
-                                        <div class="dropdown-item" data-value="Goodies">Goodies</div>
+                                        <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
+                                        <div class="dropdown-item" data-value="Registration">Registration</div>
+                                        <div class="dropdown-item" data-value="NSU_Fund">NSU Fund</div>
 
                                     </div>
                                 </div>
@@ -569,9 +569,9 @@
             const selectedCategories = [];
 
             const categoryColors = {
-                'food': '#FF9500',
-                'logistics': '#FFE082',
-                'Goodies': '#2D7FF9',
+                'Sponsor': '#FF9500',
+                'Registration': '#FFE082',
+                'NSU_Fund': '#2D7FF9',
             };
 
             // Toggle dropdown

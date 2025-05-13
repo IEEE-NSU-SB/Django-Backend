@@ -7,3 +7,10 @@ def wallet_homepage(request):
 
 def add_cash(request):
     return render(request, "add_cash.html")
+
+def cash_out(request):
+    return render(request, "cash_out.html") 
+
+
+def edit_cash(request):
+    return render(request, "edit_cash.html") 
