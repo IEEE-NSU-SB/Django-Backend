@@ -12,7 +12,7 @@ class WalletEntryCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(WalletEntry)
 class WalletEntryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'sc_ag', 'creation_date_time', 'update_date_time', 'entry_date_time', 'amount', 'payment_mode', 'status']
+    list_display = ['id', 'sc_ag', 'creation_date_time', 'update_date_time', 'entry_date_time', 'entry_type', 'amount', 'payment_mode', 'status']
 
 @admin.register(WalletEntryFile)
 class WalletEntryFileAdmin(admin.ModelAdmin):
