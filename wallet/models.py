@@ -35,9 +35,10 @@ class WalletEntry(models.Model):
     update_date_time = models.DateTimeField(null=False, blank=False, auto_now=True)
     entry_date_time = models.DateTimeField(null=False, blank=False, default=timezone.now)
     entry_event = models.ForeignKey(Events, null=True, blank=True, on_delete=models.SET_NULL)
-    entry_type = models.CharField(null=False, blank=False, default='NOT SET', choices=[
+    entry_type = models.CharField(null=False, blank=False, default='NOT_SET', choices=[
         ('CASH_IN', 'Cash In'),
         ('CASH_OUT', 'Cash Out'),
+        ('NOT_SET', 'NOT SET'),
     ])
     amount = models.DecimalField(null=False, blank=False, max_digits=7, decimal_places=2, default=0.0)
     name = models.CharField(null=True, blank=True, max_length=40)

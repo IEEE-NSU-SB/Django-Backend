@@ -517,7 +517,7 @@
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         {% for category in categories %}
-                                        <div class="dropdown-item" data-value="{{category.name}}">{{category.name}}</div>
+                                        <div class="dropdown-item" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -597,6 +597,7 @@
             function setupDropdownItems() {
                 categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
                     const category = item.dataset.value;
+                    const id = item.dataset.id;
 
                     // Only apply once
                     if (!item.dataset.styled) {
@@ -619,10 +620,10 @@
                     item.onclick = function (e) {
                         e.stopPropagation();
 
-                        if (!selectedCategories.includes(category)) {
-                            selectedCategories.push(category);
+                        if (!selectedCategories.includes(id)) {
+                            selectedCategories.push(id);
                             updateHiddenInput();
-                            createTag(category);
+                            createTag(category, id);
                             this.remove(); // Remove selected from dropdown
                             categoryDropdown.style.display = 'none';
                             console.log("Selected categories:", selectedCategories);
@@ -632,7 +633,7 @@
             }
 
             // Create category tag
-            function createTag(category) {
+            function createTag(category, id) {
                 const tag = document.createElement('div');
                 tag.className = 'tag';
                 tag.setAttribute('data-category', category);
@@ -651,6 +652,7 @@
                     const dropdownItem = document.createElement('div');
                     dropdownItem.className = 'dropdown-item';
                     dropdownItem.dataset.value = category;
+                    dropdownItem.dataset.id = id;
                     dropdownItem.textContent = category;
                     categoryDropdown.appendChild(dropdownItem);
                     setupDropdownItems(); // Reattach handlers to new item
@@ -664,7 +666,7 @@
 
             // Update hidden input with selected values
             function updateHiddenInput() {
-                hiddenCategoryInput.value = selectedCategories.join(',');
+                hiddenCategoryInput.value = selectedCategories;
             }
 
             // Handle payment mode selection

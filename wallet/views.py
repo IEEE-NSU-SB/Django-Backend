@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
+from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
 
 # Create your views here.      
@@ -16,23 +17,11 @@ def add_cash(request):
         name = request.POST.get('name')
         contact = request.POST.get('contact')
         entry_remark = request.POST.get('entry_remark')
-        # entry_categories = request.POST.get('entry_categories')
+        entry_categories = request.POST.get('entry_categories')
         payment_mode = request.POST.get('payment_mode')
         entry_files = request.FILES.getlist('entry_files')
 
-        sc_ag = Chapters_Society_and_Affinity_Groups.objects.get(primary=1)
-
-        wallet_entry = WalletEntry.objects.create(entry_date_time=entry_date_time,
-                                   amount=entry_amount,
-                                   name=name,
-                                   contact=contact,
-                                   remarks=entry_remark,
-                                   payment_mode=payment_mode,
-                                   sc_ag=sc_ag,
-                                   tenure=Panels.objects.get(panel_of=sc_ag, current=True))
-        
-        for file in entry_files:
-            WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
+        WalletManager.add_wallet_entry(1, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
     categories = WalletEntryCategory.objects.all()
