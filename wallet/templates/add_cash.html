@@ -279,7 +279,6 @@
             font-size: 14px;
             border: none;
             transition: all 0.2s ease;
-            width: 80px;
         }
 
         .payment-option.cash {
@@ -433,9 +432,10 @@
                         <div class="payment-mode">
                             <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
-                                <input type="button" value="Cash" class="payment-option cash" data-payment="Cash">
-                                <input type="button" value="Online" class="payment-option online" data-payment="Online">
-                                <input type="button" value="Cash" class="payment-option card" data-payment="Card">
+                                <div class="payment-option cash" data-payment="Cash">Cash</div>
+                                <div class="payment-option online" data-payment="Online">Online</div>
+                                <div class="payment-option card" data-payment="Card">Card</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="Cash">
                             </div>
                         </div>
 
@@ -562,6 +562,7 @@
             // Handle payment mode selection
             const paymentOptions = document.querySelectorAll('.payment-option');
             let selectedPayment = 'Cash'; // Default selected
+            const hiddenInput = document.getElementById('selectedPaymentInput'); // Get hidden input
 
             paymentOptions.forEach(option => {
                 option.addEventListener('click', () => {
@@ -572,7 +573,9 @@
 
                     option.style.backgroundColor = '#98EAC2';
                     option.style.color = '#31AE70';
+
                     selectedPayment = option.dataset.payment;
+                    hiddenInput.value = selectedPayment; // Update hidden input
                 });
             });
 
