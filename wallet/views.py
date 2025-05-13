@@ -10,8 +10,13 @@ def wallet_homepage(request):
 
 def add_cash(request):
 
-    if request.method == 'PUT':
-        print(request.PUT)
+    if request.method == 'POST':
+        entry_date_time = request.POST.get('entry_date_time')
+        entry_amount = request.POST.get('entry_amount')
+        name = request.POST.get('name')
+        contact = request.POST.get('contact')
+        entry_remark = request.POST.get('entry_remark')
+        entry_categories = request.POST.get('entry_categories')
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
 
