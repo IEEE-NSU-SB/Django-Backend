@@ -21,6 +21,7 @@ class Wallet(models.Model):
 class WalletEntryCategory(models.Model):
 
     name = models.CharField(null=False, blank=False, max_length=12)
+    colour = models.CharField(null=False, blank=False, default='#FF9500')
 
     class Meta:
         verbose_name = 'Wallet Entry Category'

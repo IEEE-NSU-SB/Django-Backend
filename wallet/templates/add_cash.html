@@ -279,17 +279,13 @@
             font-size: 14px;
             border: none;
             transition: all 0.2s ease;
+            background-color: #f1f1f1;
+            color: #666;
         }
 
         .payment-option.cash {
             background-color: #98EAC2;
             color: #31AE70;
-        }
-
-        .payment-option.online,
-        .payment-option.card {
-            background-color: #f1f1f1;
-            color: #666;
         }
 
         .payment-option:hover {
@@ -415,10 +411,9 @@
                                 <div class="custom-selectC">
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
-                                        <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
-                                        <div class="dropdown-item" data-value="Registration">Registration</div>
-                                        <div class="dropdown-item" data-value="NSU_Fund">NSU Fund</div>
-
+                                        {% for category in categories %}
+                                        <div class="dropdown-item" data-value="{{category.name}}">{{category.name}}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <input type="hidden" id="category" name="entry_categories" required>
@@ -432,10 +427,11 @@
                         <div class="payment-mode">
                             <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
-                                <div class="payment-option cash" data-payment="Cash">Cash</div>
-                                <div class="payment-option online" data-payment="Online">Online</div>
-                                <div class="payment-option card" data-payment="Card">Card</div>
-                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="Cash">
+                                <div class="payment-option cash" data-payment="CASH">Cash</div>
+                                <div class="payment-option" data-payment="CARD">Card</div>
+                                <div class="payment-option" data-payment="BKASH">Bkash</div>
+                                <div class="payment-option" data-payment="NAGAD">Nagad</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="CASH">
                             </div>
                         </div>
 
@@ -468,10 +464,9 @@
 
             // Color map for categories
             const categoryColors = {
-                'Sponsor': '#FF9500',  // Blue
-                'Registration': '#FFE082',  // Yellow
-                'NSU_Fund': '#2D7FF9',  // Blue
-
+                {% for category in categories %}
+                '{{category.name}}': '{{category.colour}}',
+                {% endfor %}
             };
 
             // Toggle dropdown
@@ -561,7 +556,7 @@
 
             // Handle payment mode selection
             const paymentOptions = document.querySelectorAll('.payment-option');
-            let selectedPayment = 'Cash'; // Default selected
+            let selectedPayment = 'CASH'; // Default selected
             const hiddenInput = document.getElementById('selectedPaymentInput'); // Get hidden input
 
             paymentOptions.forEach(option => {
