@@ -17,6 +17,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         .search_bar{
             text-decoration: none;
@@ -51,6 +52,7 @@
             border-radius: 6px;
             margin: 6px 0px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
         }
         .flex_space_between{
             display: flex;
@@ -64,6 +66,23 @@
             padding: 0px 6px;
             border-radius: 3px;
         }
+        .travel{
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
+            padding: 0px 6px;
+            border-radius: 3px;
+        }
+        .food{
+            background-color: #FFD6A5;
+            color: #FF9500; 
+            border-color: #FF9500;
+        }
+        .utilities{
+            background-color: #D4E5FF; 
+            color: #2D7FF9; 
+            border-color: #2D7FF9;
+        }
         /* Filter Menu Styles */
         .filter_menu {
             /* position: absolute; */
@@ -76,91 +95,34 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
+            overflow: auto;
+            transition: max-height .3s ease-in-out;
             z-index: 100;
             margin-top: 10px;
-            transition: all .5s ease-in-out;
+            transition: all .3s ease-in-out;
             opacity: 0%;
+            flex-direction: column;
         }
-        
-        .filter_menu.open {
-            max-height: 400px;
-        }
-        
-        .filter_options {
-            width: 30%;
-            border-right: 1px solid #D9D9D9;
-            padding: 15px;
-        }
-        
-        .filter_content {
-            width: 70%;
-            padding: 15px;
-            height: 240px;
-        }
-        
-        .filter_option {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .filter_option:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .filter_option.active {
-            background-color: #f0f0f0;
-        }
-        
-        .option_content {
-            display: none;
-        }
-        
-        .option_content.active {
-            display: block;
-            height: 149px;
-            overflow: auto;
-        }
-        
-        .radio_group {
-            margin: 10px 0;
-        }
-        
-        .radio_group label {
-            display: block;
-            margin: 8px 0;
-        }
-        
-        .apply_button {
+
+        .clear_button {
             background-color: #6c7ae0;
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 10px 20px;
+            padding: 4px 20px;
             cursor: pointer;
-            float: right;
-            margin-top: 20px;
+            /* float: right; */
+            margin: 0;
             position: relative;
             right: 0;
-            bottom: 0;
+            bottom: 5px;
         }
         
-        .apply_button:hover {
+        .clear_button:hover {
             background-color: #5663c7;
         }
         
-        .close_button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        .show{
-            opacity: 100%;
-        }
+        
         .cash_in_btn{
             background-color: #31AE70;
             color: white;
@@ -169,10 +131,12 @@
             transition: all .3s ease-in-out;
             border: 1px solid #31AE70;
         }
+
         .cash_in_btn:hover{
             color: #31AE70;
             background-color: white;
         }
+
         .cash_out_btn{
             background-color: #EB5132;
             color: white;
@@ -181,10 +145,12 @@
             transition: all .3s ease-in-out;
             border: 1px solid #EB5132;
         }
+
         .cash_out_btn:hover{
             color: #EB5132;
             background-color: white;
         }
+
         .cash_in_cash_out_div{
             display: grid;
             gap: 6px;
@@ -194,9 +160,136 @@
             text-align: center;
             padding: 16px 0;
         }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            /* padding: 12px 20px; */
+            /* border: 1px solid #e0e0e0; */
+            border-radius: 8px;
+            background: white;
+            max-width: 100%;
+            /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+            position: relative;
+            margin-top: 12px;
+        }
+          
+        .filter-bar select {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            width: 167px;
+        }
+
+        .filter_menu.show {
+            max-height: 500px; /* adjust as needed */
+            opacity: 100%;
+            padding: 20px;
+            margin: 6px 0;
+        }
+        .category_container{
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+      .tooltip-container.right {
+        float: right;
+        margin-right: 0;
+      }
+
+      .image-button:hover + .tooltip-text {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(10px);
+      }
+
+      .image-button img {
+        width: 40px; /* Adjust as needed */
+        height: auto; /* Maintain aspect ratio */
+        border-radius: 50%; /* Add rounded corners if desired */
+        box-shadow: 2px 2px 5px 0px #80808054;
+      }
+
+      .tooltip-text {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      }
+      .entry_date{
+        font-weight: bold;
+        color: #4D4D4D;
+        margin-top: 42px;
+        position: relative;
+        left: 4px;
+      }
+      .total_entries{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        text-align: center; 
+        margin-top: 12px; 
+        margin-bottom: -40px;
+      }
+      .app-body{
+                margin: 0 15%;
+      }
+
+        @media screen and (max-width: 500px) {
+            .image-button img {
+                width: 32px;
+            }
+            .filter-bar{
+                flex-direction: column;
+            }
+            .net_total{
+                grid-template-columns: 1fr;
+            }
+            .entry .flex_space_between{
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search_filter{
+                align-items: flex-start;
+                flex-direction: column-reverse;
+            }
+            .total_entries {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .total_entries hr {
+                display: none;
+            }
+            .search_bar{
+                width: 100%;
+            }
+            .filter-bar select{
+                width: 100%;
+            }
+            .app-body{
+                margin: 5%;
+            }
+        }
     </style>
 </head>
-<body>
+<body style="background-color: white;">
         <!-- ############ LAYOUT START-->
         <div class="app" id="app" style="background-color: white;">
             <!-- aside -->
@@ -219,13 +312,18 @@
             <div
               ui-view
               class="app-body"
-              style="justify-content: center; margin-left: 15%; margin-right: 15% ;"
+              style="justify-content: center;"
               id="view"
             >
-            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Title</h3>
+            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Book Name</h3>
             <div class="flex_space_between" style="margin-bottom: 16px;">
-                <h4>< <a href="">Back</a></h4>
-                <p style="color: #4D4D4D;">Wallet Balance: 100000</p>
+                <div class="tooltip-container">
+                    <a href="#" class="image-button">
+                        <img src="/static/back-arrow.png" alt="Go back to session">
+                    </a>
+                    <span class="tooltip-text">Go back</span>
+                </div>
+                <!-- <p style="color: #4D4D4D;">Wallet Balance: 100000</p> -->
             </div>
             <div class="search_filter">
                 <input class="search_bar net_total_box" type="text" name="" id="" placeholder="Search...">
@@ -233,68 +331,50 @@
             </div>
 
             <!-- Filter Menu -->
-            <div class="filter_menu" id="filterMenu">
-                <div class="filter_options">
-                    <div class="filter_option active" data-option="entry-type">Entry Type</div>
-                    <div class="filter_option" data-option="date">Date</div>
-                    <div class="filter_option" data-option="category">Category</div>
-                    <div class="filter_option" data-option="name">Name</div>
-                    <div class="filter_option" data-option="payment-mode" style="border: none;">Payment Mode</div>
-                </div>
-                <div class="filter_content">
-                    <!-- Entry Type Options -->
-                    <div class="option_content active" id="entry-type-content">
-                        <div class="radio_group">
-                            <label><input type="radio" name="entry-type" value="all"> All</label>
-                            <label><input type="radio" name="entry-type" value="cash-in"> Cash In</label>
-                            <label><input type="radio" name="entry-type" value="cash-out"> Cash Out</label>
-                        </div>
-                    </div>
-                    
-                    <!-- Date Options -->
-                    <div class="option_content" id="date-content">
-                        <div class="radio_group">
-                            <label><input type="radio" name="date" value="all-time"> All Time</label>
-                            <label><input type="radio" name="date" value="yesterday"> Yesterday</label>
-                            <label><input type="radio" name="date" value="this-week"> This Week</label>
-                            <label><input type="radio" name="date" value="this-month"> This Month</label>
-                            <label><input type="radio" name="date" value="last-month"> Last Month</label>
-                        </div>
-                    </div>
-                    
-                    <!-- Category Options -->
-                    <div class="option_content" id="category-content">
-                        <div class="radio_group">
-                            <label><input type="radio" name="category" value="all"> All</label>
-                            <label><input type="radio" name="category" value="travel"> Travel</label>
-                            <label><input type="radio" name="category" value="food"> Food</label>
-                            <label><input type="radio" name="category" value="entertainment"> Entertainment</label>
-                            <label><input type="radio" name="category" value="utilities"> Utilities</label>
-                        </div>
-                    </div>
-                    
-                    <!-- Name Options -->
-                    <div class="option_content" id="name-content">
-                        <div class="radio_group" id="namesList">
-                            <label><input type="checkbox" name="name" value="all"> All</label>
-                            <label><input type="checkbox" name="name" value="rahiq"> Rahiq</label>
-                            <label><input type="checkbox" name="name" value="john"> John</label>
-                            <label><input type="checkbox" name="name" value="sarah"> Sarah</label>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Mode Options -->
-                    <div class="option_content" id="payment-mode-content">
-                        <div class="radio_group">
-                            <label><input type="radio" name="payment-mode" value="all"> All</label>
-                            <label><input type="radio" name="payment-mode" value="online"> Online</label>
-                            <label><input type="radio" name="payment-mode" value="cash"> Cash</label>
-                            <label><input type="radio" name="payment-mode" value="card"> Card</label>
-                        </div>
-                    </div>
-                    
-                    <button class="apply_button" id="applyFilter">Apply</button>
-                </div>
+            <div class="filter_menu">
+            <strong>Filter by</strong>
+            <div class="filter-bar">
+                <select id="filter-entry">
+                  <option value="Entry">Entry</option>
+                  <option value="all">All</option>
+                  <option value="cashin">Cash In</option>
+                  <option value="cashout">Cash Out</option>
+                </select>
+
+                <!-- <select id="filter-date">
+                  <option>Month</option>
+                  <option value="this-month">This Month</option>
+                  <option value="last-month">Last Month</option>
+                  <option value="this-week">This Week</option>
+                  <option value="yesterday">Yesterday</option>
+                </select> -->
+
+                <select id="filter-category">
+                  <option>Category</option>
+                  <option value="travel">Travel</option>
+                  <option value="food">Food</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="utilities">Utilities</option>
+                </select>
+              
+                <select id="filter-name">
+                  <option value="name">Name</option>
+                  <option value="rahiq">Rahiq</option>
+                  <option value="sarah">Sarah</option>
+                  <option value="john">John</option>
+                  <option value="joe">Joe</option>
+                </select>
+                
+                <select id="filter-payment">
+                    <option>Payment</option>
+                    <option value="cash">Cash</option>
+                    <option value="online">Online</option>
+                    <option value="card">Card</option>
+                </select>
+              
+                
+                <button id="clearFilters" class="clear_button" style="margin-top: 10px;">Clear Filters</button>
+              </div>
             </div>
 
             <div class="net_total">
@@ -330,22 +410,22 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; margin-top: 12px;">
+            <div class="total_entries">
                 <hr style="width: 100%;">
                 <p style="color: #4D4D4D;">Showing 48 entries</p>
                 <hr style="width: 100%;">
             </div>
 
-            <div id="entriesContainer">
-                <p style="font-weight: bold; color: #4D4D4D;">03 May 2025</p>
-                <div class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online">
+            <div class="entriesContainer">
+                <p class="entry_date">03 May 2025</p>
+                <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Rahiq</h5>
                         <h5 style="color: #1B971F; font-weight: bold;">100</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category">Travel</p>
+                            <p class="category travel">Travel</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 100</p>
                     </div>
@@ -357,16 +437,15 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
                     </div>
-                </div>
-                
-                <div class="net_total_box entry" data-name="john" data-category="food" data-payment="cash">
+                </a>                
+                <a href="" class="net_total_box entry" data-name="joe" data-category="food" data-payment="cash" data-entryType="cashout">
                     <div class="flex_space_between">
-                        <h5 style="font-weight: bold;">John</h5>
+                        <h5 style="font-weight: bold;">Joe</h5>
                         <h5 style="color: #EB5132; font-weight: bold;">75</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category" style="background-color: #FFD6A5; color: #FF9500; border-color: #FF9500;">Food</p>
+                            <p class="category food">Food</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 175</p>
                     </div>
@@ -377,16 +456,16 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
                     </div>
-                </div>
+                </a>
                 
-                <div class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card">
+                <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Sarah</h5>
                         <h5 style="color: #1B971F; font-weight: bold;">50</h5>
                     </div>
                     <div class="flex_space_between">
                         <div>
-                            <p class="category" style="background-color: #D4E5FF; color: #2D7FF9; border-color: #2D7FF9;">Utilities</p>
+                            <p class="category utilities">Utilities</p>
                         </div>
                         <p style="color: #4D4D4D;">Balance : 225</p>
                     </div>
@@ -397,8 +476,73 @@
                     <div>
                         <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
                     </div>
-                </div>
+                </a>
             </div>
+            <div class="entriesContainer">
+            <p class="entry_date">03 May 2025</p>
+            <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">Rahiq</h5>
+                    <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div>
+                        <p class="category travel">Travel</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 100</p>
+                </div>
+                <div class="flex_space_between">
+                <p><i>📎</i>2 attachments</p>
+                <p style="color: #4D4D4D;">Payment : Online</p>
+            </div>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                </div>
+            </a>
+            
+            <a href="" class="net_total_box entry" data-name="john" data-category="food travel" data-payment="cash" data-entryType="cashout">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">John</h5>
+                    <h5 style="color: #EB5132; font-weight: bold;">75</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div class="category_container">
+                        <p class="category food">Food</p>
+                        <p class="category travel">Travel</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 175</p>
+                </div>
+                <div class="flex_space_between">
+                    <p>Weekly food expense for team lunch.</p>
+                    <p style="color: #4D4D4D;">Payment : Cash</p>
+                </div>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
+                </div>
+            </a>
+            
+            <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
+                <div class="flex_space_between">
+                    <h5 style="font-weight: bold;">Sarah</h5>
+                    <h5 style="color: #1B971F; font-weight: bold;">50</h5>
+                </div>
+                <div class="flex_space_between">
+                    <div>
+                        <p class="category utilities">Utilities</p>
+                    </div>
+                    <p style="color: #4D4D4D;">Balance : 225</p>
+                </div>
+                <div class="flex_space_between">
+                    <p>Monthly office utility payment processed.</p>
+                    <p style="color: #4D4D4D;">Payment : Card</p>
+                </div>
+                <div>
+                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
+                </div>
+            </a>
+        </div>
+
 
             <div class="cash_in_cash_out_div">
                 <a href="#" class="cash_in_btn">CASH IN</a>
@@ -409,137 +553,127 @@
     {% block common_js %} 
     {% include "common_js.html" %} 
     {% endblock common_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterButton = document.getElementById('filterButton');
-        const filterMenu = document.getElementById('filterMenu');
-        const applyFilter = document.getElementById('applyFilter');
-        const filterOptions = document.querySelectorAll('.filter_option');
-        const optionContents = document.querySelectorAll('.option_content');
-        const entries = document.querySelectorAll('.entry');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const entries = document.querySelectorAll('.entry');
+            const entryType = document.getElementById('filter-entry');
+            // const dateSelect = document.getElementById('filter-date');
+            const categorySelect = document.getElementById('filter-category');
+            const nameInput = document.getElementById('filter-name');
+            const paymentSelect = document.getElementById('filter-payment');
+            const clearButton = document.getElementById('clearFilters');
 
-        // Toggle filter menu
-        filterButton.addEventListener('click', function() {
-            filterMenu.classList.toggle('open');
-            filterMenu.classList.toggle('show');
+            function filterEntries() {
+                const entree = entryType.value;
+                const category = categorySelect.value;
+                const name = nameInput.value.trim().toLowerCase();
+                const payment = paymentSelect.value;
+
+                const containers = document.querySelectorAll('.entriesContainer');
+
+                containers.forEach(container => {
+                    const entries = container.querySelectorAll('.entry');
+                    let anyVisible = false;
+
+                    entries.forEach(entry => {
+                        const entryType = entry.dataset.entrytype?.toLowerCase();
+                        const entryCategory = entry.dataset.category?.toLowerCase();
+                        const entryName = entry.dataset.name?.toLowerCase();
+                        const entryPayment = entry.dataset.payment?.toLowerCase();
+
+                        let show = true;
+
+                        if (name !== 'name' && name && !entryName.includes(name)) show = false;
+                        if ((entree !== "Entry" && entree !== "all") && entryType !== entree.toLowerCase()) show = false;
+                        if (category !== "Category" && !entryCategory.split(" ").includes(category.toLowerCase())) show = false;
+                        if (payment !== "Payment" && entryPayment !== payment.toLowerCase()) show = false;
+
+                        entry.style.display = show ? 'block' : 'none';
+                        if (show) anyVisible = true;
+                    });
+
+                    container.style.display = anyVisible ? 'block' : 'none';
+                });
+                updateTotalEntriesVisibility();
+
+            }
+
+            // Trigger filtering on change/input
+            nameInput.addEventListener('input', filterEntries);
+            categorySelect.addEventListener('change', filterEntries);
+            paymentSelect.addEventListener('change', filterEntries);
+            // dateSelect.addEventListener('change', filterEntries);
+            entryType.addEventListener('change', filterEntries);
+
+            // Clear filters
+            clearButton.addEventListener('click', function () {
+                nameInput.value = 'name';
+                categorySelect.selectedIndex = 0;
+                paymentSelect.selectedIndex = 0;
+                // dateSelect.selectedIndex = 0;
+                entryType.selectedIndex = 0;
+                entries.forEach(entry => entry.style.display = 'block');
+            });
         });
 
-        // Apply filter button
-        applyFilter.addEventListener('click', function() {
-            filterMenu.classList.remove('open');
+        const filterBtn = document.getElementById('filterButton');
+        const filterMenu = document.querySelector('.filter_menu');
+
+        filterBtn.addEventListener('click', () => {
+            const isVisible = filterMenu.classList.contains('show');
+            
+            if (isVisible) {
             filterMenu.classList.remove('show');
-            // Here you would add your filter logic
-            // For demo, we'll just close the menu
-        });
-
-        // Switch between filter options
-        filterOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                // Remove active class from all options
-                filterOptions.forEach(opt => opt.classList.remove('active'));
-                // Add active class to clicked option
-                this.classList.add('active');
-                
-                // Show corresponding content
-                const optionId = this.getAttribute('data-option');
-                optionContents.forEach(content => content.classList.remove('active'));
-                document.getElementById(`${optionId}-content`).classList.add('active');
-            });
-        });
-
-
-        // Close filter menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!filterMenu.contains(event.target) && event.target !== filterButton) {
-                filterMenu.classList.remove('show');
-                filterMenu.classList.remove('open');
-            }
-        });
-    });
-</script>
-<script>
-        const searchInput = document.querySelector(".search_bar");
-    
-        searchInput.addEventListener("input", function () {
-            const searchTerm = this.value.toLowerCase();
-            const entries = document.querySelectorAll(".net_total_box .entry");
-    
-            entries.forEach(entry => {
-                const name = entry.getAttribute("data-name").toLowerCase();
-                const category = entry.getAttribute("data-category").toLowerCase();
-                const payment = entry.getAttribute("data-payment").toLowerCase();
-                const textContent = entry.textContent.toLowerCase();
-                if (
-                    name.includes(searchTerm) ||
-                    category.includes(searchTerm) ||
-                    payment.includes(searchTerm) ||
-                    textContent.includes(searchTerm)
-                ) {
-                    entry.style.display = "block";
-                } else {
-                    entry.style.display = "none";
-                }
-            });
-        });
-    </script>
-<script>
-    // Handle filter tab switching
-    document.querySelectorAll('.filter_option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.filter_option').forEach(opt => opt.classList.remove('active'));
-            option.classList.add('active');
-    
-            document.querySelectorAll('.option_content').forEach(content => content.classList.remove('active'));
-            const selectedId = option.dataset.option + '-content';
-            document.getElementById(selectedId).classList.add('active');
-        });
-    });
-    
-    // Handle dynamic name checkbox behavior
-    document.querySelectorAll('input[name="name"]').forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            const allCheckbox = document.querySelector('input[name="name"][value="all"]');
-            const otherCheckboxes = Array.from(document.querySelectorAll('input[name="name"]:not([value="all"])'));
-    
-            if (checkbox.value === 'all') {
-                const checkAll = checkbox.checked;
-                otherCheckboxes.forEach(cb => cb.checked = checkAll);
             } else {
-                const allChecked = otherCheckboxes.every(cb => cb.checked);
-                allCheckbox.checked = allChecked;
+            filterMenu.classList.add('show');
             }
         });
-    });
-    
-    // Apply filter logic
-    document.getElementById('applyFilter').addEventListener('click', () => {
-        const entries = document.querySelectorAll('.entry');
-    
-        const entryType = document.querySelector('input[name="entry-type"]:checked')?.value || 'all';
-        const category = document.querySelector('input[name="category"]:checked')?.value || 'all';
-        let names = Array.from(document.querySelectorAll('input[name="name"]:checked')).map(cb => cb.value);
-        if (names.length === 0 || names.includes('all')) {
-            names = ['rahiq', 'john', 'sarah']; // fallback to all
-        }
-        const payment = document.querySelector('input[name="payment-mode"]:checked')?.value || 'all';
-    
-        entries.forEach(entry => {
-            const entryColor = entry.querySelector('h5:last-child')?.style.color || '';
-            const matchesEntryType = (
-                entryType === 'all' ||
-                (entryType === 'cash-in' && entryColor === 'rgb(27, 151, 31)') ||
-                (entryType === 'cash-out' && entryColor === 'rgb(235, 81, 50)')
-            );
-    
-            const matchesCategory = category === 'all' || entry.dataset.category === category;
-            const matchesName = names.includes(entry.dataset.name);
-            const matchesPayment = payment === 'all' || entry.dataset.payment === payment;
-    
-            const visible = matchesEntryType && matchesCategory && matchesName && matchesPayment;
-            entry.style.display = visible ? 'block' : 'none';
+
+    </script>
+    <script>
+    document.querySelector('.search_bar').addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase().trim();
+        const containers = document.querySelectorAll('.entriesContainer');
+
+        containers.forEach(container => {
+            const entries = container.querySelectorAll('.entry');
+            let anyVisible = false;
+
+            entries.forEach(entry => {
+                const name = entry.dataset.name?.toLowerCase();
+                const category = entry.dataset.category?.toLowerCase();
+                const payment = entry.dataset.payment?.toLowerCase();
+                const entryType = entry.dataset.entrytype?.toLowerCase();
+                const innerText = entry.innerText.toLowerCase();
+
+                const match = name.includes(searchValue) ||
+                            category.includes(searchValue) ||
+                            payment.includes(searchValue) ||
+                            entryType === searchValue ||
+                            innerText.includes(searchValue);
+
+                entry.style.display = match ? 'block' : 'none';
+                if (match) anyVisible = true;
+            });
+
+            container.style.display = anyVisible ? 'block' : 'none';
+            updateTotalEntriesVisibility();
+
         });
     });
-    </script>
-    
+    function updateTotalEntriesVisibility() {
+    const totalBox = document.querySelector('.total_entries');
+    const allEntries = document.querySelectorAll('.entry');
+    const visibleEntries = document.querySelectorAll('.entry:not([style*="display: none"])');
+
+    if (allEntries.length === visibleEntries.length) {
+        totalBox.style.display = 'grid';
+    } else {
+        totalBox.style.display = 'none';
+    }
+}
+
+        </script>
+            
     
 </html>
