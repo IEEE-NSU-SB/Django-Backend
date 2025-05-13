@@ -78,7 +78,7 @@ class Events(models.Model):
         verbose_name="Registered Event"
     
     def __str__(self) -> str:
-        return f'{self.pk} | {self.event_name}'
+        return str(self.pk)
     
     def get_absolute_url(self):
         return reverse("registered_events", kwargs={"event_name": self.event_name})
