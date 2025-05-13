@@ -362,35 +362,35 @@
                     <a href="#" class="back-button">
                         Back</a>
                     <div class="title">Add Cash In Entry</div>
-                    <div class="wallet-balance">Wallet Balance: 100000</div>
+                    <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div>
                 </div>
 
                 <div class="form-container">
-                    <form id="cashEntryForm">
+                    <form method='PUT' id="cashEntryForm">
+                        {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" required>
+                                <input type="number" placeholder="Amount" id="amount" name="entry_amount" required>
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" required>
+                                <input type="datetime-local" id="datetime" name="entry_date_time" required>
                             </div>
                         </div>
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact">
+                                <input type="text" placeholder="Contact" id="contact" name="contact">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
-                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
-                                    required></textarea>
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required></textarea>
                             </div>
                         </div>
 
@@ -398,7 +398,7 @@
                             <div class="file-upload" id="uploadButton">
                                 <i>📎</i> Attach Image or PDF
                             </div>
-                            <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
+                            <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
                                 <div class="preview-item" id="addMoreFiles">+</div>
@@ -417,7 +417,7 @@
                                         <div class="dropdown-item" data-value="Travel">Travel</div>
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" required>
+                                <input type="hidden" id="category" name="entry_categories" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
@@ -657,27 +657,6 @@
             // Open file dialog when clicking the "+" button
             addMoreFiles.addEventListener('click', () => {
                 fileInput.click();
-            });
-
-            // Handle form submission
-            const form = document.getElementById('cashEntryForm');
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                // Check if required fields are filled
-                const amount = document.getElementById('amount').value;
-                const datetime = document.getElementById('datetime').value;
-                const remark = document.getElementById('remark').value;
-                const category = document.getElementById('category').value;
-
-                if (!amount || !datetime || !remark || !category) {
-                    alert('Please fill all required fields!');
-                    return;
-                }
-
-                // In a real app, you would send the form data to a server here
-                alert('Form submitted successfully!');
             });
         </script>
 </body>

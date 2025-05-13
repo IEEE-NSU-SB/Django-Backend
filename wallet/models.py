@@ -16,7 +16,7 @@ class Wallet(models.Model):
         verbose_name = 'Wallet'
 
     def __str__(self) -> str:
-        return str(self.sc_ag.short_form)
+        return str(self.sc_ag)
 
 class WalletEntryCategory(models.Model):
 
