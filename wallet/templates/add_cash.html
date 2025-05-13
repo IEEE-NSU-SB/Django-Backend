@@ -561,17 +561,16 @@
         </div>
 
         <script>
-            // Handle category tag selection
-            const categoryInput = document.getElementById('categoryInput');
+           const categoryInput = document.getElementById('categoryInput');
             const categoryDropdown = document.getElementById('categoryDropdown');
             const selectedTags = document.getElementById('selectedTags');
-            const selectedCategories = []; // Array to store selected categories
+            const hiddenCategoryInput = document.getElementById('category');
+            const selectedCategories = [];
 
-            // Color map for categories
             const categoryColors = {
-                'Sponsor': '#FF9500',  // Blue
-                'Registration': '#FFE082',  // Yellow
-                'NSU_Fund': '#2D7FF9',  // Blue
+                'Sponsor': '#FF9500',
+                'Registration': '#FFE082',
+                'NSU_Fund': '#2D7FF9',
             };
 
             // Toggle dropdown
@@ -579,7 +578,6 @@
                 const isOpen = categoryDropdown.style.display === 'block';
                 categoryDropdown.style.display = isOpen ? 'none' : 'block';
 
-                // Close other open dropdowns if any
                 document.querySelectorAll('.select-dropdownC').forEach(dropdown => {
                     if (dropdown !== categoryDropdown) {
                         dropdown.style.display = 'none';
@@ -589,45 +587,51 @@
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function (e) {
-                if (!categoryInput.contains(e.target)) {
+                if (!categoryInput.contains(e.target) && !categoryDropdown.contains(e.target)) {
                     categoryDropdown.style.display = 'none';
                 }
             });
 
-            // Style dropdown items
-            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
-                const category = item.dataset.value;
+            // Style and setup dropdown items
+            setupDropdownItems();
 
-                if (categoryColors[category]) {
-                    item.style.borderLeft = `4px solid ${categoryColors[category]}`;
-                    item.style.paddingLeft = '11px';
-                }
+            // Function to setup dropdown items
+            function setupDropdownItems() {
+                categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    const category = item.dataset.value;
 
-                item.addEventListener('mouseenter', function () {
-                    this.style.backgroundColor = '#f5f5f5';
-                });
+                    // Only apply once
+                    if (!item.dataset.styled) {
+                        if (categoryColors[category]) {
+                            item.style.borderLeft = `4px solid ${categoryColors[category]}`;
+                            item.style.paddingLeft = '11px';
+                        }
 
-                item.addEventListener('mouseleave', function () {
-                    this.style.backgroundColor = '';
-                });
-            });
+                        item.addEventListener('mouseenter', function () {
+                            this.style.backgroundColor = '#f5f5f5';
+                        });
 
-            // Select category from dropdown
-            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
-                item.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    const category = this.dataset.value;
+                        item.addEventListener('mouseleave', function () {
+                            this.style.backgroundColor = '';
+                        });
 
-                    // Only add if not already selected
-                    if (!selectedCategories.includes(category)) {
-                        selectedCategories.push(category);
-                        createTag(category);
-                        categoryDropdown.style.display = 'none';
-
-                        console.log("Selected categories:", selectedCategories);
+                        item.dataset.styled = true;
                     }
+
+                    item.onclick = function (e) {
+                        e.stopPropagation();
+
+                        if (!selectedCategories.includes(category)) {
+                            selectedCategories.push(category);
+                            updateHiddenInput();
+                            createTag(category);
+                            this.remove(); // Remove selected from dropdown
+                            categoryDropdown.style.display = 'none';
+                            console.log("Selected categories:", selectedCategories);
+                        }
+                    };
                 });
-            });
+            }
 
             // Create category tag
             function createTag(category) {
@@ -636,19 +640,35 @@
                 tag.setAttribute('data-category', category);
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
-                // Remove tag when clicking close button
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
                     e.stopPropagation();
+
                     const index = selectedCategories.indexOf(category);
                     if (index > -1) {
                         selectedCategories.splice(index, 1);
+                        updateHiddenInput();
                     }
+
+                    // Add back to dropdown
+                    const dropdownItem = document.createElement('div');
+                    dropdownItem.className = 'dropdown-item';
+                    dropdownItem.dataset.value = category;
+                    dropdownItem.textContent = category;
+                    categoryDropdown.appendChild(dropdownItem);
+                    setupDropdownItems(); // Reattach handlers to new item
+
                     tag.remove();
                     console.log("Selected categories:", selectedCategories);
                 });
 
                 selectedTags.appendChild(tag);
             }
+
+            // Update hidden input with selected values
+            function updateHiddenInput() {
+                hiddenCategoryInput.value = selectedCategories.join(',');
+            }
+
             // Handle payment mode selection
             const paymentOptions = document.querySelectorAll('.payment-option');
             let selectedPayment = 'Cash'; // Default selected
