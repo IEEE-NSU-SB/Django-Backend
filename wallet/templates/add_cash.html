@@ -19,7 +19,49 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, system-ui, "Helvetica Neue", Arial, sans-serif;
+            /* font-family: -apple-system, system-ui, "Helvetica Neue", Arial, sans-serif; */
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            /* margin-bottom: 5px; */
+            margin-top: 20px;
+        }
+
+        .tooltip-container.right {
+            float: right;
+            margin-right: 0;
+        }
+
+        .image-button:hover+.tooltip-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(10px);
+        }
+
+        .image-button img {
+            width: 40px;
+            /* Adjust as needed */
+            height: auto;
+            /* Maintain aspect ratio */
+            border-radius: 50%;
+            /* Add rounded corners if desired */
+            box-shadow: 2px 2px 5px 0px #80808054;
+        }
+
+        .tooltip-text {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
         }
 
         body {
@@ -39,7 +81,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #f2f2f2;
+
+            /* background-color: #f2f2f2; */
         }
 
         .back-button {
@@ -50,11 +93,15 @@
         }
 
         .title {
-            color: #33b679;
+            margin-top: 45px;
+            padding-top: 20px;
             text-align: center;
-            font-size: 18px;
+            font-size: 1.75rem;
             font-weight: 500;
             flex-grow: 1;
+
+            color: #31AE70;
+
         }
 
         .wallet-balance {
@@ -299,19 +346,18 @@
         }
 
         .save-button {
-            background-color: #4CAF50;
+            background-color: #31AE70;
             color: white;
             width: auto;
-            min-width: 200px;
-            padding: 14px 40px;
-            border: none;
-            border-radius: 6px;
+            min-width: 300px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            text-transform: uppercase;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
         }
 
         .save-button:hover {
@@ -332,6 +378,59 @@
         .default-note {
             font-size: 12px;
             color: #ff5722;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                padding: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 20px;
+            }
+
+            .payment-options {
+                flex-wrap: wrap;
+            }
+
+            .payment-option {
+                flex: 1;
+                min-width: 80px;
+            }
+
+            .file-upload {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+                border-radius: 0;
+            }
+
+            .payment-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .payment-option {
+                width: 100%;
+            }
+
+            .save-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -358,11 +457,17 @@
         <!-- ############ PAGE START-->
         <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
             <div class="container">
+                <div class="title">Add Cash In Entry</div>
+                <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div>
                 <div class="header">
-                    <a href="#" class="back-button">
-                        Back</a>
-                    <div class="title">Add Cash In Entry</div>
-                    <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div>
+                    <div class="tooltip-container">
+                        <a href="#" class="image-button">
+                            <img src="/static/back-arrow.png" alt="Go back to session">
+                        </a>
+                        <span class="tooltip-text">Go back</span>
+                    </div>
+
+
                 </div>
 
                 <div class="form-container">
@@ -454,15 +559,12 @@
         </div>
 
         <script>
-            // Handle category tag selection
-            // Handle custom category dropdown
-            const categoryInput = document.getElementById('categoryInput');
+           const categoryInput = document.getElementById('categoryInput');
             const categoryDropdown = document.getElementById('categoryDropdown');
-            const hiddenCategoryInput = document.getElementById('category');
             const selectedTags = document.getElementById('selectedTags');
-            const selectedCategories = new Set();
+            const hiddenCategoryInput = document.getElementById('category');
+            const selectedCategories = [];
 
-            // Color map for categories
             const categoryColors = {
                 {% for category in categories %}
                 '{{category.name}}': '{{category.colour}}',
@@ -474,7 +576,6 @@
                 const isOpen = categoryDropdown.style.display === 'block';
                 categoryDropdown.style.display = isOpen ? 'none' : 'block';
 
-                // Close other open dropdowns if any
                 document.querySelectorAll('.select-dropdownC').forEach(dropdown => {
                     if (dropdown !== categoryDropdown) {
                         dropdown.style.display = 'none';
@@ -484,74 +585,86 @@
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function (e) {
-                if (!categoryInput.contains(e.target)) {
+                if (!categoryInput.contains(e.target) && !categoryDropdown.contains(e.target)) {
                     categoryDropdown.style.display = 'none';
                 }
             });
 
-            // Add a hover effect to dropdown items
-            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
-                const category = item.dataset.value;
+            // Style and setup dropdown items
+            setupDropdownItems();
 
-                // Add a color indicator to each dropdown item
-                if (categoryColors[category]) {
-                    item.style.borderLeft = `4px solid ${categoryColors[category]}`;
-                    item.style.paddingLeft = '11px'; // Compensate for the border
-                }
+            // Function to setup dropdown items
+            function setupDropdownItems() {
+                categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    const category = item.dataset.value;
 
-                item.addEventListener('mouseenter', function () {
-                    this.style.backgroundColor = '#f5f5f5';
-                });
+                    // Only apply once
+                    if (!item.dataset.styled) {
+                        if (categoryColors[category]) {
+                            item.style.borderLeft = `4px solid ${categoryColors[category]}`;
+                            item.style.paddingLeft = '11px';
+                        }
 
-                item.addEventListener('mouseleave', function () {
-                    this.style.backgroundColor = '';
-                });
-            });
+                        item.addEventListener('mouseenter', function () {
+                            this.style.backgroundColor = '#f5f5f5';
+                        });
 
-            // Select category from dropdown
-            categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
-                item.addEventListener('click', function (e) {
-                    e.stopPropagation(); // Prevent closing the dropdown
+                        item.addEventListener('mouseleave', function () {
+                            this.style.backgroundColor = '';
+                        });
 
-                    const category = this.dataset.value;
-
-                    // Only add if not already selected
-                    if (!selectedCategories.has(category)) {
-                        selectedCategories.add(category);
-                        createTag(category);
-                        updateCategoryInput();
-
-                        // Close the dropdown after selecting a tag
-                        categoryDropdown.style.display = 'none';
+                        item.dataset.styled = true;
                     }
+
+                    item.onclick = function (e) {
+                        e.stopPropagation();
+
+                        if (!selectedCategories.includes(category)) {
+                            selectedCategories.push(category);
+                            updateHiddenInput();
+                            createTag(category);
+                            this.remove(); // Remove selected from dropdown
+                            categoryDropdown.style.display = 'none';
+                            console.log("Selected categories:", selectedCategories);
+                        }
+                    };
                 });
-            });
+            }
 
             // Create category tag
             function createTag(category) {
                 const tag = document.createElement('div');
                 tag.className = 'tag';
                 tag.setAttribute('data-category', category);
-
-                // Color is now set via CSS based on data-category attribute
-
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
-                // Remove tag when clicking close button
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
                     e.stopPropagation();
-                    selectedCategories.delete(category);
+
+                    const index = selectedCategories.indexOf(category);
+                    if (index > -1) {
+                        selectedCategories.splice(index, 1);
+                        updateHiddenInput();
+                    }
+
+                    // Add back to dropdown
+                    const dropdownItem = document.createElement('div');
+                    dropdownItem.className = 'dropdown-item';
+                    dropdownItem.dataset.value = category;
+                    dropdownItem.textContent = category;
+                    categoryDropdown.appendChild(dropdownItem);
+                    setupDropdownItems(); // Reattach handlers to new item
+
                     tag.remove();
-                    updateCategoryInput();
+                    console.log("Selected categories:", selectedCategories);
                 });
 
                 selectedTags.appendChild(tag);
             }
 
-            // Update hidden input with selected categories
-            function updateCategoryInput() {
-                hiddenCategoryInput.value = Array.from(selectedCategories).join(', ');
-
+            // Update hidden input with selected values
+            function updateHiddenInput() {
+                hiddenCategoryInput.value = selectedCategories.join(',');
             }
 
             // Handle payment mode selection
@@ -574,7 +687,6 @@
                 });
             });
 
-            // Handle file input
             // Handle file input
             const fileInput = document.getElementById('fileInput');
             const uploadButton = document.getElementById('uploadButton');
@@ -629,6 +741,38 @@
                         img.style.height = '100%';
                         img.style.objectFit = 'cover';
                         previewItem.appendChild(img);
+
+                        // Add click event to preview image in larger view
+                        previewItem.addEventListener('click', function () {
+                            // Create modal for image preview
+                            const modal = document.createElement('div');
+                            modal.style.position = 'fixed';
+                            modal.style.top = '0';
+                            modal.style.left = '0';
+                            modal.style.width = '100%';
+                            modal.style.height = '100%';
+                            modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                            modal.style.display = 'flex';
+                            modal.style.alignItems = 'center';
+                            modal.style.justifyContent = 'center';
+                            modal.style.zIndex = '1000';
+                            modal.style.cursor = 'pointer';
+
+                            // Create image in modal
+                            const modalImg = document.createElement('img');
+                            modalImg.src = e.target.result;
+                            modalImg.style.maxWidth = '90%';
+                            modalImg.style.maxHeight = '90%';
+                            modalImg.style.objectFit = 'contain';
+
+                            // Close modal on click
+                            modal.addEventListener('click', function () {
+                                document.body.removeChild(modal);
+                            });
+
+                            modal.appendChild(modalImg);
+                            document.body.appendChild(modal);
+                        });
                     } else if (file.type === 'application/pdf') {
                         // Create PDF icon/label without overwriting the close button
                         const pdfLabel = document.createElement('span');
@@ -638,6 +782,19 @@
                         previewItem.style.alignItems = 'center';
                         previewItem.style.justifyContent = 'center';
                         previewItem.appendChild(pdfLabel);
+
+                        // Add click event to download PDF
+                        previewItem.addEventListener('click', function () {
+                            // Create a download link
+                            const downloadLink = document.createElement('a');
+                            downloadLink.href = URL.createObjectURL(file);
+                            downloadLink.download = file.name;
+
+                            // Trigger download
+                            document.body.appendChild(downloadLink);
+                            downloadLink.click();
+                            document.body.removeChild(downloadLink);
+                        });
                     }
 
                     // Insert the new preview before the "+" button
