@@ -229,23 +229,19 @@
 
         /* Specific category tag colors */
         .tag[data-category="Sponsor"] {
-            background-color: #FFD6A5;
-            color: #FF9500;
-            border-color: #FF9500;
+            background-color: #7986CB;
             /* Blue */
         }
 
         .tag[data-category="Registration"] {
-            background-color: #FFFACD;
-            color: #FFA500;
-
+            background-color: #FFD54F;
+            /* Yellow */
+            color: #FFFFFF;
             /* Darker text for better contrast on yellow */
         }
 
-        .tag[data-category="NSU_Fund"] {
-            background-color: #D4E5FF;
-            color: #2D7FF9;
-            border-color: #2D7FF9;
+        .tag[data-category="Food"] {
+            background-color: #FF9E80;
             /* Orange */
         }
 
@@ -273,7 +269,7 @@
 
         .payment-option {
             text-align: center;
-            padding: 2px 14px;
+            padding: 2px 8px;
             border-radius: 16px;
             cursor: pointer;
             font-size: 14px;
@@ -417,8 +413,8 @@
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         <div class="dropdown-item" data-value="Sponsor">Sponsor</div>
                                         <div class="dropdown-item" data-value="Registration">Registration</div>
-                                        <div class="dropdown-item" data-value="NSU_Fund">NSU Fund</div>
-
+                                        <div class="dropdown-item" data-value="Food">Food</div>
+                                        <div class="dropdown-item" data-value="Travel">Travel</div>
                                     </div>
                                 </div>
                                 <input type="hidden" id="category" required>
@@ -467,10 +463,10 @@
 
             // Color map for categories
             const categoryColors = {
-                'Sponsor': '#FF9500',  // Blue
-                'Registration': '#FFE082',  // Yellow
-                'NSU_Fund': '#2D7FF9',  // Blue
-
+                'Sponsor': '#506CC0',  // Blue
+                'Registration': '#D2C557',  // Yellow
+                'Food': '#D9994F',  // Orange
+                'Travel': '#FFE082'  // Light Yellow
             };
 
             // Toggle dropdown
@@ -555,7 +551,12 @@
             // Update hidden input with selected categories
             function updateCategoryInput() {
                 hiddenCategoryInput.value = Array.from(selectedCategories).join(', ');
-
+                // If there are categories, clear the placeholder
+                if (selectedCategories.size > 0) {
+                    categoryInput.placeholder = '';
+                } else {
+                    categoryInput.placeholder = 'Select categories...';
+                }
             }
 
             // Handle payment mode selection
@@ -575,7 +576,6 @@
                 });
             });
 
-            // Handle file input
             // Handle file input
             const fileInput = document.getElementById('fileInput');
             const uploadButton = document.getElementById('uploadButton');
@@ -631,14 +631,12 @@
                         img.style.objectFit = 'cover';
                         previewItem.appendChild(img);
                     } else if (file.type === 'application/pdf') {
-                        // Create PDF icon/label without overwriting the close button
-                        const pdfLabel = document.createElement('span');
-                        pdfLabel.textContent = 'PDF';
-                        pdfLabel.style.fontSize = '12px';
+                        // Create PDF icon
+                        previewItem.textContent = 'PDF';
+                        previewItem.style.fontSize = '12px';
                         previewItem.style.display = 'flex';
                         previewItem.style.alignItems = 'center';
                         previewItem.style.justifyContent = 'center';
-                        previewItem.appendChild(pdfLabel);
                     }
 
                     // Insert the new preview before the "+" button
@@ -660,6 +658,7 @@
             addMoreFiles.addEventListener('click', () => {
                 fileInput.click();
             });
+
             // Handle form submission
             const form = document.getElementById('cashEntryForm');
 
