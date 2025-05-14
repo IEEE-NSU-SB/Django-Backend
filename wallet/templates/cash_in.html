@@ -271,25 +271,25 @@
             font-size: 14px;
             color: white;
             margin-right: 8px;
-            background-color: #7986CB;
+    
         }
 
         /* Specific category tag colors */
-        .tag[data-category="Sponsor"] {
+        .Sponsor{
             background-color: #FFD6A5;
             color: #FF9500;
             border-color: #FF9500;
             /* Blue */
         }
 
-        .tag[data-category="Registration"] {
+        .Food{
             background-color: #FFFACD;
             color: #FFA500;
 
             /* Darker text for better contrast on yellow */
         }
 
-        .tag[data-category="NSU_Fund"] {
+        .Crest{
             background-color: #D4E5FF;
             color: #2D7FF9;
             border-color: #2D7FF9;
@@ -635,14 +635,14 @@
             // Create category tag
             function createTag(category, id) {
                 const tag = document.createElement('div');
-                tag.className = 'tag';
+                tag.className = `tag ${category}`;
                 tag.setAttribute('data-category', category);
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
                     e.stopPropagation();
 
-                    const index = selectedCategories.indexOf(category);
+                const index = selectedCategories.indexOf(id);
                     if (index > -1) {
                         selectedCategories.splice(index, 1);
                         updateHiddenInput();
@@ -650,7 +650,7 @@
 
                     // Add back to dropdown
                     const dropdownItem = document.createElement('div');
-                    dropdownItem.className = 'dropdown-item';
+                    dropdownItem.className = `dropdown-item`;
                     dropdownItem.dataset.value = category;
                     dropdownItem.dataset.id = id;
                     dropdownItem.textContent = category;
