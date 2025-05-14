@@ -8,9 +8,14 @@ from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max
 # Create your views here.      
 
 def entries(request, event_id=None):
-    return render(request, "entries.html")
 
-def cash_in(request):
+    context = {
+        'event_id': event_id,
+    }
+
+    return render(request, "entries.html", context)
+
+def cash_in(request, event_id=None):
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -22,7 +27,7 @@ def cash_in(request):
         payment_mode = request.POST.get('payment_mode')
         entry_files = request.FILES.getlist('entry_files')
 
-        WalletManager.add_wallet_entry(1, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
+        WalletManager.add_wallet_entry(1, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
     categories = WalletEntryCategory.objects.all()
@@ -34,7 +39,7 @@ def cash_in(request):
 
     return render(request, "cash_in.html", context)
 
-def cash_out(request):
+def cash_out(request, event_id=None):
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -46,7 +51,7 @@ def cash_out(request):
         payment_mode = request.POST.get('payment_mode')
         entry_files = request.FILES.getlist('entry_files')
 
-        WalletManager.add_wallet_entry(1, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
+        WalletManager.add_wallet_entry(1, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
     categories = WalletEntryCategory.objects.all()
