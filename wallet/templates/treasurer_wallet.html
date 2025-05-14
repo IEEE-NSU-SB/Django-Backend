@@ -272,8 +272,27 @@
     </style>
 </head>
 <body>
-   
-    
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app" style="background-color: white;">
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            {% block navbar %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% endblock navbar %}
+        </div>
+        <!--navbar content end-->
+
+        <!-- ############ PAGE START -->
+
+
     <div class="container">
         <h1 class="wallet-title">Treasurer's Wallet</h1>
         
