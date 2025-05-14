@@ -5,7 +5,7 @@ from wallet.models import WalletEntry, WalletEntryFile
 
 class WalletManager:
 
-    def add_wallet_entry(primary, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
+    def add_wallet_entry(primary, entry_type, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
         
         sc_ag = Chapters_Society_and_Affinity_Groups.objects.get(primary=primary)
 
@@ -17,6 +17,7 @@ class WalletManager:
                                    contact=contact,
                                    remarks=entry_remark,
                                    payment_mode=payment_mode,
+                                   entry_type=entry_type,
                                    sc_ag=sc_ag,
                                    tenure=Panels.objects.get(panel_of=sc_ag, current=True))
         
