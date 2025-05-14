@@ -271,25 +271,24 @@
             font-size: 14px;
             color: white;
             margin-right: 8px;
-            background-color: #7986CB;
         }
 
         /* Specific category tag colors */
-        .tag[data-category="food"] {
+        .Sponsor{
             background-color: #FFD6A5;
             color: #FF9500;
             border-color: #FF9500;
             /* Blue */
         }
 
-        .tag[data-category="logistics"] {
+        .Food{
             background-color: #FFFACD;
             color: #FFA500;
 
             /* Darker text for better contrast on yellow */
         }
 
-        .tag[data-category="Goodies"] {
+        .Crest{
             background-color: #D4E5FF;
             color: #2D7FF9;
             border-color: #2D7FF9;
@@ -462,6 +461,7 @@
         <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
             <div class="container">
                 <div class="title">Add Cash Out Entry</div>
+                               <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
                 <div class="header">
                     <div class="tooltip-container">
                         <a href="#" class="image-button">
@@ -474,7 +474,8 @@
                 </div>
 
                 <div class="form-container">
-                    <form id="cashEntryForm">
+                    <form method="POST" id="cashEntryForm" enctype='multipart/form-data'>
+                        {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
                                 <input type="number" placeholder="Amount" id="amount" required>
@@ -519,13 +520,12 @@
                                 <div class="custom-selectC">
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
-                                        <div class="dropdown-item" data-value="food">Food</div>
-                                        <div class="dropdown-item" data-value="logistics">Logistics</div>
-                                        <div class="dropdown-item" data-value="Goodies">Goodies</div>
-
+                                        {% for category in categories %}
+                                        <div class="dropdown-item" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
+                                        {% endfor %}
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" required>
+                                <input type="hidden" id="category" name="entry_categories" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
@@ -569,9 +569,9 @@
             const selectedCategories = [];
 
             const categoryColors = {
-                'food': '#FF9500',
-                'logistics': '#FFE082',
-                'Goodies': '#2D7FF9',
+                {% for category in categories %}
+                '{{category.name}}': '{{category.colour}}',
+                {% endfor %}
             };
 
             // Toggle dropdown
@@ -600,6 +600,7 @@
             function setupDropdownItems() {
                 categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
                     const category = item.dataset.value;
+                    const id = item.dataset.id;
 
                     // Only apply once
                     if (!item.dataset.styled) {
@@ -622,10 +623,10 @@
                     item.onclick = function (e) {
                         e.stopPropagation();
 
-                        if (!selectedCategories.includes(category)) {
-                            selectedCategories.push(category);
+                        if (!selectedCategories.includes(id)) {
+                            selectedCategories.push(id);
                             updateHiddenInput();
-                            createTag(category);
+                            createTag(category, id);
                             this.remove(); // Remove selected from dropdown
                             categoryDropdown.style.display = 'none';
                             console.log("Selected categories:", selectedCategories);
@@ -635,16 +636,16 @@
             }
 
             // Create category tag
-            function createTag(category) {
+            function createTag(category, id) {
                 const tag = document.createElement('div');
-                tag.className = 'tag';
+                tag.className = `tag ${category}`;
                 tag.setAttribute('data-category', category);
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
                     e.stopPropagation();
 
-                    const index = selectedCategories.indexOf(category);
+                const index = selectedCategories.indexOf(id);
                     if (index > -1) {
                         selectedCategories.splice(index, 1);
                         updateHiddenInput();
@@ -652,8 +653,9 @@
 
                     // Add back to dropdown
                     const dropdownItem = document.createElement('div');
-                    dropdownItem.className = 'dropdown-item';
+                    dropdownItem.className = `dropdown-item`;
                     dropdownItem.dataset.value = category;
+                    dropdownItem.dataset.id = id;
                     dropdownItem.textContent = category;
                     categoryDropdown.appendChild(dropdownItem);
                     setupDropdownItems(); // Reattach handlers to new item
@@ -667,7 +669,7 @@
 
             // Update hidden input with selected values
             function updateHiddenInput() {
-                hiddenCategoryInput.value = selectedCategories.join(',');
+                hiddenCategoryInput.value = selectedCategories;
             }
 
             // Handle payment mode selection
