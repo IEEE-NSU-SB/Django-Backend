@@ -5,5 +5,6 @@ app_name = 'wallet'
 
 urlpatterns = [   
     path('', views.wallet_homepage, name='wallet_homepage'),
-    path('add_cash/', views.add_cash, name='add_cash')
+    path('entries', views.entries, name='entries'),
+    path('cash_in/', views.cash_in, name='cash_in'),
 ]

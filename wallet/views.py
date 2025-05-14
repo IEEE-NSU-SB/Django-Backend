@@ -6,10 +6,10 @@ from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
 
 # Create your views here.      
 
-def wallet_homepage(request):
-    return render(request, "wallet_page.html")
+def entries(request):
+    return render(request, "entries.html")
 
-def add_cash(request):
+def cash_in(request):
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -31,4 +31,7 @@ def add_cash(request):
         'categories': categories,
     }
 
-    return render(request, "add_cash.html", context)
+    return render(request, "cash_in.html", context)
+
+def wallet_homepage(request):
+    return render(request, "wallet_homepage.html")
