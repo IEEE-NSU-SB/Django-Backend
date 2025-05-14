@@ -18,11 +18,10 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
         }
         
         body {
-            background-color: #f5f5f5;
+            background-color: white;
         }
         
         
@@ -36,8 +35,7 @@
         
         .wallet-title {
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
+            margin: 30px 0;
             font-weight: bold;
         }
         
@@ -51,6 +49,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+            align-items: center;
         }
         
         .search-bar {
@@ -62,11 +61,6 @@
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
-        }
-        
-        .buttons {
-            display: flex;
-            gap: 10px;
         }
         
         .btn {
@@ -84,6 +78,7 @@
         .btn-apply {
             background-color: #6495ED;
             color: white;
+            text-align: r;
         }
         
         .btn-apply:hover {
@@ -91,7 +86,7 @@
         }
         
         .accounts-title {
-            margin: 20px 0 10px;
+            margin: 0px 0 10px;
             font-weight: bold;
         }
         
@@ -99,11 +94,13 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            border-radius: 6px;
+            overflow: hidden;
         }
         
         .accounts-table th, .accounts-table td {
             padding: 10px;
-            text-align: left;
+            text-align: center;
             border-bottom: 1px solid #ddd;
         }
         
@@ -137,8 +134,15 @@
         }
         
         .net-balance {
-            color: green;
             font-weight: bold;
+        }
+
+        .profit{
+            color: green;
+        }
+
+        .loss{
+            color: rgb(224, 20, 20);
         }
         
         .filter-panel {
@@ -223,7 +227,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
+            z-index: 99900;
             justify-content: center;
             align-items: center;
         }
@@ -234,7 +238,7 @@
         
         .modal-content {
             background-color: white;
-            padding: 20px;
+            padding: 16px;
             border-radius: 5px;
             max-width: 500px;
             width: 90%;
@@ -251,7 +255,7 @@
         
         .modal-title {
             font-size: 18px;
-            font-weight: bold;
+            /* font-weight: bold; */
         }
         
         .close-modal {
@@ -268,6 +272,177 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+        }
+        .shadow_box{
+            padding: 16px 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+        .table_box{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            /* padding: 12px 20px; */
+            /* border: 1px solid #e0e0e0; */
+            border-radius: 8px;
+            background: white;
+            max-width: 100%;
+            /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+            position: relative;
+            margin-top: 12px;
+        }
+          
+        .filter-bar select {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            width: 160px;
+        }
+
+        .filter_menu.show {
+            max-height: 500px; /* adjust as needed */
+            opacity: 100%;
+            padding: 20px;
+            margin: 6px 0;
+        }
+        /* Filter Menu Styles */
+        .filter_menu {
+            /* position: absolute; */
+            top: 100%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-height: 0;
+            overflow: auto;
+            transition: max-height .3s ease-in-out;
+            z-index: 100;
+            margin-top: 10px;
+            transition: all .3s ease-in-out;
+            opacity: 0%;
+            flex-direction: column;
+        }
+
+        .clear_button {
+            background-color: #6c7ae0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 20px;
+            cursor: pointer;
+            /* float: right; */
+            margin: 0;
+            position: relative;
+            right: 0;
+            bottom: 5px;
+        }
+        
+        .clear_button:hover {
+            background-color: #5663c7;
+        }
+        .filter{
+            border-radius: 4px;
+            border: 1px solid rgb(76 76 171);
+            color: rgb(76 76 171);
+            background-color: rgb(206, 206, 254);
+            padding: 3px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter:hover{
+            background-color: rgb(76 76 171);
+            color: rgb(206, 206, 254);
+        }
+        .download_btn{
+            border-radius: 4px;
+            border: 1px solid #0cc2aa;
+            color: #0cc2aa;
+            background-color: #c5fcf5;
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .download_btn:hover{
+            background-color: #0cc2aa;
+            color: #c5fcf5;
+        }
+        .create_btn{
+            border-radius: 4px;
+            border: 1px solid rgb(76, 171, 92);
+            color: rgb(76, 171, 92);
+            background-color: rgb(213, 251, 219);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .create_btn:hover{
+            background-color: rgb(76, 171, 92);
+            color: rgb(213, 251, 219);
+        }
+        .cash_in_btn{
+            background-color: #31AE70;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
+        }
+
+        .cash_in_btn:hover{
+            color: #31AE70;
+            background-color: white;
+        }
+
+        .cash_out_btn{
+            background-color: #EB5132;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #EB5132;
+        }
+
+        .cash_out_btn:hover{
+            color: #EB5132;
+            background-color: white;
+        }
+
+        .cash_in_cash_out_div{
+            display: grid;
+            gap: 6px;
+            grid-template-columns: 1fr 1fr;
+            justify-items: stretch;
+            align-items: center;
+            text-align: center;
+            padding: 16px 0;
+        }
+        .buttons{
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
     </style>
 </head>
@@ -294,99 +469,84 @@
 
 
     <div class="container">
-        <h1 class="wallet-title">Treasurer's Wallet</h1>
+        <h2 class="wallet-title">Treasurer's Wallet</h2>
         
-        <div class="wallet-balance">Wallet Balance: 100000</div>
+        <!-- <div class="wallet-balance">Wallet Balance: 100000</div> -->
         
         <div class="actions">
-            <div class="search-bar">
-                <input type="text" placeholder="Search">
+            <div>
+                <input type="text" class="search_bar shadow_box" placeholder="Search">
             </div>
             <div class="buttons">
-                <button class="btn" id="create-account-btn">Create Account</button>
-                <button class="btn" id="download-btn">Download</button>
-                <button class="btn" id="filter-btn">Filter</button>
+                <button class="btn create_btn" id="create-account-btn">Create Book</button>
+                <button class="btn download_btn" id="download-btn">Download</button>
+                <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
             </div>
         </div>
         
-        <div class="filter-panel" id="filter-panel">
-            <div class="filter-header">
-                <span>Filter by</span>
-                <span class="close-filter" id="close-filter">&times;</span>
+        <!-- Filter Menu -->
+            <div class="filter_menu">
+            <strong>Filter by</strong>
+            <div class="filter-bar">
+                <select id="filter-category">
+                  <option>Category</option>
+                  <option value="travel">Travel</option>
+                  <option value="food">Food</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="utilities">Utilities</option>
+                </select>
+
+                <select id="filter-month">
+                  <option>Month</option>
+                  <option value="January">January</option>
+                </select>
+
+                <select id="filter-tenure">
+                  <option>Tenure</option>
+                  <option value="Spring 2025">Spring 2025</option>
+                </select>
+
+                <select id="filter-last-updated">
+                  <option value="latestupdated">Latest Updated</option>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+
+                <select id="filter-balance">
+                  <option value="netbalance">Net Balance</option>
+                  <option value="profit">Profit</option>
+                  <option value="loss">Loss</option>
+                </select>
+
+                <select id="filter-status">
+                    <option>Status</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="complete">Complete</option>
+                </select>
+                
+                <button id="clearFilters" class="clear_button" style="margin-top: 10px;">Clear Filters</button>
+              </div>
             </div>
-            <div class="filter-options">
-                <div class="filter-group">
-                    <label class="filter-label">Category</label>
-                    <select class="filter-select">
-                        <option value="">All</option>
-                        <option value="technical">Technical</option>
-                        <option value="financial">Financial</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Month</label>
-                    <select class="filter-select">
-                        <option value="">All</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Tenure</label>
-                    <select class="filter-select" id="tenure-dropdown">
-                        <option value="">All</option>
-                        <option value="1month">1 Month</option>
-                        <option value="3months">3 Months</option>
-                        <option value="6months">6 Months</option>
-                        <option value="1year">1 Year</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Balance</label>
-                    <select class="filter-select">
-                        <option value="">All</option>
-                        <option value="lt100">Less than 100</option>
-                        <option value="100-500">100 - 500</option>
-                        <option value="gt500">Greater than 500</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Status</label>
-                    <select class="filter-select">
-                        <option value="">All</option>
-                        <option value="complete">Complete</option>
-                        <option value="ongoing">Ongoing</option>
-                        <option value="null">Null</option>
-                    </select>
-                </div>
-                <div class="filter-group" style="display: flex; align-items: flex-end;">
-                    <button class="btn btn-apply">Apply</button>
-                </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h5 class="accounts-title">Your Books</h5>
+            <div>
+                <select id="filter-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
+                  <option value="event">Event View</option>
+                  <option value="nonevent">Non Event View</option>
+                </select>
             </div>
         </div>
         
-        <h3 class="accounts-title">Your Accounts</h3>
-        
-        <table class="accounts-table">
+        <table class="accounts-table table_box" id="event">
             <thead>
                 <tr>
                     <th>SL</th>
                     <th>Event</th>
                     <th>Category</th>
-                    <th>Created on</th>
-                    <th>Last Updated on</th>
-                    <th>Net balance</th>
+                    <th>Created</th>
+                    <th>Last Updated</th>
+                    <th>Balance</th>
                     <th>Download</th>
                     <th>Status</th>
                 </tr>
@@ -394,36 +554,51 @@
             <tbody>
                 <tr>
                     <td>1.</td>
-                    <td>Title</td>
+                    <td><a href="#">Title</a></td>
                     <td>Technical</td>
                     <td>02/05/2025</td>
                     <td>02/06/2025</td>
-                    <td class="net-balance">350</td>
+                    <td class="net-balance profit">+ 350</td>
                     <td class="download-icon">⭳</td>
-                    <td><div class="status-circle" id="status-1"></div></td>
+                    <td><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
                 </tr>
                 <tr>
                     <td>1.</td>
-                    <td>Title</td>
+                    <td><a href="#">Title</a></td>
                     <td>Technical</td>
                     <td>02/05/2025</td>
                     <td>02/06/2025</td>
-                    <td class="net-balance">350</td>
+                    <td class="net-balance loss">- 350</td>
                     <td class="download-icon">⭳</td>
-                    <td><div class="status-circle" id="status-2"></div></td>
+                    <td><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="accounts-table table_box" id="non-event">
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Event</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1.</td>
+                    <td><a href="#">Title</a></td>
+                    <td class="net-balance profit">+ 350</td>
+                </tr>
+                <tr>
+                    <td>1.</td>
+                    <td><a href="#">Title</a></td>
+                    <td class="net-balance loss">- 350</td>
                 </tr>
             </tbody>
         </table>
         
-        <div class="status-dropdown" id="status-dropdown">
-            <div class="status-option" data-status="complete">Complete</div>
-            <div class="status-option" data-status="ongoing">Ongoing</div>
-            <div class="status-option" data-status="null">Null</div>
-        </div>
-        
-        <div class="pagination">
+        <!-- <div class="pagination">
             < 1 of 10 >
-        </div>
+        </div> -->
     </div>
     
     <!-- Download Modal -->
@@ -499,49 +674,39 @@
     <div class="modal" id="create-account-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Create New Account</div>
+                <div class="modal-title">Create Book</div>
                 <span class="close-modal" id="close-create-modal">&times;</span>
             </div>
             <div class="modal-body">
                 <div style="margin-bottom: 15px;">
-                    <label class="filter-label">Title</label>
-                    <input type="text" class="filter-select" placeholder="Enter account title">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label class="filter-label">Category</label>
+                    <h6 style="font-weight: bold;">For event books</h6>
+                    <!-- <label class="filter-label"></label> -->
                     <select class="filter-select">
-                        <option value="">Select category</option>
-                        <option value="technical">Technical</option>
-                        <option value="financial">Financial</option>
-                        <option value="other">Other</option>
-                    </select>
+                        <option value="none">Select Event</option>
+                        <option value="Spac2025">Spac2025</option>
+                        <option value="Spac2024">Spac2024</option>
+                    </select>  
+                    <div style="display: flex; flex-direction: column; margin-top: 6px;">
+                        <button class="btn btn-apply" id="confirm-create">Create</button>
+                    </div>
                 </div>
+                <h6 style="font-weight: bold; margin-top: 36px;">For non event books</h6>
                 <div style="margin-bottom: 15px;">
-                    <label class="filter-label">Initial Balance</label>
-                    <input type="number" class="filter-select" placeholder="Enter initial balance">
+                    <!-- <label class="filter-label">Title</label> -->
+                    <!-- <input type="text" class="filter-select" placeholder="Enter book title"> -->
+                    <div class="cash_in_cash_out_div">
+                        <a href="#" class="cash_in_btn">CASH IN</a>
+                        <a href="#" class="cash_out_btn">CASH OUT</a>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" id="cancel-create">Cancel</button>
-                <button class="btn btn-apply" id="confirm-create">Create</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Filter panel toggle
-        const filterBtn = document.getElementById('filter-btn');
-        const filterPanel = document.getElementById('filter-panel');
-        const closeFilter = document.getElementById('close-filter');
-        
-        filterBtn.addEventListener('click', function() {
-            filterPanel.classList.toggle('active');
-        });
-        
-        closeFilter.addEventListener('click', function() {
-            filterPanel.classList.remove('active');
-        });
-        
         // Status circle dropdown
         const statusCircles = document.querySelectorAll('.status-circle');
         const statusDropdown = document.getElementById('status-dropdown');
@@ -667,6 +832,106 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const entries = document.querySelectorAll('.entry');
+            const entryType = document.getElementById('filter-entry');
+            // const dateSelect = document.getElementById('filter-date');
+            const categorySelect = document.getElementById('filter-category');
+            const nameInput = document.getElementById('filter-name');
+            const paymentSelect = document.getElementById('filter-payment');
+            const clearButton = document.getElementById('clearFilters');
+
+            function filterEntries() {
+                const entree = entryType.value;
+                const category = categorySelect.value;
+                const name = nameInput.value.trim().toLowerCase();
+                const payment = paymentSelect.value;
+
+                const containers = document.querySelectorAll('.entriesContainer');
+
+                containers.forEach(container => {
+                    const entries = container.querySelectorAll('.entry');
+                    let anyVisible = false;
+
+                    entries.forEach(entry => {
+                        const entryType = entry.dataset.entrytype?.toLowerCase();
+                        const entryCategory = entry.dataset.category?.toLowerCase();
+                        const entryName = entry.dataset.name?.toLowerCase();
+                        const entryPayment = entry.dataset.payment?.toLowerCase();
+
+                        let show = true;
+
+                        if (name !== 'name' && name && !entryName.includes(name)) show = false;
+                        if ((entree !== "Entry" && entree !== "all") && entryType !== entree.toLowerCase()) show = false;
+                        if (category !== "Category" && !entryCategory.split(" ").includes(category.toLowerCase())) show = false;
+                        if (payment !== "Payment" && entryPayment !== payment.toLowerCase()) show = false;
+
+                        entry.style.display = show ? 'block' : 'none';
+                        if (show) anyVisible = true;
+                    });
+
+                    container.style.display = anyVisible ? 'block' : 'none';
+                });
+                updateTotalEntriesVisibility();
+
+            }
+
+            // Trigger filtering on change/input
+            nameInput.addEventListener('input', filterEntries);
+            categorySelect.addEventListener('change', filterEntries);
+            paymentSelect.addEventListener('change', filterEntries);
+            // dateSelect.addEventListener('change', filterEntries);
+            entryType.addEventListener('change', filterEntries);
+
+            // Clear filters
+            clearButton.addEventListener('click', function () {
+                nameInput.value = 'name';
+                categorySelect.selectedIndex = 0;
+                paymentSelect.selectedIndex = 0;
+                // dateSelect.selectedIndex = 0;
+                entryType.selectedIndex = 0;
+                entries.forEach(entry => entry.style.display = 'block');
+            });
+        });
+
+        const filterBtn = document.getElementById('filterButton');
+        const filterMenu = document.querySelector('.filter_menu');
+
+        filterBtn.addEventListener('click', () => {
+            const isVisible = filterMenu.classList.contains('show');
+            
+            if (isVisible) {
+            filterMenu.classList.remove('show');
+            } else {
+            filterMenu.classList.add('show');
+            }
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterSelect = document.getElementById("filter-table");
+        const eventTable = document.getElementById("event");
+        const nonEventTable = document.getElementById("non-event");
+
+        // Show event view by default
+        filterSelect.value = "event";
+        eventTable.style.display = "table";
+        nonEventTable.style.display = "none";
+
+        // Handle dropdown change
+        filterSelect.addEventListener("change", function () {
+            if (this.value === "event") {
+                eventTable.style.display = "table";
+                nonEventTable.style.display = "none";
+            } else {
+                eventTable.style.display = "none";
+                nonEventTable.style.display = "table";
+            }
+        });
+    });
+    </script>
+
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
