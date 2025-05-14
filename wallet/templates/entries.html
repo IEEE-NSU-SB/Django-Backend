@@ -250,7 +250,75 @@
       .app-body{
                 margin: 0 15%;
       }
+    .complete_text{
+        margin-right: 8px;
+        font-weight: 600;
+        color: #000000a2;
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 17px;
+        }
 
+        .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #75D481;
+        }
+
+        input:focus + .slider {
+        box-shadow: 0 0 1px #75D481;
+        }
+
+        input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+        }
+
+        .slider.round {
+        border-radius: 34px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        }
+
+        .delete_complete_toggle{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+        }
         @media screen and (max-width: 500px) {
             .image-button img {
                 width: 32px;
@@ -323,7 +391,17 @@
                     </a>
                     <span class="tooltip-text">Go back</span>
                 </div>
-                <!-- <p style="color: #4D4D4D;">Wallet Balance: 100000</p> -->
+                    <div class="delete_complete_toggle">
+                        <div style="display: flex; margin: 0 10px;">
+                            <p class="complete_text">Mark as complete?</p>
+                            <label class="switch">
+                                <input type="checkbox" name="task_completed_toggle_switch">
+                                <span class="slider round"></span>
+                            </label>
+                            
+                        </div>
+                    </div>
+                {% comment %} <p style="color: #4D4D4D;">Wallet Balance: 100000</p> {% endcomment %}
             </div>
             <div class="search_filter">
                 <input class="search_bar net_total_box" type="text" name="" id="" placeholder="Search...">
@@ -674,6 +752,24 @@
 }
 
         </script>
-            
+                <script>
+        //change text if the toggle is active
+
+        let completeText = document.querySelector('.complete_text');
+        let toggle = document.querySelector('.delete_complete_toggle input[name="task_completed_toggle_switch"]');
+
+        toggle.onclick = function(){
+            let active = document.querySelector('.delete_complete_toggle input[name="task_completed_toggle_switch"]:checked');
+    
+            if(active){
+                completeText.innerHTML = 'Completed!';
+                completeText.style.color = '#75D481';
+            }
+            else{
+                completeText.innerHTML = 'Mark as complete?';
+                completeText.style.color = '#000000a2';
+            }
+        };
+    </script>
     
 </html>
