@@ -271,6 +271,7 @@
             font-size: 14px;
             color: white;
             margin-right: 8px;
+    
         }
 
         /* Specific category tag colors */
@@ -325,17 +326,13 @@
             font-size: 14px;
             border: none;
             transition: all 0.2s ease;
+            background-color: #f1f1f1;
+            color: #666;
         }
 
         .payment-option.cash {
             background-color: #98EAC2;
             color: #31AE70;
-        }
-
-        .payment-option.online,
-        .payment-option.card {
-            background-color: #f1f1f1;
-            color: #666;
         }
 
         .payment-option:hover {
@@ -460,8 +457,8 @@
         <!-- ############ PAGE START-->
         <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
             <div class="container">
-                <div class="title">Add Cash Out Entry</div>
-                               <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
+                <div class="title">Add Cash In Entry</div>
+                <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
                 <div class="header">
                     <div class="tooltip-container">
                         <a href="#" class="image-button">
@@ -478,28 +475,27 @@
                         {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" required>
+                                <input type="number" placeholder="Amount" id="amount" name="entry_amount" required>
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" required>
+                                <input type="datetime-local" id="datetime" name="entry_date_time" required>
                             </div>
                         </div>
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact">
+                                <input type="text" placeholder="Contact" id="contact" name="contact">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
-                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
-                                    required></textarea>
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required></textarea>
                             </div>
                         </div>
 
@@ -507,7 +503,7 @@
                             <div class="file-upload" id="uploadButton">
                                 <i>📎</i> Attach Image or PDF
                             </div>
-                            <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
+                            <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
                                 <div class="preview-item" id="addMoreFiles">+</div>
@@ -536,10 +532,11 @@
                         <div class="payment-mode">
                             <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
-                                <div class="payment-option cash" data-payment="Cash">Cash</div>
-                                <div class="payment-option online" data-payment="Online">Online</div>
-                                <div class="payment-option card" data-payment="Card">Card</div>
-                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="Cash">
+                                <div class="payment-option cash" data-payment="CASH">Cash</div>
+                                <div class="payment-option" data-payment="CARD">Card</div>
+                                <div class="payment-option" data-payment="BKASH">Bkash</div>
+                                <div class="payment-option" data-payment="NAGAD">Nagad</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="CASH">
                             </div>
                         </div>
 
@@ -674,7 +671,7 @@
 
             // Handle payment mode selection
             const paymentOptions = document.querySelectorAll('.payment-option');
-            let selectedPayment = 'Cash'; // Default selected
+            let selectedPayment = 'CASH'; // Default selected
             const hiddenInput = document.getElementById('selectedPaymentInput'); // Get hidden input
 
             paymentOptions.forEach(option => {
@@ -820,26 +817,6 @@
             // Open file dialog when clicking the "+" button
             addMoreFiles.addEventListener('click', () => {
                 fileInput.click();
-            });
-            // Handle form submission
-            const form = document.getElementById('cashEntryForm');
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                // Check if required fields are filled
-                const amount = document.getElementById('amount').value;
-                const datetime = document.getElementById('datetime').value;
-                const remark = document.getElementById('remark').value;
-                const category = document.getElementById('category').value;
-
-                if (!amount || !datetime || !remark || !category) {
-                    alert('Please fill all required fields!');
-                    return;
-                }
-
-                // In a real app, you would send the form data to a server here
-                alert('Form submitted successfully!');
             });
         </script>
 </body>
