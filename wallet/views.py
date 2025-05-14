@@ -33,5 +33,8 @@ def cash_in(request):
 
     return render(request, "cash_in.html", context)
 
+def cash_out(request):
+    return render(request, "cash_out.html")
+
 def wallet_homepage(request):
     return render(request, "wallet_homepage.html")

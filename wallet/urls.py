@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.wallet_homepage, name='wallet_homepage'),
     path('entries', views.entries, name='entries'),
     path('cash_in/', views.cash_in, name='cash_in'),
+    path('cash_out/', views.cash_out, name='cash_out'),
 ]
