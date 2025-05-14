@@ -8,7 +8,7 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(WalletEntryCategory)
 class WalletEntryCategoryAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'background_colour', 'text_colour']
 
 @admin.register(WalletEntry)
 class WalletEntryAdmin(admin.ModelAdmin):
