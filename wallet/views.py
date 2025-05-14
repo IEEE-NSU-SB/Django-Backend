@@ -3,10 +3,11 @@ from django.shortcuts import render
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
+from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max
 
 # Create your views here.      
 
-def entries(request):
+def entries(request, event_id=None):
     return render(request, "entries.html")
 
 def cash_in(request):
@@ -61,4 +62,31 @@ def cash_edit(request):
     return render(request, "cash_edit.html")
 
 def wallet_homepage(request):
-    return render(request, "wallet_homepage.html")
+
+    wallet_entries_event = (
+        WalletEntry.objects
+        .filter(entry_event__isnull=False)
+        .values(
+            'entry_event',
+            'entry_event__event_name',
+            #'status',
+        )
+        .annotate(
+            total_amount=Sum(
+                Case(
+                    When(entry_type='CASH_IN', then=F('amount')),
+                    When(entry_type='CASH_OUT', then=-F('amount')),
+                    default=Value(0),
+                    output_field=DecimalField()
+                )
+            ),
+            creation_date_time=Min('creation_date_time'),
+            last_update_date_time=Max('update_date_time'),
+        )
+    )
+
+    context = {
+        'wallet_entries_event':wallet_entries_event
+    }
+
+    return render(request, "wallet_homepage.html", context)
