@@ -623,8 +623,8 @@
 
 
             <div class="cash_in_cash_out_div">
-                <a href="#" class="cash_in_btn">CASH IN</a>
-                <a href="#" class="cash_out_btn">CASH OUT</a>
+                <a href="{% url 'central_branch:wallet:cash_in_event' event_id %}" class="cash_in_btn">CASH IN</a>
+                <a href="{% url 'central_branch:wallet:cash_out_event' event_id %}" class="cash_out_btn">CASH OUT</a>
             </div>
         </div>
 </body>
