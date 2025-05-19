@@ -926,20 +926,26 @@
         const eventTable = document.getElementById("event");
         const nonEventTable = document.getElementById("non-event");
 
-        // Show event view by default
-        filterSelect.value = "event";
-        eventTable.style.display = "table";
-        nonEventTable.style.display = "none";
+        // Check URL parameter
+        const params = new URLSearchParams(window.location.search);
+        const filterType = params.get("filter") || "event";
 
-        // Handle dropdown change
+        // Set dropdown and table display based on filter type
+        filterSelect.value = filterType;
+        if (filterType === "event") {
+            eventTable.style.display = "table";
+            nonEventTable.style.display = "none";
+        } else {
+            eventTable.style.display = "none";
+            nonEventTable.style.display = "table";
+        }
+
+        // On change, update URL and reload
         filterSelect.addEventListener("change", function () {
-            if (this.value === "event") {
-                eventTable.style.display = "table";
-                nonEventTable.style.display = "none";
-            } else {
-                eventTable.style.display = "none";
-                nonEventTable.style.display = "table";
-            }
+            const selected = this.value;
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set("filter", selected);
+            window.location.href = newUrl.toString(); // triggers page reload
         });
     });
     </script>
