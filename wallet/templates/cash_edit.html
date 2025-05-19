@@ -490,31 +490,31 @@
                         </p>
                         <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
                     </div>
-                    <form id="cashEntryForm">
+                    <form id="cashEntryForm" enctype='multipart/form-data'>
+                        {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" value="{{entry.amount}}" required>
+                                <input type="number" placeholder="Amount" id="amount" name="entry_amount" value="{{entry.amount}}" required>
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" required>
+                                <input type="datetime-local" id="datetime" name="entry_date_time" required>
                             </div>
                         </div>
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" value="{{entry.name}}">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name" value="{{entry.name}}">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact" value="{{entry.contact}}">
+                                <input type="text" placeholder="Contact" id="contact" name="contact" value="{{entry.contact}}">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
-                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
-                                    required>{{entry.remarks}}</textarea>
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required>{{entry.remarks}}</textarea>
                             </div>
                         </div>
 
@@ -541,7 +541,7 @@
 
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" required>
+                                <input type="hidden" id="category"  value="{% for category in categories %}{{category.name}},{% endfor %}" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     {% for category in entry.categories.all %}
@@ -841,8 +841,7 @@
             // Handle form submission
             const form = document.getElementById('cashEntryForm');
 
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
+            form.addEventListener('submit', (e) => {                
 
                 // Check if required fields are filled
                 const amount = document.getElementById('amount').value;
@@ -851,12 +850,10 @@
                 const category = document.getElementById('category').value;
 
                 if (!amount || !datetime || !remark || !category) {
+                    e.preventDefault();
                     alert('Please fill all required fields!');
                     return;
                 }
-
-                // In a real app, you would send the form data to a server here
-                alert('Form submitted successfully!');
             });
         </script>
 </body>

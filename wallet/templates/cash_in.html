@@ -271,30 +271,19 @@
             font-size: 14px;
             color: white;
             margin-right: 8px;
-    
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
         }
 
         /* Specific category tag colors */
-        .Sponsor{
-            background-color: #FFD6A5;
-            color: #FF9500;
-            border-color: #FF9500;
-            /* Blue */
+        {% for category in categories %}
+        .tag[data-cat='{{category.name}}']{
+            background-color: {{category.background_colour}};
+            color: {{category.text_colour}};
+            border-color: {{category.text_colour}};
         }
-
-        .Food{
-            background-color: #FFFACD;
-            color: #FFA500;
-
-            /* Darker text for better contrast on yellow */
-        }
-
-        .Crest{
-            background-color: #D4E5FF;
-            color: #2D7FF9;
-            border-color: #2D7FF9;
-            /* Orange */
-        }
+        {% endfor %}
 
         .tag-close {
             margin-left: 5px;

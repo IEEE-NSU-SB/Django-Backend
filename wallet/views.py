@@ -4,6 +4,8 @@ from django.shortcuts import redirect, render
 
 from central_events.models import Events
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
+from port.renderData import PortData
+from users import renderData
 from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
 from users.renderData import LoggedinUser,member_login_permission
@@ -120,6 +122,9 @@ def cash_out(request, event_id=None):
 @member_login_permission
 def cash_edit(request, entry_id):
 
+    if request.method == 'POST':
+        print(request.POST)
+        
     entry = WalletEntry.objects.get(id=entry_id)
 
     context = {
@@ -132,6 +137,10 @@ def cash_edit(request, entry_id):
 @member_login_permission
 def wallet_homepage(request):
 
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+    
     wallet_entries_event = (
         WalletEntry.objects
         .filter(entry_event__isnull=False)
@@ -154,6 +163,8 @@ def wallet_homepage(request):
     )
 
     context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
         'wallet_entries_event':wallet_entries_event
     }
 

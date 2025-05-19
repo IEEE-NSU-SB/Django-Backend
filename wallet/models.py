@@ -55,10 +55,10 @@ class WalletEntry(models.Model):
 
     sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.DO_NOTHING)
     tenure = models.ForeignKey(Panels, null=False, blank=False, on_delete=models.DO_NOTHING)
-    status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
-        ('ONGOING', 'Ongoing'),
-        ('COMPLETED', 'Completed'),
-    ])
+    # status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
+    #     ('ONGOING', 'Ongoing'),
+    #     ('COMPLETED', 'Completed'),
+    # ])
 
     class Meta:
         verbose_name = 'Wallet Entry'
@@ -81,3 +81,17 @@ class WalletEntryFile(models.Model):
     @property
     def filename(self) -> str:
         return os.path.basename(self.document.path)
+    
+class WalletEntryStatus(models.Model):
+
+    wallet_entry = models.ForeignKey(WalletEntry, null=False, blank=False, on_delete=models.CASCADE)
+    status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
+        ('ONGOING', 'Ongoing'),
+        ('COMPLETED', 'Completed'),
+    ])
+
+    class Meta:
+        verbose_name = 'Wallet Entry Status'
+
+    def __str__(self) -> str:
+        return str(self.pk)

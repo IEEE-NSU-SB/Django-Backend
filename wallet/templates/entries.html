@@ -435,9 +435,10 @@
                 
                 <select id="filter-payment">
                     <option>Payment</option>
-                    <option value="cash">Cash</option>
-                    <option value="online">Online</option>
-                    <option value="card">Card</option>
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
+                    <option value="BKASH">Bkash</option>
+                    <option value="NAGAD">Nagad</option>
                 </select>
               
                 
@@ -488,9 +489,9 @@
             <div class="entriesContainer">
                 <p class="entry_date">{{entry_date}}</p>
                 {% for entry in entries %}
-                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="online" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
+                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
                     <div class="flex_space_between">
-                        <h5 style="font-weight: bold;">Rahiq</h5>
+                        <h5 style="font-weight: bold;">{% if entry.0.name %}{{entry.0.name}}{% endif %}</h5>
                         <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>
                     </div>
                     <div class="flex_space_between">
@@ -501,15 +502,13 @@
                         </div>
                         <p style="color: #4D4D4D;">Balance : 100</p>
                     </div>
-                    <div class="flex_space_between">
-                    {% if entry.1 %}
-                    <p><i>📎</i>{{entry.1}} attachments</p>
-                    {% endif %}
-                    <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
-                </div>
+                    <div class="flex_space_between">                  
+                        <p><i>📎</i>{% if entry.1 %}{{entry.1}} attachments{% else %}No attachments{% endif %}</p>                 
+                        <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
+                    </div>
                     <p>{{entry.0.remarks}}</p>
                     <div>
-                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">{{entry.0.creation_date_time|date:"g:i A"}}</span></p>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">{{entry.0.entry_date_time|date:"g:i A"}}</span></p>
                     </div>
                 </a>                
                 {% endfor %}
