@@ -1,5 +1,8 @@
+from collections import defaultdict
+from django.utils.timezone import localtime
 from django.shortcuts import render
 
+from central_events.models import Events
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
@@ -9,8 +12,38 @@ from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max
 
 def entries(request, event_id=None):
 
+    event_name = Events.objects.filter(id=event_id).values_list('event_name', flat=True).first()
+    categories = WalletEntryCategory.objects.all()
+    entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
+
+    total_entries = len(entries)
+
+    wallet_entries = defaultdict(list)
+    cash_in_total = 0
+    cash_out_total = 0
+
+    for entry in entries:
+        entry_date = localtime(entry.entry_date_time).date()
+        file_count = WalletEntryFile.objects.filter(wallet_entry=entry).count()
+        wallet_entries[entry_date].append([entry, file_count])
+        if entry.entry_type == 'CASH_IN':
+            cash_in_total += entry.amount
+        elif entry.entry_type == 'CASH_OUT':
+            cash_out_total += entry.amount
+
+    net_balance = cash_in_total - cash_out_total
+
+    wallet_entries = dict(wallet_entries)
+
     context = {
         'event_id': event_id,
+        'event_name': event_name,
+        'wallet_entries': wallet_entries,
+        'total_entries': total_entries,
+        'cash_in_total': cash_in_total,
+        'cash_out_total': cash_out_total,
+        'net_balance': net_balance,
+        'categories': categories,
     }
 
     return render(request, "entries.html", context)
@@ -63,7 +96,7 @@ def cash_out(request, event_id=None):
 
     return render(request, "cash_out.html" , context)
 
-def cash_edit(request):
+def cash_edit(request, entry_id):
     return render(request, "cash_edit.html")
 
 def wallet_homepage(request):

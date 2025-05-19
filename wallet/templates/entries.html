@@ -66,23 +66,14 @@
             padding: 0px 6px;
             border-radius: 3px;
         }
-        .travel{
-            color: #31AE70;
-            background-color: #98EAC2;
-            border: 1px solid #31AE70;
-            padding: 0px 6px;
-            border-radius: 3px;
+        {% for category in categories %}
+        .category[data-cat='{{category.name}}']{
+            background-color: {{category.background_colour}}; 
+            color: {{category.text_colour}}; 
+            border-color: {{category.text_colour}};
         }
-        .food{
-            background-color: #FFD6A5;
-            color: #FF9500; 
-            border-color: #FF9500;
-        }
-        .utilities{
-            background-color: #D4E5FF; 
-            color: #2D7FF9; 
-            border-color: #2D7FF9;
-        }
+        {% endfor %}
+        
         /* Filter Menu Styles */
         .filter_menu {
             /* position: absolute; */
@@ -383,7 +374,7 @@
               style="justify-content: center;"
               id="view"
             >
-            <h3 style="text-align: center; color: #002855; margin-top: 45px;">Book Name</h3>
+            <h3 style="text-align: center; color: #002855; margin-top: 45px;">{{event_name}}</h3>
             <div class="flex_space_between" style="margin-bottom: 16px;">
                 <div class="tooltip-container">
                     <a href="#" class="image-button">
@@ -415,8 +406,8 @@
                 <select id="filter-entry">
                   <option value="Entry">Entry</option>
                   <option value="all">All</option>
-                  <option value="cashin">Cash In</option>
-                  <option value="cashout">Cash Out</option>
+                  <option value="CASH_IN">Cash In</option>
+                  <option value="CASH_OUT">Cash Out</option>
                 </select>
 
                 <!-- <select id="filter-date">
@@ -459,16 +450,16 @@
                 <div class="net_total_box" style="font-weight: bold;">
                     <div class="flex_space_between">
                         <p>Cash In</p>
-                        <p style="color: #EB5132;">275</p>
+                        <p style="color: #1B971F;">{{cash_in_total}}</p>
                     </div>
                     <div class="flex_space_between">
                         <p>Cash Out</p>
-                        <p style="color: #1B971F;">100</p>
+                        <p style="color: #EB5132;">{{cash_out_total}}</p>
                     </div>
                     <hr style="width: 100%;">
                     <div class="flex_space_between">
                         <p>Net Balance</p>
-                        <p>175</p>
+                        <p>{{net_balance}}</p>
                     </div>
                 </div>
                 <div class="net_total_box"  style="font-weight: bold;">
@@ -490,137 +481,41 @@
 
             <div class="total_entries">
                 <hr style="width: 100%;">
-                <p style="color: #4D4D4D;">Showing 48 entries</p>
+                <p style="color: #4D4D4D;">Showing {{total_entries}} entries</p>
                 <hr style="width: 100%;">
             </div>
 
+            {% for entry_date, entries in wallet_entries.items %}
             <div class="entriesContainer">
-                <p class="entry_date">03 May 2025</p>
-                <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
+                <p class="entry_date">{{entry_date}}</p>
+                {% for entry in entries %}
+                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Rahiq</h5>
-                        <h5 style="color: #1B971F; font-weight: bold;">100</h5>
+                        <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>
                     </div>
                     <div class="flex_space_between">
-                        <div>
-                            <p class="category travel">Travel</p>
+                        <div class="category_container">
+                            {% for category in entry.0.categories.all %}
+                            <p class="category" data-cat='{{category.name}}'>{{category.name}}</p>
+                            {% endfor %}
                         </div>
                         <p style="color: #4D4D4D;">Balance : 100</p>
                     </div>
                     <div class="flex_space_between">
-                    <p><i>📎</i>2 attachments</p>
-                    <p style="color: #4D4D4D;">Payment : Online</p>
+                    {% if entry.1 %}
+                    <p><i>📎</i>{{entry.1}} attachments</p>
+                    {% endif %}
+                    <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
                 </div>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <p>{{entry.0.remarks}}</p>
                     <div>
-                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">{{entry.0.creation_date_time|date:"g:i A"}}</span></p>
                     </div>
                 </a>                
-                <a href="" class="net_total_box entry" data-name="joe" data-category="food" data-payment="cash" data-entryType="cashout">
-                    <div class="flex_space_between">
-                        <h5 style="font-weight: bold;">Joe</h5>
-                        <h5 style="color: #EB5132; font-weight: bold;">75</h5>
-                    </div>
-                    <div class="flex_space_between">
-                        <div>
-                            <p class="category food">Food</p>
-                        </div>
-                        <p style="color: #4D4D4D;">Balance : 175</p>
-                    </div>
-                    <div class="flex_space_between">
-                        <p>Weekly food expense for team lunch.</p>
-                        <p style="color: #4D4D4D;">Payment : Cash</p>
-                    </div>
-                    <div>
-                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
-                    </div>
-                </a>
-                
-                <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
-                    <div class="flex_space_between">
-                        <h5 style="font-weight: bold;">Sarah</h5>
-                        <h5 style="color: #1B971F; font-weight: bold;">50</h5>
-                    </div>
-                    <div class="flex_space_between">
-                        <div>
-                            <p class="category utilities">Utilities</p>
-                        </div>
-                        <p style="color: #4D4D4D;">Balance : 225</p>
-                    </div>
-                    <div class="flex_space_between">
-                        <p>Monthly office utility payment processed.</p>
-                        <p style="color: #4D4D4D;">Payment : Card</p>
-                    </div>
-                    <div>
-                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
-                    </div>
-                </a>
+                {% endfor %}
             </div>
-            <div class="entriesContainer">
-            <p class="entry_date">03 May 2025</p>
-            <a href="" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="cashin" data-date="05-05-2025">
-                <div class="flex_space_between">
-                    <h5 style="font-weight: bold;">Rahiq</h5>
-                    <h5 style="color: #1B971F; font-weight: bold;">100</h5>
-                </div>
-                <div class="flex_space_between">
-                    <div>
-                        <p class="category travel">Travel</p>
-                    </div>
-                    <p style="color: #4D4D4D;">Balance : 100</p>
-                </div>
-                <div class="flex_space_between">
-                <p><i>📎</i>2 attachments</p>
-                <p style="color: #4D4D4D;">Payment : Online</p>
-            </div>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                <div>
-                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">1:03PM</span></p>
-                </div>
-            </a>
-            
-            <a href="" class="net_total_box entry" data-name="john" data-category="food travel" data-payment="cash" data-entryType="cashout">
-                <div class="flex_space_between">
-                    <h5 style="font-weight: bold;">John</h5>
-                    <h5 style="color: #EB5132; font-weight: bold;">75</h5>
-                </div>
-                <div class="flex_space_between">
-                    <div class="category_container">
-                        <p class="category food">Food</p>
-                        <p class="category travel">Travel</p>
-                    </div>
-                    <p style="color: #4D4D4D;">Balance : 175</p>
-                </div>
-                <div class="flex_space_between">
-                    <p>Weekly food expense for team lunch.</p>
-                    <p style="color: #4D4D4D;">Payment : Cash</p>
-                </div>
-                <div>
-                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">2:15PM</span></p>
-                </div>
-            </a>
-            
-            <a href="" class="net_total_box entry" data-name="sarah" data-category="utilities" data-payment="card" data-entryType="cashin">
-                <div class="flex_space_between">
-                    <h5 style="font-weight: bold;">Sarah</h5>
-                    <h5 style="color: #1B971F; font-weight: bold;">50</h5>
-                </div>
-                <div class="flex_space_between">
-                    <div>
-                        <p class="category utilities">Utilities</p>
-                    </div>
-                    <p style="color: #4D4D4D;">Balance : 225</p>
-                </div>
-                <div class="flex_space_between">
-                    <p>Monthly office utility payment processed.</p>
-                    <p style="color: #4D4D4D;">Payment : Card</p>
-                </div>
-                <div>
-                    <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">4:30PM</span></p>
-                </div>
-            </a>
-        </div>
-
+            {% endfor %}
 
             <div class="cash_in_cash_out_div">
                 <a href="{% url 'central_branch:wallet:cash_in_event' event_id %}" class="cash_in_btn">CASH IN</a>

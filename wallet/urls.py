@@ -11,5 +11,5 @@ urlpatterns = [
     path('cash_in/<int:event_id>/', views.cash_in, name='cash_in_event'),
     path('cash_out/', views.cash_out, name='cash_out'),
     path('cash_out/<int:event_id>/', views.cash_out, name='cash_out_event'),
-    path('cash_edit/', views.cash_edit, name='cash_edit'),
+    path('cash_edit/<int:entry_id>/', views.cash_edit, name='cash_edit'),
 ]
