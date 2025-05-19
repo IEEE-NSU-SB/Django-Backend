@@ -473,7 +473,7 @@
                 <div class="title">Edit Entry</div>
                 <div class="header">
                     <div class="tooltip-container">
-                        <a href="#" class="image-button">
+                        <a href="{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
@@ -486,14 +486,14 @@
                 <div class="form-container">
                     <div class="entry_details">
                         <p class="last_updated">
-                            Last updated at 05/05/2025 4:30PM
+                            Last updated at {{entry.update_date_time}}
                         </p>
-                        <p class="entry_created">Entry created at 05/05/2025 1:00PM</p>
+                        <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
                     </div>
                     <form id="cashEntryForm">
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" required>
+                                <input type="number" placeholder="Amount" id="amount" value="{{entry.amount}}" required>
                             </div>
 
                             <div class="input-container">
@@ -503,18 +503,18 @@
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" value="{{entry.name}}">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact">
+                                <input type="text" placeholder="Contact" id="contact" value="{{entry.contact}}">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
                                 <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
-                                    required></textarea>
+                                    required>{{entry.remarks}}</textarea>
                             </div>
                         </div>
 
@@ -544,6 +544,9 @@
                                 <input type="hidden" id="category" required>
 
                                 <div class="selected-tags" id="selectedTags">
+                                    {% for category in entry.categories.all %}
+                                    <div class="tag" data-category="{{category.name}}">{{category.name}} <span class="tag-close">×</span></div>
+                                    {% endfor %}
                                     <!-- Selected tags will appear here -->
                                 </div>
                             </div>

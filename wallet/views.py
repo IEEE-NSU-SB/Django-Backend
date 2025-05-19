@@ -1,16 +1,20 @@
 from collections import defaultdict
 from django.utils.timezone import localtime
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from central_events.models import Events
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
+from users.renderData import LoggedinUser,member_login_permission
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max
 
 # Create your views here.      
 
-def entries(request, event_id=None):
+@login_required
+@member_login_permission
+def entries(request, event_id):
 
     event_name = Events.objects.filter(id=event_id).values_list('event_name', flat=True).first()
     categories = WalletEntryCategory.objects.all()
@@ -48,6 +52,8 @@ def entries(request, event_id=None):
 
     return render(request, "entries.html", context)
 
+@login_required
+@member_login_permission
 def cash_in(request, event_id=None):
 
     if request.method == 'POST':
@@ -61,6 +67,11 @@ def cash_in(request, event_id=None):
         entry_files = request.FILES.getlist('entry_files')
 
         WalletManager.add_wallet_entry(1, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+
+        if event_id:
+            return redirect('central_branch:wallet:entries_event', event_id)
+        else:
+            return redirect('central_branch:wallet')
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
     categories = WalletEntryCategory.objects.all()
@@ -68,10 +79,13 @@ def cash_in(request, event_id=None):
     context = {
         'wallet_balance': wallet_balance,
         'categories': categories,
+        'event_id': event_id,
     }
 
     return render(request, "cash_in.html", context)
 
+@login_required
+@member_login_permission
 def cash_out(request, event_id=None):
 
     if request.method == 'POST':
@@ -85,6 +99,11 @@ def cash_out(request, event_id=None):
         entry_files = request.FILES.getlist('entry_files')
 
         WalletManager.add_wallet_entry(1, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+
+        if event_id:
+            return redirect('central_branch:wallet:entries_event', event_id)
+        else:
+            return redirect('central_branch:wallet')
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=1).pk).balance
     categories = WalletEntryCategory.objects.all()
@@ -92,13 +111,25 @@ def cash_out(request, event_id=None):
     context = {
         'wallet_balance': wallet_balance,
         'categories': categories,
+        'event_id': event_id,
     }
 
     return render(request, "cash_out.html" , context)
 
+@login_required
+@member_login_permission
 def cash_edit(request, entry_id):
-    return render(request, "cash_edit.html")
 
+    entry = WalletEntry.objects.get(id=entry_id)
+
+    context = {
+        'entry': entry,
+    }
+
+    return render(request, "cash_edit.html", context)
+
+@login_required
+@member_login_permission
 def wallet_homepage(request):
 
     wallet_entries_event = (
@@ -107,7 +138,6 @@ def wallet_homepage(request):
         .values(
             'entry_event',
             'entry_event__event_name',
-            #'status',
         )
         .annotate(
             total_amount=Sum(

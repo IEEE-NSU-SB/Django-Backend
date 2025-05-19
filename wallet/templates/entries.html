@@ -420,10 +420,9 @@
 
                 <select id="filter-category">
                   <option>Category</option>
-                  <option value="travel">Travel</option>
-                  <option value="food">Food</option>
-                  <option value="entertainment">Entertainment</option>
-                  <option value="utilities">Utilities</option>
+                  {% for category in categories %}
+                  <option value="{{category.name}}">{{category.name}}</option>
+                  {% endfor %}
                 </select>
               
                 <select id="filter-name">
@@ -489,7 +488,7 @@
             <div class="entriesContainer">
                 <p class="entry_date">{{entry_date}}</p>
                 {% for entry in entries %}
-                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="travel" data-payment="online" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
+                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="online" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">Rahiq</h5>
                         <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>

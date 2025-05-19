@@ -461,7 +461,7 @@
                 <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
                 <div class="header">
                     <div class="tooltip-container">
-                        <a href="#" class="image-button">
+                        <a href="{% if event_id %}{% url 'central_branch:wallet:entries_event' event_id %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
