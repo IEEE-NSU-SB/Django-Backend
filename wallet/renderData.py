@@ -1,7 +1,7 @@
 
 from central_events.models import Events
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
-from wallet.models import WalletEntry, WalletEntryFile
+from wallet.models import WalletEntry, WalletEntryFile, WalletEntryStatus
 
 
 class WalletManager:
@@ -31,3 +31,5 @@ class WalletManager:
         
         for file in entry_files:
             WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
+
+        WalletEntryStatus.objects.create(wallet_entry=wallet_entry)

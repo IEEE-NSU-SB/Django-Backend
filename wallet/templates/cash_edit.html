@@ -498,7 +498,7 @@
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" name="entry_date_time" required>
+                                <input type="datetime-local" id="datetime" name="entry_date_time" value="{{ entry.entry_date_time|date:"Y-m-d\\TH:i" }}" required>
                             </div>
                         </div>
 
