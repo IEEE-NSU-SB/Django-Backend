@@ -1,16 +1,19 @@
 from collections import defaultdict
+import json
+from django.http import JsonResponse
 from django.utils.timezone import localtime
 from django.shortcuts import redirect, render
+from django.views import View
 
 from central_events.models import Events
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from port.renderData import PortData
 from users import renderData
 from wallet.renderData import WalletManager
-from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile
+from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile, WalletEventStatus
 from users.renderData import LoggedinUser,member_login_permission
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max
+from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef
 
 # Create your views here.      
 
@@ -21,6 +24,7 @@ def entries(request, event_id):
     event_name = Events.objects.filter(id=event_id).values_list('event_name', flat=True).first()
     categories = WalletEntryCategory.objects.all()
     entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
+    wallet_event_status, created = WalletEventStatus.objects.get_or_create(wallet_event_id=event_id)
 
     total_entries = len(entries)
 
@@ -50,6 +54,7 @@ def entries(request, event_id):
         'cash_out_total': cash_out_total,
         'net_balance': net_balance,
         'categories': categories,
+        'wallet_event_status': wallet_event_status,
     }
 
     return render(request, "entries.html", context)
@@ -159,8 +164,10 @@ def wallet_homepage(request):
             ),
             creation_date_time=Min('creation_date_time'),
             last_update_date_time=Max('update_date_time'),
+            status = Subquery(WalletEventStatus.objects.filter(wallet_event=OuterRef('entry_event')).values('status'))
         )
     )
+    print(wallet_entries_event)
 
     context = {
         'all_sc_ag':sc_ag,
@@ -169,3 +176,23 @@ def wallet_homepage(request):
     }
 
     return render(request, "wallet_homepage.html", context)
+
+class WalletEventStatusUpdateAjax(View):
+    
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            event_id = data['event_id']
+            checked = data['completed']
+
+            wallet_event_status, created = WalletEventStatus.objects.get_or_create(wallet_event_id=event_id)
+            if checked == True:
+                wallet_event_status.status = 'COMPLETED'
+            else:
+                wallet_event_status.status = 'ONGOING'
+            
+            wallet_event_status.save()
+
+            return JsonResponse({'message':'success'})
+        except:
+            return JsonResponse({'message':'error'})

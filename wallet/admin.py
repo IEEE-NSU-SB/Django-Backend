@@ -18,6 +18,6 @@ class WalletEntryAdmin(admin.ModelAdmin):
 class WalletEntryFileAdmin(admin.ModelAdmin):
     list_display = ['id', 'wallet_entry', 'document']
 
-@admin.register(WalletEntryStatus)
-class WalletEntryStatusAdmin(admin.ModelAdmin):
-    list_display = ['id', 'wallet_entry', 'status']
+@admin.register(WalletEventStatus)
+class WalletEventStatusAdmin(admin.ModelAdmin):
+    list_display = ['id', 'wallet_event', 'status']

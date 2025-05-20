@@ -11,4 +11,5 @@ urlpatterns = [
     path('entries/cash_out/', views.cash_out, name='cash_out'),
     path('entries/cash_out/<int:event_id>/', views.cash_out, name='cash_out_event'),
     path('entries/cash_edit/<int:entry_id>/', views.cash_edit, name='cash_edit'),
+    path('entries/update_status/', views.WalletEventStatusUpdateAjax.as_view(), name='wallet_event_update_status'),
 ]

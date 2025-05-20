@@ -384,9 +384,13 @@
                 </div>
                     <div class="delete_complete_toggle">
                         <div style="display: flex; margin: 0 10px;">
-                            <p class="complete_text">Mark as complete?</p>
+                            {% if wallet_event_status.status == 'COMPLETED' %}
+                            <p class="complete_text" style="color: #75D481;">Completed!</p>
+                            {% else %}
+                            <p class="complete_text" style="color: #000000a2;">Mark as complete?</p>
+                            {% endif %}
                             <label class="switch">
-                                <input type="checkbox" name="task_completed_toggle_switch">
+                                <input type="checkbox" name="wallet_event_update_status" {% if wallet_event_status.status == 'COMPLETED' %}checked{% endif %}>
                                 <span class="slider round"></span>
                             </label>
                             
@@ -645,24 +649,65 @@
 }
 
         </script>
-                <script>
+        <script>
         //change text if the toggle is active
 
         let completeText = document.querySelector('.complete_text');
-        let toggle = document.querySelector('.delete_complete_toggle input[name="task_completed_toggle_switch"]');
+        let toggle = document.querySelector('.delete_complete_toggle input[name="wallet_event_update_status"]');
 
         toggle.onclick = function(){
-            let active = document.querySelector('.delete_complete_toggle input[name="task_completed_toggle_switch"]:checked');
-    
-            if(active){
-                completeText.innerHTML = 'Completed!';
-                completeText.style.color = '#75D481';
-            }
-            else{
-                completeText.innerHTML = 'Mark as complete?';
-                completeText.style.color = '#000000a2';
-            }
+            let active = toggle.checked;
+
+            $.ajax({
+                url: "{% url 'central_branch:wallet:wallet_event_update_status' %}",
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' 
+                },
+                data: JSON.stringify({
+                    event_id: {{ event_id }},
+                    completed: active
+                }),
+                success: function (response) {
+                    console.log('Wallet event status updated:', response);
+                    if(response.message == 'success') {
+                        if(active){
+                            completeText.innerHTML = 'Completed!';
+                            completeText.style.color = '#75D481';
+                        }
+                        else{
+                            completeText.innerHTML = 'Mark as complete?';
+                            completeText.style.color = '#000000a2';
+                        }
+                    }
+                    else {
+                        if(active){
+                            toggle.checked = false;
+                            completeText.innerHTML = 'Mark as complete?';
+                            completeText.style.color = '#000000a2';
+                        }
+                        else{
+                            toggle.checked = true;
+                            completeText.innerHTML = 'Completed!';
+                            completeText.style.color = '#75D481';
+                        }
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to update wallet event status:', error);
+
+                    if(active){
+                        toggle.checked = false;
+                    }
+                    else{
+                        toggle.checked = true;
+                    }
+                }
+            });
         };
     </script>
+
     
 </html>

@@ -82,16 +82,16 @@ class WalletEntryFile(models.Model):
     def filename(self) -> str:
         return os.path.basename(self.document.path)
     
-class WalletEntryStatus(models.Model):
+class WalletEventStatus(models.Model):
 
-    wallet_entry = models.ForeignKey(WalletEntry, null=False, blank=False, on_delete=models.CASCADE)
+    wallet_event = models.ForeignKey(Events, null=False, blank=False, on_delete=models.CASCADE)
     status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
         ('ONGOING', 'Ongoing'),
         ('COMPLETED', 'Completed'),
     ])
 
     class Meta:
-        verbose_name = 'Wallet Entry Status'
+        verbose_name = 'Wallet Event Status'
 
     def __str__(self) -> str:
         return str(self.pk)
