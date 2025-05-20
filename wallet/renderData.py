@@ -34,5 +34,5 @@ class WalletManager:
             WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
 
         if event_id:
-            if not WalletEventStatus.objects.exists(wallet_event=event):
+            if not WalletEventStatus.objects.filter(wallet_event=event).exists():
                 WalletEventStatus.objects.create(wallet_event=event)

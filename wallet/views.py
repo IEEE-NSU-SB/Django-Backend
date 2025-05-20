@@ -21,6 +21,10 @@ from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, 
 @member_login_permission
 def entries(request, event_id):
 
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
     event_name = Events.objects.filter(id=event_id).values_list('event_name', flat=True).first()
     categories = WalletEntryCategory.objects.all()
     entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
@@ -46,6 +50,8 @@ def entries(request, event_id):
     wallet_entries = dict(wallet_entries)
 
     context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
         'event_id': event_id,
         'event_name': event_name,
         'wallet_entries': wallet_entries,
@@ -78,7 +84,7 @@ def cash_in(request, event_id=None):
         if event_id:
             return redirect('central_branch:wallet:entries_event', event_id)
         else:
-            return redirect('central_branch:wallet')
+            return redirect('central_branch:wallet:wallet_homepage')
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
     categories = WalletEntryCategory.objects.all()
@@ -110,7 +116,7 @@ def cash_out(request, event_id=None):
         if event_id:
             return redirect('central_branch:wallet:entries_event', event_id)
         else:
-            return redirect('central_branch:wallet')
+            return redirect('central_branch:wallet:wallet_homepage')
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
     categories = WalletEntryCategory.objects.all()
@@ -179,7 +185,7 @@ def wallet_homepage(request):
     elif view == 'non_event_view':
         wallet_entries = (WalletEntry.objects
                 .filter(entry_event__isnull=True)
-                .values('creation_date_time', 'update_date_time', 'amount')
+                .values('creation_date_time', 'update_date_time', 'entry_type', 'amount')
         )
 
     context = {

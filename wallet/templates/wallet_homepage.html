@@ -598,7 +598,7 @@
                     {% comment %} <td><a href="#">Title</a></td> {% endcomment %}
                     <td>{{wallet_entry.creation_date_time}}</td>
                     <td>{{wallet_entry.update_date_time}}</td>
-                    <td class="net-balance {% if wallet_entry.amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry.amount < 0 %}- {{wallet_entry.amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry.amount}}{% endif %}</td>
+                    <td class="net-balance {% if wallet_entry.entry_type == 'CASH_OUT' %}loss{% else %}profit{% endif %}">{% if wallet_entry.entry_type == 'CASH_OUT' %}- {{wallet_entry.amount }}{% else %}+ {{wallet_entry.amount}}{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
