@@ -464,7 +464,7 @@
                         {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" name="entry_amount" required>
+                                <input type="decimal" placeholder="Amount" id="amount" name="entry_amount" required>
                             </div>
 
                             <div class="input-container">
@@ -506,7 +506,7 @@
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         {% for category in categories %}
-                                        <div class="dropdown-item" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
+                                        <div class="dropdown-item" data-cat="{{category.name}}" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
                                         {% endfor %}
                                     </div>
                                 </div>
