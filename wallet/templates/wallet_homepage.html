@@ -585,13 +585,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                {% comment %} <tr>
                     <td>1.</td>
-                    {% comment %} <td><a href="#">Title</a></td> {% endcomment %}
+                    <td><a href="#">Title</a></td>
                     <td>This is a static entry for TESTING</td>
                     <td>This is a static entry for TESTING</td>
                     <td class="net-balance profit">+ 350</td>
-                </tr>
+                </tr> {% endcomment %}
                 {% for wallet_entry in wallet_entries %}
                 <tr>
                     <td>{{forloop.counter}}.</td>
@@ -693,7 +693,7 @@
                     <select id='event-select' name='event_select' class="filter-select">
                         <option value="none">Select Event</option>
                         {% for event in events %}
-                        <option value="{{event.id}}">{{event}}</option>
+                        <option value="{{event.id}}">{{event.event_name}}</option>
                         {% endfor %}
                     </select>  
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
