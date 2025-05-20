@@ -504,11 +504,11 @@
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name" value="{{entry.name}}">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name" value="{% if entry.name %}{{entry.name}}{% endif %}">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact" name="contact" value="{{entry.contact}}">
+                                <input type="text" placeholder="Contact" id="contact" name="contact" value="{% if entry.name %}{{entry.contact}}{% endif %}">
                             </div>
                         </div>
 
@@ -555,10 +555,11 @@
                         <div class="payment-mode">
                             <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
-                                <div class="payment-option cash" data-payment="Cash">Cash</div>
-                                <div class="payment-option online" data-payment="Online">Online</div>
-                                <div class="payment-option card" data-payment="Card">Card</div>
-                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="Cash">
+                                <div class="payment-option cash" data-payment="CASH">Cash</div>
+                                <div class="payment-option card" data-payment="CARD">Card</div>
+                                <div class="payment-option online" data-payment="BKASH">Bkash</div>
+                                <div class="payment-option online" data-payment="NAGAD">Nagad</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="CASH">
                             </div>
                         </div>
 

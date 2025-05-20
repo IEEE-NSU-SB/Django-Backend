@@ -531,13 +531,16 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h5 class="accounts-title">Your Books</h5>
             <div>
-                <select id="filter-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
-                  <option value="event">Event View</option>
-                  <option value="nonevent">Non Event View</option>
-                </select>
+                <form id="ViewSelectForm">
+                    <select id="filter-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;" name="view" onchange="ViewSelect();">
+                      <option value="event_view" {% if view == 'event_view' %}selected{% endif %}>Event View</option>
+                      <option value="non_event_view" {% if view == 'non_event_view' %}selected{% endif %}>Non Event View</option>
+                    </select>
+                </form>
             </div>
         </div>
         
+        {% if view == 'event_view' %}
         <table class="accounts-table table_box" id="event">
             <thead>
                 <tr>
@@ -570,27 +573,37 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
         <table class="accounts-table table_box" id="non-event">
             <thead>
                 <tr>
                     <th>SL</th>
-                    <th>Event</th>
+                    {% comment %} <th>Event</th> {% endcomment %}
+                    <th>Created</th>
+                    <th>Last Updated</th>
                     <th>Balance</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>1.</td>
-                    <td><a href="#">Title</a></td>
+                    {% comment %} <td><a href="#">Title</a></td> {% endcomment %}
+                    <td>This is a static entry for TESTING</td>
+                    <td>This is a static entry for TESTING</td>
                     <td class="net-balance profit">+ 350</td>
                 </tr>
+                {% for wallet_entry in wallet_entries %}
                 <tr>
-                    <td>1.</td>
-                    <td><a href="#">Title</a></td>
-                    <td class="net-balance loss">- 350</td>
+                    <td>{{forloop.counter}}.</td>
+                    {% comment %} <td><a href="#">Title</a></td> {% endcomment %}
+                    <td>{{wallet_entry.creation_date_time}}</td>
+                    <td>{{wallet_entry.update_date_time}}</td>
+                    <td class="net-balance {% if wallet_entry.amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry.amount < 0 %}- {{wallet_entry.amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry.amount}}{% endif %}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
+        {% endif %}
         
         <!-- <div class="pagination">
             < 1 of 10 >
@@ -904,34 +917,13 @@
             }
         });
     </script>
+
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const filterSelect = document.getElementById("filter-table");
-        const eventTable = document.getElementById("event");
-        const nonEventTable = document.getElementById("non-event");
+        var form = document.getElementById('ViewSelectForm');
 
-        // Check URL parameter
-        const params = new URLSearchParams(window.location.search);
-        const filterType = params.get("filter") || "event";
-
-        // Set dropdown and table display based on filter type
-        filterSelect.value = filterType;
-        if (filterType === "event") {
-            eventTable.style.display = "table";
-            nonEventTable.style.display = "none";
-        } else {
-            eventTable.style.display = "none";
-            nonEventTable.style.display = "table";
+        function ViewSelect() {
+            form.submit();
         }
-
-        // On change, update URL and reload
-        filterSelect.addEventListener("change", function () {
-            const selected = this.value;
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set("filter", selected);
-            window.location.href = newUrl.toString(); // triggers page reload
-        });
-    });
     </script>
 
 </body>
