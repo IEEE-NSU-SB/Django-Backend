@@ -384,6 +384,7 @@
                 </div>
                     <div class="delete_complete_toggle">
                         <div style="display: flex; margin: 0 10px;">
+                            {% if total_entries != 0 %}
                             {% if wallet_event_status.status == 'COMPLETED' %}
                             <p class="complete_text" style="color: #75D481;">Completed!</p>
                             {% else %}
@@ -393,6 +394,7 @@
                                 <input type="checkbox" name="wallet_event_update_status" {% if wallet_event_status.status == 'COMPLETED' %}checked{% endif %}>
                                 <span class="slider round"></span>
                             </label>
+                            {% endif %}
                             
                         </div>
                     </div>
@@ -488,7 +490,7 @@
                 <p style="color: #4D4D4D;">Showing {{total_entries}} entries</p>
                 <hr style="width: 100%;">
             </div>
-
+            
             {% for entry_date, entries in wallet_entries.items %}
             <div class="entriesContainer">
                 <p class="entry_date">{{entry_date}}</p>

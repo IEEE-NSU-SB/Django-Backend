@@ -146,6 +146,8 @@ def wallet_homepage(request):
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
     
+    events = Events.objects.all().values('id', 'event_name')
+
     wallet_entries_event = None
     wallet_entries = None
     view = 'event_view'
@@ -183,6 +185,7 @@ def wallet_homepage(request):
     context = {
         'all_sc_ag':sc_ag,
         'user_data':user_data,
+        'events': events,
         'wallet_entries_event':wallet_entries_event,
         'wallet_entries': wallet_entries,
         'view': view,

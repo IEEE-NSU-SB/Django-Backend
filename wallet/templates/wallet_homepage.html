@@ -690,10 +690,11 @@
                 <div style="margin-bottom: 15px;">
                     <h6 style="font-weight: bold;">For event books</h6>
                     <!-- <label class="filter-label"></label> -->
-                    <select class="filter-select">
+                    <select id='event-select' name='event_select' class="filter-select">
                         <option value="none">Select Event</option>
-                        <option value="Spac2025">Spac2025</option>
-                        <option value="Spac2024">Spac2024</option>
+                        {% for event in events %}
+                        <option value="{{event.id}}">{{event}}</option>
+                        {% endfor %}
                     </select>  
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
                         <button class="btn btn-apply" id="confirm-create">Create</button>
@@ -812,6 +813,7 @@
         const closeCreateModal = document.getElementById('close-create-modal');
         const cancelCreate = document.getElementById('cancel-create');
         const confirmCreate = document.getElementById('confirm-create');
+        const event_select = document.getElementById('event-select');
         
         createAccountBtn.addEventListener('click', function() {
             createAccountModal.classList.add('active');
@@ -825,10 +827,9 @@
             createAccountModal.classList.remove('active');
         });
         
-        confirmCreate.addEventListener('click', function() {
-            // Add account creation logic here
-            alert('Account created successfully');
-            createAccountModal.classList.remove('active');
+        confirmCreate.addEventListener('click', function(e) {
+            var event_id = event_select.value;
+            window.location.href = `./entries/${event_id}/`;
         });
         
         // Close modals when clicking outside
