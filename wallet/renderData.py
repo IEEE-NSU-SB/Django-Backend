@@ -36,3 +36,16 @@ class WalletManager:
         if event_id:
             if not WalletEventStatus.objects.filter(wallet_event=event).exists():
                 WalletEventStatus.objects.create(wallet_event=event)
+
+    def update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
+
+        # categories = str(entry_categories).split(',')
+
+        wallet_entry = WalletEntry.objects.get(id=entry_id)
+        wallet_entry.entry_date_time = entry_date_time
+        wallet_entry.name = name
+        wallet_entry.contact = contact
+        wallet_entry.remarks = entry_remark
+        wallet_entry.payment_mode = payment_mode
+
+        wallet_entry.save()

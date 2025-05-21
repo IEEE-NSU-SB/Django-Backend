@@ -475,8 +475,9 @@
                         </p>
                         <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
                     </div>
-                    <form id="cashEntryForm" enctype='multipart/form-data'>
+                    <form method="POST" id="cashEntryForm" enctype='multipart/form-data'>
                         {% csrf_token %}
+                        <input type="hidden" name="event_id" value="{{entry.entry_event}}">
                         <div class="form-row input-group">
                             <div class="input-container">
                                 <input type="decimal" placeholder="Amount" id="amount" name="entry_amount" value="{{entry.amount}}" required>

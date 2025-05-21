@@ -146,7 +146,22 @@ def cash_edit(request, entry_id):
     categories = WalletEntryCategory.objects.all()
 
     if request.method == 'POST':
-        print(request.POST)
+        event_id = request.POST.get('event_id')
+        entry_date_time = request.POST.get('entry_date_time')
+        # entry_amount = request.POST.get('entry_amount')
+        name = request.POST.get('name')
+        contact = request.POST.get('contact')
+        entry_remark = request.POST.get('entry_remark')
+        # entry_categories = request.POST.get('entry_categories')
+        payment_mode = request.POST.get('payment_mode')
+        # entry_files = request.FILES.getlist('entry_files')
+
+        WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, None)
+
+        if event_id:
+            return redirect('central_branch:wallet:entries_event', event_id)
+        else:
+            return redirect('central_branch:wallet:wallet_homepage')
         
     entry = WalletEntry.objects.get(id=entry_id)
     files = WalletEntryFile.objects.filter(wallet_entry=entry)
