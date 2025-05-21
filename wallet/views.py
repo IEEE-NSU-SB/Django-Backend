@@ -141,6 +141,8 @@ def cash_out(request, event_id=None):
 @member_login_permission
 def cash_edit(request, entry_id):
 
+    categories = WalletEntryCategory.objects.all()
+
     if request.method == 'POST':
         print(request.POST)
         
@@ -148,6 +150,7 @@ def cash_edit(request, entry_id):
 
     context = {
         'entry': entry,
+        'categories': categories,
     }
 
     return render(request, "cash_edit.html", context)
