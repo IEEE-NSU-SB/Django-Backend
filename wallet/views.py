@@ -196,7 +196,7 @@ def wallet_homepage(request):
     elif view == 'non_event_view':
         wallet_entries = (WalletEntry.objects
                 .filter(entry_event__isnull=True)
-                .values('creation_date_time', 'update_date_time', 'entry_type', 'amount')
+                .values('id', 'creation_date_time', 'update_date_time', 'entry_type', 'amount', 'remarks')
         )
 
     context = {
