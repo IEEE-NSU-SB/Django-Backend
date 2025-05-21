@@ -625,7 +625,7 @@
             function createTag(category, id) {
                 const tag = document.createElement('div');
                 tag.className = `tag ${category}`;
-                tag.setAttribute('data-category', category);
+                tag.setAttribute('data-cat', category);
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
