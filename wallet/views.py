@@ -1,11 +1,13 @@
 from collections import defaultdict
 import json
+import mimetypes
 from django.http import JsonResponse
 from django.utils.timezone import localtime
 from django.shortcuts import redirect, render
 from django.views import View
 
 from central_events.models import Events
+from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from port.renderData import PortData
 from users import renderData
@@ -145,9 +147,17 @@ def cash_edit(request, entry_id):
         print(request.POST)
         
     entry = WalletEntry.objects.get(id=entry_id)
+    files = WalletEntryFile.objects.filter(wallet_entry=entry)
+
+    for file in files:
+        variable, _ = mimetypes.guess_type(file.document.name)
+        variable = variable.split('/')
+        file.mimetype = [variable[0], variable[1].upper()]
 
     context = {
         'entry': entry,
+        'files': files,
+        'media_url':settings.MEDIA_URL
     }
 
     return render(request, "cash_edit.html", context)

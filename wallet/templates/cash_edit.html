@@ -525,6 +525,13 @@
                             <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
+                                {% for file in files %}
+                                {% if file.mimetype.0 == 'image' %}
+                                <div onclick="createFilePreviewXXX('{{media_url}}{{file.document}}')" class="preview-item" data-file-id="file-1"><div class="preview-item-close">×</div><img src="{{media_url}}{{file.document}}" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                                {% else %}
+                                <a href="{{media_url}}{{file.document}}" target="_blank" class="preview-item" data-file-id="file-0" style="display: flex; align-items: center; justify-content: center;"><div class="preview-item-close">×</div><span style="font-size: 12px;">{{file.mimetype.1}}</span></a>
+                                {% endif %}
+                                {% endfor %}
                                 <div class="preview-item" id="addMoreFiles">+</div>
                             </div>
                         </div>
@@ -569,13 +576,6 @@
                     </form>
                 </div>
             </div>
-
-
-
-
-
-
-
 
 
 
@@ -739,75 +739,43 @@
                 const reader = new FileReader();
 
                 reader.onload = function (e) {
-                    const previewItem = document.createElement('div');
-                    previewItem.className = 'preview-item';
-                    previewItem.dataset.fileId = fileId;
-
-                    // Add close button
-                    const closeBtn = document.createElement('div');
-                    closeBtn.className = 'preview-item-close';
-                    closeBtn.innerHTML = '×';
-                    closeBtn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        // Remove from DOM
-                        previewItem.remove();
-                        // Remove from stored files
-                        uploadedFiles.delete(fileId);
-                    });
-                    previewItem.appendChild(closeBtn);
 
                     if (file.type.startsWith('image/')) {
                         // Create image preview
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-                        previewItem.appendChild(img);
+                        var kiekta = `<div class="preview-item" data-file-id="file-1" onclick="createFilePreviewXXXA('${e.target.result} ')">
+                            <span class="preview-item-close" onclick="event.stopPropagation(); removeFileInput(this.parentElement, '${fileId}')">×</span>
+                            <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>`
 
-                        // Add click event to preview image in larger view
-                        previewItem.addEventListener('click', function () {
-                            // Create modal for image preview
-                            const modal = document.createElement('div');
-                            modal.style.position = 'fixed';
-                            modal.style.top = '0';
-                            modal.style.left = '0';
-                            modal.style.width = '100%';
-                            modal.style.height = '100%';
-                            modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-                            modal.style.display = 'flex';
-                            modal.style.alignItems = 'center';
-                            modal.style.justifyContent = 'center';
-                            modal.style.zIndex = '1000';
-                            modal.style.cursor = 'pointer';
-
-                            // Create image in modal
-                            const modalImg = document.createElement('img');
-                            modalImg.src = e.target.result;
-                            modalImg.style.maxWidth = '90%';
-                            modalImg.style.maxHeight = '90%';
-                            modalImg.style.objectFit = 'contain';
-
-                            // Close modal on click
-                            modal.addEventListener('click', function () {
-                                document.body.removeChild(modal);
-                            });
-
-                            modal.appendChild(modalImg);
-                            document.body.appendChild(modal);
-                        });
+                        document.body.insertAdjacentHTML('beforeend', kiekta);
                     } else if (file.type === 'application/pdf') {
+                        const kiekta = document.createElement('div');
+                        kiekta.className = 'preview-item';
+                        kiekta.dataset.fileId = fileId;
+
+                        // Add close button
+                        const closeBtn = document.createElement('div');
+                        closeBtn.className = 'preview-item-close';
+                        closeBtn.innerHTML = '×';
+                        closeBtn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            // Remove from DOM
+                            previewItem.remove();
+                            // Remove from stored files
+                            uploadedFiles.delete(fileId);
+                        });
+                        kiekta.appendChild(closeBtn);
                         // Create PDF icon/label without overwriting the close button
                         const pdfLabel = document.createElement('span');
                         pdfLabel.textContent = 'PDF';
                         pdfLabel.style.fontSize = '12px';
-                        previewItem.style.display = 'flex';
-                        previewItem.style.alignItems = 'center';
-                        previewItem.style.justifyContent = 'center';
-                        previewItem.appendChild(pdfLabel);
+                        kiekta.style.display = 'flex';
+                        kiekta.style.alignItems = 'center';
+                        kiekta.style.justifyContent = 'center';
+                        kiekta.appendChild(pdfLabel);
 
                         // Add click event to download PDF
-                        previewItem.addEventListener('click', function () {
+                        kiekta.addEventListener('click', function () {
                             // Create a download link
                             const downloadLink = document.createElement('a');
                             downloadLink.href = URL.createObjectURL(file);
@@ -818,13 +786,38 @@
                             downloadLink.click();
                             document.body.removeChild(downloadLink);
                         });
-                    }
 
-                    // Insert the new preview before the "+" button
-                    filePreviewContainer.insertBefore(previewItem, addMoreFiles);
+                        filePreviewContainer.insertBefore(kiekta, addMoreFiles);
+                        return;
+                    }
                 };
 
                 reader.readAsDataURL(file);
+            }
+
+            function createFilePreviewXXX(file_url, filetype) {
+                var previewItem = `<div onclick="closePreviewModal(this)" style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: pointer;"><img src="${file_url}" style="max-width: 90%; max-height: 90%; object-fit: contain;"></div>`;
+
+                // Insert the new preview before the "+" button
+                addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+            }
+
+            function createFilePreviewXXXA(image_data) {
+                var previewItem = `<div onclick="closePreviewModal(this)" style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: pointer;"><img src="${image_data}" style="max-width: 90%; max-height: 90%; object-fit: contain;"></div>`;
+
+                // Insert the new preview before the "+" button
+                addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+            }
+
+            function closePreviewModal(modal) {
+                modal.remove();
+            }
+
+            function removeFileInput(previewItem, file_id) {
+                // Remove from DOM
+                previewItem.remove();
+                // Remove from stored files
+                uploadedFiles.delete(file_id);
             }
 
             // Event listener for file input change
