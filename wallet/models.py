@@ -41,7 +41,7 @@ class WalletEntry(models.Model):
         ('CASH_OUT', 'Cash Out'),
         ('NOT_SET', 'NOT SET'),
     ])
-    amount = models.DecimalField(null=False, blank=False, max_digits=7, decimal_places=2, default=0.0)
+    amount = models.DecimalField(null=False, blank=False, max_digits=9, decimal_places=2, default=0.0)
     name = models.CharField(null=True, blank=True, max_length=40)
     contact = models.CharField(null=True, blank=True, max_length=40)
     remarks = models.TextField(null=False, blank=False)
