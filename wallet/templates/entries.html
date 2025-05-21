@@ -710,6 +710,15 @@
             });
         };
     </script>
-
+    <script>
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
     
 </html>

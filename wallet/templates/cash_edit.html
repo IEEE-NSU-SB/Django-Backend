@@ -857,6 +857,16 @@
                 }
             });
         </script>
+        <script>
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
