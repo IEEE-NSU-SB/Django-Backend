@@ -35,15 +35,22 @@ def entries(request, event_id):
     wallet_entries = defaultdict(list)
     cash_in_total = 0
     cash_out_total = 0
+    names = []
 
     for entry in entries:
         entry_date = localtime(entry.entry_date_time).date()
         file_count = WalletEntryFile.objects.filter(wallet_entry=entry).count()
         wallet_entries[entry_date].append([entry, file_count])
+
         if entry.entry_type == 'CASH_IN':
             cash_in_total += entry.amount
         elif entry.entry_type == 'CASH_OUT':
             cash_out_total += entry.amount
+
+        if entry.name and entry.name != '':
+            name = entry.name.replace(" ", "").lower()
+            if name != '':
+                names.append(name)
 
     net_balance = cash_in_total - cash_out_total
 
@@ -61,6 +68,7 @@ def entries(request, event_id):
         'net_balance': net_balance,
         'categories': categories,
         'wallet_event_status': wallet_event_status,
+        'names': names,
     }
 
     return render(request, "entries.html", context)

@@ -433,10 +433,10 @@
               
                 <select id="filter-name">
                   <option value="name">Name</option>
-                  <option value="rahiq">Rahiq</option>
-                  <option value="sarah">Sarah</option>
-                  <option value="john">John</option>
-                  <option value="joe">Joe</option>
+                  <option value="None">No Name</option>
+                  {% for name in names %}
+                  <option value="{{name}}">{{name}}</option>
+                  {% endfor %}
                 </select>
                 
                 <select id="filter-payment">
@@ -495,7 +495,7 @@
             <div class="entriesContainer">
                 <p class="entry_date">{{entry_date}}</p>
                 {% for entry in entries %}
-                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="rahiq" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
+                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="{% if entry.0.name %}{{entry.0.name}}{% else %}None{% endif %}" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">{% if entry.0.name %}{{entry.0.name}}{% endif %}</h5>
                         <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>
