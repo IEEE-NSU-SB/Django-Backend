@@ -734,7 +734,7 @@
                             <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>`
 
-                        document.body.insertAdjacentHTML('beforeend', kiekta);
+                        addMoreFiles.insertAdjacentHTML('beforebegin', kiekta);
                     } else if (file.type === 'application/pdf') {
                         const kiekta = document.createElement('div');
                         kiekta.className = 'preview-item';
