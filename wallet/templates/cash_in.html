@@ -503,7 +503,7 @@
                             <div class="input-container">
 
                                 <div class="custom-selectC">
-                                    <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
+                                    <input type="text" id="categoryInput" placeholder="Select categories..." readonly required>
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         {% for category in categories %}
                                         <div class="dropdown-item" data-cat="{{category.name}}" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
@@ -625,7 +625,7 @@
             function createTag(category, id) {
                 const tag = document.createElement('div');
                 tag.className = `tag ${category}`;
-                tag.setAttribute('data-category', category);
+                tag.setAttribute('data-cat', category);
                 tag.innerHTML = `${category} <span class="tag-close">×</span>`;
 
                 tag.querySelector('.tag-close').addEventListener('click', function (e) {
@@ -808,6 +808,16 @@
                 fileInput.click();
             });
         </script>
+            <script>
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
