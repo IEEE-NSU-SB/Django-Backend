@@ -444,6 +444,22 @@
             gap: 10px;
             align-items: center;
         }
+        .non_event_remarks{
+            white-space: nowrap;         /* Prevents wrapping to the next line */
+            overflow: hidden;            /* Hides overflow text */
+            text-overflow: ellipsis;     /* Shows ... when text overflows */
+            max-width: 200px;  
+        }
+        .filter-select {
+            width: 200px;           /* Fixed width */
+            height: 40px;           /* Height of the visible select box */
+            overflow: hidden;       /* Prevent overflow on main box */
+        }
+
+        .filter-select option {
+            max-height: 50px;      /* Not supported in all browsers */
+            overflow-y: auto;       /* Doesn't apply to <option> directly */
+        }
     </style>
 </head>
 <body>
@@ -558,7 +574,7 @@
                 {% for wallet_entry_event in wallet_entries_event %}
                 <tr>
                     <td>{{forloop.counter}}.</td>
-                    <td><a href="{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}">{{wallet_entry_event.entry_event__event_name}}</a></td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'">{{wallet_entry_event.entry_event__event_name}}</td>
                     {% comment %} <td>Technical</td> {% endcomment %}
                     <td>{{wallet_entry_event.creation_date_time}}</td>
                     <td>{{wallet_entry_event.last_update_date_time}}</td>
@@ -578,24 +594,17 @@
             <thead>
                 <tr>
                     <th>SL</th>
-                    {% comment %} <th>Event</th> {% endcomment %}
+                    <th>Description</th>
                     <th>Created</th>
                     <th>Last Updated</th>
                     <th>Balance</th>
                 </tr>
             </thead>
             <tbody>
-                {% comment %} <tr>
-                    <td>1.</td>
-                    <td><a href="#">Title</a></td>
-                    <td>This is a static entry for TESTING</td>
-                    <td>This is a static entry for TESTING</td>
-                    <td class="net-balance profit">+ 350</td>
-                </tr> {% endcomment %}
                 {% for wallet_entry in wallet_entries %}
-                <tr>
+                <tr onclick="window.location.href='{% url 'central_branch:wallet:cash_edit' wallet_entry.id %}'" style="cursor: pointer;">
                     <td>{{forloop.counter}}.</td>
-                    {% comment %} <td><a href="#">Title</a></td> {% endcomment %}
+                    <td class="non_event_remarks">{{wallet_entry.remarks}}</td>
                     <td>{{wallet_entry.creation_date_time}}</td>
                     <td>{{wallet_entry.update_date_time}}</td>
                     <td class="net-balance {% if wallet_entry.entry_type == 'CASH_OUT' %}loss{% else %}profit{% endif %}">{% if wallet_entry.entry_type == 'CASH_OUT' %}- {{wallet_entry.amount }}{% else %}+ {{wallet_entry.amount}}{% endif %}</td>
