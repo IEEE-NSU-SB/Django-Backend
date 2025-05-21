@@ -154,7 +154,7 @@
                   </span>
                   <span class="nav-text">{% if user_data.position.is_eb_member %}My Assigned Task{% else %}My Tasks{% endif %}</span>
                 </a>
-                <a href="#" >
+                <a href="{% url 'central_branch:wallet:wallet_homepage' %}" >
                   <span class="nav-icon">
                     <img src={% static 'images/wallet.png' %} width="20px" height="20px">
                       <i class="fa-fa-user">

@@ -473,7 +473,7 @@
                 <div class="title">Edit Entry</div>
                 <div class="header">
                     <div class="tooltip-container">
-                        <a href="#" class="image-button">
+                        <a href="{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
@@ -486,35 +486,35 @@
                 <div class="form-container">
                     <div class="entry_details">
                         <p class="last_updated">
-                            Last updated at 05/05/2025 4:30PM
+                            Last updated at {{entry.update_date_time}}
                         </p>
-                        <p class="entry_created">Entry created at 05/05/2025 1:00PM</p>
+                        <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
                     </div>
-                    <form id="cashEntryForm">
+                    <form id="cashEntryForm" enctype='multipart/form-data'>
+                        {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="number" placeholder="Amount" id="amount" required>
+                                <input type="decimal" placeholder="Amount" id="amount" name="entry_amount" value="{{entry.amount}}" required>
                             </div>
 
                             <div class="input-container">
-                                <input type="datetime-local" id="datetime" required>
+                                <input type="datetime-local" id="datetime" name="entry_date_time" value="{{ entry.entry_date_time|date:"Y-m-d\\TH:i" }}" required>
                             </div>
                         </div>
 
                         <div class="form-row input-group">
                             <div class="input-container">
-                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name" value="{% if entry.name %}{{entry.name}}{% endif %}">
                             </div>
 
                             <div class="input-container">
-                                <input type="text" placeholder="Contact" id="contact">
+                                <input type="text" placeholder="Contact" id="contact" name="contact" value="{% if entry.contact %}{{entry.contact}}{% endif %}">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="input-container">
-                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)"
-                                    required></textarea>
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required>{{entry.remarks}}</textarea>
                             </div>
                         </div>
 
@@ -541,9 +541,12 @@
 
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" required>
+                                <input type="hidden" id="category"  value="{% for category in categories %}{{category.name}},{% endfor %}" required>
 
                                 <div class="selected-tags" id="selectedTags">
+                                    {% for category in entry.categories.all %}
+                                    <div class="tag" data-category="{{category.name}}">{{category.name}} <span class="tag-close">×</span></div>
+                                    {% endfor %}
                                     <!-- Selected tags will appear here -->
                                 </div>
                             </div>
@@ -552,10 +555,11 @@
                         <div class="payment-mode">
                             <span class="payment-label">Payment Mode </span>
                             <div class="payment-options">
-                                <div class="payment-option cash" data-payment="Cash">Cash</div>
-                                <div class="payment-option online" data-payment="Online">Online</div>
-                                <div class="payment-option card" data-payment="Card">Card</div>
-                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="Cash">
+                                <div class="payment-option cash" data-payment="CASH">Cash</div>
+                                <div class="payment-option card" data-payment="CARD">Card</div>
+                                <div class="payment-option online" data-payment="BKASH">Bkash</div>
+                                <div class="payment-option online" data-payment="NAGAD">Nagad</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="CASH">
                             </div>
                         </div>
 
@@ -838,8 +842,7 @@
             // Handle form submission
             const form = document.getElementById('cashEntryForm');
 
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
+            form.addEventListener('submit', (e) => {                
 
                 // Check if required fields are filled
                 const amount = document.getElementById('amount').value;
@@ -848,12 +851,10 @@
                 const category = document.getElementById('category').value;
 
                 if (!amount || !datetime || !remark || !category) {
+                    e.preventDefault();
                     alert('Please fill all required fields!');
                     return;
                 }
-
-                // In a real app, you would send the form data to a server here
-                alert('Form submitted successfully!');
             });
         </script>
 </body>

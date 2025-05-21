@@ -73,7 +73,6 @@ from recruitment.models import recruitment_session
 from membership_development_team.models import Renewal_Sessions
 from system_administration.render_access import Access_Render
 from django.views import View
-from users.renderData import member_login_permission
 from task_assignation.models import *
 import re
 from email.utils import getaddresses, parseaddr, parsedate_to_datetime
