@@ -511,7 +511,7 @@
                         </p>
                         <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
                     </div>
-                    <form method="POST" id="cashEntryForm" enctype='multipart/form-data'>
+                    <form method="POST" id="cashEntryForm" onsubmit="disableSubmit(this)" enctype='multipart/form-data'>
                         {% csrf_token %}
                         <input type="hidden" name="event_id" value="{{entry.entry_event.id}}">
                         <div class="form-row input-group">
@@ -577,14 +577,19 @@
                                     <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
                                     <div class="select-dropdownC" id="categoryDropdown">
                                         {% for category in categories %}
+                                        {% if category not in entry.categories.all %}
                                         <div class="dropdown-item" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
+                                        {% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" name="entry_categories" required>
+                                <input type="hidden" id="category" name="entry_categories" value="{% for entry_category in entry.categories.all %}{{entry_category}}{% if not forloop.last %},{% endif %}{% endfor %}" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
+                                    {% for entry_category in entry.categories.all %}
+                                    <div class="tag {{entry_category.name}}" data-cat="{{entry_category.name}}">{{entry_category.name}} <span class="tag-close">×</span></div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -601,7 +606,8 @@
                         </div>
 
                         <div class="save-button-container">
-                            <button type="submit" class="save-button" name="update_entry">SAVE</button>
+                            <input type="hidden" name="update_entry"/>
+                            <button type="submit" class="save-button" id="update_entry">SAVE</button>
                         </div>
                     </form>
                 </div>
@@ -616,7 +622,7 @@
             const categoryDropdown = document.getElementById('categoryDropdown');
             const selectedTags = document.getElementById('selectedTags');
             const hiddenCategoryInput = document.getElementById('category');
-            const selectedCategories = [];
+            const selectedCategories = [{% for entry_category in entry.categories.all %}'{{entry_category.id}}'{% if not forloop.last %},{% endif %}{% endfor %}];
 
             const categoryColors = {
                 {% for category in categories %}
@@ -869,6 +875,12 @@
                     return;
                 }
             });
+
+            function disableSubmit(form) {
+                const button = form.querySelector('button[id="update_entry"]');
+                button.disabled = true;
+                button.innerText = "Submitting...";
+            }
         </script>
         <script>
         {% for message in messages %}

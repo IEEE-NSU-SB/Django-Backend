@@ -28,15 +28,18 @@ def entries(request, event_id, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+    get_sc_ag_info=None
 
     if primary == None:
         primary = 1
+    else:
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     event_name = Events.objects.filter(id=event_id).order_by('-start_date','-event_date').values_list('event_name', flat=True).first()
     categories = WalletEntryCategory.objects.all()
     entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
     wallet_event_status, created = WalletEventStatus.objects.get_or_create(wallet_event_id=event_id)
+    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
     budget_data = BudgetSheet.objects.filter(event=event_id)
     if len(budget_data) > 0:
         budget_data = budget_data[0]
@@ -80,6 +83,7 @@ def entries(request, event_id, primary=None):
         'event_id': event_id,
         'event_name': event_name,
         'wallet_entries': wallet_entries,
+        'wallet_balance': wallet_balance,
         'total_entries': total_entries,
         'cash_in_total': cash_in_total,
         'cash_out_total': cash_out_total,
@@ -100,10 +104,12 @@ def cash_in(request, event_id=None, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+    get_sc_ag_info=None
 
     if primary == None:
         primary = 1
+    else:
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -150,10 +156,12 @@ def cash_out(request, event_id=None, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+    get_sc_ag_info=None
 
     if primary == None:
         primary = 1
+    else:
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -200,10 +208,12 @@ def cash_edit(request, entry_id, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+    get_sc_ag_info=None
 
     if primary == None:
         primary = 1
+    else:
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     categories = WalletEntryCategory.objects.all()
 
@@ -212,15 +222,15 @@ def cash_edit(request, entry_id, primary=None):
 
         if 'update_entry' in request.POST:
             entry_date_time = request.POST.get('entry_date_time')
-            # entry_amount = request.POST.get('entry_amount')
+            entry_amount = request.POST.get('entry_amount')
             name = request.POST.get('name')
             contact = request.POST.get('contact')
             entry_remark = request.POST.get('entry_remark')
-            # entry_categories = request.POST.get('entry_categories')
+            entry_categories = request.POST.get('entry_categories')
             payment_mode = request.POST.get('payment_mode')
             entry_files = request.FILES.getlist('entry_files')
 
-            WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, entry_files)
+            WalletManager.update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
 
         elif 'delete_entry' in request.POST:
 
@@ -266,10 +276,12 @@ def wallet_homepage(request, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+    get_sc_ag_info=None
 
     if primary == None:
         primary = 1
+    else:
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
     
     events = Events.objects.filter(event_organiser__primary=primary).values('id', 'event_name')
 

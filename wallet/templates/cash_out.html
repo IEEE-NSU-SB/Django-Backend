@@ -476,7 +476,7 @@
                 </div>
 
                 <div class="form-container">
-                    <form method="POST" id="cashEntryForm" enctype='multipart/form-data'>
+                    <form method="POST" id="cashEntryForm" onsubmit="disableSubmit(this)" enctype='multipart/form-data'>
                         {% csrf_token %}
                         <div class="form-row input-group">
                             <div class="input-container">
@@ -823,6 +823,12 @@
             addMoreFiles.addEventListener('click', () => {
                 fileInput.click();
             });
+
+            function disableSubmit(form) {
+                const button = form.querySelector('button[type="submit"]');
+                button.disabled = true;
+                button.innerText = "Submitting...";
+            }
         </script>
         <script>
         {% for message in messages %}
