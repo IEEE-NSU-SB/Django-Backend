@@ -1,4 +1,5 @@
 
+from decimal import Decimal
 import os
 from central_events.models import Events
 from insb_port import settings
@@ -34,9 +35,9 @@ class WalletManager:
 
         wallet = Wallet.objects.get(sc_ag=sc_ag)
         if wallet_entry.entry_type == 'CASH_IN':
-            wallet.balance += wallet_entry.amount
+            wallet.balance += Decimal(wallet_entry.amount)
         elif wallet_entry.entry_type == 'CASH_OUT':
-            wallet.balance -= wallet_entry.amount
+            wallet.balance -= Decimal(wallet_entry.amount)
         wallet.save()
         
         for file in entry_files:
@@ -77,4 +78,11 @@ class WalletManager:
         if wallet_event_status.exists():
             wallet_event_status.delete()
 
+        wallet = Wallet.objects.get(sc_ag=wallet_entry.sc_ag)
+        if wallet_entry.entry_type == 'CASH_IN':
+            wallet.balance -= Decimal(wallet_entry.amount)
+        elif wallet_entry.entry_type == 'CASH_OUT':
+            wallet.balance += Decimal(wallet_entry.amount)
+
+        wallet.save()
         wallet_entry.delete()
