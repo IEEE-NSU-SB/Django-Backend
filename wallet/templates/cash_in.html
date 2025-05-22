@@ -194,11 +194,12 @@
         }
 
         .preview-item-close {
+            border: 1px solid #3e3e3e;
             position: absolute;
             top: 2px;
             right: 2px;
-            background-color: rgba(255, 255, 255, 0.8);
-            color: #ff5722;
+            background-color: rgb(255 255 255);
+            color: #3e3e3e;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -746,14 +747,26 @@
                             modal.style.display = 'flex';
                             modal.style.alignItems = 'center';
                             modal.style.justifyContent = 'center';
-                            modal.style.zIndex = '1000';
+                            modal.style.zIndex = '1020';
                             modal.style.cursor = 'pointer';
 
+                            // Disable background scroll
+                            document.body.style.overflow = 'hidden';
+
+                            // Add to DOM
+                            document.body.appendChild(modal);
+
+                            // Example close handler
+                            modal.addEventListener('click', () => {
+                                document.body.removeChild(modal);
+                                document.body.style.overflow = ''; // Restore scroll
+                            });
+                            
                             // Create image in modal
                             const modalImg = document.createElement('img');
                             modalImg.src = e.target.result;
-                            modalImg.style.maxWidth = '90%';
-                            modalImg.style.maxHeight = '90%';
+                            modalImg.style.maxWidth = '50%';
+                            modalImg.style.maxHeight = '50%';
                             modalImg.style.objectFit = 'contain';
 
                             // Close modal on click
