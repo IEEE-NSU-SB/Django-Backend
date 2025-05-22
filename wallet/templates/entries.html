@@ -508,11 +508,10 @@
                             <p class="category" data-cat='{{category.name}}'>{{category.name}}</p>
                             {% endfor %}
                         </div>
-                        <p style="color: #4D4D4D;">Balance : 100</p>
+                        <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
                     </div>
                     <div class="flex_space_between">                  
                         <p><i>📎</i>{% if entry.1 %}{{entry.1}} attachments{% else %}No attachments{% endif %}</p>                 
-                        <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
                     </div>
                     <p>{{entry.0.remarks}}</p>
                     <div>
