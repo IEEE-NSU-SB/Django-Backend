@@ -22,13 +22,16 @@ from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, 
 
 @login_required
 @member_login_permission
-def entries(request, event_id):
+def entries(request, event_id, primary=None):
 
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
 
-    event_name = Events.objects.filter(id=event_id).values_list('event_name', flat=True).first()
+    if primary == None:
+        primary = 1
+
+    event_name = Events.objects.filter(id=event_id).order_by('-start_date','-event_date').values_list('event_name', flat=True).first()
     categories = WalletEntryCategory.objects.all()
     entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
     wallet_event_status, created = WalletEventStatus.objects.get_or_create(wallet_event_id=event_id)
@@ -70,6 +73,7 @@ def entries(request, event_id):
     context = {
         'all_sc_ag':sc_ag,
         'user_data':user_data,
+        'primary': primary,
         'event_id': event_id,
         'event_name': event_name,
         'wallet_entries': wallet_entries,
@@ -88,7 +92,14 @@ def entries(request, event_id):
 
 @login_required
 @member_login_permission
-def cash_in(request, event_id=None):
+def cash_in(request, event_id=None, primary=None):
+
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
+    if primary == None:
+        primary = 1
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -100,17 +111,26 @@ def cash_in(request, event_id=None):
         payment_mode = request.POST.get('payment_mode')
         entry_files = request.FILES.getlist('entry_files')
 
-        WalletManager.add_wallet_entry(1, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+        WalletManager.add_wallet_entry(primary, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
 
         if event_id:
-            return redirect('central_branch:wallet:entries_event', event_id)
+            if primary == 1:
+                return redirect('central_branch:wallet:entries_event', event_id)
+            else:
+                return redirect('chapters_and_affinity_group:wallet:entries_event', primary, event_id)
         else:
-            return redirect('central_branch:wallet:wallet_homepage')
+            if primary == 1:
+                return redirect('central_branch:wallet:wallet_homepage')
+            else:
+                return redirect('chapters_and_affinity_group:wallet:wallet_homepage', primary)
     
-    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
+    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
     categories = WalletEntryCategory.objects.all()
 
     context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
+        'primary': primary,
         'wallet_balance': wallet_balance,
         'categories': categories,
         'event_id': event_id,
@@ -120,7 +140,14 @@ def cash_in(request, event_id=None):
 
 @login_required
 @member_login_permission
-def cash_out(request, event_id=None):
+def cash_out(request, event_id=None, primary=None):
+
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
+    if primary == None:
+        primary = 1
 
     if request.method == 'POST':
         entry_date_time = request.POST.get('entry_date_time')
@@ -132,17 +159,26 @@ def cash_out(request, event_id=None):
         payment_mode = request.POST.get('payment_mode')
         entry_files = request.FILES.getlist('entry_files')
 
-        WalletManager.add_wallet_entry(1, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+        WalletManager.add_wallet_entry(primary, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
 
         if event_id:
-            return redirect('central_branch:wallet:entries_event', event_id)
+            if primary == 1:
+                return redirect('central_branch:wallet:entries_event', event_id)
+            else:
+                return redirect('chapters_and_affinity_group:wallet:entries_event', primary, event_id)
         else:
-            return redirect('central_branch:wallet:wallet_homepage')
+            if primary == 1:
+                return redirect('central_branch:wallet:wallet_homepage')
+            else:
+                return redirect('chapters_and_affinity_group:wallet:wallet_homepage', primary)
     
-    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
+    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
     categories = WalletEntryCategory.objects.all()
 
     context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
+        'primary': primary,
         'wallet_balance': wallet_balance,
         'categories': categories,
         'event_id': event_id,
@@ -152,7 +188,14 @@ def cash_out(request, event_id=None):
 
 @login_required
 @member_login_permission
-def cash_edit(request, entry_id):
+def cash_edit(request, entry_id, primary=None):
+
+    sc_ag=PortData.get_all_sc_ag(request=request)
+    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+    user_data=current_user.getUserData() #getting user data as dictionary file
+
+    if primary == None:
+        primary = 1
 
     categories = WalletEntryCategory.objects.all()
 
@@ -170,9 +213,15 @@ def cash_edit(request, entry_id):
         WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, None)
 
         if event_id:
-            return redirect('central_branch:wallet:entries_event', event_id)
+            if primary == 1:
+                return redirect('central_branch:wallet:entries_event', event_id)
+            else:
+                return redirect('chapters_and_affinity_group:wallet:entries_event', primary, event_id)
         else:
-            return redirect('central_branch:wallet:wallet_homepage')
+            if primary == 1:
+                return redirect('central_branch:wallet:wallet_homepage')
+            else:
+                return redirect('chapters_and_affinity_group:wallet:wallet_homepage', primary)
         
     entry = WalletEntry.objects.get(id=entry_id)
     files = WalletEntryFile.objects.filter(wallet_entry=entry)
@@ -183,6 +232,9 @@ def cash_edit(request, entry_id):
         file.mimetype = [variable[0], variable[1].upper()]
 
     context = {
+        'all_sc_ag':sc_ag,
+        'user_data':user_data,
+        'primary': primary,
         'entry': entry,
         'files': files,
         'media_url':settings.MEDIA_URL,
@@ -193,13 +245,16 @@ def cash_edit(request, entry_id):
 
 @login_required
 @member_login_permission
-def wallet_homepage(request):
+def wallet_homepage(request, primary=None):
 
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+
+    if primary == None:
+        primary = 1
     
-    events = Events.objects.all().values('id', 'event_name')
+    events = Events.objects.filter(event_organiser__primary=primary).values('id', 'event_name')
 
     wallet_entries_event = None
     wallet_entries = None
@@ -210,7 +265,7 @@ def wallet_homepage(request):
     if view == 'event_view':
         wallet_entries_event = (
             WalletEntry.objects
-            .filter(entry_event__isnull=False)
+            .filter(entry_event__isnull=False, sc_ag__primary=primary)
             .values(
                 'entry_event',
                 'entry_event__event_name',
@@ -231,13 +286,14 @@ def wallet_homepage(request):
         )
     elif view == 'non_event_view':
         wallet_entries = (WalletEntry.objects
-                .filter(entry_event__isnull=True)
+                .filter(entry_event__isnull=True, sc_ag__primary=primary)
                 .values('id', 'creation_date_time', 'update_date_time', 'entry_type', 'amount', 'remarks')
         )
 
     context = {
         'all_sc_ag':sc_ag,
         'user_data':user_data,
+        'primary': primary,
         'events': events,
         'wallet_entries_event':wallet_entries_event,
         'wallet_entries': wallet_entries,
