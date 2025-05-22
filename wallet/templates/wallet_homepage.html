@@ -302,6 +302,16 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: block;
         }
+        .stat_box{
+            padding: 16px 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+            width: 280px;
+        }
+        
         .table_box{
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -769,17 +779,17 @@
 
         <!--Stats-->
         <div class="stats_menu">
-            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                <h3><strong>Wallet Balance: 10000</strong></h3>
-                <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
-                      <!-- <option value="all_time">All Time</option> -->
+            <div style="display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;">
+                <h6 class="stat_box">Wallet Balance: 10000</h6>
+                <!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
+                      <option value="all_time">All Time</option>
                       <option value="tenure">Current Tenure</option>
-                </select>
-            </div>
-            <div style="display: flex; justify-content: flex-start;gap: 20px; flex-wrap: wrap; margin-top: 20px;">
-                <h6>Cash In:1000</h6>
-                <h6>Cash Out:1000</h6>
-                <h6>Total entries: 89</h6>
+                </select> -->
+                <h6 class="stat_box">Cash In:1000</h6>
+                <h6 class="stat_box">Cash Out:1000</h6>
+                <h6 class="stat_box">Total entries: 89</h6>
             </div>
             <!-- <h2>Cash In vs Cash Out (Monthly)</h2> -->
             <div style="display: flex; gap: 20px; flex-wrap: nowrap; justify-content: space-between;">

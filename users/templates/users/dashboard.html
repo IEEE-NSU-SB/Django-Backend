@@ -339,11 +339,22 @@
 		background-color: #fff;
 		height: 100%;
 	}
-	.outer_box a{
+	.treasurer_container a{
 		color: #0076ae;
 		margin: 0;
 		text-align: center;
 		font-size: 24px;
+	}
+	.stat_box{
+		padding: 30px 20px;
+		border: 1px solid #D9D9D9;
+		border-radius: 6px;
+		margin: 6px 0px;
+		box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
+		display: block;
+		width: 49%;
+		background-color: #fff;
+		font-weight: bold;
 	}
 	@media screen and (max-width:700px){
 		.outer_box{
@@ -351,7 +362,6 @@
 		}
 	}
 	canvas {
-      max-width: 800px;
       margin: 40px auto;
       display: block;
     }
@@ -422,9 +432,38 @@
 		</div>
 		<div class="col-xl-6">
 			<div class="treasurer_container">
-			<div class="outer_box">
+			<div>
 				<a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a>
-				<canvas id="balanceChart"></canvas>
+				<!--Stats-->
+				<div class="stats_menu">
+					<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+						<h5 class="stat_box">Total Balance: 10000</h5>
+						<!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
+							<option value="all_time">All Time</option>
+							<option value="tenure">Current Tenure</option>
+						</select> -->
+						<h5 class="stat_box">Cash In:1000</h5>
+						<h5 class="stat_box">Cash Out:1000</h5>
+						<h5 class="stat_box">Total entries: 89</h5>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+	<div class="row" >
+		<div class="col-xl-6">
+		<div class="outer_box">
+		<!-- <h2>Cash In vs Cash Out (Monthly)</h2> -->
+			<div>
+				<canvas id="cashChart2" width="600"></canvas>
+			</div>
+		</div>
+		</div>
+		<div class="col-xl-6">
+		<div class="outer_box">
+			<div>
+				<canvas id="cashChart1" width="600"></canvas>
 			</div>
 		</div>
 		</div>
@@ -2472,56 +2511,109 @@ async function initializeCircleChart2(){
 		};
 </script>
 <script>
-  const ctx = document.getElementById('balanceChart').getContext('2d');
-
-  const data1 = {
-    labels: [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ],
-    datasets: [{
-      label: 'Monthly Balance',
-      data: [700, 800, 950, 1000, 980, 1050, 1100, 1170, 1230, 1280, 1350, 700],
-      borderColor: 'rgba(54, 162, 235, 1)',
-      backgroundColor: 'rgba(54, 162, 235, 0.2)',
-      tension: 0.4, // Smooth line (0 = linear, 0.4 = smooth)
-      fill: true
-    }]
-  };
-
-  const config1 = {
-    type: 'line',
-    data: data1,
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Monthly Balance (January – December)'
-        },
-        legend: {
-          display: false
-        }
+    const ctx2 = document.getElementById('cashChart2').getContext('2d');
+    const cashChart2 = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: [
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ],
+        datasets: [
+          {
+            label: 'Cash In',
+            data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950],
+            backgroundColor: '#00629B'
+          },
+          {
+            label: 'Cash Out',
+            data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880],
+            backgroundColor: '#00629Bae'
+          }
+        ]
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Balance ($)'
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Amount (BDT)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Month'
+            }
           }
         },
-        x: {
+        plugins: {
+          legend: {
+            position: 'top'
+          },
           title: {
             display: true,
-            text: 'Month'
+            text: 'Yearly Cash In & Cash Out'
           }
         }
       }
-    }
-  };
+    });
 
-  new Chart(ctx, config1);
-</script>
+    const ctx1 = document.getElementById('cashChart1').getContext('2d');
+const cashChart1 = new Chart(ctx1, {
+  type: 'line', // Changed to line
+  data: {
+    labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString()), // '1' to '30'
+    datasets: [
+      {
+        label: 'Cash In',
+        data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950, 500, 600, 750, 680, 720, 690, 800, 820, 740, 760, 790, 810, 830, 850, 870, 890, 910, 930],
+        borderColor: '#00629B',
+        backgroundColor: 'transparent',
+        fill: true,
+        tension: 0.3
+      },
+      {
+        label: 'Cash Out',
+        data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880, 450, 520, 700, 660, 710, 670, 760, 770, 730, 740, 760, 780, 800, 820, 840, 860, 880, 900],
+        borderColor: '#00629Bae',
+        backgroundColor: 'transparent',
+        fill: true,
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Amount (BDT)'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Day of the Month'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'top'
+      },
+      title: {
+        display: true,
+        text: 'Daily Cash In & Cash Out (30 Days)'
+      }
+    }
+  }
+});
+
+  </script>
 </body>
 </html>
