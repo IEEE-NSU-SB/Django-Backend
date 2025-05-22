@@ -71,3 +71,9 @@ margin-top: 10px;
   max-width: 100%;
   /* padding: 15px; */
 }
+table tr{
+  white-space: nowrap;         /* Prevents wrapping to the next line */
+  overflow: hidden;            /* Hides overflow text */
+  text-overflow: ellipsis;     /* Shows ... when text overflows */
+  max-width: 200px; 
+}
