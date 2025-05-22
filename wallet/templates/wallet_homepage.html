@@ -95,9 +95,7 @@
         .accounts-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             border-radius: 6px;
-            overflow: auto;
         }
         
         .accounts-table th, .accounts-table td {
@@ -509,9 +507,7 @@
         .custom-dropdown-options div:hover {
             background-color: #f0f0f0;
         }
-        thead tr{
-            position: sticky;
-        }
+
         table{
             max-height: 50px;
             overflow: auto;
@@ -524,6 +520,11 @@
         }
         .table-responsive{
             overflow-x: hidden;
+            max-height: 400px;
+        }
+        .table-responsive th{
+            position: sticky;
+            top: -2px;
         }
         @media screen and (max-width: 700px) {
             .table-responsive{
@@ -639,8 +640,8 @@
         
         {% if view == 'event_view' %}
     <div class="table-responsive">
-        <table class="accounts-table table_box" id="event">
-            <thead>
+        <table class="accounts-table table_box table" id="event">
+            <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
                     <th>Event</th>
@@ -674,8 +675,8 @@
         </div>
         {% else %}
         <div class="table-responsive">
-        <table class="accounts-table table_box" id="non-event">
-            <thead>
+        <table class="accounts-table table_box table" id="non-event">
+            <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
                     <th>Description</th>
