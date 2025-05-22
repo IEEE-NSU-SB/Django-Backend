@@ -925,34 +925,34 @@
         });
         
         // Status options selection
-        const statusOptions = document.querySelectorAll('.status-option');
+        // const statusOptions = document.querySelectorAll('.status-option');
         
-        statusOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const status = this.dataset.status;
-                const targetId = statusDropdown.dataset.currentTarget;
-                const targetCircle = document.getElementById(targetId);
+        // statusOptions.forEach(option => {
+        //     option.addEventListener('click', function() {
+        //         const status = this.dataset.status;
+        //         const targetId = statusDropdown.dataset.currentTarget;
+        //         const targetCircle = document.getElementById(targetId);
                 
-                // Update circle appearance based on selection
-                if (status === 'complete') {
-                    targetCircle.style.backgroundColor = 'green';
-                } else if (status === 'ongoing') {
-                    targetCircle.style.backgroundColor = 'orange';
-                } else {
-                    targetCircle.style.backgroundColor = 'white';
-                }
+        //         // Update circle appearance based on selection
+        //         if (status === 'complete') {
+        //             targetCircle.style.backgroundColor = 'green';
+        //         } else if (status === 'ongoing') {
+        //             targetCircle.style.backgroundColor = 'orange';
+        //         } else {
+        //             targetCircle.style.backgroundColor = 'white';
+        //         }
                 
-                statusDropdown.classList.remove('show');
-            });
-        });
+        //         statusDropdown.classList.remove('show');
+        //     });
+        // });
         
-        // Close dropdown when clicking elsewhere
-        document.addEventListener('click', function(e) {
-            if (!e.target.matches('.status-circle') && 
-                !e.target.matches('.status-option')) {
-                statusDropdown.classList.remove('show');
-            }
-        });
+        // // Close dropdown when clicking elsewhere
+        // document.addEventListener('click', function(e) {
+        //     if (!e.target.matches('.status-circle') && 
+        //         !e.target.matches('.status-option')) {
+        //         statusDropdown.classList.remove('show');
+        //     }
+        // });
         
         // Download Modal
         // const downloadBtn = document.getElementById('download-btn');
@@ -1006,12 +1006,13 @@
             createAccountModal.classList.remove('active');
         });
         
-        cancelCreate.addEventListener('click', function() {
-            createAccountModal.classList.remove('active');
-        });
+        // cancelCreate.addEventListener('click', function() {
+        //     createAccountModal.classList.remove('active');
+        // });
         
         confirmCreate.addEventListener('click', function(e) {
             var event_id = event_select.value;
+                console.log("Confirm button clicked!");
             window.location.href = `./entries/${event_id}/`;
         });
         
@@ -1070,22 +1071,22 @@
 
             }
 
-            // Trigger filtering on change/input
-            nameInput.addEventListener('input', filterEntries);
-            categorySelect.addEventListener('change', filterEntries);
-            paymentSelect.addEventListener('change', filterEntries);
-            // dateSelect.addEventListener('change', filterEntries);
-            entryType.addEventListener('change', filterEntries);
+        //     // Trigger filtering on change/input
+        //     nameInput.addEventListener('input', filterEntries);
+        //     categorySelect.addEventListener('change', filterEntries);
+        //     paymentSelect.addEventListener('change', filterEntries);
+        //     // dateSelect.addEventListener('change', filterEntries);
+        //     entryType.addEventListener('change', filterEntries);
 
-            // Clear filters
-            clearButton.addEventListener('click', function () {
-                nameInput.value = 'name';
-                categorySelect.selectedIndex = 0;
-                paymentSelect.selectedIndex = 0;
-                // dateSelect.selectedIndex = 0;
-                entryType.selectedIndex = 0;
-                entries.forEach(entry => entry.style.display = 'block');
-            });
+        //     // Clear filters
+        //     clearButton.addEventListener('click', function () {
+        //         nameInput.value = 'name';
+        //         categorySelect.selectedIndex = 0;
+        //         paymentSelect.selectedIndex = 0;
+        //         // dateSelect.selectedIndex = 0;
+        //         entryType.selectedIndex = 0;
+        //         entries.forEach(entry => entry.style.display = 'block');
+        //     });
         });
 
         const filterBtn = document.getElementById('filterButton');
@@ -1119,75 +1120,75 @@
         })
         {% endfor %}
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dropdown = document.getElementById('customEventDropdown');
-            const selected = dropdown.querySelector('.custom-dropdown-selected');
-            const options = dropdown.querySelector('.custom-dropdown-options');
-            const hiddenInput = document.getElementById('event-select');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tab switching
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-            // Toggle dropdown
-            selected.addEventListener('click', () => {
-                options.style.display = options.style.display === 'block' ? 'none' : 'block';
-            });
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabButtons.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(tc => tc.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
 
-            // Option selection
-            options.querySelectorAll('div').forEach(option => {
-                option.addEventListener('click', () => {
-                    selected.textContent = option.textContent;
-                    hiddenInput.value = option.dataset.value;
-                    options.style.display = 'none';
-                });
-            });
+    // Old dropdown (if still used somewhere else)
+    const legacyDropdown = document.getElementById('customEventDropdown');
+    if (legacyDropdown) {
+        const legacySelected = legacyDropdown.querySelector('.custom-dropdown-selected');
+        const legacyOptions = legacyDropdown.querySelector('.custom-dropdown-options');
+        const legacyHiddenInput = document.getElementById('event-select');
 
-            // Close if clicking outside
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    options.style.display = 'none';
-                }
+        legacySelected.addEventListener('click', () => {
+            legacyOptions.style.display = legacyOptions.style.display === 'block' ? 'none' : 'block';
+        });
+
+        legacyOptions.querySelectorAll('div').forEach(option => {
+            option.addEventListener('click', () => {
+                legacySelected.textContent = option.textContent;
+                legacyHiddenInput.value = option.dataset.value;
+                legacyOptions.style.display = 'none';
             });
         });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-            // Tab switching
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
 
-            tabButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    tabButtons.forEach(b => b.classList.remove('active'));
-                    tabContents.forEach(tc => tc.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.getElementById(btn.dataset.tab).classList.add('active');
-                });
-            });
+        document.addEventListener('click', (e) => {
+            if (!legacyDropdown.contains(e.target)) {
+                legacyOptions.style.display = 'none';
+            }
+        });
+    }
 
-            // Dropdown for event selection
-            const dropdown = document.getElementById('eventDropdown');
-            const selected = dropdown.querySelector('.event-dropdown-selected');
-            const options = dropdown.querySelector('.event-dropdown-options');
-            const hiddenInput = document.getElementById('event-select');
+    // Updated dropdown for new event tab
+    const newDropdown = document.getElementById('eventDropdown');
+    if (newDropdown) {
+        const newSelected = newDropdown.querySelector('.event-dropdown-selected');
+        const newOptions = newDropdown.querySelector('.event-dropdown-options');
+        const newHiddenInput = document.getElementById('event-select');
 
-            selected.addEventListener('click', () => {
-                options.style.display = options.style.display === 'block' ? 'none' : 'block';
-            });
+        newSelected.addEventListener('click', () => {
+            newOptions.style.display = newOptions.style.display === 'block' ? 'none' : 'block';
+        });
 
-            options.querySelectorAll('div').forEach(option => {
-                option.addEventListener('click', () => {
-                    selected.textContent = option.textContent;
-                    hiddenInput.value = option.dataset.value;
-                    options.style.display = 'none';
-                });
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    options.style.display = 'none';
-                }
+        newOptions.querySelectorAll('div').forEach(option => {
+            option.addEventListener('click', () => {
+                newSelected.textContent = option.textContent;
+                newHiddenInput.value = option.dataset.value;
+                newOptions.style.display = 'none';
             });
         });
-        </script>
+
+        document.addEventListener('click', (e) => {
+            if (!newDropdown.contains(e.target)) {
+                newOptions.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
