@@ -455,7 +455,7 @@
                 <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
                 <div class="header">
                     <div class="tooltip-container">
-                        <a href="{% if event_id %}{% url 'central_branch:wallet:entries_event' event_id %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
+                        <a href="{% if event_id %}{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' event_id %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary event_id %}{% endif %}{% else %}{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
