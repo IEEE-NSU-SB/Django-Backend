@@ -48,6 +48,7 @@
         
         .actions {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             margin-bottom: 20px;
             align-items: center;
@@ -96,7 +97,7 @@
             border-collapse: collapse;
             margin-top: 10px;
             border-radius: 6px;
-            overflow: hidden;
+            overflow: auto;
         }
         
         .accounts-table th, .accounts-table td {
@@ -508,6 +509,38 @@
         .custom-dropdown-options div:hover {
             background-color: #f0f0f0;
         }
+        thead tr{
+            position: sticky;
+        }
+        table{
+            max-height: 50px;
+            overflow: auto;
+        }
+        table th{
+                color: #000;
+        }
+        table tr:nth-child(even) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+        .table-responsive{
+            overflow-x: hidden;
+        }
+        @media screen and (max-width: 700px) {
+            .table-responsive{
+                overflow-x: scroll;
+                width: 500px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .table-responsive{
+                width: 400px;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            .table-responsive{
+                width: 350px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -605,6 +638,7 @@
         </div>
         
         {% if view == 'event_view' %}
+    <div class="table-responsive">
         <table class="accounts-table table_box" id="event">
             <thead>
                 <tr>
@@ -637,7 +671,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
+        <div class="table-responsive">
         <table class="accounts-table table_box" id="non-event">
             <thead>
                 <tr>
@@ -660,6 +696,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% endif %}
         
         <!-- <div class="pagination">
