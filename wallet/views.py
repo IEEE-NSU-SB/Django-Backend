@@ -233,8 +233,17 @@ def cash_edit(request, entry_id, primary=None):
             WalletManager.update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
 
         elif 'delete_entry' in request.POST:
-
             WalletManager.delete_wallet_entry(entry_id)
+
+        elif 'delete_file' in request.POST:
+            file_id = request.POST.get('delete_file')
+
+            WalletManager.delete_entry_file(file_id)
+
+            if primary == 1:
+                return redirect('central_branch:wallet:cash_edit', entry_id)
+            else:
+                return redirect('chapters_and_affinity_group:wallet:cash_edit', primary, entry_id)
 
         if event_id:
             if primary == 1:

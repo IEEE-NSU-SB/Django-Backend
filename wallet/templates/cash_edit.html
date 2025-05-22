@@ -547,15 +547,16 @@
                             <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
+            
                                 {% for file in files %}
                                 {% if file.mimetype.0 == 'image' %}
                                 <div class="preview-item" data-file-id="file-1" onclick="createFilePreviewWithImageServer('{{media_url}}{{file.document}}')">
-                                    <span class="preview-item-close" onclick="event.stopPropagation();">×</span>
+                                    <span class="preview-item-close" onclick="event.stopPropagation(); delete_file({{file.id}});">×</span>
                                     <img src="{{media_url}}{{file.document}}" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 {% else %}
                                 <div class="preview-wrapper" data-file-id="file-0" style="position: relative; display: inline-block;">
-                                    <div class="preview-item-close" style="position: absolute; top: 4px; right: 4px; z-index: 2; background: white; border-radius: 50%; padding: 2px 6px; cursor: pointer;
+                                    <div class="preview-item-close" onclick="event.stopPropagation(); delete_file({{file.id}});" style="position: absolute; top: 4px; right: 4px; z-index: 2; background: white; border-radius: 50%; padding: 2px 6px; cursor: pointer;
                                     ">×</div>
 
                                     <a href="{{media_url}}{{file.document}}" target="_blank"
@@ -583,7 +584,7 @@
                                         {% endfor %}
                                     </div>
                                 </div>
-                                <input type="hidden" id="category" name="entry_categories" value="{% for entry_category in entry.categories.all %}{{entry_category}}{% if not forloop.last %},{% endif %}{% endfor %}" required>
+                                <input type="hidden" id="category" name="entry_categories" value="{% for entry_category in entry.categories.all %}{{entry_category.id}}{% if not forloop.last %},{% endif %}{% endfor %}" required>
 
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
@@ -609,6 +610,11 @@
                             <input type="hidden" name="update_entry"/>
                             <button type="submit" class="save-button" id="update_entry">SAVE</button>
                         </div>
+                    </form>
+
+                    <form method="POST" id="delete_form">
+                        {% csrf_token %}
+                        <input type="hidden" id="delete_file" name="delete_file">
                     </form>
                 </div>
             </div>
@@ -875,6 +881,14 @@
                     return;
                 }
             });
+
+            const deleteForm = document.getElementById('delete_form')
+            const fileIdInput = document.getElementById('delete_file');
+
+            function delete_file(fileId) {
+                fileIdInput.value = fileId;
+                delete_form.submit();
+            }
 
             function disableSubmit(form) {
                 const button = form.querySelector('button[id="update_entry"]');

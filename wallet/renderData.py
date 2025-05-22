@@ -100,3 +100,12 @@ class WalletManager:
 
         wallet.save()
         wallet_entry.delete()
+
+    def delete_entry_file(file_id):
+
+        entry_file = WalletEntryFile.objects.get(id=file_id)
+        
+        path = settings.MEDIA_ROOT+str(entry_file.document)
+        if os.path.exists(path):
+            os.remove(path)
+        entry_file.delete()
