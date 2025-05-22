@@ -1,5 +1,7 @@
 
+import os
 from central_events.models import Events
+from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.models import WalletEntry, WalletEntryFile, WalletEventStatus
 
@@ -49,3 +51,19 @@ class WalletManager:
         wallet_entry.payment_mode = payment_mode
 
         wallet_entry.save()
+
+    def delete_wallet_entry(entry_id):
+
+        wallet_entry = WalletEntry.objects.get(id=entry_id)
+        wallet_entry_files = WalletEntryFile.objects.filter(wallet_entry=wallet_entry)
+        
+        for file in wallet_entry_files:
+            path = settings.MEDIA_ROOT+str(file.document)
+            if os.path.exists(path):
+                os.remove(path)
+            file.delete()
+
+        wallet_event_status = WalletEventStatus.objects.get(wallet_event=wallet_entry.entry_event)
+        wallet_event_status.delete()
+
+        wallet_entry.delete()

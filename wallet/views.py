@@ -200,17 +200,22 @@ def cash_edit(request, entry_id, primary=None):
     categories = WalletEntryCategory.objects.all()
 
     if request.method == 'POST':
-        event_id = request.POST.get('event_id')
-        entry_date_time = request.POST.get('entry_date_time')
-        # entry_amount = request.POST.get('entry_amount')
-        name = request.POST.get('name')
-        contact = request.POST.get('contact')
-        entry_remark = request.POST.get('entry_remark')
-        # entry_categories = request.POST.get('entry_categories')
-        payment_mode = request.POST.get('payment_mode')
-        # entry_files = request.FILES.getlist('entry_files')
+        if request.POST.get('update_entry'):
+            event_id = request.POST.get('event_id')
+            entry_date_time = request.POST.get('entry_date_time')
+            # entry_amount = request.POST.get('entry_amount')
+            name = request.POST.get('name')
+            contact = request.POST.get('contact')
+            entry_remark = request.POST.get('entry_remark')
+            # entry_categories = request.POST.get('entry_categories')
+            payment_mode = request.POST.get('payment_mode')
+            # entry_files = request.FILES.getlist('entry_files')
 
-        WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, None)
+            WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, None)
+
+        elif request.POST.get('delete_entry'):
+
+            WalletManager.delete_wallet_entry(entry_id)
 
         if event_id:
             if primary == 1:
@@ -222,6 +227,7 @@ def cash_edit(request, entry_id, primary=None):
                 return redirect('central_branch:wallet:wallet_homepage')
             else:
                 return redirect('chapters_and_affinity_group:wallet:wallet_homepage', primary)
+
         
     entry = WalletEntry.objects.get(id=entry_id)
     files = WalletEntryFile.objects.filter(wallet_entry=entry)
@@ -260,7 +266,7 @@ def wallet_homepage(request, primary=None):
     wallet_entries = None
     view = 'event_view'
     if request.GET.get('view') and request.GET.get('view') != '':
-            view = request.GET.get('view')
+        view = request.GET.get('view')
 
     if view == 'event_view':
         wallet_entries_event = (
@@ -289,13 +295,16 @@ def wallet_homepage(request, primary=None):
                 .filter(entry_event__isnull=True, sc_ag__primary=primary)
                 .values('id', 'creation_date_time', 'update_date_time', 'entry_type', 'amount', 'remarks')
         )
+    
+    wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
 
     context = {
         'all_sc_ag':sc_ag,
         'user_data':user_data,
         'primary': primary,
         'events': events,
-        'wallet_entries_event':wallet_entries_event,
+        'wallet_balance': wallet_balance,
+        'wallet_entries_event': wallet_entries_event,
         'wallet_entries': wallet_entries,
         'view': view,
     }
