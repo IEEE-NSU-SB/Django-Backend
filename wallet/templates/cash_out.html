@@ -372,6 +372,18 @@
             color: #ff5722;
         }
 
+        .app-body{
+            margin: 0 15%;
+        }
+        .wallet_balance{
+            border-radius: 6px;
+            color: rgb(76, 171, 119);
+            background-color: rgb(168, 255, 207);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
         @media (max-width: 992px) {
             .container {
                 padding: 15px;
@@ -423,6 +435,9 @@
             .save-button {
                 width: 100%;
             }
+            .app-body{
+                margin:5%;
+            }
         }
     </style>
 </head>
@@ -447,10 +462,9 @@
         <!--navbar content end-->
 
         <!-- ############ PAGE START-->
-        <div ui-view class="app-body" style="justify-content: center; margin-left: 15%; margin-right: 15% ;" id="view">
+        <div ui-view class="app-body" id="view">
             <div class="container">
                 <div class="title">Cash Out Entry</div>
-                <!-- <div class="wallet-balance">Wallet Balance: {{wallet_balance}}</div> -->
                 <div class="header">
                     <div class="tooltip-container">
                         <a href="{% if event_id %}{% url 'central_branch:wallet:entries_event' event_id %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
@@ -458,8 +472,7 @@
                         </a>
                         <span class="tooltip-text">Go back</span>
                     </div>
-
-
+                    <p class="wallet_balance">Wallet Balance: 1000</p>
                 </div>
 
                 <div class="form-container">
