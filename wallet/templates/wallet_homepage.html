@@ -451,14 +451,61 @@
             max-width: 200px;  
         }
         .filter-select {
-            width: 200px;           /* Fixed width */
-            height: 40px;           /* Height of the visible select box */
             overflow: hidden;       /* Prevent overflow on main box */
         }
 
         .filter-select option {
-            max-height: 50px;      /* Not supported in all browsers */
+            height: 50px; 
+            width: 50px;     /* Not supported in all browsers */
             overflow-y: auto;       /* Doesn't apply to <option> directly */
+        }
+        .download-btn-book {
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            color: #00629b;
+            /* border-radius: 50%; */
+        }
+        .custom-dropdown {
+            position: relative;
+            user-select: none;
+            font-family: sans-serif;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .custom-dropdown-selected {
+            padding: 10px;
+            border: 1px solid #e5e5e5;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .custom-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+        }
+
+        .custom-dropdown-options div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .custom-dropdown-options div:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -566,7 +613,7 @@
                     <th>Created</th>
                     <th>Last Updated</th>
                     <th>Balance</th>
-                    <th>Download</th>
+                    <!-- <th>Download</th> -->
                     <th>Status</th>
                 </tr>
             </thead>
@@ -579,7 +626,7 @@
                     <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
                     <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
                     <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;" class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
-                    <td class="download-icon">⭳</td>
+                    <!-- <td class="fa fa-download download-btn-book" style="display: revert;"></td> -->
                     {% if wallet_entry_event.status == 'COMPLETED' %}
                     <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;"><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
                     {% else %}
@@ -699,12 +746,17 @@
                 <div style="margin-bottom: 15px;">
                     <h6 style="font-weight: bold;">For event books</h6>
                     <!-- <label class="filter-label"></label> -->
-                    <select id='event-select' name='event_select' class="filter-select">
-                        <option value="none">Select Event</option>
-                        {% for event in events %}
-                        <option value="{{event.id}}">{{event.event_name}}</option>
-                        {% endfor %}
-                    </select>  
+                    <div class="custom-dropdown" id="customEventDropdown">
+                    <div class="custom-dropdown-selected">Select Event</div>
+                        <div class="custom-dropdown-options">
+                            {% for event in events %}
+                            <div data-value="{{ event.id }}">{{ event.event_name }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Hidden input to store selected value for form submission -->
+                    <input type="hidden" id="event-select" name="event_select" value="none"> 
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
                         <button class="btn btn-apply" id="confirm-create">Create</button>
                     </div>
@@ -945,6 +997,35 @@
         })
         {% endfor %}
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.getElementById('customEventDropdown');
+            const selected = dropdown.querySelector('.custom-dropdown-selected');
+            const options = dropdown.querySelector('.custom-dropdown-options');
+            const hiddenInput = document.getElementById('event-select');
+
+            // Toggle dropdown
+            selected.addEventListener('click', () => {
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Option selection
+            options.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', () => {
+                    selected.textContent = option.textContent;
+                    hiddenInput.value = option.dataset.value;
+                    options.style.display = 'none';
+                });
+            });
+
+            // Close if clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    options.style.display = 'none';
+                }
+            });
+        });
+        </script>
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
