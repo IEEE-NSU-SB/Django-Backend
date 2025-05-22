@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
     <title>Treasurer's Wallet</title>
 
     <!--Sweet Alert-->
@@ -47,6 +48,7 @@
         
         .actions {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             margin-bottom: 20px;
             align-items: center;
@@ -62,27 +64,37 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        
-        .btn {
+
+        .btn-apply {
+            background-color: #6495ED;
+            color: white;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
             padding: 8px 15px;
-            background-color: #ddd;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         
-        .btn:hover {
-            background-color: #ccc;
+        .btn-apply:hover {
+            color: #6495ED;
+            background-color: white;
         }
-        
-        .btn-apply {
+        .btn-create {
             background-color: #6495ED;
             color: white;
-            text-align: r;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
         }
         
-        .btn-apply:hover {
-            background-color: #5A86D9;
+        .btn-create:hover {
+            color: #6495ED;
+            background-color: white;
         }
         
         .accounts-title {
@@ -93,9 +105,7 @@
         .accounts-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             border-radius: 6px;
-            overflow: hidden;
         }
         
         .accounts-table th, .accounts-table td {
@@ -343,23 +353,23 @@
             flex-direction: column;
         }
 
-        .clear_button {
+        .apply_button {
             background-color: #6c7ae0;
             color: white;
             border: none;
             border-radius: 4px;
             padding: 4px 20px;
             cursor: pointer;
-            /* float: right; */
             margin: 0;
             position: relative;
             right: 0;
             bottom: 5px;
         }
-        
-        .clear_button:hover {
+
+        .apply_button:hover {
             background-color: #5663c7;
         }
+
         .filter{
             border-radius: 4px;
             border: 1px solid rgb(76 76 171);
@@ -438,6 +448,7 @@
             align-items: center;
             text-align: center;
             padding: 16px 0;
+            margin-top: 20px;
         }
         .buttons{
             display: flex;
@@ -451,14 +462,163 @@
             max-width: 200px;  
         }
         .filter-select {
-            width: 200px;           /* Fixed width */
-            height: 40px;           /* Height of the visible select box */
             overflow: hidden;       /* Prevent overflow on main box */
         }
 
         .filter-select option {
-            max-height: 50px;      /* Not supported in all browsers */
+            height: 50px; 
+            width: 50px;     /* Not supported in all browsers */
             overflow-y: auto;       /* Doesn't apply to <option> directly */
+        }
+        .download-btn-book {
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            color: #00629b;
+            /* border-radius: 50%; */
+        }
+        .custom-dropdown {
+            position: relative;
+            user-select: none;
+            font-family: sans-serif;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+        }
+
+        .custom-dropdown-selected {
+            padding: 10px;
+            border: 1px solid #e5e5e5;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .custom-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+        }
+
+        .custom-dropdown-options div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .custom-dropdown-options div:hover {
+            background-color: #f0f0f0;
+        }
+
+        table{
+            max-height: 50px;
+            overflow: auto;
+        }
+        table th{
+                color: #000;
+        }
+        table tr:nth-child(even) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+        .table-responsive{
+            overflow-x: hidden;
+            max-height: 400px;
+        }
+        .table-responsive th{
+            position: sticky;
+            top: -2px;
+        }
+        @media screen and (max-width: 700px) {
+            .table-responsive{
+                overflow-x: scroll;
+                width: 500px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .table-responsive{
+                width: 400px;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            .table-responsive{
+                width: 350px;
+            }
+            .actions{
+                justify-content: space-around;
+            }
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .tab-buttons button.active {
+            border-bottom: 2px solid #6c7ae0;
+            color: #6c7ae0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* New class names */
+        .event-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .event-dropdown-selected {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .event-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+        }
+
+        .event-dropdown-options div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .event-dropdown-options div:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -475,9 +635,9 @@
 
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
-            {% block navbar %}
-            {% include 'finance_and_corporate_team/finance_navbar.html' %}
-            {% endblock navbar %}
+            	{% block navbar %}
+                    {% include 'navbar.html' %}
+                {% endblock navbar %}
         </div>
         <!--navbar content end-->
 
@@ -494,8 +654,8 @@
                 <input type="text" class="search_bar shadow_box" placeholder="Search">
             </div>
             <div class="buttons">
-                <button class="btn create_btn" id="create-account-btn">Create Book</button>
-                <button class="btn download_btn" id="download-btn">Download</button>
+                <button class="create_btn" id="create-account-btn">Create Book</button>
+                <!-- <button class="btn download_btn" id="download-btn">Download</button> -->
                 <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
             </div>
         </div>
@@ -540,7 +700,7 @@
                     <option value="complete">Complete</option>
                 </select>
                 
-                <button id="clearFilters" class="clear_button" style="margin-top: 10px;">Clear Filters</button>
+                <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
               </div>
             </div>
 
@@ -557,8 +717,9 @@
         </div>
         
         {% if view == 'event_view' %}
-        <table class="accounts-table table_box" id="event">
-            <thead>
+    <div class="table-responsive table_box">
+        <table class="accounts-table  table" id="event">
+            <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
                     <th>Event</th>
@@ -566,7 +727,7 @@
                     <th>Created</th>
                     <th>Last Updated</th>
                     <th>Balance</th>
-                    <th>Download</th>
+                    <!-- <th>Download</th> -->
                     <th>Status</th>
                 </tr>
             </thead>
@@ -574,24 +735,26 @@
                 {% for wallet_entry_event in wallet_entries_event %}
                 <tr>
                     <td>{{forloop.counter}}.</td>
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'">{{wallet_entry_event.entry_event__event_name}}</td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
                     {% comment %} <td>Technical</td> {% endcomment %}
-                    <td>{{wallet_entry_event.creation_date_time}}</td>
-                    <td>{{wallet_entry_event.last_update_date_time}}</td>
-                    <td class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
-                    <td class="download-icon">⭳</td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;" class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
+                    <!-- <td class="fa fa-download download-btn-book" style="display: revert;"></td> -->
                     {% if wallet_entry_event.status == 'COMPLETED' %}
-                    <td><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;"><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
                     {% else %}
-                    <td><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
+                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;"><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
-        <table class="accounts-table table_box" id="non-event">
-            <thead>
+        <div class="table-responsive table_box">
+        <table class="accounts-table table" id="non-event">
+            <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
                     <th>Description</th>
@@ -612,6 +775,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% endif %}
         
         <!-- <div class="pagination">
@@ -683,7 +847,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" id="cancel-download">Cancel</button>
-                <button class="btn btn-apply" id="confirm-download">Download</button>
+                <button class="btn-apply" id="confirm-download">Download</button>
             </div>
         </div>
     </div>
@@ -695,33 +859,43 @@
                 <div class="modal-title">Create Book</div>
                 <span class="close-modal" id="close-create-modal">&times;</span>
             </div>
+            <!-- Renamed dropdown class: event-dropdown -->
             <div class="modal-body">
-                <div style="margin-bottom: 15px;">
+                <!-- Tab Buttons -->
+                <div class="tab-buttons">
+                    <button type="button" class="tab-btn active" data-tab="event-tab">Event Book</button>
+                    <button type="button" class="tab-btn" data-tab="non-event-tab">Non-Event Book</button>
+                </div>
+
+                <!-- Event Book Tab -->
+                <div id="event-tab" class="tab-content active">
                     <h6 style="font-weight: bold;">For event books</h6>
-                    <!-- <label class="filter-label"></label> -->
-                    <select id='event-select' name='event_select' class="filter-select">
-                        <option value="none">Select Event</option>
-                        {% for event in events %}
-                        <option value="{{event.id}}">{{event.event_name}}</option>
-                        {% endfor %}
-                    </select>  
+                    <div class="event-dropdown" id="eventDropdown">
+                        <div class="event-dropdown-selected">Select Event</div>
+                        <div class="event-dropdown-options">
+                            {% for event in events %}
+                            <div data-value="{{ event.id }}">{{ event.event_name }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" id="event-select" name="event_select" value="none">
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
-                        <button class="btn btn-apply" id="confirm-create">Create</button>
+                        <button class="btn-create" id="confirm-create">Create</button>
                     </div>
                 </div>
-                <h6 style="font-weight: bold; margin-top: 36px;">For non event books</h6>
-                <div style="margin-bottom: 15px;">
-                    <!-- <label class="filter-label">Title</label> -->
-                    <!-- <input type="text" class="filter-select" placeholder="Enter book title"> -->
+
+                <!-- Non-Event Book Tab -->
+                <div id="non-event-tab" class="tab-content">
+                    <h6 style="font-weight: bold;">For non event books</h6>
                     <div class="cash_in_cash_out_div">
                         <a href="{% url 'central_branch:wallet:cash_in' %}" class="cash_in_btn">CASH IN</a>
                         <a href="{% url 'central_branch:wallet:cash_out' %}" class="cash_out_btn">CASH OUT</a>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <!-- <div class="modal-footer">
                 <button class="btn" id="cancel-create">Cancel</button>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -781,40 +955,40 @@
         });
         
         // Download Modal
-        const downloadBtn = document.getElementById('download-btn');
-        const downloadModal = document.getElementById('download-modal');
-        const closeDownloadModal = document.getElementById('close-download-modal');
-        const cancelDownload = document.getElementById('cancel-download');
-        const confirmDownload = document.getElementById('confirm-download');
-        const dateRangeSelect = document.getElementById('date-range-select');
-        const customDateContainer = document.getElementById('custom-date-container');
+        // const downloadBtn = document.getElementById('download-btn');
+        // const downloadModal = document.getElementById('download-modal');
+        // const closeDownloadModal = document.getElementById('close-download-modal');
+        // const cancelDownload = document.getElementById('cancel-download');
+        // const confirmDownload = document.getElementById('confirm-download');
+        // const dateRangeSelect = document.getElementById('date-range-select');
+        // const customDateContainer = document.getElementById('custom-date-container');
         
-        downloadBtn.addEventListener('click', function() {
-            downloadModal.classList.add('active');
-        });
+        // downloadBtn.addEventListener('click', function() {
+        //     downloadModal.classList.add('active');
+        // });
         
-        closeDownloadModal.addEventListener('click', function() {
-            downloadModal.classList.remove('active');
-        });
+        // closeDownloadModal.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
         
-        cancelDownload.addEventListener('click', function() {
-            downloadModal.classList.remove('active');
-        });
+        // cancelDownload.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
         
-        confirmDownload.addEventListener('click', function() {
-            // Add download logic here
-            alert('Download started');
-            downloadModal.classList.remove('active');
-        });
+        // confirmDownload.addEventListener('click', function() {
+        //     // Add download logic here
+        //     alert('Download started');
+        //     downloadModal.classList.remove('active');
+        // });
         
-        // Handle custom date range selection
-        dateRangeSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateContainer.style.display = 'block';
-            } else {
-                customDateContainer.style.display = 'none';
-            }
-        });
+        // // Handle custom date range selection
+        // dateRangeSelect.addEventListener('change', function() {
+        //     if (this.value === 'custom') {
+        //         customDateContainer.style.display = 'block';
+        //     } else {
+        //         customDateContainer.style.display = 'none';
+        //     }
+        // });
         
         // Create Account Modal
         const createAccountBtn = document.getElementById('create-account-btn');
@@ -945,6 +1119,75 @@
         })
         {% endfor %}
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.getElementById('customEventDropdown');
+            const selected = dropdown.querySelector('.custom-dropdown-selected');
+            const options = dropdown.querySelector('.custom-dropdown-options');
+            const hiddenInput = document.getElementById('event-select');
+
+            // Toggle dropdown
+            selected.addEventListener('click', () => {
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Option selection
+            options.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', () => {
+                    selected.textContent = option.textContent;
+                    hiddenInput.value = option.dataset.value;
+                    options.style.display = 'none';
+                });
+            });
+
+            // Close if clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    options.style.display = 'none';
+                }
+            });
+        });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Dropdown for event selection
+            const dropdown = document.getElementById('eventDropdown');
+            const selected = dropdown.querySelector('.event-dropdown-selected');
+            const options = dropdown.querySelector('.event-dropdown-options');
+            const hiddenInput = document.getElementById('event-select');
+
+            selected.addEventListener('click', () => {
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            });
+
+            options.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', () => {
+                    selected.textContent = option.textContent;
+                    hiddenInput.value = option.dataset.value;
+                    options.style.display = 'none';
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    options.style.display = 'none';
+                }
+            });
+        });
+        </script>
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
