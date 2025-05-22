@@ -620,6 +620,17 @@
         .event-dropdown-options div:hover {
             background-color: #f0f0f0;
         }
+
+        .clear_btn{
+            color: #1a1a1a;
+            border-bottom: 1px solid transparent;
+            transition: all .3s ease-in-out;
+        }
+        .clear_btn:hover{
+            color: #00629b;
+            border-bottom: 1px solid #00629b;
+            border-radius: 0%;
+        }
     </style>
 </head>
 <body>
@@ -662,7 +673,10 @@
         
         <!-- Filter Menu -->
             <div class="filter_menu">
-            <strong>Filter by</strong>
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>Filter by</strong>
+                    <a href="#" class="clear_btn">Clear filter</a>
+                </div>
             <div class="filter-bar">
                 <select id="filter-category">
                   <option>Category</option>
