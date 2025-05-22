@@ -52,6 +52,9 @@ class WalletManager:
 
         wallet_entry.save()
 
+        for file in entry_files:
+            WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
+
     def delete_wallet_entry(entry_id):
 
         wallet_entry = WalletEntry.objects.get(id=entry_id)
@@ -63,7 +66,8 @@ class WalletManager:
                 os.remove(path)
             file.delete()
 
-        wallet_event_status = WalletEventStatus.objects.get(wallet_event=wallet_entry.entry_event)
-        wallet_event_status.delete()
+        wallet_event_status = WalletEventStatus.objects.filter(wallet_event=wallet_entry.entry_event)
+        if wallet_event_status.exists():
+            wallet_event_status.delete()
 
         wallet_entry.delete()

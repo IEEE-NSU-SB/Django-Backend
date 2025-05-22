@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 
 from central_events.models import Events
+from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from finance_and_corporate_team.models import BudgetSheet
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
@@ -27,6 +28,7 @@ def entries(request, event_id, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if primary == None:
         primary = 1
@@ -72,6 +74,7 @@ def entries(request, event_id, primary=None):
 
     context = {
         'all_sc_ag':sc_ag,
+        'sc_ag_info':get_sc_ag_info,
         'user_data':user_data,
         'primary': primary,
         'event_id': event_id,
@@ -97,6 +100,7 @@ def cash_in(request, event_id=None, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if primary == None:
         primary = 1
@@ -129,6 +133,7 @@ def cash_in(request, event_id=None, primary=None):
 
     context = {
         'all_sc_ag':sc_ag,
+        'sc_ag_info':get_sc_ag_info,
         'user_data':user_data,
         'primary': primary,
         'wallet_balance': wallet_balance,
@@ -145,6 +150,7 @@ def cash_out(request, event_id=None, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if primary == None:
         primary = 1
@@ -177,6 +183,7 @@ def cash_out(request, event_id=None, primary=None):
 
     context = {
         'all_sc_ag':sc_ag,
+        'sc_ag_info':get_sc_ag_info,
         'user_data':user_data,
         'primary': primary,
         'wallet_balance': wallet_balance,
@@ -193,6 +200,7 @@ def cash_edit(request, entry_id, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if primary == None:
         primary = 1
@@ -200,7 +208,7 @@ def cash_edit(request, entry_id, primary=None):
     categories = WalletEntryCategory.objects.all()
 
     if request.method == 'POST':
-        if request.POST.get('update_entry'):
+        if 'update_entry' in request.POST:
             event_id = request.POST.get('event_id')
             entry_date_time = request.POST.get('entry_date_time')
             # entry_amount = request.POST.get('entry_amount')
@@ -209,11 +217,12 @@ def cash_edit(request, entry_id, primary=None):
             entry_remark = request.POST.get('entry_remark')
             # entry_categories = request.POST.get('entry_categories')
             payment_mode = request.POST.get('payment_mode')
-            # entry_files = request.FILES.getlist('entry_files')
+            entry_files = request.FILES.getlist('entry_files')
 
-            WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, None)
+            WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, entry_files)
 
-        elif request.POST.get('delete_entry'):
+        elif 'delete_entry' in request.POST:
+            event_id = request.POST.get('event_id')
 
             WalletManager.delete_wallet_entry(entry_id)
 
@@ -239,6 +248,7 @@ def cash_edit(request, entry_id, primary=None):
 
     context = {
         'all_sc_ag':sc_ag,
+        'sc_ag_info':get_sc_ag_info,
         'user_data':user_data,
         'primary': primary,
         'entry': entry,
@@ -256,6 +266,7 @@ def wallet_homepage(request, primary=None):
     sc_ag=PortData.get_all_sc_ag(request=request)
     current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
     user_data=current_user.getUserData() #getting user data as dictionary file
+    get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
 
     if primary == None:
         primary = 1
@@ -300,6 +311,7 @@ def wallet_homepage(request, primary=None):
 
     context = {
         'all_sc_ag':sc_ag,
+        'sc_ag_info':get_sc_ag_info,
         'user_data':user_data,
         'primary': primary,
         'events': events,

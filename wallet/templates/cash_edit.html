@@ -487,17 +487,21 @@
         <div ui-view class="app-body" style="" id="view">
             <div class="container">
                 <div class="title">Edit Entry</div>
-                <form class="header">
+                <div class="header">
                     <div class="tooltip-container">
-                        <a href="{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
+                        <a href="{% if primary == 1 %}{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}{% else %}{% if entry.entry_event %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary entry.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
                     </div>
-                    <button type="button" class="remove-btn">
-                        <p>Delete </p><i class="fa fa-trash action-btn" aria-hidden="true"></i>
-                    </button>
-                </form>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="event_id" value="{{entry.entry_event}}">
+                        <button type="submit" class="remove-btn" name="delete_entry">
+                            <p>Delete </p><i class="fa fa-trash action-btn" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
 
 
                 <div class="form-container">
@@ -540,7 +544,7 @@
                             <div class="file-upload" id="uploadButton">
                                 <i>📎</i> Attach Image or PDF
                             </div>
-                            <input type="file" id="fileInput" accept="image/*,application/pdf" multiple>
+                            <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
 
                             <div class="file-preview" id="filePreviewContainer">
                                 {% for file in files %}
@@ -597,7 +601,7 @@
                         </div>
 
                         <div class="save-button-container">
-                            <button type="submit" class="save-button">SAVE</button>
+                            <button type="submit" class="save-button" name="update_entry">SAVE</button>
                         </div>
                     </form>
                 </div>
