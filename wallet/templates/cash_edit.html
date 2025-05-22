@@ -383,6 +383,8 @@
         }
 
         .remove-btn {
+            text-decoration: none;
+            border: none;
             color: #ef4444;
             font-size: 16px;
             display: flex;
@@ -485,18 +487,17 @@
         <div ui-view class="app-body" style="" id="view">
             <div class="container">
                 <div class="title">Edit Entry</div>
-                <div class="header">
+                <form class="header">
                     <div class="tooltip-container">
                         <a href="{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}" class="image-button">
                             <img src="/static/back-arrow.png" alt="Go back to session">
                         </a>
                         <span class="tooltip-text">Go back</span>
                     </div>
-                    <div class="remove-btn">
-                        <p>Delete </p><i class="fa fa-trash action-btn" onclick="removeRow(this)" aria-hidden="true"></i>
-                    </div>
-
-                </div>
+                    <button type="button" class="remove-btn">
+                        <p>Delete </p><i class="fa fa-trash action-btn" aria-hidden="true"></i>
+                    </button>
+                </form>
 
 
                 <div class="form-container">
