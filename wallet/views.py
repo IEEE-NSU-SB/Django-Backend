@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 
 from central_events.models import Events
+from finance_and_corporate_team.models import BudgetSheet
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from port.renderData import PortData
@@ -31,6 +32,11 @@ def entries(request, event_id):
     categories = WalletEntryCategory.objects.all()
     entries = WalletEntry.objects.filter(entry_event=event_id).order_by('entry_date_time')
     wallet_event_status, created = WalletEventStatus.objects.get_or_create(wallet_event_id=event_id)
+    budget_data = BudgetSheet.objects.filter(event=event_id)
+    if len(budget_data) > 0:
+        budget_data = budget_data[0]
+    else:
+        budget_data = None
 
     total_entries = len(entries)
 
@@ -55,6 +61,9 @@ def entries(request, event_id):
                 names.append(name)
 
     net_balance = cash_in_total - cash_out_total
+    budget_amount_available = None
+    if budget_data:
+        budget_amount_available = budget_data.total_cost - float(net_balance)
 
     wallet_entries = dict(wallet_entries)
 
@@ -71,6 +80,8 @@ def entries(request, event_id):
         'categories': categories,
         'wallet_event_status': wallet_event_status,
         'names': names,
+        'budget_data': budget_data,
+        'budget_amount_available': budget_amount_available,
     }
 
     return render(request, "entries.html", context)

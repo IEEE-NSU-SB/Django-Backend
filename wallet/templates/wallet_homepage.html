@@ -880,7 +880,7 @@
                     </div>
                     <input type="hidden" id="event-select" name="event_select" value="none">
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
-                        <button class="btn-create" id="confirm-create">Create</button>
+                        <button type="button" class="btn-create" id="confirm-create">Create</button>
                     </div>
                 </div>
 
@@ -947,12 +947,12 @@
         });
         
         // Close dropdown when clicking elsewhere
-        document.addEventListener('click', function(e) {
+        {% comment %} document.addEventListener('click', function(e) {
             if (!e.target.matches('.status-circle') && 
                 !e.target.matches('.status-option')) {
                 statusDropdown.classList.remove('show');
             }
-        });
+        }); {% endcomment %}
         
         // Download Modal
         // const downloadBtn = document.getElementById('download-btn');
