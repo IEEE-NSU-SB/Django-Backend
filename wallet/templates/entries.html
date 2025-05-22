@@ -391,7 +391,7 @@
                             {% if wallet_event_status.status == 'COMPLETED' %}
                             <p class="complete_text" style="color: #75D481;">Completed!</p>
                             {% else %}
-                            <p class="complete_text" style="color: #000000a2;">Mark as complete?</p>
+                            <p class="complete_text" style="color: #000000a2;">Book complete?</p>
                             {% endif %}
                             <label class="switch">
                                 <input type="checkbox" name="wallet_event_update_status" {% if wallet_event_status.status == 'COMPLETED' %}checked{% endif %}>
@@ -681,14 +681,14 @@
                             completeText.style.color = '#75D481';
                         }
                         else{
-                            completeText.innerHTML = 'Mark as complete?';
+                            completeText.innerHTML = 'Book complete?';
                             completeText.style.color = '#000000a2';
                         }
                     }
                     else {
                         if(active){
                             toggle.checked = false;
-                            completeText.innerHTML = 'Mark as complete?';
+                            completeText.innerHTML = 'Book complete?';
                             completeText.style.color = '#000000a2';
                         }
                         else{
