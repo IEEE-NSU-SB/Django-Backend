@@ -380,7 +380,7 @@
             <h3 style="text-align: center; color: #002855; margin-top: 45px;">{{event_name}}</h3>
             <div class="flex_space_between" style="margin-bottom: 16px;">
                 <div class="tooltip-container">
-                    <a href="{% url 'central_branch:wallet:wallet_homepage' %}" class="image-button">
+                    <a href="{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}" class="image-button">
                         <img src="/static/back-arrow.png" alt="Go back to session">
                     </a>
                     <span class="tooltip-text">Go back</span>
@@ -497,7 +497,7 @@
             <div class="entriesContainer">
                 <p class="entry_date">{{entry_date}}</p>
                 {% for entry in entries %}
-                <a href="{% url 'central_branch:wallet:cash_edit' entry.0.pk %}" class="net_total_box entry" data-name="{% if entry.0.name %}{{entry.0.name}}{% else %}None{% endif %}" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_edit' entry.0.pk %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_edit' primary entry.0.pk %}{% endif %}" class="net_total_box entry" data-name="{% if entry.0.name %}{{entry.0.name}}{% else %}None{% endif %}" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
                     <div class="flex_space_between">
                         <h5 style="font-weight: bold;">{% if entry.0.name %}{{entry.0.name}}{% endif %}</h5>
                         <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>
@@ -524,8 +524,8 @@
             {% endfor %}
 
             <div class="cash_in_cash_out_div">
-                <a href="{% url 'central_branch:wallet:cash_in_event' event_id %}" class="cash_in_btn">CASH IN</a>
-                <a href="{% url 'central_branch:wallet:cash_out_event' event_id %}" class="cash_out_btn">CASH OUT</a>
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_in_event' event_id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_in_event' primary event_id %}{% endif %}" class="cash_in_btn">CASH IN</a>
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_out_event' event_id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_out_event' primary event_id %}{% endif %}" class="cash_out_btn">CASH OUT</a>
             </div>
         </div>
 </body>

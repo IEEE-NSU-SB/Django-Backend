@@ -735,16 +735,16 @@
                 {% for wallet_entry_event in wallet_entries_event %}
                 <tr>
                     <td>{{forloop.counter}}.</td>
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
                     {% comment %} <td>Technical</td> {% endcomment %}
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;" class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;" class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
                     <!-- <td class="fa fa-download download-btn-book" style="display: revert;"></td> -->
                     {% if wallet_entry_event.status == 'COMPLETED' %}
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;"><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;"><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
                     {% else %}
-                    <td onclick="window.location.href='{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}'" style="cursor: pointer;"><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;"><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
@@ -765,7 +765,7 @@
             </thead>
             <tbody>
                 {% for wallet_entry in wallet_entries %}
-                <tr onclick="window.location.href='{% url 'central_branch:wallet:cash_edit' wallet_entry.id %}'" style="cursor: pointer;">
+                <tr onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:cash_edit' wallet_entry.id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_edit' primary wallet_entry.id %}{% endif %}'" style="cursor: pointer;">
                     <td>{{forloop.counter}}.</td>
                     <td class="non_event_remarks">{{wallet_entry.remarks}}</td>
                     <td>{{wallet_entry.creation_date_time}}</td>
@@ -888,8 +888,8 @@
                 <div id="non-event-tab" class="tab-content">
                     <h6 style="font-weight: bold;">For non event books</h6>
                     <div class="cash_in_cash_out_div">
-                        <a href="{% url 'central_branch:wallet:cash_in' %}" class="cash_in_btn">CASH IN</a>
-                        <a href="{% url 'central_branch:wallet:cash_out' %}" class="cash_out_btn">CASH OUT</a>
+                        <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_in' %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_in' primary %}{% endif %}" class="cash_in_btn">CASH IN</a>
+                        <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_out' %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_out' primary %}{% endif %}" class="cash_out_btn">CASH OUT</a>
                     </div>
                 </div>
             </div>
@@ -1012,7 +1012,6 @@
         
         confirmCreate.addEventListener('click', function(e) {
             var event_id = event_select.value;
-                console.log("Confirm button clicked!");
             window.location.href = `./entries/${event_id}/`;
         });
         
