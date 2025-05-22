@@ -64,27 +64,37 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        
-        .btn {
+
+        .btn-apply {
+            background-color: #6495ED;
+            color: white;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
             padding: 8px 15px;
-            background-color: #ddd;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         
-        .btn:hover {
-            background-color: #ccc;
+        .btn-apply:hover {
+            color: #6495ED;
+            background-color: white;
         }
-        
-        .btn-apply {
+        .btn-create {
             background-color: #6495ED;
             color: white;
-            text-align: r;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
         }
         
-        .btn-apply:hover {
-            background-color: #5A86D9;
+        .btn-create:hover {
+            color: #6495ED;
+            background-color: white;
         }
         
         .accounts-title {
@@ -343,23 +353,23 @@
             flex-direction: column;
         }
 
-        .clear_button {
+        .apply_button {
             background-color: #6c7ae0;
             color: white;
             border: none;
             border-radius: 4px;
             padding: 4px 20px;
             cursor: pointer;
-            /* float: right; */
             margin: 0;
             position: relative;
             right: 0;
             bottom: 5px;
         }
-        
-        .clear_button:hover {
+
+        .apply_button:hover {
             background-color: #5663c7;
         }
+
         .filter{
             border-radius: 4px;
             border: 1px solid rgb(76 76 171);
@@ -438,6 +448,7 @@
             align-items: center;
             text-align: center;
             padding: 16px 0;
+            margin-top: 20px;
         }
         .buttons{
             display: flex;
@@ -541,6 +552,73 @@
             .table-responsive{
                 width: 350px;
             }
+            .actions{
+                justify-content: space-around;
+            }
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .tab-buttons button.active {
+            border-bottom: 2px solid #6c7ae0;
+            color: #6c7ae0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* New class names */
+        .event-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .event-dropdown-selected {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .event-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+        }
+
+        .event-dropdown-options div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .event-dropdown-options div:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -576,7 +654,7 @@
                 <input type="text" class="search_bar shadow_box" placeholder="Search">
             </div>
             <div class="buttons">
-                <button class="btn create_btn" id="create-account-btn">Create Book</button>
+                <button class="create_btn" id="create-account-btn">Create Book</button>
                 <!-- <button class="btn download_btn" id="download-btn">Download</button> -->
                 <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
             </div>
@@ -622,7 +700,7 @@
                     <option value="complete">Complete</option>
                 </select>
                 
-                <button id="clearFilters" class="clear_button" style="margin-top: 10px;">Clear Filters</button>
+                <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
               </div>
             </div>
 
@@ -769,7 +847,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" id="cancel-download">Cancel</button>
-                <button class="btn btn-apply" id="confirm-download">Download</button>
+                <button class="btn-apply" id="confirm-download">Download</button>
             </div>
         </div>
     </div>
@@ -781,38 +859,43 @@
                 <div class="modal-title">Create Book</div>
                 <span class="close-modal" id="close-create-modal">&times;</span>
             </div>
+            <!-- Renamed dropdown class: event-dropdown -->
             <div class="modal-body">
-                <div style="margin-bottom: 15px;">
+                <!-- Tab Buttons -->
+                <div class="tab-buttons">
+                    <button type="button" class="tab-btn active" data-tab="event-tab">Event Book</button>
+                    <button type="button" class="tab-btn" data-tab="non-event-tab">Non-Event Book</button>
+                </div>
+
+                <!-- Event Book Tab -->
+                <div id="event-tab" class="tab-content active">
                     <h6 style="font-weight: bold;">For event books</h6>
-                    <!-- <label class="filter-label"></label> -->
-                    <div class="custom-dropdown" id="customEventDropdown">
-                    <div class="custom-dropdown-selected">Select Event</div>
-                        <div class="custom-dropdown-options">
+                    <div class="event-dropdown" id="eventDropdown">
+                        <div class="event-dropdown-selected">Select Event</div>
+                        <div class="event-dropdown-options">
                             {% for event in events %}
                             <div data-value="{{ event.id }}">{{ event.event_name }}</div>
                             {% endfor %}
                         </div>
                     </div>
-
-                    <!-- Hidden input to store selected value for form submission -->
-                    <input type="hidden" id="event-select" name="event_select" value="none"> 
+                    <input type="hidden" id="event-select" name="event_select" value="none">
                     <div style="display: flex; flex-direction: column; margin-top: 6px;">
-                        <button class="btn btn-apply" id="confirm-create">Create</button>
+                        <button class="btn-create" id="confirm-create">Create</button>
                     </div>
                 </div>
-                <h6 style="font-weight: bold; margin-top: 36px;">For non event books</h6>
-                <div style="margin-bottom: 15px;">
-                    <!-- <label class="filter-label">Title</label> -->
-                    <!-- <input type="text" class="filter-select" placeholder="Enter book title"> -->
+
+                <!-- Non-Event Book Tab -->
+                <div id="non-event-tab" class="tab-content">
+                    <h6 style="font-weight: bold;">For non event books</h6>
                     <div class="cash_in_cash_out_div">
                         <a href="{% url 'central_branch:wallet:cash_in' %}" class="cash_in_btn">CASH IN</a>
                         <a href="{% url 'central_branch:wallet:cash_out' %}" class="cash_out_btn">CASH OUT</a>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <!-- <div class="modal-footer">
                 <button class="btn" id="cancel-create">Cancel</button>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -872,40 +955,40 @@
         });
         
         // Download Modal
-        const downloadBtn = document.getElementById('download-btn');
-        const downloadModal = document.getElementById('download-modal');
-        const closeDownloadModal = document.getElementById('close-download-modal');
-        const cancelDownload = document.getElementById('cancel-download');
-        const confirmDownload = document.getElementById('confirm-download');
-        const dateRangeSelect = document.getElementById('date-range-select');
-        const customDateContainer = document.getElementById('custom-date-container');
+        // const downloadBtn = document.getElementById('download-btn');
+        // const downloadModal = document.getElementById('download-modal');
+        // const closeDownloadModal = document.getElementById('close-download-modal');
+        // const cancelDownload = document.getElementById('cancel-download');
+        // const confirmDownload = document.getElementById('confirm-download');
+        // const dateRangeSelect = document.getElementById('date-range-select');
+        // const customDateContainer = document.getElementById('custom-date-container');
         
-        downloadBtn.addEventListener('click', function() {
-            downloadModal.classList.add('active');
-        });
+        // downloadBtn.addEventListener('click', function() {
+        //     downloadModal.classList.add('active');
+        // });
         
-        closeDownloadModal.addEventListener('click', function() {
-            downloadModal.classList.remove('active');
-        });
+        // closeDownloadModal.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
         
-        cancelDownload.addEventListener('click', function() {
-            downloadModal.classList.remove('active');
-        });
+        // cancelDownload.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
         
-        confirmDownload.addEventListener('click', function() {
-            // Add download logic here
-            alert('Download started');
-            downloadModal.classList.remove('active');
-        });
+        // confirmDownload.addEventListener('click', function() {
+        //     // Add download logic here
+        //     alert('Download started');
+        //     downloadModal.classList.remove('active');
+        // });
         
-        // Handle custom date range selection
-        dateRangeSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateContainer.style.display = 'block';
-            } else {
-                customDateContainer.style.display = 'none';
-            }
-        });
+        // // Handle custom date range selection
+        // dateRangeSelect.addEventListener('change', function() {
+        //     if (this.value === 'custom') {
+        //         customDateContainer.style.display = 'block';
+        //     } else {
+        //         customDateContainer.style.display = 'none';
+        //     }
+        // });
         
         // Create Account Modal
         const createAccountBtn = document.getElementById('create-account-btn');
@@ -1058,6 +1141,46 @@
             });
 
             // Close if clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    options.style.display = 'none';
+                }
+            });
+        });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Dropdown for event selection
+            const dropdown = document.getElementById('eventDropdown');
+            const selected = dropdown.querySelector('.event-dropdown-selected');
+            const options = dropdown.querySelector('.event-dropdown-options');
+            const hiddenInput = document.getElementById('event-select');
+
+            selected.addEventListener('click', () => {
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            });
+
+            options.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', () => {
+                    selected.textContent = option.textContent;
+                    hiddenInput.value = option.dataset.value;
+                    options.style.display = 'none';
+                });
+            });
+
             document.addEventListener('click', (e) => {
                 if (!dropdown.contains(e.target)) {
                     options.style.display = 'none';
