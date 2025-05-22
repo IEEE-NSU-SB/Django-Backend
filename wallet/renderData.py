@@ -1,9 +1,10 @@
 
+from decimal import Decimal
 import os
 from central_events.models import Events
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
-from wallet.models import WalletEntry, WalletEntryFile, WalletEventStatus
+from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
 
 
 class WalletManager:
@@ -31,6 +32,13 @@ class WalletManager:
                                    tenure=Panels.objects.get(panel_of=sc_ag, current=True))
         
         wallet_entry.categories.add(*categories)
+
+        wallet = Wallet.objects.get(sc_ag=sc_ag)
+        if wallet_entry.entry_type == 'CASH_IN':
+            wallet.balance += Decimal(wallet_entry.amount)
+        elif wallet_entry.entry_type == 'CASH_OUT':
+            wallet.balance -= Decimal(wallet_entry.amount)
+        wallet.save()
         
         for file in entry_files:
             WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
@@ -70,4 +78,11 @@ class WalletManager:
         if wallet_event_status.exists():
             wallet_event_status.delete()
 
+        wallet = Wallet.objects.get(sc_ag=wallet_entry.sc_ag)
+        if wallet_entry.entry_type == 'CASH_IN':
+            wallet.balance -= Decimal(wallet_entry.amount)
+        elif wallet_entry.entry_type == 'CASH_OUT':
+            wallet.balance += Decimal(wallet_entry.amount)
+
+        wallet.save()
         wallet_entry.delete()

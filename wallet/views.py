@@ -208,8 +208,9 @@ def cash_edit(request, entry_id, primary=None):
     categories = WalletEntryCategory.objects.all()
 
     if request.method == 'POST':
+        event_id = request.POST.get('event_id')
+
         if 'update_entry' in request.POST:
-            event_id = request.POST.get('event_id')
             entry_date_time = request.POST.get('entry_date_time')
             # entry_amount = request.POST.get('entry_amount')
             name = request.POST.get('name')
@@ -222,7 +223,6 @@ def cash_edit(request, entry_id, primary=None):
             WalletManager.update_wallet_entry(entry_id, entry_date_time, None, name, contact, entry_remark, payment_mode, None, entry_files)
 
         elif 'delete_entry' in request.POST:
-            event_id = request.POST.get('event_id')
 
             WalletManager.delete_wallet_entry(entry_id)
 
