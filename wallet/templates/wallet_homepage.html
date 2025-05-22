@@ -577,7 +577,7 @@
             </div>
             <div class="buttons">
                 <button class="btn create_btn" id="create-account-btn">Create Book</button>
-                <button class="btn download_btn" id="download-btn">Download</button>
+                <!-- <button class="btn download_btn" id="download-btn">Download</button> -->
                 <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
             </div>
         </div>
@@ -639,8 +639,8 @@
         </div>
         
         {% if view == 'event_view' %}
-    <div class="table-responsive">
-        <table class="accounts-table table_box table" id="event">
+    <div class="table-responsive table_box">
+        <table class="accounts-table  table" id="event">
             <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
@@ -674,8 +674,8 @@
         </table>
         </div>
         {% else %}
-        <div class="table-responsive">
-        <table class="accounts-table table_box table" id="non-event">
+        <div class="table-responsive table_box">
+        <table class="accounts-table table" id="non-event">
             <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
