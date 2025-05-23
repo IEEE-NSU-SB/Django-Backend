@@ -508,7 +508,7 @@
             gap: 10px;
             align-items: center;
         }
-        .non_event_remarks{
+        .non_event_remarks , .event_title {
             white-space: nowrap;         /* Prevents wrapping to the next line */
             overflow: hidden;            /* Hides overflow text */
             text-overflow: ellipsis;     /* Shows ... when text overflows */
@@ -842,7 +842,7 @@
                 {% for wallet_entry_event in wallet_entries_event %}
                 <tr>
                     <td>{{forloop.counter}}.</td>
-                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" class="event_title" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
                     {% comment %} <td>Technical</td> {% endcomment %}
                     <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
                     <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
