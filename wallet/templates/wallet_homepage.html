@@ -222,7 +222,7 @@
             margin: 6px 0px;
             box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
             display: block;
-            width: 280px;
+            width: 24%;
         }
         
         .table_box{
@@ -368,7 +368,7 @@
             border: 1px solid transparent;
             color: rgb(76, 171, 92);
             background-color: rgb(213, 251, 219);
-            padding: 4px 16px;
+            padding: 3px 16px;
             transition: all .3s ease-in-out;
             cursor: pointer;
             margin: 0;
@@ -548,6 +548,8 @@
             background: #fff;
             /* border: 1px solid #ccc; */
             padding: 10px;
+            height: 350px;
+            width: 500px;
         }
         .remove-btn {
             text-decoration: none;
@@ -571,9 +573,15 @@
                 overflow-x: scroll;
                 width: 500px;
             }
+            .stat_box{
+                width: 49%;
+            }
         }
         @media screen and (max-width: 600px) {
             .table-responsive{
+                width: 400px;
+            }
+            canvas{
                 width: 400px;
             }
         }
@@ -583,6 +591,9 @@
             }
             .actions{
                 justify-content: space-around;
+            }
+            .stat_box{
+                width: 100%;
             }
         }
     </style>
@@ -620,7 +631,7 @@
                 
         <div class="actions">
             <div>
-                <input type="text" class="search_bar shadow_box" placeholder="Search">
+                <input type="text" id="searchBar" class="search_bar shadow_box" placeholder="Search">
             </div>
             <div class="buttons">
                 <button class="create_btn" id="create-account-btn">Create Book/Entry</button>
@@ -703,17 +714,17 @@
                       <option value="all_time">All Time</option>
                       <option value="tenure">Current Tenure</option>
                 </select> -->
-                <h6 class="stat_box">Cash In:1000</h6>
-                <h6 class="stat_box">Cash Out:1000</h6>
+                <h6 class="stat_box">Total Cash In: 1000</h6>
+                <h6 class="stat_box">Total Cash Out: 1000</h6>
                 <h6 class="stat_box">Total entries: 89</h6>
             </div>
             <!-- <h2>Cash In vs Cash Out (Monthly)</h2> -->
-            <div style="display: flex; gap: 20px; flex-wrap: nowrap; justify-content: space-between;">
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between;">
                 <div>
-                    <canvas id="cashChart1" height="350" width="500"></canvas>
+                    <canvas id="cashChart1"></canvas>
                 </div>
                 <div>
-                    <canvas id="cashChart2" height="350" width="500"></canvas>
+                    <canvas id="cashChart2"></canvas>
                 </div>
         </div>
         </div>
@@ -1261,6 +1272,33 @@
     });
 
   </script>
+  <script>
+    document.getElementById("searchBar").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const tables = ["event", "non-event"];
+
+        tables.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            if (table) {
+                const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+                for (let row of rows) {
+                    const cells = row.getElementsByTagName("td");
+                    let match = false;
+
+                    for (let cell of cells) {
+                        if (cell.textContent.toLowerCase().includes(filter)) {
+                            match = true;
+                            break;
+                        }
+                    }
+
+                    row.style.display = match ? "" : "none";
+                }
+            }
+        });
+    });
+    </script>
+
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
