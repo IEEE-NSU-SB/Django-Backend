@@ -1,7 +1,9 @@
 
 from decimal import Decimal
 import os
+from central_branch.view_access import Branch_View_Access
 from central_events.models import Events
+from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
@@ -109,3 +111,47 @@ class WalletManager:
         if os.path.exists(path):
             os.remove(path)
         entry_file.delete()
+
+    def has_access(request, primary, event_id=None, entry_id=None):
+        username = request.user.username
+        
+        if primary == None:
+            if Branch_View_Access.common_access(username):
+                sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']
+
+                if event_id:
+                    organiser = Events.objects.filter(id=event_id).values('event_organiser')[0]['event_organiser']
+                    if organiser == sc_ag:
+                        return True
+                    else:
+                        return False
+                elif entry_id:
+                    entry_owner = WalletEntry.objects.filter(id=entry_id).values('sc_ag')[0]['sc_ag']
+                    if entry_owner == sc_ag:
+                        return True
+                    else:
+                        return False
+                return True
+            else:
+                return False
+        elif primary == '1' or primary == 1:
+            return False
+        else:
+            if SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, primary):
+                sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
+
+                if event_id:
+                    organiser = Events.objects.filter(id=event_id).values('event_organiser')[0]['event_organiser']
+                    if organiser == sc_ag:
+                        return True
+                    else:
+                        return False
+                elif entry_id:
+                    entry_owner = WalletEntry.objects.filter(id=entry_id).values('sc_ag')[0]['sc_ag']
+                    if entry_owner == sc_ag:
+                        return True
+                    else:
+                        return False
+                return True
+            else:
+                return False
