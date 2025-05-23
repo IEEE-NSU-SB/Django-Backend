@@ -291,6 +291,12 @@ def wallet_homepage(request, primary=None):
         primary = 1
     else:
         get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+
+    if request.method == 'POST':
+        if 'delete_entry' in request.POST:
+            entry_id = request.POST.get('delete_entry')
+
+            WalletManager.delete_wallet_entry(entry_id)
     
     events = Events.objects.filter(event_organiser__primary=primary).values('id', 'event_name')
 
