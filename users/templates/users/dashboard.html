@@ -346,10 +346,10 @@
 		font-size: 24px;
 	}
 	.stat_box{
-		padding: 30px 20px;
+		padding: 38px 20px;
 		border: 1px solid #D9D9D9;
 		border-radius: 6px;
-		margin: 6px 0px;
+		margin: 0px;
 		box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
 		display: block;
 		width: 49%;
@@ -432,11 +432,10 @@
 		</div>
 		<div class="col-xl-6">
 			<div class="treasurer_container">
-			<div>
-				<a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a>
+				{% comment %} <a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a> {% endcomment %}
 				<!--Stats-->
-				<div class="stats_menu">
-					<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+				<!-- <div class="stats_menu"> -->
+					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
 						<h5 class="stat_box">Total Balance: 10000</h5>
 						<!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
 							<option value="all_time">All Time</option>
@@ -446,9 +445,8 @@
 						<h5 class="stat_box">Cash Out:1000</h5>
 						<h5 class="stat_box">Total entries: 89</h5>
 					</div>
-				</div>
+				<!-- </div> -->
 			</div>
-		</div>
 		</div>
 	</div>
 	<div class="row" >
