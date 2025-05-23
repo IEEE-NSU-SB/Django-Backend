@@ -55,10 +55,6 @@ class WalletEntry(models.Model):
 
     sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.DO_NOTHING)
     tenure = models.ForeignKey(Panels, null=False, blank=False, on_delete=models.DO_NOTHING)
-    # status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
-    #     ('ONGOING', 'Ongoing'),
-    #     ('COMPLETED', 'Completed'),
-    # ])
 
     class Meta:
         verbose_name = 'Wallet Entry'

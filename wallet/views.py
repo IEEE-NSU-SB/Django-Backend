@@ -6,6 +6,7 @@ from django.utils.timezone import localtime
 from django.shortcuts import redirect, render
 from django.views import View
 
+from central_branch.renderData import Branch
 from central_events.models import Events
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from finance_and_corporate_team.models import BudgetSheet
@@ -17,7 +18,8 @@ from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile, WalletEventStatus
 from users.renderData import LoggedinUser,member_login_permission
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef
+from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField
+from django.db.models.functions import TruncDate
 
 # Create your views here.      
 
@@ -299,17 +301,73 @@ def wallet_homepage(request, primary=None):
             WalletManager.delete_wallet_entry(entry_id)
     
     events = Events.objects.filter(event_organiser__primary=primary).values('id', 'event_name')
+    tenures = Panels.objects.filter(panel_of__primary=primary).order_by('-year')
 
     wallet_entries_event = None
     wallet_entries = None
+    filter_queries = {}
+    filters = {}
+    order_by = []
+
     view = 'event_view'
+
     if request.GET.get('view') and request.GET.get('view') != '':
         view = request.GET.get('view')
 
     if view == 'event_view':
+        if request.GET.get('tenure') and request.GET.get('tenure') != '':
+            filter_tenure = Panels.objects.get(panel_of__primary=primary, year=request.GET.get('tenure'))
+            filter_queries.update({'tenure': request.GET.get('tenure')})
+        else:
+            filter_tenure = Panels.objects.get(panel_of__primary=primary, current=True)
+
+        if request.GET.get('month') and request.GET.get('month') != '':
+            filters.update({'entry_date_time__month': request.GET.get('month')})
+            filter_queries.update({'month': request.GET.get('month')})
+
+        last_updated = None
+        if request.GET.get('last_updated') and request.GET.get('last_updated') != '':
+            last_updated = request.GET.get('last_updated')
+            if last_updated == 'latest':
+                order_by.append('-update_date')
+            elif last_updated == 'oldest':
+                order_by.append('update_date')
+            filter_queries.update({'last_updated': last_updated})
+
+        if request.GET.get('net_balance') and request.GET.get('net_balance') != '':
+            net_balance = request.GET.get('net_balance')
+            if net_balance == 'htol':
+                order_by.append('-total_amount')
+            elif net_balance == 'ltoh':
+                order_by.append('total_amount')               
+            filter_queries.update({'net_balance': net_balance})
+
+        status_filter = None
+        if request.GET.get('status') and request.GET.get('status') != '':
+            status_filter = request.GET.get('status').upper()
+            filter_queries.update({'status': status_filter})
+
+        status_subquery = WalletEventStatus.objects.filter(
+            wallet_event=OuterRef('entry_event')
+        ).values('status')[:1]
+
+        # Base queryset
+        queryset = WalletEntry.objects.filter(
+            entry_event__isnull=False,
+            sc_ag__primary=primary,
+            tenure=filter_tenure,
+            **filters
+        )
+
+        if status_filter:
+            queryset = queryset.filter(
+                entry_event__in=WalletEventStatus.objects.filter(
+                    status=status_filter
+                ).values('wallet_event')
+            )
+
         wallet_entries_event = (
-            WalletEntry.objects
-            .filter(entry_event__isnull=False, sc_ag__primary=primary)
+            queryset
             .values(
                 'entry_event',
                 'entry_event__event_name',
@@ -325,13 +383,67 @@ def wallet_homepage(request, primary=None):
                 ),
                 creation_date_time=Min('creation_date_time'),
                 last_update_date_time=Max('update_date_time'),
-                status = Subquery(WalletEventStatus.objects.filter(wallet_event=OuterRef('entry_event')).values('status'))
+                update_date = TruncDate('last_update_date_time'),
+                status=Subquery(status_subquery),
             )
+            .order_by(*order_by)
         )
     elif view == 'non_event_view':
-        wallet_entries = (WalletEntry.objects
-                .filter(entry_event__isnull=True, sc_ag__primary=primary)
-                .values('id', 'creation_date_time', 'update_date_time', 'entry_type', 'amount', 'remarks')
+
+        if request.GET.get('tenure') and request.GET.get('tenure') != '':
+            filter_tenure = Panels.objects.get(panel_of__primary=primary, year=request.GET.get('tenure'))
+            filter_queries.update({'tenure': request.GET.get('tenure')})
+        else:
+            filter_tenure = Panels.objects.get(panel_of__primary=primary, current=True)
+
+        if request.GET.get('month') and request.GET.get('month') != '':
+            filters.update({'entry_date_time__month': request.GET.get('month')})
+            filter_queries.update({'month': request.GET.get('month')})
+
+        if request.GET.get('last_updated') and request.GET.get('last_updated') != '':
+            last_updated = request.GET.get('last_updated')
+            if last_updated == 'latest':
+                order_by.append('-update_date')
+            elif last_updated == 'oldest':
+                order_by.append('update_date')
+            filter_queries.update({'last_updated': last_updated})
+
+        net_balance = None
+        if request.GET.get('net_balance') and request.GET.get('net_balance') != '':
+            net_balance = request.GET.get('net_balance')
+            filter_queries.update({'net_balance': net_balance})
+
+        # Base queryset
+        wallet_entries_queryset = WalletEntry.objects.filter(
+            entry_event__isnull=True,
+            sc_ag__primary=primary,
+            **filters
+        )
+
+        # Initialize annotation
+        annotations = {}
+
+        if net_balance:
+            annotations['priority'] = Case(
+                When(entry_type='CASH_IN', then=Value(0)),
+                When(entry_type='CASH_OUT', then=Value(1)),
+                default=Value(2),
+                output_field=IntegerField()
+            )
+            annotations['update_date'] = TruncDate('update_date_time')
+
+        ordering = []
+        if net_balance == 'ltoh':
+            ordering = ['-priority', 'amount']
+        elif net_balance == 'htol':
+            ordering = ['priority', '-amount']
+
+        # Apply annotations and final query
+        wallet_entries = (
+            wallet_entries_queryset
+            .annotate(**annotations)
+            .order_by(*order_by, *ordering)
+            .values('id', 'creation_date_time', 'update_date_time', 'entry_type', 'amount', 'remarks')
         )
     
     wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
@@ -346,6 +458,8 @@ def wallet_homepage(request, primary=None):
         'wallet_entries_event': wallet_entries_event,
         'wallet_entries': wallet_entries,
         'view': view,
+        'tenures': tenures,
+        'filter_queries': filter_queries,
     }
 
     return render(request, "wallet_homepage.html", context)

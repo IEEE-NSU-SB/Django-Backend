@@ -631,7 +631,7 @@
         </div>
         
         <!-- Filter Menu -->
-        <div class="filter_menu">
+        <div class="filter_menu {% if filter_queries %}show{% endif %}">
             <div style="display: flex; justify-content: space-between;">
                 <strong>Filter by</strong>
                 <a href="{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}" class="clear_btn">Clear filter</a>
@@ -639,41 +639,56 @@
 
             <form id="filterForm">
             <div class="filter-bar">
-                <select id="filter-category" name="category">
+                {% comment %} <select id="filter-category" name="category">
                     <option>Category</option>
                     <option value="travel">Travel</option>
                     <option value="food">Food</option>
                     <option value="entertainment">Entertainment</option>
                     <option value="utilities">Utilities</option>
-                </select>
+                </select> {% endcomment %}
 
                 <select id="filter-month" name="month">
                     <option>Month</option>
-                    <option value="January">January</option>
+                    <option value="1" {% if filter_queries.month == '1' %}selected{% endif %}>January</option>
+                    <option value="2" {% if filter_queries.month == '2' %}selected{% endif %}>February</option>
+                    <option value="3" {% if filter_queries.month == '3' %}selected{% endif %}>March</option>
+                    <option value="4" {% if filter_queries.month == '4' %}selected{% endif %}>April</option>
+                    <option value="5" {% if filter_queries.month == '5' %}selected{% endif %}>May</option>
+                    <option value="6" {% if filter_queries.month == '6' %}selected{% endif %}>June</option>
+                    <option value="7" {% if filter_queries.month == '7' %}selected{% endif %}>July</option>
+                    <option value="8" {% if filter_queries.month == '8' %}selected{% endif %}>August</option>
+                    <option value="9" {% if filter_queries.month == '9' %}selected{% endif %}>September</option>
+                    <option value="10" {% if filter_queries.month == '10' %}selected{% endif %}>October</option>
+                    <option value="11" {% if filter_queries.month == '11' %}selected{% endif %}>November</option>
+                    <option value="12" {% if filter_queries.month == '12' %}selected{% endif %}>December</option>
                 </select>
 
                 <select id="filter-tenure" name="tenure">
                     <option>Tenure</option>
-                    <option value="Spring 2025">Spring 2025</option>
+                    {% for tenure in tenures %}
+                    <option value="{{tenure.year}}" {% if filter_queries.tenure == tenure.year %}selected{% endif %}>{{tenure.year}}</option>
+                    {% endfor %}
                 </select>
 
                 <select id="filter-last-updated" name="last_updated">
-                    <option value="latestupdated">Latest Updated</option>
-                    <option value="latest">Latest</option>
-                    <option value="oldest">Oldest</option>
+                    <option value="latestupdated">Last Updated</option>
+                    <option value="latest" {% if filter_queries.last_updated == 'latest' %}selected{% endif %}>Latest</option>
+                    <option value="oldest" {% if filter_queries.last_updated == 'oldest' %}selected{% endif %}>Oldest</option>
                 </select>
 
-                <select id="filter-balance" name="balance">
+                <select id="filter-balance" name="net_balance">
                     <option value="netbalance">Net Balance</option>
-                    <option value="profit">Profit</option>
-                    <option value="loss">Loss</option>
+                    <option value="htol" {% if filter_queries.net_balance == 'htol' %}selected{% endif %}>High to Low</option>
+                    <option value="ltoh" {% if filter_queries.net_balance == 'ltoh' %}selected{% endif %}>Low to High</option>
                 </select>
 
+                {% if view == 'event_view' %}
                 <select id="filter-status" name="status">
                     <option>Status</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="complete">Complete</option>
+                    <option value="ongoing" {% if filter_queries.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                    <option value="completed" {% if filter_queries.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
                 </select>
+                {% endif %}
 
                 <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
             </div>
