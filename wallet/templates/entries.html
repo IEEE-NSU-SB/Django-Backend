@@ -504,7 +504,8 @@
                     <hr style="width: 100%;">
                     <div class="flex_space_between">
                         <p>Surplus/Deficit</p>
-                        <p style= "color: #1B971F;">{{budget_surplus_deficit}}</p>
+                        {% if budget_surplus_deficit > 0 %}
+                        <p style="color: #1B971F;">{{budget_surplus_deficit}}</p>
                         {% elif budget_surplus_deficit < 0 %}
                         <p style="color: #EB5132;">{{budget_surplus_deficit}}</p>
                         {% else %}
