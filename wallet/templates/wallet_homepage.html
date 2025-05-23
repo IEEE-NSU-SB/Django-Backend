@@ -631,7 +631,7 @@
                 
         <div class="actions">
             <div>
-                <input type="text" class="search_bar shadow_box" placeholder="Search">
+                <input type="text" id="searchBar" class="search_bar shadow_box" placeholder="Search">
             </div>
             <div class="buttons">
                 <button class="create_btn" id="create-account-btn">Create Book/Entry</button>
@@ -1256,6 +1256,33 @@
     });
 
   </script>
+  <script>
+    document.getElementById("searchBar").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const tables = ["event", "non-event"];
+
+        tables.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            if (table) {
+                const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+                for (let row of rows) {
+                    const cells = row.getElementsByTagName("td");
+                    let match = false;
+
+                    for (let cell of cells) {
+                        if (cell.textContent.toLowerCase().includes(filter)) {
+                            match = true;
+                            break;
+                        }
+                    }
+
+                    row.style.display = match ? "" : "none";
+                }
+            }
+        });
+    });
+    </script>
+
 </body>
 {% block common_js %}
 {% include "common_js.html" %}
