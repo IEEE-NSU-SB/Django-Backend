@@ -504,10 +504,9 @@
                     <hr style="width: 100%;">
                     <div class="flex_space_between">
                         <p>Surplus/Deficit</p>
-                        {% if budget_amount_available > 0 %}
-                        <p style="color: #1B971F;">{{budget_amount_available}}</p>
-                        {% elif budget_amount_available < 0 %}
-                        <p style="color: #EB5132;">{{budget_amount_available}}</p>
+                        <p style= "color: #1B971F;">{{budget_surplus_deficit}}</p>
+                        {% elif budget_surplus_deficit < 0 %}
+                        <p style="color: #EB5132;">{{budget_surplus_deficit}}</p>
                         {% else %}
                         <p style="color: #EB5132;">No Data</p>
                         {% endif %}

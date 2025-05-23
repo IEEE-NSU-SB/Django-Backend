@@ -69,9 +69,9 @@ def entries(request, event_id, primary=None):
                 names.append(name)
 
     net_balance = cash_in_total - cash_out_total
-    budget_amount_available = None
+    budget_surplus_deficit = None
     if budget_data:
-        budget_amount_available = budget_data.total_cost - float(net_balance)
+        budget_surplus_deficit = budget_data.total_revenue - budget_data.total_cost
 
     wallet_entries = dict(wallet_entries)
 
@@ -92,7 +92,7 @@ def entries(request, event_id, primary=None):
         'wallet_event_status': wallet_event_status,
         'names': names,
         'budget_data': budget_data,
-        'budget_amount_available': budget_amount_available,
+        'budget_surplus_deficit': budget_surplus_deficit,
     }
 
     return render(request, "entries.html", context)
