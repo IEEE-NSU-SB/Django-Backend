@@ -485,22 +485,32 @@
                     <hr style="width: 100%;">
                     <div class="flex_space_between">
                         <p>Net Balance</p>
-                        <p>{{net_balance}}</p>
+                        {% if net_balance > 0 %}
+                        <p style="color: #1B971F;">{{net_balance}}</p>
+                        {% else %}
+                        <p style="color: #EB5132;">{{net_balance}}</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="net_total_box"  style="font-weight: bold;">
                     <div class="flex_space_between">
-                        <p>Budget (Cost)</p>
-                        <p>{% if budget_data %}{{budget_data.total_cost|floatformat:2}}{% else %}No Data{% endif %}</p>
+                        <p>Budget (Revenue)</p>
+                        <p style="color: #1B971F;">{% if budget_data %}{{budget_data.total_revenue|floatformat:2}}{% else %}No Data{% endif %}</p>
                     </div>
                     <div class="flex_space_between">
-                        <p>Budget (Revenue)</p>
-                        <p>{% if budget_data %}{{budget_data.total_revenue|floatformat:2}}{% else %}No Data{% endif %}</p>
+                        <p>Budget (Cost)</p>
+                        <p style="color: #EB5132;">{% if budget_data %}{{budget_data.total_cost|floatformat:2}}{% else %}No Data{% endif %}</p>
                     </div>
                     <hr style="width: 100%;">
                     <div class="flex_space_between">
-                        <p>Budget Amount Available</p>
-                        <p style="color: #1B971F;">{% if budget_amount_available %}{{budget_amount_available}}{% else %}No Data{% endif %}</p>
+                        <p>Surplus/Deficit</p>
+                        {% if budget_amount_available > 0 %}
+                        <p style="color: #1B971F;">{{budget_amount_available}}</p>
+                        {% elif budget_amount_available < 0 %}
+                        <p style="color: #EB5132;">{{budget_amount_available}}</p>
+                        {% else %}
+                        <p style="color: #EB5132;">No Data</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
