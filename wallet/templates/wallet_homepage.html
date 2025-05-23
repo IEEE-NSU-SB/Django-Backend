@@ -11,7 +11,7 @@
     <!--Sweet Alert-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!--Chart-->>
+    <!--Chart-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     {% block common_css %}
@@ -411,7 +411,7 @@
 
         .filter{
             border-radius: 4px;
-            border: 1px solid rgb(76 76 171);
+            /* border: 1px solid rgb(76 76 171); */
             color: rgb(76 76 171);
             background-color: rgb(206, 206, 254);
             padding: 3px 16px;
@@ -420,22 +420,21 @@
             margin: 0;
         }
         .filter:hover{
-            background-color: rgb(76 76 171);
-            color: rgb(206, 206, 254);
+            background-color: rgb(155, 155, 255);
         }
         .stats_btn{
             border-radius: 4px;
-            border: 1px solid rgb(76 76 171);
-            color: rgb(76 76 171);
-            background-color: rgb(206, 206, 254);
+            /* border: 1px solid #a59113; */
+            color: #a59113;
+            background-color: #fff4ad;
             padding: 3px 16px;
             transition: all .3s ease-in-out;
             cursor: pointer;
             margin: 0;
         }
         .stats_btn:hover{
-            background-color: rgb(76 76 171);
-            color: rgb(206, 206, 254);
+            background-color: #fde965;
+            /* color: #a59113; */
         }
         .download_btn{
             border-radius: 4px;
@@ -453,7 +452,7 @@
         }
         .create_btn{
             border-radius: 4px;
-            border: 1px solid rgb(76, 171, 92);
+            border: 1px solid transparent;
             color: rgb(76, 171, 92);
             background-color: rgb(213, 251, 219);
             padding: 4px 16px;
@@ -462,8 +461,8 @@
             margin: 0;
         }
         .create_btn:hover{
-            background-color: rgb(76, 171, 92);
-            color: rgb(213, 251, 219);
+            background-color: rgb(149, 255, 165);
+            /* color: rgb(213, 251, 219); */
         }
         .cash_in_btn{
             background-color: #31AE70;
@@ -650,6 +649,7 @@
             border: 1px solid #ccc;
             background-color: #fff;
             cursor: pointer;
+            border-radius: 4px;
         }
 
         .event-dropdown-options {
@@ -663,6 +663,7 @@
             background-color: #fff;
             z-index: 1000;
             display: none;
+            border-radius: 4px;
         }
 
         .event-dropdown-options div {
@@ -805,9 +806,7 @@
 
         <!--Stats-->
         <div class="stats_menu">
-            <div style="display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
                 <h6 class="stat_box">Wallet Balance: {{wallet_balance}}</h6>
                 <!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
                       <option value="all_time">All Time</option>
@@ -828,7 +827,7 @@
         </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
             <h5 class="accounts-title">Your Books</h5>
             <div>
                 <form id="ViewSelectForm">
