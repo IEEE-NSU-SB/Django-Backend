@@ -34,13 +34,13 @@
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 0;
         }
         
         .wallet-title {
             text-align: center;
             margin: 30px 0;
-            font-weight: bold;
+            /* font-weight: bold; */
+            color: #00629b;
         }
         
         .wallet-balance {
@@ -56,19 +56,8 @@
             margin-bottom: 20px;
             align-items: center;
         }
-        
-        .search-bar {
-            width: 70%;
-        }
-        
-        .search-bar input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
 
-        .btn-apply {
+        .modal_download_btn {
             background-color: #6495ED;
             color: white;
             text-align: center;
@@ -80,7 +69,7 @@
             cursor: pointer;
         }
         
-        .btn-apply:hover {
+        .modal_download_btn:hover {
             color: #6495ED;
             background-color: white;
         }
@@ -100,50 +89,29 @@
             background-color: white;
         }
         
-        .accounts-title {
+        .book-title {
             margin: 0px 0 10px;
             font-weight: bold;
         }
         
-        .accounts-table {
+        .books-table {
             width: 100%;
             border-collapse: collapse;
             border-radius: 6px;
         }
         
-        .accounts-table th, .accounts-table td {
+        .books-table th, .books-table td {
             padding: 10px;
             text-align: center;
             border-bottom: 1px solid #ddd;
         }
         
-        .accounts-table th {
+        .books-table th {
             background-color: #f0f0f0;
         }
         
-        .accounts-table tr:hover {
+        .books-table tr:hover {
             background-color: #f9f9f9;
-        }
-        
-        .download-icon {
-            cursor: pointer;
-            color: #666;
-            text-align: center;
-        }
-        
-        .status-circle {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 1px solid #ddd;
-            display: inline-block;
-            cursor: pointer;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
         }
         
         .net-balance {
@@ -151,42 +119,11 @@
         }
 
         .profit{
-            color: green;
+            color: #1B971F;
         }
 
         .loss{
             color: rgb(224, 20, 20);
-        }
-        
-        .filter-panel {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: none;
-            position: relative;
-        }
-        
-        .filter-panel.active {
-            display: block;
-        }
-        
-        .filter-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .close-filter {
-            cursor: pointer;
-            font-size: 18px;
-            color: #666;
-        }
-        
-        .filter-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
         }
         
         .filter-group {
@@ -206,31 +143,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        
-        .status-dropdown {
-            position: absolute;
-            right: 20px;
-            background: white;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 10;
-            width: 150px;
-            display: none;
-        }
-        
-        .status-dropdown.show {
-            display: block;
-        }
-        
-        .status-option {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        
-        .status-option:hover {
-            background-color: #f5f5f5;
-        }
-        
+
         /* Download Modal Styles */
         .modal {
             display: none;
@@ -534,42 +447,6 @@
             color: #00629b;
             /* border-radius: 50%; */
         }
-        .custom-dropdown {
-            position: relative;
-            user-select: none;
-            font-family: sans-serif;
-            border: 1px solid #e5e5e5;
-            border-radius: 4px;
-        }
-
-        .custom-dropdown-selected {
-            padding: 10px;
-            border: 1px solid #e5e5e5;
-            background-color: #fff;
-            cursor: pointer;
-        }
-
-        .custom-dropdown-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            z-index: 1000;
-            display: none;
-        }
-
-        .custom-dropdown-options div {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .custom-dropdown-options div:hover {
-            background-color: #f0f0f0;
-        }
 
         table{
             max-height: 50px;
@@ -589,25 +466,7 @@
             position: sticky;
             top: -2px;
         }
-        @media screen and (max-width: 700px) {
-            .table-responsive{
-                overflow-x: scroll;
-                width: 500px;
-            }
-        }
-        @media screen and (max-width: 600px) {
-            .table-responsive{
-                width: 400px;
-            }
-        }
-        @media screen and (max-width: 450px) {
-            .table-responsive{
-                width: 350px;
-            }
-            .actions{
-                justify-content: space-around;
-            }
-        }
+
         .tab-buttons {
             display: flex;
             border-bottom: 2px solid #ccc;
@@ -707,6 +566,25 @@
         .remove-btn:hover {
             color: #ec1616;
         }
+        @media screen and (max-width: 700px) {
+            .table-responsive{
+                overflow-x: scroll;
+                width: 500px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .table-responsive{
+                width: 400px;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            .table-responsive{
+                width: 350px;
+            }
+            .actions{
+                justify-content: space-around;
+            }
+        }
     </style>
 </head>
 <body>
@@ -739,9 +617,7 @@
 
     <div class="container">
         <h2 class="wallet-title">Treasurer's Wallet</h2>
-        
-        <!-- <div class="wallet-balance">Wallet Balance: 100000</div> -->
-        
+                
         <div class="actions">
             <div>
                 <input type="text" class="search_bar shadow_box" placeholder="Search">
@@ -819,16 +695,16 @@
             <!-- <h2>Cash In vs Cash Out (Monthly)</h2> -->
             <div style="display: flex; gap: 20px; flex-wrap: nowrap; justify-content: space-between;">
                 <div>
-                    <canvas id="cashChart" height="350" width="500"></canvas>
+                    <canvas id="cashChart1" height="350" width="500"></canvas>
                 </div>
                 <div>
-                    <canvas id="cashChart1" height="350" width="500"></canvas>
+                    <canvas id="cashChart2" height="350" width="500"></canvas>
                 </div>
         </div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-            <h5 class="accounts-title">Your Books</h5>
+            <h5 class="book-title">Your Books</h5>
             <div>
                 <form id="ViewSelectForm">
                     <select id="filter-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;" name="view" onchange="ViewSelect();">
@@ -841,7 +717,7 @@
         
         {% if view == 'event_view' %}
     <div class="table-responsive table_box">
-        <table class="accounts-table  table" id="event">
+        <table class="books-table  table" id="event">
             <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
@@ -876,7 +752,7 @@
         </div>
         {% else %}
         <div class="table-responsive table_box">
-        <table class="accounts-table table" id="non-event">
+        <table class="books-table table" id="non-event">
             <thead style="position: relative; z-index: 101;">
                 <tr>
                     <th>SL</th>
@@ -909,9 +785,6 @@
         </div>
         {% endif %}
         
-        <!-- <div class="pagination">
-            < 1 of 10 >
-        </div> -->
     </div>
     
     <!-- Download Modal -->
@@ -978,7 +851,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" id="cancel-download">Cancel</button>
-                <button class="btn-apply" id="confirm-download">Download</button>
+                <button class="modal_download_btn" id="confirm-download">Download</button>
             </div>
         </div>
     </div>
@@ -1024,67 +897,10 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="modal-footer">
-                <button class="btn" id="cancel-create">Cancel</button>
-            </div> -->
         </div>
     </div>
 
     <script>
-        // Status circle dropdown
-        const statusCircles = document.querySelectorAll('.status-circle');
-        const statusDropdown = document.getElementById('status-dropdown');
-        
-        statusCircles.forEach(circle => {
-            circle.addEventListener('click', function(e) {
-                // Hide dropdown if already visible
-                if (statusDropdown.classList.contains('show') && 
-                    statusDropdown.dataset.currentTarget === this.id) {
-                    statusDropdown.classList.remove('show');
-                    return;
-                }
-                
-                // Position and show dropdown
-                const rect = this.getBoundingClientRect();
-                statusDropdown.style.top = `${rect.bottom + window.scrollY}px`;
-                statusDropdown.style.left = `${rect.left + window.scrollX - 120}px`;
-                statusDropdown.classList.add('show');
-                statusDropdown.dataset.currentTarget = this.id;
-                
-                e.stopPropagation();
-            });
-        });
-        
-        // Status options selection
-        // const statusOptions = document.querySelectorAll('.status-option');
-        
-        // statusOptions.forEach(option => {
-        //     option.addEventListener('click', function() {
-        //         const status = this.dataset.status;
-        //         const targetId = statusDropdown.dataset.currentTarget;
-        //         const targetCircle = document.getElementById(targetId);
-                
-        //         // Update circle appearance based on selection
-        //         if (status === 'complete') {
-        //             targetCircle.style.backgroundColor = 'green';
-        //         } else if (status === 'ongoing') {
-        //             targetCircle.style.backgroundColor = 'orange';
-        //         } else {
-        //             targetCircle.style.backgroundColor = 'white';
-        //         }
-                
-        //         statusDropdown.classList.remove('show');
-        //     });
-        // });
-        
-        // // Close dropdown when clicking elsewhere
-        // document.addEventListener('click', function(e) {
-        //     if (!e.target.matches('.status-circle') && 
-        //         !e.target.matches('.status-option')) {
-        //         statusDropdown.classList.remove('show');
-        //     }
-        // });
-        
         // Download Modal
         // const downloadBtn = document.getElementById('download-btn');
         // const downloadModal = document.getElementById('download-modal');
@@ -1137,23 +953,9 @@
             createAccountModal.classList.remove('active');
         });
         
-        // cancelCreate.addEventListener('click', function() {
-        //     createAccountModal.classList.remove('active');
-        // });
-        
         confirmCreate.addEventListener('click', function(e) {
             var event_id = event_select.value;
             window.location.href = `./entries/${event_id}/`;
-        });
-        
-        // Close modals when clicking outside
-        window.addEventListener('click', function(e) {
-            if (e.target === downloadModal) {
-                downloadModal.classList.remove('active');
-            }
-            if (e.target === createAccountModal) {
-                createAccountModal.classList.remove('active');
-            }
         });
     </script>
     <script>
@@ -1254,6 +1056,7 @@
         }
     </script>
     <script>
+        //Sweet Alert
         {% for message in messages %}
     
         Swal.fire({
@@ -1263,107 +1066,83 @@
         })
         {% endfor %}
     </script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Tab switching
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabButtons.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(tc => tc.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.tab).classList.add('active');
-        });
-    });
-
-    // Old dropdown (if still used somewhere else)
-    const legacyDropdown = document.getElementById('customEventDropdown');
-    if (legacyDropdown) {
-        const legacySelected = legacyDropdown.querySelector('.custom-dropdown-selected');
-        const legacyOptions = legacyDropdown.querySelector('.custom-dropdown-options');
-        const legacyHiddenInput = document.getElementById('event-select');
-
-        legacySelected.addEventListener('click', () => {
-            legacyOptions.style.display = legacyOptions.style.display === 'block' ? 'none' : 'block';
-        });
-
-        legacyOptions.querySelectorAll('div').forEach(option => {
-            option.addEventListener('click', () => {
-                legacySelected.textContent = option.textContent;
-                legacyHiddenInput.value = option.dataset.value;
-                legacyOptions.style.display = 'none';
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
             });
         });
 
-        document.addEventListener('click', (e) => {
-            if (!legacyDropdown.contains(e.target)) {
-                legacyOptions.style.display = 'none';
-            }
-        });
-    }
 
-    // Updated dropdown for new event tab
-    const newDropdown = document.getElementById('eventDropdown');
-    if (newDropdown) {
-        const newSelected = newDropdown.querySelector('.event-dropdown-selected');
-        const newOptions = newDropdown.querySelector('.event-dropdown-options');
-        const newHiddenInput = document.getElementById('event-select');
+        // Updated dropdown for new event tab
+        const newDropdown = document.getElementById('eventDropdown');
+        if (newDropdown) {
+            const newSelected = newDropdown.querySelector('.event-dropdown-selected');
+            const newOptions = newDropdown.querySelector('.event-dropdown-options');
+            const newHiddenInput = document.getElementById('event-select');
 
-        newSelected.addEventListener('click', () => {
-            newOptions.style.display = newOptions.style.display === 'block' ? 'none' : 'block';
-        });
-
-        newOptions.querySelectorAll('div').forEach(option => {
-            option.addEventListener('click', () => {
-                newSelected.textContent = option.textContent;
-                newHiddenInput.value = option.dataset.value;
-                newOptions.style.display = 'none';
+            newSelected.addEventListener('click', () => {
+                newOptions.style.display = newOptions.style.display === 'block' ? 'none' : 'block';
             });
-        });
 
-        document.addEventListener('click', (e) => {
-            if (!newDropdown.contains(e.target)) {
-                newOptions.style.display = 'none';
-            }
-        });
-    }
-});
-</script>
+            newOptions.querySelectorAll('div').forEach(option => {
+                option.addEventListener('click', () => {
+                    newSelected.textContent = option.textContent;
+                    newHiddenInput.value = option.dataset.value;
+                    newOptions.style.display = 'none';
+                });
+            });
 
-<script>
-    document.getElementById('filterForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const form = e.target;
-        const formData = new FormData(form);
-        const params = new URLSearchParams(window.location.search);
-
-        // Update existing or append new form values to URL parameters
-        for (const [key, value] of formData.entries()) {
-            if (value !== '' && value !== key) {
-                params.set(key, value);
-            }
+            document.addEventListener('click', (e) => {
+                if (!newDropdown.contains(e.target)) {
+                    newOptions.style.display = 'none';
+                }
+            });
         }
-
-        // Remove empty selects (optional, cleaner URLs)
-        for (const select of form.querySelectorAll('select')) {
-            const val = select.value;
-            const key = select.name;
-            if (val === '' || val === key || select.selectedIndex === 0) {
-                params.delete(key);
-            }
-        }
-
-        // Redirect with updated URL params
-        window.location.search = params.toString();
     });
-</script>
+    </script>
 
-<script>
-    const ctx = document.getElementById('cashChart').getContext('2d');
-    const cashChart = new Chart(ctx, {
+    <script>
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const params = new URLSearchParams(window.location.search);
+
+            // Update existing or append new form values to URL parameters
+            for (const [key, value] of formData.entries()) {
+                if (value !== '' && value !== key) {
+                    params.set(key, value);
+                }
+            }
+
+            // Remove empty selects (optional, cleaner URLs)
+            for (const select of form.querySelectorAll('select')) {
+                const val = select.value;
+                const key = select.name;
+                if (val === '' || val === key || select.selectedIndex === 0) {
+                    params.delete(key);
+                }
+            }
+
+            // Redirect with updated URL params
+            window.location.search = params.toString();
+        });
+    </script>
+
+    <script>
+    //Stats chart
+    const ctx1 = document.getElementById('cashChart1').getContext('2d');
+    const cashChart1 = new Chart(ctx1, {
       type: 'bar',
       data: {
         labels: [
@@ -1412,58 +1191,58 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    const ctx1 = document.getElementById('cashChart1').getContext('2d');
-const cashChart1 = new Chart(ctx1, {
-  type: 'line', // Changed to line
-  data: {
-    labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString()), // '1' to '30'
-    datasets: [
-      {
-        label: 'Cash In',
-        data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950, 500, 600, 750, 680, 720, 690, 800, 820, 740, 760, 790, 810, 830, 850, 870, 890, 910, 930],
-        borderColor: '#00629B',
-        backgroundColor: 'transparent',
-        fill: true,
-        tension: 0.3
-      },
-      {
-        label: 'Cash Out',
-        data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880, 450, 520, 700, 660, 710, 670, 760, 770, 730, 740, 760, 780, 800, 820, 840, 860, 880, 900],
-        borderColor: '#00629Bae',
-        backgroundColor: 'transparent',
-        fill: true,
-        tension: 0.3
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Amount (BDT)'
+    const ctx2 = document.getElementById('cashChart2').getContext('2d');
+    const cashChart2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString()), // '1' to '30'
+        datasets: [
+        {
+            label: 'Cash In',
+            data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950, 500, 600, 750, 680, 720, 690, 800, 820, 740, 760, 790, 810, 830, 850, 870, 890, 910, 930],
+            borderColor: '#00629B',
+            backgroundColor: 'transparent',
+            fill: true,
+            tension: 0.3
+        },
+        {
+            label: 'Cash Out',
+            data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880, 450, 520, 700, 660, 710, 670, 760, 770, 730, 740, 760, 780, 800, 820, 840, 860, 880, 900],
+            borderColor: '#00629Bae',
+            backgroundColor: 'transparent',
+            fill: true,
+            tension: 0.3
         }
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Day of the Month'
-        }
-      }
+        ]
     },
-    plugins: {
-      legend: {
-        position: 'top'
-      },
-      title: {
-        display: true,
-        text: 'Daily Cash In & Cash Out (30 Days)'
-      }
+    options: {
+        responsive: true,
+        scales: {
+        y: {
+            beginAtZero: true,
+            title: {
+            display: true,
+            text: 'Amount (BDT)'
+            }
+        },
+        x: {
+            title: {
+            display: true,
+            text: 'Day of the Month'
+            }
+        }
+        },
+        plugins: {
+        legend: {
+            position: 'top'
+        },
+        title: {
+            display: true,
+            text: 'Daily Cash In & Cash Out (30 Days)'
+        }
+        }
     }
-  }
-});
+    });
 
   </script>
 </body>
