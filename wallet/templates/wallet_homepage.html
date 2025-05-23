@@ -740,47 +740,50 @@
         <div class="filter_menu">
             <div style="display: flex; justify-content: space-between;">
                 <strong>Filter by</strong>
-                <a href="#" class="clear_btn">Clear filter</a>
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}" class="clear_btn">Clear filter</a>
             </div>
-        <div class="filter-bar">
-            <select id="filter-category">
-                <option>Category</option>
-                <option value="travel">Travel</option>
-                <option value="food">Food</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="utilities">Utilities</option>
-            </select>
 
-            <select id="filter-month">
-                <option>Month</option>
-                <option value="January">January</option>
-            </select>
+            <form id="filterForm">
+            <div class="filter-bar">
+                <select id="filter-category" name="category">
+                    <option>Category</option>
+                    <option value="travel">Travel</option>
+                    <option value="food">Food</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="utilities">Utilities</option>
+                </select>
 
-            <select id="filter-tenure">
-                <option>Tenure</option>
-                <option value="Spring 2025">Spring 2025</option>
-            </select>
+                <select id="filter-month" name="month">
+                    <option>Month</option>
+                    <option value="January">January</option>
+                </select>
 
-            <select id="filter-last-updated">
-                <option value="latestupdated">Latest Updated</option>
-                <option value="latest">Latest</option>
-                <option value="oldest">Oldest</option>
-            </select>
+                <select id="filter-tenure" name="tenure">
+                    <option>Tenure</option>
+                    <option value="Spring 2025">Spring 2025</option>
+                </select>
 
-            <select id="filter-balance">
-                <option value="netbalance">Net Balance</option>
-                <option value="profit">Profit</option>
-                <option value="loss">Loss</option>
-            </select>
+                <select id="filter-last-updated" name="last_updated">
+                    <option value="latestupdated">Latest Updated</option>
+                    <option value="latest">Latest</option>
+                    <option value="oldest">Oldest</option>
+                </select>
 
-            <select id="filter-status">
-                <option>Status</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="complete">Complete</option>
-            </select>
-            
-            <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
+                <select id="filter-balance" name="balance">
+                    <option value="netbalance">Net Balance</option>
+                    <option value="profit">Profit</option>
+                    <option value="loss">Loss</option>
+                </select>
+
+                <select id="filter-status" name="status">
+                    <option>Status</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="complete">Complete</option>
+                </select>
+
+                <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
             </div>
+            </form>
         </div>
 
         <!--Stats-->
@@ -1304,6 +1307,36 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
+<script>
+    document.getElementById('filterForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const params = new URLSearchParams(window.location.search);
+
+        // Update existing or append new form values to URL parameters
+        for (const [key, value] of formData.entries()) {
+            if (value !== '' && value !== key) {
+                params.set(key, value);
+            }
+        }
+
+        // Remove empty selects (optional, cleaner URLs)
+        for (const select of form.querySelectorAll('select')) {
+            const val = select.value;
+            const key = select.name;
+            if (val === '' || val === key || select.selectedIndex === 0) {
+                params.delete(key);
+            }
+        }
+
+        // Redirect with updated URL params
+        window.location.search = params.toString();
+    });
+</script>
+
 <script>
     const ctx = document.getElementById('cashChart').getContext('2d');
     const cashChart = new Chart(ctx, {

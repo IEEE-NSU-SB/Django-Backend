@@ -49,7 +49,7 @@ class WalletManager:
 
     def update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
 
-        # categories = str(entry_categories).split(',')
+        categories = str(entry_categories).split(',')
 
         wallet_entry = WalletEntry.objects.get(id=entry_id)
         wallet_entry.entry_date_time = entry_date_time
@@ -58,7 +58,21 @@ class WalletManager:
         wallet_entry.remarks = entry_remark
         wallet_entry.payment_mode = payment_mode
 
+        if wallet_entry.amount != Decimal(entry_amount):
+            wallet = Wallet.objects.get(sc_ag=wallet_entry.sc_ag)
+            if wallet_entry.entry_type == 'CASH_IN':
+                wallet.balance -= Decimal(wallet_entry.amount)
+                wallet_entry.amount = entry_amount
+                wallet.balance += Decimal(wallet_entry.amount)
+            elif wallet_entry.entry_type == 'CASH_OUT':
+                wallet.balance += Decimal(wallet_entry.amount)
+                wallet_entry.amount = entry_amount
+                wallet.balance -= Decimal(wallet_entry.amount)
+
+            wallet.save()
+
         wallet_entry.save()
+        wallet_entry.categories.add(*categories)
 
         for file in entry_files:
             WalletEntryFile.objects.create(wallet_entry=wallet_entry, document=file)
@@ -86,3 +100,12 @@ class WalletManager:
 
         wallet.save()
         wallet_entry.delete()
+
+    def delete_entry_file(file_id):
+
+        entry_file = WalletEntryFile.objects.get(id=file_id)
+        
+        path = settings.MEDIA_ROOT+str(entry_file.document)
+        if os.path.exists(path):
+            os.remove(path)
+        entry_file.delete()
