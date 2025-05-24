@@ -700,18 +700,32 @@
                     completed: active
                 }),
                 success: function (response) {
-                    console.log('Wallet event status updated:', response);
                     if(response.message == 'success') {
                         if(active){
+                            Swal.fire({
+                                icon:"success",
+                                title:"Event status is marked as Completed!",
+                                
+                            })
                             completeText.innerHTML = 'Completed!';
                             completeText.style.color = '#75D481';
                         }
                         else{
+                            Swal.fire({
+                                icon:"success",
+                                title:"Event status is marked as Ongoing!",
+                                
+                            })
                             completeText.innerHTML = 'Book complete?';
                             completeText.style.color = '#000000a2';
                         }
                     }
                     else {
+                        Swal.fire({
+                            icon:"error",
+                            title:"Could not updated event status!",
+                            
+                        })
                         if(active){
                             toggle.checked = false;
                             completeText.innerHTML = 'Book complete?';

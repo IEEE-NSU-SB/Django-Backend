@@ -131,7 +131,7 @@ def cash_in(request, event_id=None, primary=None):
             if WalletManager.add_wallet_entry(primary, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id):
                 messages.success(request, 'Entry added successfully!')
             else:
-                messages.warning(request, 'Error! Could not process your request')
+                messages.error(request, 'Error! Could not process your request')
 
             if event_id:
                 if primary == 1:
@@ -189,7 +189,7 @@ def cash_out(request, event_id=None, primary=None):
             if WalletManager.add_wallet_entry(primary, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id):
                 messages.success(request, 'Entry added successfully!')
             else:
-                messages.warning(request, 'Error! Could not process your request')
+                messages.error(request, 'Error! Could not process your request')
 
             if event_id:
                 if primary == 1:
@@ -252,13 +252,13 @@ def cash_edit(request, entry_id, primary=None):
                 if WalletManager.update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
                     messages.success(request, 'Entry updated successfully!')
                 else:
-                    messages.warning(request, 'Error! Could not process your request')
+                    messages.error(request, 'Error! Could not process your request')
 
             elif 'delete_entry' in request.POST:
                 if WalletManager.delete_wallet_entry(entry_id):
                     messages.success(request, 'Entry deleted successfully!')
                 else:
-                    messages.warning(request, 'Error! Could not process your request')
+                    messages.error(request, 'Error! Could not process your request')
 
             elif 'delete_file' in request.POST:
                 file_id = request.POST.get('delete_file')
@@ -266,7 +266,7 @@ def cash_edit(request, entry_id, primary=None):
                 if WalletManager.delete_entry_file(file_id):
                     messages.success(request, 'File deleted successfully!')
                 else:
-                    messages.warning(request, 'Error! Could not process your request')
+                    messages.error(request, 'Error! Could not process your request')
 
                 if primary == 1:
                     return redirect('central_branch:wallet:cash_edit', entry_id)
@@ -330,7 +330,7 @@ def wallet_homepage(request, primary=None):
                 if WalletManager.delete_wallet_entry(entry_id):
                     messages.success(request, 'Entry deleted successfully!')
                 else:
-                    messages.warning(request, 'Error! Could not process your request')
+                    messages.error(request, 'Error! Could not process your request')
         
         events = Events.objects.filter(event_organiser__primary=primary).order_by('-start_date','-event_date').values('id', 'event_name')
         tenures = Panels.objects.filter(panel_of__primary=primary).order_by('-year')
