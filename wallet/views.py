@@ -6,7 +6,7 @@ from django.utils.timezone import localtime
 from django.shortcuts import redirect, render
 from django.views import View
 
-from central_branch.renderData import Branch
+from django.contrib import messages
 from central_events.models import Events
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from finance_and_corporate_team.models import BudgetSheet
@@ -16,7 +16,7 @@ from port.renderData import PortData
 from users import renderData
 from wallet.renderData import WalletManager
 from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile, WalletEventStatus
-from users.renderData import LoggedinUser,member_login_permission
+from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField
 from django.db.models.functions import TruncDate
@@ -128,7 +128,10 @@ def cash_in(request, event_id=None, primary=None):
             payment_mode = request.POST.get('payment_mode')
             entry_files = request.FILES.getlist('entry_files')
 
-            WalletManager.add_wallet_entry(primary, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+            if WalletManager.add_wallet_entry(primary, 'CASH_IN', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id):
+                messages.success(request, 'Entry added successfully!')
+            else:
+                messages.warning(request, 'Error! Could not process your request')
 
             if event_id:
                 if primary == 1:
@@ -183,7 +186,10 @@ def cash_out(request, event_id=None, primary=None):
             payment_mode = request.POST.get('payment_mode')
             entry_files = request.FILES.getlist('entry_files')
 
-            WalletManager.add_wallet_entry(primary, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id)
+            if WalletManager.add_wallet_entry(primary, 'CASH_OUT', entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files, event_id):
+                messages.success(request, 'Entry added successfully!')
+            else:
+                messages.warning(request, 'Error! Could not process your request')
 
             if event_id:
                 if primary == 1:
@@ -243,15 +249,24 @@ def cash_edit(request, entry_id, primary=None):
                 payment_mode = request.POST.get('payment_mode')
                 entry_files = request.FILES.getlist('entry_files')
 
-                WalletManager.update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files)
+                if WalletManager.update_wallet_entry(entry_id, entry_date_time, entry_amount, name, contact, entry_remark, payment_mode, entry_categories, entry_files):
+                    messages.success(request, 'Entry updated successfully!')
+                else:
+                    messages.warning(request, 'Error! Could not process your request')
 
             elif 'delete_entry' in request.POST:
-                WalletManager.delete_wallet_entry(entry_id)
+                if WalletManager.delete_wallet_entry(entry_id):
+                    messages.success(request, 'Entry deleted successfully!')
+                else:
+                    messages.warning(request, 'Error! Could not process your request')
 
             elif 'delete_file' in request.POST:
                 file_id = request.POST.get('delete_file')
 
-                WalletManager.delete_entry_file(file_id)
+                if WalletManager.delete_entry_file(file_id):
+                    messages.success(request, 'File deleted successfully!')
+                else:
+                    messages.warning(request, 'Error! Could not process your request')
 
                 if primary == 1:
                     return redirect('central_branch:wallet:cash_edit', entry_id)
@@ -312,7 +327,10 @@ def wallet_homepage(request, primary=None):
             if 'delete_entry' in request.POST:
                 entry_id = request.POST.get('delete_entry')
 
-                WalletManager.delete_wallet_entry(entry_id)
+                if WalletManager.delete_wallet_entry(entry_id):
+                    messages.success(request, 'Entry deleted successfully!')
+                else:
+                    messages.warning(request, 'Error! Could not process your request')
         
         events = Events.objects.filter(event_organiser__primary=primary).order_by('-start_date','-event_date').values('id', 'event_name')
         tenures = Panels.objects.filter(panel_of__primary=primary).order_by('-year')
