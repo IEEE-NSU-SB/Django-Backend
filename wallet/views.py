@@ -314,7 +314,7 @@ def wallet_homepage(request, primary=None):
 
                 WalletManager.delete_wallet_entry(entry_id)
         
-        events = Events.objects.filter(event_organiser__primary=primary).values('id', 'event_name')
+        events = Events.objects.filter(event_organiser__primary=primary).order_by('-start_date','-event_date').values('id', 'event_name')
         tenures = Panels.objects.filter(panel_of__primary=primary).order_by('-year')
 
         wallet_entries_event = None
