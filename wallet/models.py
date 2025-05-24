@@ -36,7 +36,7 @@ class WalletEntry(models.Model):
     update_date_time = models.DateTimeField(null=False, blank=False, auto_now=True)
     entry_date_time = models.DateTimeField(null=False, blank=False, default=timezone.now)
     entry_event = models.ForeignKey(Events, null=True, blank=True, on_delete=models.SET_NULL)
-    entry_type = models.CharField(null=False, blank=False, default='NOT_SET', choices=[
+    entry_type = models.CharField(null=False, blank=False, max_length=12, default='NOT_SET', choices=[
         ('CASH_IN', 'Cash In'),
         ('CASH_OUT', 'Cash Out'),
         ('NOT_SET', 'NOT SET'),
@@ -81,7 +81,7 @@ class WalletEntryFile(models.Model):
 class WalletEventStatus(models.Model):
 
     wallet_event = models.ForeignKey(Events, null=False, blank=False, on_delete=models.CASCADE)
-    status = models.CharField(null=False, blank=False, default='ONGOING', choices=[
+    status = models.CharField(null=False, blank=False, max_length=12, default='ONGOING', choices=[
         ('ONGOING', 'Ongoing'),
         ('COMPLETED', 'Completed'),
     ])
