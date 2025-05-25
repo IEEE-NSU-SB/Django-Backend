@@ -260,7 +260,10 @@ class WalletManager:
 
         for entry in entries:
             # Convert to local time if needed
-            dt = localtime(entry.entry_date_time)
+            if isinstance(entry.entry_date_time, str):
+                dt = datetime.strptime(entry.entry_date_time, '%Y-%m-%d')
+            else:
+                dt = entry.entry_date_time
             day = dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
             if entry.entry_type == 'CASH_IN':
