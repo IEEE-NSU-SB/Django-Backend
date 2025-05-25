@@ -250,16 +250,26 @@ class WalletManager:
         now = datetime.now()
 
         # Fetch daily entries for the current month
-        raw_entries = WalletEntry.objects.filter(
+        entries = WalletEntry.objects.filter(
             tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
             sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
             entry_date_time__year=now.year,
             entry_date_time__month=now.month
-        ).annotate(
-            day=TruncDay('entry_date_time')
-        ).values('day').annotate(
-            cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
-            cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
-        ).order_by('day')
+        )
+        daily_data = defaultdict(lambda: {'cash_in': 0, 'cash_out': 0})
 
-        return list(raw_entries)
+        for entry in entries:
+            # Convert to local time if needed
+            dt = localtime(entry.entry_date_time)
+            day = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+
+            if entry.entry_type == 'CASH_IN':
+                daily_data[day]['cash_in'] += entry.amount
+            elif entry.entry_type == 'CASH_OUT':
+                daily_data[day]['cash_out'] += entry.amount
+
+        # Step 4: Return as sorted list of dicts
+        return [
+            {'day': day, 'cash_in': data['cash_in'], 'cash_out': data['cash_out']}
+            for day, data in sorted(daily_data.items())
+        ]
