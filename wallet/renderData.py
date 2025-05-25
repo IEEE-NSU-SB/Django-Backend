@@ -218,19 +218,15 @@ class WalletManager:
         data_by_month = {}
         for entry in raw_entries:
             try:
-                # Ensure we can safely extract the month
-                month_value = entry['month']
-                if isinstance(month_value, str):
-                    # Parse string to datetime (MySQL may return string)
-                    month_dt = datetime.strptime(month_value, '%Y-%m-%d')
-                elif isinstance(month_value, datetime):
-                    month_dt = month_value
-                elif hasattr(month_value, 'month'):
-                    month_dt = month_value  # date or datetime object
+                month_val = entry['month']
+                if isinstance(month_val, str):
+                    month_dt = datetime.strptime(month_val, '%Y-%m-%d')
                 else:
-                    continue
-            except:
-                pass
+                    month_dt = month_val  # date or datetime
+                month_number = month_dt.month
+                data_by_month[month_number] = entry
+            except Exception as e:
+                pass  # optionally log
 
         month_number = month_dt.month
         data_by_month[month_number] = entry
