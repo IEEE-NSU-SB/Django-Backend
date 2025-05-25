@@ -225,13 +225,15 @@ def dashboard(request):
         performers = get_top_5_performers(request)
         top_teams = get_top_5_teams(request)
 
+
         if is_eb_or_admin:
             wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary=1)
-
             wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary=1)
+            wallet_entry_stats_for_current_month = WalletManager.get_wallet_entry_stats_for_current_month(primary=1)
         else:
             wallet_entry_stats_whole_tenure = None
             wallet_entry_stats_whole_tenure_by_month = None
+            wallet_entry_stats_for_current_month = None
 
         if(user_data==False):
 
@@ -269,6 +271,8 @@ def dashboard(request):
             'top_teams':top_teams,
             'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
             'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
+            'wallet_entry_stats_for_current_month':wallet_entry_stats_for_current_month,
+            'now': datetime.now(),
         }
 
         

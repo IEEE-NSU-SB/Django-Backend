@@ -509,6 +509,7 @@ def wallet_homepage(request, primary=None):
             wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary)
 
             wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary)
+            wallet_entry_stats_for_current_month = WalletManager.get_wallet_entry_stats_for_current_month(primary)
 
             context = {
                 'all_sc_ag':sc_ag,
@@ -524,6 +525,8 @@ def wallet_homepage(request, primary=None):
                 'filter_queries': filter_queries,
                 'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
                 'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
+                'wallet_entry_stats_for_current_month':wallet_entry_stats_for_current_month,
+                'now': datetime.now(),
             }
 
             return render(request, "wallet_homepage.html", context)

@@ -1168,108 +1168,128 @@
 
     <script>
     //Stats chart
-    const ctx1 = document.getElementById('cashChart1').getContext('2d');
-    const cashChart1 = new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        ],
-        datasets: [
-          {
-            label: 'Cash In',
-            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_in is not None %}{{data.cash_in}},{% endif %}{% endfor %}],
-            backgroundColor: '#00629B'
-          },
-          {
-            label: 'Cash Out',
-            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_out is not None %}{{data.cash_out}},{% endif %}{% endfor %}],
-            backgroundColor: '#00629Bae'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Amount (BDT)'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Month'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            position: 'top'
-          },
-          title: {
-            display: true,
-            text: 'Yearly Cash In & Cash Out'
-          }
-        }
-      }
-    });
-
-    const ctx2 = document.getElementById('cashChart2').getContext('2d');
-    const cashChart2 = new Chart(ctx2, {
-    type: 'line',
+  const ctx1 = document.getElementById('cashChart1').getContext('2d');
+  const cashChart1 = new Chart(ctx1, {
+    type: 'bar',
     data: {
-        labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString()), // '1' to '30'
-        datasets: [
+      labels: [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ],
+      datasets: [
         {
-            label: 'Cash In',
-            data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950, 500, 600, 750, 680, 720, 690, 800, 820, 740, 760, 790, 810, 830, 850, 870, 890, 910, 930],
-            borderColor: '#00629B',
-            backgroundColor: 'transparent',
-            fill: true,
-            tension: 0.3
+          label: 'Cash In',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629B'
         },
         {
-            label: 'Cash Out',
-            data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880, 450, 520, 700, 660, 710, 670, 760, 770, 730, 740, 760, 780, 800, 820, 840, 860, 880, 900],
-            borderColor: '#00629Bae',
-            backgroundColor: 'transparent',
-            fill: true,
-            tension: 0.3
+          label: 'Cash Out',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629Bae'
         }
-        ]
+      ]
     },
     options: {
-        responsive: true,
-        scales: {
+      responsive: true,
+      scales: {
         y: {
-            beginAtZero: true,
-            title: {
+          beginAtZero: true,
+          title: {
             display: true,
             text: 'Amount (BDT)'
-            }
+          }
         },
         x: {
-            title: {
+          title: {
             display: true,
-            text: 'Day of the Month'
-            }
+            text: 'Month'
+          }
         }
-        },
-        plugins: {
+      },
+      plugins: {
         legend: {
-            position: 'top'
+          position: 'top'
         },
         title: {
-            display: true,
-            text: 'Daily Cash In & Cash Out (30 Days)'
+          display: true,
+          text: 'Yearly Cash In & Cash Out'
         }
-        }
+      }
     }
-    });
+  });
+
+  const ctx2 = document.getElementById('cashChart2').getContext('2d');
+  const cashChart2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: [
+        {% for entry in wallet_entry_stats_for_current_month %}
+          "{{ entry.day|date:'j M' }}",
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Cash In',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629B',
+          backgroundColor: '#00629B',
+          tension: 0.3,
+          fill: false
+        },
+        {
+          label: 'Cash Out',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629Bae',
+          backgroundColor: '#00629Bae',
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Amount (BDT)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Date (Current Month)'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Daily Cash In & Cash Out (This Month)'
+        }
+      }
+    }
+  });
 
   </script>
   <script>

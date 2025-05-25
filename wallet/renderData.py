@@ -9,7 +9,8 @@ from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
-from django.db.models.functions import TruncDate, TruncMonth
+from django.db.models.functions import TruncDate, TruncMonth, TruncDay
+from calendar import monthrange 
 
 class WalletManager:
 
@@ -190,9 +191,24 @@ class WalletManager:
         return stats
     
     def get_wallet_entry_stats_whole_tenure_by_month(primary):
+        # Get the SC/AG ID
+        sc_ag_id = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id').first()
+        if not sc_ag_id:
+            return []
+
+        sc_ag_id = sc_ag_id['id']
+
+        # Get the current tenure ID
+        tenure_id = Panels.objects.filter(panel_of=sc_ag_id, current=True).values('id').first()
+        if not tenure_id:
+            return []
+
+        tenure_id = tenure_id['id']
+
+        # Fetch monthly cash in/out data
         raw_entries = WalletEntry.objects.filter(
-            tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
-            sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
+            tenure_id=tenure_id,
+            sc_ag_id=sc_ag_id,
             entry_date_time__year=datetime.now().year
         ).annotate(
             month=TruncMonth('entry_date_time')
@@ -201,14 +217,47 @@ class WalletManager:
             cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
         ).order_by('month')
 
-        data_by_month = {entry['month'].date().month: entry for entry in raw_entries}
+        # Organize by month
+        data_by_month = {entry['month'].month: entry for entry in raw_entries}
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
             wallet_entry_stats_whole_tenure_by_month.append({
                 'month': datetime(datetime.now().year, month, 1),
                 'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
-                'cash_out': data_by_month.get(month, {}).get('cash_out', 0)
+                'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
             })
 
         return wallet_entry_stats_whole_tenure_by_month
+
+    def get_wallet_entry_stats_for_current_month(primary):
+        # Get the SC/AG ID
+        sc_ag_id = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id').first()
+        if not sc_ag_id:
+            return []
+
+        sc_ag_id = sc_ag_id['id']
+
+        # Get the current tenure ID
+        tenure_id = Panels.objects.filter(panel_of=sc_ag_id, current=True).values('id').first()
+        if not tenure_id:
+            return []
+
+        tenure_id = tenure_id['id']
+
+        now = datetime.now()
+
+        # Fetch daily entries for the current month
+        raw_entries = WalletEntry.objects.filter(
+            tenure_id=tenure_id,
+            sc_ag_id=sc_ag_id,
+            entry_date_time__year=now.year,
+            entry_date_time__month=now.month
+        ).annotate(
+            day=TruncDay('entry_date_time')
+        ).values('day').annotate(
+            cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
+            cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
+        ).order_by('day')
+
+        return list(raw_entries)
