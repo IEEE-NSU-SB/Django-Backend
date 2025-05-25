@@ -2,6 +2,7 @@
 from datetime import datetime
 from decimal import Decimal
 import os
+import traceback
 
 import pytz
 from central_branch.view_access import Branch_View_Access
@@ -9,6 +10,7 @@ from central_events.models import Events
 from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
+from system_administration.system_error_handling import ErrorHandling
 from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
 from django.db.models.functions import TruncDate, TruncMonth, TruncDay
@@ -194,7 +196,7 @@ class WalletManager:
     
     def get_wallet_entry_stats_whole_tenure_by_month(primary):
         
-        date_time = datetime.now(tz=pytz.timezone('Asia/Dhaka'))
+        date_time = datetime.now()
         # Fetch monthly cash in/out data
         raw_entries = WalletEntry.objects.filter(
             tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
@@ -208,7 +210,12 @@ class WalletManager:
         ).order_by('month')
 
         # Organize by month
-        # data_by_month = {entry['month'].month: entry for entry in raw_entries}
+        data_by_month = {}
+        for entry in raw_entries:
+            month_number = entry['month'].month  # 'month' is already a datetime object from TruncMonth
+            ErrorHandling.saveSystemErrors(error_name='1',error_traceback=month_number)
+            data_by_month[month_number] = entry
+            ErrorHandling.saveSystemErrors(error_name='2',error_traceback=data_by_month[month_number])
 
         wallet_entry_stats_whole_tenure_by_month = []
         # for month in range(1, 13):
