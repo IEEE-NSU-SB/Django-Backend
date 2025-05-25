@@ -215,11 +215,8 @@ class WalletManager:
 
         data_by_month = {}
         for entry in raw_entries:
-            try:
-                month_number = entry['month'].month  # 'month' is already a datetime object from TruncMonth
-                data_by_month[month_number] = entry
-            except:
-                pass
+            month_number = datetime.strptime(entry['month'], '%Y-%m-%d').month  # 'month' is already a datetime object from TruncMonth
+            data_by_month[month_number] = entry
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
