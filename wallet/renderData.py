@@ -2,6 +2,8 @@
 from datetime import datetime
 from decimal import Decimal
 import os
+
+import pytz
 from central_branch.view_access import Branch_View_Access
 from central_events.models import Events
 from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
@@ -192,11 +194,12 @@ class WalletManager:
     
     def get_wallet_entry_stats_whole_tenure_by_month(primary):
         
+        date_time = datetime.now(tz=pytz.timezone('Asia/Dhaka'))
         # Fetch monthly cash in/out data
         raw_entries = WalletEntry.objects.filter(
             tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
             sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
-            entry_date_time__year=datetime.now().year
+            entry_date_time__year=date_time.year
         ).annotate(
             month=TruncMonth('entry_date_time')
         ).values('month').annotate(
@@ -205,12 +208,12 @@ class WalletManager:
         ).order_by('month')
 
         # Organize by month
-        data_by_month = {datetime(entry['month']).month: entry for entry in raw_entries}
+        data_by_month = {entry['month'].month: entry for entry in raw_entries}
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
             wallet_entry_stats_whole_tenure_by_month.append({
-                'month': datetime(datetime.now().year, month, 1),
+                'month': datetime(date_time.year, month, 1),
                 'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
                 'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
             })
