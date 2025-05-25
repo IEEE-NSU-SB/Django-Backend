@@ -1,6 +1,8 @@
 
 from datetime import datetime
 from decimal import Decimal
+import json
+import logging
 import os
 import traceback
 
@@ -15,6 +17,8 @@ from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatu
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
 from django.db.models.functions import TruncDate, TruncMonth, TruncDay
 from calendar import monthrange 
+
+logger=logging.getLogger(__name__)      
 
 class WalletManager:
 
@@ -209,21 +213,29 @@ class WalletManager:
             cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
         ).order_by('month')
 
-        # Organize by month
+        serializable_entries = []
+        for entry in raw_entries:
+            serializable_entries.append({
+                'month': entry['month'],
+                'cash_in': float(entry['cash_in']) if isinstance(entry['cash_in'], Decimal) else entry['cash_in'] or 0,
+                'cash_out': float(entry['cash_out']) if isinstance(entry['cash_out'], Decimal) else entry['cash_out'] or 0,
+            })
+
+        # Log the entries as a string (or JSON string if you prefer)
+        logger.error(f"Wallet Entry Stats: {serializable_entries}")
+
         data_by_month = {}
         for entry in raw_entries:
             month_number = entry['month'].month  # 'month' is already a datetime object from TruncMonth
-            ErrorHandling.saveSystemErrors(error_name='1',error_traceback=month_number)
             data_by_month[month_number] = entry
-            ErrorHandling.saveSystemErrors(error_name='2',error_traceback=data_by_month[month_number])
 
         wallet_entry_stats_whole_tenure_by_month = []
-        # for month in range(1, 13):
-        #     wallet_entry_stats_whole_tenure_by_month.append({
-        #         'month': datetime(date_time.year, month, 1),
-        #         'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
-        #         'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
-        #     })
+        for month in range(1, 13):
+            wallet_entry_stats_whole_tenure_by_month.append({
+                'month': datetime(date_time.year, month, 1),
+                'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
+                'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
+            })
 
         return wallet_entry_stats_whole_tenure_by_month
 
