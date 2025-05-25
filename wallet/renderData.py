@@ -5,7 +5,7 @@ from decimal import Decimal
 import json
 import logging
 import os
-from time import localtime
+from django.utils.timezone import localtime, is_aware
 import traceback
 
 import pytz
@@ -260,7 +260,7 @@ class WalletManager:
 
         for entry in entries:
             # Convert to local time if needed
-            dt = entry.entry_date_time
+            dt = localtime(entry.entry_date_time)
             day = dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
             if entry.entry_type == 'CASH_IN':
