@@ -430,25 +430,28 @@
 				</div>
 			</div>
 		</div>
+		{% if user_data.position.is_eb_member or user_data.is_admin_user %}
 		<div class="col-xl-6">
 			<div class="treasurer_container">
 				{% comment %} <a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a> {% endcomment %}
 				<!--Stats-->
 				<!-- <div class="stats_menu"> -->
 					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-						<h5 class="stat_box">Wallet Balance: 10000</h5>
+						<h5 class="stat_box">Wallet Balance: {{Wallet_balance}}</h5>
 						<!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
 							<option value="all_time">All Time</option>
 							<option value="tenure">Current Tenure</option>
 						</select> -->
-						<h5 class="stat_box">Total Cash In: 1000</h5>
-						<h5 class="stat_box">Total Cash Out: 1000</h5>
-						<h5 class="stat_box">Total entries: 89</h5>
+						<h5 class="stat_box">Total Cash In: {{wallet_entry_stats_whole_tenure.total_cash_in}}</h5>
+						<h5 class="stat_box">Total Cash Out: {{wallet_entry_stats_whole_tenure.total_cash_out}}</h5>
+						<h5 class="stat_box">Total entries: {{wallet_entry_stats_whole_tenure.total_entries}}</h5>
 					</div>
 				<!-- </div> -->
 			</div>
 		</div>
+		{% endif %}
 	</div>
+	{% if user_data.position.is_eb_member or user_data.is_admin_user %}
 	<div class="row" >
 		<div class="col-xl-6">
 		<div class="outer_box">
@@ -466,6 +469,7 @@
 		</div>
 		</div>
 	</div>
+	{% endif %}
 	<div class="row">
 		<div class="col-xl-6">
 			<div class="card">
