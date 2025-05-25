@@ -208,15 +208,15 @@ class WalletManager:
         ).order_by('month')
 
         # Organize by month
-        data_by_month = {entry['month'].month: entry for entry in raw_entries}
+        # data_by_month = {entry['month'].month: entry for entry in raw_entries}
 
         wallet_entry_stats_whole_tenure_by_month = []
-        for month in range(1, 13):
-            wallet_entry_stats_whole_tenure_by_month.append({
-                'month': datetime(date_time.year, month, 1),
-                'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
-                'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
-            })
+        # for month in range(1, 13):
+        #     wallet_entry_stats_whole_tenure_by_month.append({
+        #         'month': datetime(date_time.year, month, 1),
+        #         'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
+        #         'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
+        #     })
 
         return wallet_entry_stats_whole_tenure_by_month
 
