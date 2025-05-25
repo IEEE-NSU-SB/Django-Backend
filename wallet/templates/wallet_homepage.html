@@ -531,7 +531,7 @@
         }
 
         .event-dropdown-options div:hover {
-            background-color: #f0f0f0;
+            /* background-color: #f0f0f0; */
         }
 
         .clear_btn{
@@ -903,10 +903,13 @@
                     <h6 style="font-weight: bold;">For event books</h6>
                     <div class="event-dropdown" id="eventDropdown">
                         <div class="event-dropdown-selected">Select Event</div>
-                        <div class="event-dropdown-options">
-                            {% for event in events %}
-                            <div data-value="{{ event.id }}">{{ event.event_name }}</div>
-                            {% endfor %}
+                        <div class="event-dropdown-options" style="display: none;">
+                            <input type="text" id="event-search" placeholder="Search event..." style="width: 100%; padding: 5px; box-sizing: border-box;border: 1px solid #dedede;;">
+                            <div id="event-options-list">
+                                {% for event in events %}
+                                <div class="event-option" data-value="{{ event.id }}">{{ event.event_name }}</div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                     <input type="hidden" id="event-select" name="event_select" value="none">
@@ -1109,31 +1112,52 @@
         });
 
 
-        // Updated dropdown for new event tab
-        const newDropdown = document.getElementById('eventDropdown');
-        if (newDropdown) {
-            const newSelected = newDropdown.querySelector('.event-dropdown-selected');
-            const newOptions = newDropdown.querySelector('.event-dropdown-options');
-            const newHiddenInput = document.getElementById('event-select');
+        // Updated searchable dropdown
+const newDropdown = document.getElementById('eventDropdown');
+if (newDropdown) {
+    const newSelected = newDropdown.querySelector('.event-dropdown-selected');
+    const newOptionsContainer = newDropdown.querySelector('.event-dropdown-options');
+    const newOptionsList = newDropdown.querySelector('#event-options-list');
+    const searchInput = newDropdown.querySelector('#event-search');
+    const hiddenInput = document.getElementById('event-select');
 
-            newSelected.addEventListener('click', () => {
-                newOptions.style.display = newOptions.style.display === 'block' ? 'none' : 'block';
-            });
+    // Toggle dropdown
+    newSelected.addEventListener('click', () => {
+        newOptionsContainer.style.display = 'block';
+        searchInput.focus();
+    });
 
-            newOptions.querySelectorAll('div').forEach(option => {
-                option.addEventListener('click', () => {
-                    newSelected.textContent = option.textContent;
-                    newHiddenInput.value = option.dataset.value;
-                    newOptions.style.display = 'none';
-                });
-            });
+    // Handle option click
+    newOptionsList.querySelectorAll('.event-option').forEach(option => {
+        option.addEventListener('click', () => {
+            newSelected.textContent = option.textContent;
+            hiddenInput.value = option.dataset.value;
+            newOptionsContainer.style.display = 'none';
+            searchInput.value = '';
+            filterOptions('');
+        });
+    });
 
-            document.addEventListener('click', (e) => {
-                if (!newDropdown.contains(e.target)) {
-                    newOptions.style.display = 'none';
-                }
+        // Filter options
+        const filterOptions = (searchTerm) => {
+            const options = newOptionsList.querySelectorAll('.event-option');
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                option.style.display = text.includes(searchTerm.toLowerCase()) ? 'block' : 'none';
             });
-        }
+        };
+
+        searchInput.addEventListener('input', (e) => {
+            filterOptions(e.target.value);
+        });
+
+        // Close dropdown if clicking outside
+        document.addEventListener('click', (e) => {
+            if (!newDropdown.contains(e.target)) {
+                newOptionsContainer.style.display = 'none';
+            }
+        });
+    }
     });
     </script>
 
