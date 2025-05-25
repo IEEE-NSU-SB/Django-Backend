@@ -226,12 +226,21 @@ class WalletManager:
             for k, v in sorted(monthly_data.items())
 ]
 
+        monthly_result_by_number = {}
+        for entry in result:
+            if isinstance(entry['month'], str):
+                entry_month = datetime.strptime(entry['month'], '%Y-%m-%d').month
+            else:
+                entry_month = entry['month'].month
+            monthly_result_by_number[entry_month] = entry
+
+        # Step 2: Build stats for all 12 months
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
             wallet_entry_stats_whole_tenure_by_month.append({
                 'month': datetime(date_time.year, month, 1),
-                'cash_in': result.get(month, {}).get('cash_in', 0),
-                'cash_out': result.get(month, {}).get('cash_out', 0),
+                'cash_in': monthly_result_by_number.get(month, {}).get('cash_in', 0),
+                'cash_out': monthly_result_by_number.get(month, {}).get('cash_out', 0),
             })
 
         return wallet_entry_stats_whole_tenure_by_month
