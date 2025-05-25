@@ -215,8 +215,20 @@ class WalletManager:
 
         data_by_month = {}
         for entry in raw_entries:
-            month_number = datetime.strptime(entry['month'], '%Y-%m-%d').month  # 'month' is already a datetime object from TruncMonth
-            data_by_month[month_number] = entry
+            # Ensure we can safely extract the month
+            month_value = entry['month']
+            if isinstance(month_value, str):
+                # Parse string to datetime (MySQL may return string)
+                month_dt = datetime.strptime(month_value, '%Y-%m-%d')
+            elif isinstance(month_value, datetime):
+                month_dt = month_value
+            elif hasattr(month_value, 'month'):
+                month_dt = month_value  # date or datetime object
+            else:
+                continue
+
+        month_number = month_dt.month
+        data_by_month[month_number] = entry
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
