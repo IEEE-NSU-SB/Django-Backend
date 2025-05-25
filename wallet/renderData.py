@@ -214,21 +214,22 @@ class WalletManager:
         ).order_by('month')
 
         data_by_month = {}
-        for entry in raw_entries:
-            try:
-                # Ensure we can safely extract the month
-                month_value = entry['month']
-                if isinstance(month_value, str):
-                    # Parse string to datetime (MySQL may return string)
-                    month_dt = datetime.strptime(month_value, '%Y-%m-%d')
-                elif isinstance(month_value, datetime):
-                    month_dt = month_value
-                elif hasattr(month_value, 'month'):
-                    month_dt = month_value  # date or datetime object
-                else:
-                    continue
-            except:
-                pass
+        if raw_entries:
+            for entry in raw_entries:
+                try:
+                    # Ensure we can safely extract the month
+                    month_value = entry['month']
+                    if isinstance(month_value, str):
+                        # Parse string to datetime (MySQL may return string)
+                        month_dt = datetime.strptime(month_value, '%Y-%m-%d')
+                    elif isinstance(month_value, datetime):
+                        month_dt = month_value
+                    elif hasattr(month_value, 'month'):
+                        month_dt = month_value  # date or datetime object
+                    else:
+                        continue
+                except:
+                    pass
 
         month_number = month_dt.month
         data_by_month[month_number] = entry
