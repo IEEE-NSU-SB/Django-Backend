@@ -848,6 +848,15 @@
                 button.disabled = true;
                 button.innerText = "Submitting...";
             }
+
+            document.querySelector('form').addEventListener('submit', function (e) {
+                if (selectedCategories.length === 0) {
+                    e.preventDefault(); // Prevent form submission
+                    alert("Please select at least one category."); // Or show a custom error message
+                    return false;
+                }
+                disableSubmit(this);
+            });
         </script>
             <script>
         {% for message in messages %}
