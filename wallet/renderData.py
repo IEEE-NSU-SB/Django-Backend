@@ -228,9 +228,6 @@ class WalletManager:
             except Exception as e:
                 pass  # optionally log
 
-        month_number = month_dt.month
-        data_by_month[month_number] = entry
-
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
             wallet_entry_stats_whole_tenure_by_month.append({
