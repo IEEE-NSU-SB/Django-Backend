@@ -14,8 +14,8 @@ from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from system_administration.system_error_handling import ErrorHandling
 from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
-from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
-from django.db.models.functions import TruncDate, TruncMonth, TruncDay
+from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count, DateTimeField
+from django.db.models.functions import TruncDate, TruncMonth, TruncDay, Cast
 from calendar import monthrange 
 
 logger=logging.getLogger(__name__)      
@@ -207,7 +207,7 @@ class WalletManager:
             sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
             entry_date_time__year=date_time.year
         ).annotate(
-            month=TruncMonth('entry_date_time')
+            month=Cast(TruncMonth('entry_date_time'), output_field=DateTimeField())
         ).values('month').annotate(
             cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
             cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
