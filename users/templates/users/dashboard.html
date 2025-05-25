@@ -430,7 +430,7 @@
 				</div>
 			</div>
 		</div>
-		{% if user_data.position.is_eb_member or user_data.is_admin_user %}
+		{% if eb_member %}
 		<div class="col-xl-6">
 			<div class="treasurer_container">
 				{% comment %} <a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a> {% endcomment %}
@@ -451,7 +451,7 @@
 		</div>
 		{% endif %}
 	</div>
-	{% if user_data.position.is_eb_member or user_data.is_admin_user %}
+	{% if eb_member %}
 	<div class="row" >
 		<div class="col-xl-6">
 		<div class="outer_box">
@@ -2524,12 +2524,12 @@ async function initializeCircleChart2(){
         datasets: [
           {
             label: 'Cash In',
-            data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950],
+            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_in is not None %}{{data.cash_in}},{% endif %}{% endfor %}],
             backgroundColor: '#00629B'
           },
           {
             label: 'Cash Out',
-            data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880],
+            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_in is not None %}{{data.cash_in}},{% endif %}{% endfor %}],
             backgroundColor: '#00629Bae'
           }
         ]
