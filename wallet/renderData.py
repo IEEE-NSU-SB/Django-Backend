@@ -213,21 +213,13 @@ class WalletManager:
             cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
         ).order_by('month')
 
-        serializable_entries = []
-        for entry in raw_entries:
-            serializable_entries.append({
-                'month': entry['month'],
-                'cash_in': float(entry['cash_in']) if isinstance(entry['cash_in'], Decimal) else entry['cash_in'] or 0,
-                'cash_out': float(entry['cash_out']) if isinstance(entry['cash_out'], Decimal) else entry['cash_out'] or 0,
-            })
-
-        # Log the entries as a string (or JSON string if you prefer)
-        logger.error(f"Wallet Entry Stats: {serializable_entries}")
-
         data_by_month = {}
         for entry in raw_entries:
-            month_number = entry['month'].month  # 'month' is already a datetime object from TruncMonth
-            data_by_month[month_number] = entry
+            try:
+                month_number = entry['month'].month  # 'month' is already a datetime object from TruncMonth
+                data_by_month[month_number] = entry
+            except:
+                pass
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
