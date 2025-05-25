@@ -191,24 +191,11 @@ class WalletManager:
         return stats
     
     def get_wallet_entry_stats_whole_tenure_by_month(primary):
-        # Get the SC/AG ID
-        sc_ag_id = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id').first()
-        if not sc_ag_id:
-            return []
-
-        sc_ag_id = sc_ag_id['id']
-
-        # Get the current tenure ID
-        tenure_id = Panels.objects.filter(panel_of=sc_ag_id, current=True).values('id').first()
-        if not tenure_id:
-            return []
-
-        tenure_id = tenure_id['id']
-
+        
         # Fetch monthly cash in/out data
         raw_entries = WalletEntry.objects.filter(
-            tenure_id=tenure_id,
-            sc_ag_id=sc_ag_id,
+            tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
+            sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
             entry_date_time__year=datetime.now().year
         ).annotate(
             month=TruncMonth('entry_date_time')
@@ -218,7 +205,7 @@ class WalletManager:
         ).order_by('month')
 
         # Organize by month
-        data_by_month = {entry['month'].month: entry for entry in raw_entries}
+        data_by_month = {datetime(entry['month']).month: entry for entry in raw_entries}
 
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
@@ -231,26 +218,13 @@ class WalletManager:
         return wallet_entry_stats_whole_tenure_by_month
 
     def get_wallet_entry_stats_for_current_month(primary):
-        # Get the SC/AG ID
-        sc_ag_id = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id').first()
-        if not sc_ag_id:
-            return []
-
-        sc_ag_id = sc_ag_id['id']
-
-        # Get the current tenure ID
-        tenure_id = Panels.objects.filter(panel_of=sc_ag_id, current=True).values('id').first()
-        if not tenure_id:
-            return []
-
-        tenure_id = tenure_id['id']
 
         now = datetime.now()
 
         # Fetch daily entries for the current month
         raw_entries = WalletEntry.objects.filter(
-            tenure_id=tenure_id,
-            sc_ag_id=sc_ag_id,
+            tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
+            sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
             entry_date_time__year=now.year,
             entry_date_time__month=now.month
         ).annotate(
