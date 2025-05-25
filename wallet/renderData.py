@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from decimal import Decimal
 import os
 from central_branch.view_access import Branch_View_Access
@@ -7,7 +8,8 @@ from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from insb_port import settings
 from port.models import Chapters_Society_and_Affinity_Groups, Panels
 from wallet.models import Wallet, WalletEntry, WalletEntryFile, WalletEventStatus
-
+from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
+from django.db.models.functions import TruncDate, TruncMonth
 
 class WalletManager:
 
@@ -174,3 +176,39 @@ class WalletManager:
                 return True
             else:
                 return False
+            
+    def get_wallet_entry_stats_whole_tenure(primary):
+        stats = WalletEntry.objects.filter(
+                tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
+                sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
+            ).aggregate(
+                total_entries=Count('id'),
+                total_cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
+                total_cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
+            )
+        
+        return stats
+    
+    def get_wallet_entry_stats_whole_tenure_by_month(primary):
+        raw_entries = WalletEntry.objects.filter(
+            tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
+            sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
+            entry_date_time__year=datetime.now().year
+        ).annotate(
+            month=TruncMonth('entry_date_time')
+        ).values('month').annotate(
+            cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
+            cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
+        ).order_by('month')
+
+        data_by_month = {entry['month'].date().month: entry for entry in raw_entries}
+
+        wallet_entry_stats_whole_tenure_by_month = []
+        for month in range(1, 13):
+            wallet_entry_stats_whole_tenure_by_month.append({
+                'month': datetime(datetime.now().year, month, 1),
+                'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
+                'cash_out': data_by_month.get(month, {}).get('cash_out', 0)
+            })
+
+        return wallet_entry_stats_whole_tenure_by_month

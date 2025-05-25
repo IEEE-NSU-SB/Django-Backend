@@ -24,7 +24,7 @@ from .models import Wallet, WalletEntry, WalletEntryCategory, WalletEntryFile, W
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Case, When, F, Value, DecimalField, Min, Max, Subquery, OuterRef, IntegerField, Q, Count
-from django.db.models.functions import TruncDate
+from django.db.models.functions import TruncDate, TruncMonth
 
 # Create your views here.
 logger=logging.getLogger(__name__)      
@@ -506,14 +506,9 @@ def wallet_homepage(request, primary=None):
             
             wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']).balance
 
-            wallet_entry_stats_whole_tenure = WalletEntry.objects.filter(
-                tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
-                sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
-            ).aggregate(
-                total_entries=Count('id'),
-                total_cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
-                total_cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
-            )
+            wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary)
+
+            wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary)
 
             context = {
                 'all_sc_ag':sc_ag,
@@ -528,6 +523,7 @@ def wallet_homepage(request, primary=None):
                 'tenures': tenures,
                 'filter_queries': filter_queries,
                 'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
+                'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
             }
 
             return render(request, "wallet_homepage.html", context)

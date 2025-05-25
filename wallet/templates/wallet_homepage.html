@@ -1179,12 +1179,12 @@
         datasets: [
           {
             label: 'Cash In',
-            data: [500, 700, 800, 650, 720, 600, 900, 850, 700, 750, 800, 950],
+            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_in is not None %}{{data.cash_in}},{% endif %}{% endfor %}],
             backgroundColor: '#00629B'
           },
           {
             label: 'Cash Out',
-            data: [400, 600, 750, 500, 680, 550, 800, 780, 650, 700, 720, 880],
+            data: [{% for data in wallet_entry_stats_whole_tenure_by_month %}{% if data.cash_out is not None %}{{data.cash_out}},{% endif %}{% endfor %}],
             backgroundColor: '#00629Bae'
           }
         ]

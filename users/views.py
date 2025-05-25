@@ -11,6 +11,7 @@ from users import registerUser
 from django.db import connection
 from django.db.utils import IntegrityError
 from recruitment.models import recruited_members
+from wallet.renderData import WalletManager
 from . models import Members,ResetPasswordTokenTable,UserSignupTokenTable
 import csv,datetime
 from django.utils.timezone import now
@@ -213,6 +214,7 @@ def dashboard(request):
         hit_count_over_5_years = renderData.getHitCountOver5Years()
         #getting monthly members with highest task completion points
         monthly_top_members = renderData.getMonthlyTopMembers()
+
                 
         # Get the SC & AGS
         sc_ag=PortData.get_all_sc_ag(request=request)
@@ -222,6 +224,15 @@ def dashboard(request):
         user_data=current_user.getUserData() #getting user data as dictionary file
         performers = get_top_5_performers(request)
         top_teams = get_top_5_teams(request)
+
+        if is_eb_or_admin:
+            wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary=1)
+
+            wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary=1)
+        else:
+            wallet_entry_stats_whole_tenure = None
+            wallet_entry_stats_whole_tenure_by_month = None
+
         if(user_data==False):
 
             if request.method == "POST":
@@ -256,6 +267,8 @@ def dashboard(request):
             'media_url':settings.MEDIA_URL,
             'performers':performers,
             'top_teams':top_teams,
+            'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
+            'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
         }
 
         
