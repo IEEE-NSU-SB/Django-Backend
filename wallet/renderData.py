@@ -202,45 +202,34 @@ class WalletManager:
     
     def get_wallet_entry_stats_whole_tenure_by_month(primary):
         
-        date_time = datetime.now()
+        now = datetime.now()
+
+        start = datetime(now.year, now.month, 1)
+
+        # Safely compute the first day of the next month
+        end = datetime(now.year, now.month, 31)
+
         # Fetch monthly cash in/out data
-        entries = WalletEntry.objects.filter(
+        raw_entries = WalletEntry.objects.filter(
             tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
             sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
-            entry_date_time__year=date_time.year
-        )
+            entry_date_time__range=(start, end)
+        ).values('entry_date_time').annotate(
+            cash_in=Sum('amount', filter=Q(entry_type='CASH_IN')),
+            cash_out=Sum('amount', filter=Q(entry_type='CASH_OUT'))
+        ).order_by('entry_date_time__month')
 
-        monthly_data = defaultdict(lambda: {'cash_in': 0, 'cash_out': 0})
+        data_by_month = {}
+        for entry in raw_entries:
+            month_number = entry['entry_date_time'].month  # 'month' is already a datetime object from TruncMonth
+            data_by_month[month_number] = entry
 
-        for entry in entries:
-            dt = entry.entry_date_time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            key = dt
-            if entry.entry_type == 'CASH_IN':
-                monthly_data[key]['cash_in'] += entry.amount
-            elif entry.entry_type == 'CASH_OUT':
-                monthly_data[key]['cash_out'] += entry.amount
-
-        # Sorted list
-        result = [
-            {'month': k, 'cash_in': v['cash_in'], 'cash_out': v['cash_out']}
-            for k, v in sorted(monthly_data.items())
-]
-
-        monthly_result_by_number = {}
-        for entry in result:
-            if isinstance(entry['month'], str):
-                entry_month = datetime.strptime(entry['month'], '%Y-%m-%d').month
-            else:
-                entry_month = entry['month'].month
-            monthly_result_by_number[entry_month] = entry
-
-        # Step 2: Build stats for all 12 months
         wallet_entry_stats_whole_tenure_by_month = []
         for month in range(1, 13):
             wallet_entry_stats_whole_tenure_by_month.append({
-                'month': datetime(date_time.year, month, 1),
-                'cash_in': monthly_result_by_number.get(month, {}).get('cash_in', 0),
-                'cash_out': monthly_result_by_number.get(month, {}).get('cash_out', 0),
+                'month': datetime(now.year, month, 1),
+                'cash_in': data_by_month.get(month, {}).get('cash_in', 0),
+                'cash_out': data_by_month.get(month, {}).get('cash_out', 0),
             })
 
         return wallet_entry_stats_whole_tenure_by_month
@@ -249,12 +238,14 @@ class WalletManager:
 
         now = datetime.now()
 
+        start = (datetime(now.year, now.month, 1))
+        end = (datetime(now.year, now.month, 31))
+
         # Fetch daily entries for the current month
         entries = WalletEntry.objects.filter(
             tenure_id=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'], current=True).values('id')[0]['id'],
             sc_ag_id=Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id'],
-            entry_date_time__year=now.year,
-            entry_date_time__month=now.month
+            entry_date_time__range=(start, end)
         )
         daily_data = defaultdict(lambda: {'cash_in': 0, 'cash_out': 0})
 
