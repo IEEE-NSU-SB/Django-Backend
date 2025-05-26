@@ -7,7 +7,7 @@ from system_administration.system_error_handling import ErrorHandling
 from system_administration.system_logs import System_Logs
 
 # Models to exclude from logging
-EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','Migration', 'SystemErrors', 'Session', 'LogEntry']
+EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','Migration', 'Permission', 'SystemErrors', 'Session', 'LogEntry']
 # List of app labels to exclude (default Django apps)
 EXCLUDED_APP_LABELS = [
     'admin',
@@ -19,7 +19,7 @@ EXCLUDED_APP_LABELS = [
 
 def is_migration_running():
     """Check if the command being run is a migration."""
-    return 'makemigrations' in sys.argv or 'migrate' in sys.argv
+    return 'makemigrations' in sys.argv or 'migrate' in sys.argv or 'loaddata' in sys.argv
 
 def create_general_log(instance, action):
     # Check if model should be excluded from logging
