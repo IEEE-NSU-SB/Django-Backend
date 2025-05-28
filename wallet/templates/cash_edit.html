@@ -595,7 +595,7 @@
                                 <div class="selected-tags" id="selectedTags">
                                     <!-- Selected tags will appear here -->
                                     {% for entry_category in entry.categories.all %}
-                                    <div class="tag {{entry_category.name}}" data-cat="{{entry_category.name}}">{{entry_category.name}} <span class="tag-close">×</span></div>
+                                    <div class="tag {{entry_category.name}}" data-id="{{entry_category.id}}" data-cat="{{entry_category.name}}">{{entry_category.name}} <span class="tag-close" onclick="deleteTag(this)">×</span></div>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -703,36 +703,34 @@
                 });
             }
 
+            function deleteTag(closeButton) {
+                const tag = closeButton.parentElement;
+                var id = tag.dataset.id;
+                var category = tag.dataset.cat;
+                const index = selectedCategories.indexOf(id);
+                if (index > -1) {
+                    selectedCategories.splice(index, 1);
+                    updateHiddenInput();
+                }
+
+                // Add back to dropdown
+                const dropdownItem = document.createElement('div');
+                dropdownItem.className = `dropdown-item`;
+                dropdownItem.dataset.value = category;
+                dropdownItem.dataset.id = id;
+                dropdownItem.textContent = category;
+                categoryDropdown.appendChild(dropdownItem);
+                setupDropdownItems(); // Reattach handlers to new item
+
+                tag.remove();
+                console.log("Selected categories:", selectedCategories);
+            }
+
             // Create category tag
             function createTag(category, id) {
-                const tag = document.createElement('div');
-                tag.className = `tag ${category}`;
-                tag.setAttribute('data-cat', category);
-                tag.innerHTML = `${category} <span class="tag-close">×</span>`;
+                const tag = `<div class=tag ${category} data-id="${id}" data-cat="${category}">${category} <span class="tag-close" onclick="deleteTag(this)">×</span></div>`;
 
-                tag.querySelector('.tag-close').addEventListener('click', function (e) {
-                    e.stopPropagation();
-
-                const index = selectedCategories.indexOf(id);
-                    if (index > -1) {
-                        selectedCategories.splice(index, 1);
-                        updateHiddenInput();
-                    }
-
-                    // Add back to dropdown
-                    const dropdownItem = document.createElement('div');
-                    dropdownItem.className = `dropdown-item`;
-                    dropdownItem.dataset.value = category;
-                    dropdownItem.dataset.id = id;
-                    dropdownItem.textContent = category;
-                    categoryDropdown.appendChild(dropdownItem);
-                    setupDropdownItems(); // Reattach handlers to new item
-
-                    tag.remove();
-                    console.log("Selected categories:", selectedCategories);
-                });
-
-                selectedTags.appendChild(tag);
+                selectedTags.innerHTML += tag;
             }
 
             // Update hidden input with selected values

@@ -93,6 +93,7 @@ class WalletManager:
                 wallet.save()
 
             wallet_entry.save()
+            wallet_entry.categories.clear()
             wallet_entry.categories.add(*categories)
 
             for file in entry_files:
