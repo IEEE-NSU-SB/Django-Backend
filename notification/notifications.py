@@ -278,7 +278,8 @@ class NotificationHandler:
         
         try:
             subject=f"Notification : {title}"
-            message=f'Hello,\nYou got a notification from IEEE NSU SB Portal\nlink: {general_link}\n{body}'
+            link = f'Link: {general_link}' if general_link else ''
+            message=f'<p>Hello,</p><p>You got a notification from IEEE NSU SB Portal</p><p>{link}</p>{body}'
             email_from=settings.EMAIL_HOST_USER
             recipient_list=[]
 
