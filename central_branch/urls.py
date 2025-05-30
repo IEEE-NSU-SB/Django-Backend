@@ -1,8 +1,9 @@
 import imp
 from django.urls import path,include
 from . import views
-from .views import UpdatePositionAjax,UpdateAwardAjax
+from .views import GetTaskCategoryPointsAjax, SaveMemberTaskPointsAjax, UpdatePositionAjax,UpdateAwardAjax
 from .views import UpdatePositionAjax,UpdateRestrictionAjax,AwardRanking
+from wallet import views as walletViews
 
 app_name='central_branch'
 
@@ -37,7 +38,7 @@ urlpatterns = [
     #WEBSITE Management URL Path
     path('manage_website/homepage',views.manage_website_homepage,name="manage_website_home"),
     path('manage_website/homepage/update/<int:pk>',views.manage_website_homepage_top_banner_update,name="manage_website_home_top_banner_update"),
-    path('manage_website/homepage/volunteer_of_the_month/<int:pk>',views.update_volunteer_of_month,name="update_vom"),
+    # path('manage_website/homepage/volunteer_of_the_month/<int:pk>',views.update_volunteer_of_month,name="update_vom"),
     path('manage_website/achievements',views.manage_achievements,name="manage_achievements"),
     path('manage_website/achievements/update/<int:pk>',views.update_achievements,name="achievements_update"),
     path('manage_website/news',views.manage_news,name="manage_news"),
@@ -93,6 +94,8 @@ urlpatterns = [
     path('event_details/<int:event_id>/edit/graphics/links/',views.event_edit_graphics_form_links_sub_tab,name='event_edit_graphics_form_links_sub_tab'),
     #Event content tab page
     path('event_details/<int:event_id>/edit/content/',views.event_edit_content_form_tab,name='event_edit_content_form_tab'),
+    #Event budget tab page
+    path('event_details/<int:event_id>/edit/budget/',views.event_edit_budget_form_tab,name='event_edit_budget_form_tab'),
     #Mega Event Creation Form
     path('events/create_mega_event/',views.mega_event_creation,name="mega_event_creation"), 
     #Mega Events homepage
@@ -106,6 +109,10 @@ urlpatterns = [
     path('event_details/<int:event_id>/preview/',views.event_preview,name='event_preview'),
     #Event Feedback
     path('event_details/<int:event_id>/feedbacks/',views.event_feedback,name="event_feedback"),  
+
+    #Event Google Calendar
+    path('event_details/<int:event_id>/google_calendar/',views.event_google_calendar,name="google_calendar"),  
+
     #Members list
     path('members/',views.insb_members_list,name="members_list"),
     #Members details list
@@ -126,4 +133,38 @@ urlpatterns = [
     path('generateExcelSheet_events_by_year/<int:year>',views.generateExcelSheet_events_by_year,name="generateExcelSheet_events_by_year"),
     path('members/user_access/',views.user_access,name="user_access"),
     path('update_restricted_members/',UpdateRestrictionAjax.as_view(),name="update_restricted_members"),
+
+    #task assignation urls
+    path('create_task/',views.create_task,name="create_task"),
+    path('task_home/',views.task_home,name="task_home"),
+    path('task/<int:task_id>',views.task_edit,name="task_edit"),
+    path('task/<int:task_id>/upload_task/',views.upload_task,name="upload_task"),
+    path('task/<int:task_id>/forward_to_incharges/<int:team_primary>',views.forward_to_incharges,name="forward_to_incharges"),
+    path('task/<int:task_id>/add_task/',views.add_task,name="add_task"),
+    path('task/get_task_category_points',GetTaskCategoryPointsAjax.as_view(),name="get_task_category_points"),
+    path('task/save_mem_task_points/<team_primary>/',SaveMemberTaskPointsAjax.as_view(),name="save_mem_task_points"),
+
+    #task history
+    path('task_history/individual/<int:ieee_id>',views.individual_task_history,name="individual_task_history"),
+    path('task_history/team/<int:team_primary>',views.team_task_history,name="team_task_history"),
+    ##
+    path('task_leaderboard/',views.task_leaderboard,name="task_leaderboard"),
+    path('export_task_contents/',views.export_task_contents, name='export_task_contents'),
+
+    #Email
+    path('mail/',views.mail,name="mail"),
+    path('mail/view/<str:mail_id>',views.view_mail,name="view_mail"),
+    path('mail/send_mail_request/', views.SendMailAjax.as_view(),name='send_mail_request'),
+    path('mail/send_reply_mail_request/',views.SendReplyMailAjax.as_view(),name='send_reply_mail_request'),
+    path('mail/send_forward_mail_request/',views.SendForwardMailAjax.as_view(),name='send_forward_mail_request'),
+    path('mail/request_read_unread/', views.ReadUnreadEmailAjax.as_view(),name='request_email_read_unread'),
+    path('mail/request_delete/',views.DeleteEmailAjax.as_view(),name='request_email_delete'),
+    path('mail/request_star_unstar/',views.StarUnstarEmailAjax.as_view(),name='request_email_star_unstar'),
+    path('mail/request_scheduled/',views.GetScheduledEmailInfoAjax.as_view(),name='request_scheduled_email'),
+    path('mail/request_update_schedule/',views.UpdateScheduledEmailOptionsAjax.as_view(),name='request_update_email_schedule'),
+    path('navigate/', views.PaginationAjax.as_view(),name='navigate'),
+    path('mail/view/attachments/<str:message_id>/<str:attachment_id>/', views.get_attachment, name='get_attachment'),
+
+    # Wallet Urls
+    path('wallet/', include('wallet.urls'), name='wallet'),
 ]

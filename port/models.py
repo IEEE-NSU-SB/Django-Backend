@@ -49,6 +49,7 @@ class Teams(models.Model):
     # team_of attribute means to which SC_AG or Branch The Team is registered to
     team_of=models.ForeignKey(Chapters_Society_and_Affinity_Groups,null=True,blank=True,on_delete=models.CASCADE)
     is_active=models.BooleanField(null=True,blank=True,default=True)
+    completed_task_points = models.FloatField(null=False,blank=False,default=0)
     
     class Meta:
         verbose_name="Registered Team"
@@ -92,12 +93,14 @@ class Panels(models.Model):
         -year indicates the tenure of the panel
         -creation_time is initialized whenever the panel is created from the Panel Page.
         -panel_of means for which society or AG the panel is for
+        -display is used to determine if the panel is to be displayed in portal and main site. (Used for joining panels with different ranges)
     '''
     year=models.CharField(max_length=40,null=False,blank=False)
     creation_time=models.DateTimeField(null=True,blank=True)
     current=models.BooleanField(null=False,blank=False,default=False)
     panel_of=models.ForeignKey(Chapters_Society_and_Affinity_Groups,null=True,blank=True,on_delete=models.CASCADE)
     panel_end_time=models.DateTimeField(null=True,blank=True)
+    display=models.BooleanField(null=False,blank=False,default=True)
     
     class Meta:
         verbose_name='IEEE NSU SB Panels'
@@ -120,6 +123,15 @@ class VolunteerAwards(models.Model):
         
     def __str__(self):
         return self.volunteer_award_name
+    
+class SkillSetTypes(models.Model):
+    '''Stores skillset types'''
+    skill_type=models.CharField(null=False,blank=False,max_length=200)
+
+    class Meta:
+        verbose_name="Skill set Types"
+    def __str__(self) -> str:
+        return str(self.pk)
 
     
     

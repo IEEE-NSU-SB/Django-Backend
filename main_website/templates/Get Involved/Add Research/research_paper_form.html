@@ -16,7 +16,7 @@
     <!--Extra CSS-->
 
     <!-- CKEditor CDN -->
-    <script src="https://cdn.ckeditor.com/4.17.0/standard-all/ckeditor.js"></script>
+    <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 
     <style>
         .gdlr-header-inner,
@@ -208,7 +208,9 @@
         }
     </style>
 </head>
-
+{% block preloader %}
+    {% include 'preloader.html' %}
+{% endblock preloader %}
 <body data-rsssl=1 class="home page-template-default page page-id-5368 _masterslider _msp_version_3.2.7">
     <div class="body-wrapper  float-menu">
         

@@ -36,7 +36,7 @@ else:
 if(os.environ.get('SETTINGS')=='dev'):
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['ieeensusb.org','portal.ieeensusb.org']
+    ALLOWED_HOSTS = ['ieeensusb.org','sandbox.ieeensusb.org']
 
 
 LOGIN_URL='/portal/users/login'
@@ -70,13 +70,15 @@ INSTALLED_APPS = [
     'media_team',
     'graphics_team',
     'finance_and_corporate_team',
-    # 'ieee_nsu_sb_pes_sbc',
-    # 'ieee_nsu_sb_ras_sbc',
     'ckeditor',
     'chapters_and_affinity_group',
     'central_events',
+    'task_assignation',
+    'notification',
+    'wallet',
     'django_celery_beat',
     'django_celery_results',
+    'django_json_widget',
 ]
 
 MIDDLEWARE = [
@@ -88,7 +90,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'main_website.middleware.BlockMainWebMiddleWare',
+    'insb_port.middleware.BlockSiteMiddleWare',
+    'system_administration.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'insb_port.urls'
@@ -238,8 +241,25 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 
 if(os.environ.get('SETTINGS')=='prod'):
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_PROD')
+    FIREBASE_API_KEY = os.environ.get('FIREBASE_API_KEY')
+    FIREBASE_AUTH_DOMAIN = os.environ.get('FIREBASE_AUTH_DOMAIN')
+    FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID')
+    FIREBASE_STORAGE_BUCKET = os.environ.get('FIREBASE_STORAGE_BUCKET')
+    FIREBASE_MESSAGING_SENDER_ID = os.environ.get('FIREBASE_MESSAGING_SENDER_ID')
+    FIREBASE_APP_ID = os.environ.get('FIREBASE_APP_ID')
+    FIREBASE_MEASUREMENT_ID = os.environ.get('FIREBASE_MEASUREMENT_ID')
+    
 else:
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_DEV')
+    FIREBASE_API_KEY = os.environ.get('DEV_FIREBASE_API_KEY')
+    FIREBASE_AUTH_DOMAIN = os.environ.get('DEV_FIREBASE_AUTH_DOMAIN')
+    FIREBASE_PROJECT_ID = os.environ.get('DEV_FIREBASE_PROJECT_ID')
+    FIREBASE_STORAGE_BUCKET = os.environ.get('DEV_FIREBASE_STORAGE_BUCKET')
+    FIREBASE_MESSAGING_SENDER_ID = os.environ.get('DEV_FIREBASE_MESSAGING_SENDER_ID')
+    FIREBASE_APP_ID = os.environ.get('DEV_FIREBASE_APP_ID')
+    FIREBASE_MEASUREMENT_ID = os.environ.get('DEV_FIREBASE_MEASUREMENT_ID')
+
+
 
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_RESULT_EXTENDED = True
@@ -256,3 +276,43 @@ CELERY_TASK_SERIALIZER = 'json'
 # }
 
 NEWS_API_KEY=os.environ.get('NEWS_API_KEY')
+
+if(os.environ.get('SETTINGS')=='prod'):
+    GOOGLE_CLOUD_CLIENT_ID=os.environ.get('GOOGLE_CLOUD_CLIENT_ID')
+    GOOGLE_CLOUD_PROJECT_ID=os.environ.get('GOOGLE_CLOUD_PROJECT_ID')
+    GOOGLE_CLOUD_AUTH_URI=os.environ.get('GOOGLE_CLOUD_AUTH_URI')
+    GOOGLE_CLOUD_TOKEN_URI=os.environ.get('GOOGLE_CLOUD_TOKEN_URI')
+    GOOGLE_CLOUD_AUTH_PROVIDER_x509_cert_url=os.environ.get('GOOGLE_CLOUD_AUTH_PROVIDER_x509_cert_url')
+    GOOGLE_CLOUD_CLIENT_SECRET=os.environ.get('GOOGLE_CLOUD_CLIENT_SECRET')
+    SCOPES=os.environ.get('SCOPES').split(',')
+    GOOGLE_CALENDAR_ID_BRANCH=os.environ.get('GOOGLE_CALENDAR_ID_BRANCH')
+    GOOGLE_CALENDAR_ID_PES=os.environ.get('GOOGLE_CALENDAR_ID_PES')
+    GOOGLE_CALENDAR_ID_IAS=os.environ.get('GOOGLE_CALENDAR_ID_IAS')
+    GOOGLE_CALENDAR_ID_RAS=os.environ.get('GOOGLE_CALENDAR_ID_RAS')
+    GOOGLE_CALENDAR_ID_WIE=os.environ.get('GOOGLE_CALENDAR_ID_WIE')
+else:
+    GOOGLE_CLOUD_CLIENT_ID=os.environ.get('DEV_GOOGLE_CLOUD_CLIENT_ID')
+    GOOGLE_CLOUD_PROJECT_ID=os.environ.get('DEV_GOOGLE_CLOUD_PROJECT_ID')
+    GOOGLE_CLOUD_AUTH_URI=os.environ.get('DEV_GOOGLE_CLOUD_AUTH_URI')
+    GOOGLE_CLOUD_TOKEN_URI=os.environ.get('DEV_GOOGLE_CLOUD_TOKEN_URI')
+    GOOGLE_CLOUD_AUTH_PROVIDER_x509_cert_url=os.environ.get('DEV_GOOGLE_CLOUD_AUTH_PROVIDER_x509_cert_url')
+    GOOGLE_CLOUD_CLIENT_SECRET=os.environ.get('DEV_GOOGLE_CLOUD_CLIENT_SECRET')
+    SCOPES=os.environ.get('DEV_SCOPES').split(',')
+    GOOGLE_CALENDAR_ID_BRANCH=os.environ.get('DEV_GOOGLE_CALENDAR_ID_BRANCH')
+    GOOGLE_CALENDAR_ID_PES=os.environ.get('DEV_GOOGLE_CALENDAR_ID_PES')
+    GOOGLE_CALENDAR_ID_IAS=os.environ.get('DEV_GOOGLE_CALENDAR_ID_IAS')
+    GOOGLE_CALENDAR_ID_RAS=os.environ.get('DEV_GOOGLE_CALENDAR_ID_RAS')
+    GOOGLE_CALENDAR_ID_WIE=os.environ.get('DEV_GOOGLE_CALENDAR_ID_WIE')
+
+GOOGLE_CALENDAR_API_NAME=os.environ.get('GOOGLE_CALENDAR_API_NAME')
+GOOGLE_CALENDAR_API_VERSION=os.environ.get('GOOGLE_CALENDAR_API_VERSION')
+
+GOOGLE_DRIVE_API_NAME=os.environ.get('GOOGLE_DRIVE_API_NAME')
+GOOGLE_DRIVE_API_VERSION=os.environ.get('GOOGLE_DRIVE_API_VERSION')
+
+GOOGLE_MAIL_API_NAME=os.environ.get('GOOGLE_MAIL_API_NAME')
+GOOGLE_MAIL_API_VERSION=os.environ.get('GOOGLE_MAIL_API_VERSION')
+
+GOOGLE_CLOUD_TOKEN=os.environ.get('GOOGLE_CLOUD_TOKEN')
+GOOGLE_CLOUD_REFRESH_TOKEN=os.environ.get('GOOGLE_CLOUD_REFRESH_TOKEN')
+GOOGLE_CLOUD_EXPIRY=os.environ.get('GOOGLE_CLOUD_EXPIRY')

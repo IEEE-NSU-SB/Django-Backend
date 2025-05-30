@@ -8,6 +8,8 @@ from users.models import Members
 from PIL import Image, ExifTags
 from io import BytesIO
 from django.core.files import File
+import os
+from django.forms import ValidationError
 # Create your models here.
     
 # Tables for Homepage
@@ -90,7 +92,7 @@ class Blog(models.Model):
 #Table for Achievements
 class Achievements(models.Model):
     award_name=models.CharField(null=False,blank=False,max_length=100)
-    award_description=RichTextField(null=True,blank=True,max_length=1000)
+    award_description=RichTextField(null=True,blank=True,max_length=25000)
     award_winning_year=models.IntegerField(null=False,blank=False)
     award_winning_datefield = models.DateField(null=True,blank=True)
     award_of=models.ForeignKey(Chapters_Society_and_Affinity_Groups,on_delete=models.CASCADE)
@@ -289,23 +291,32 @@ class IEEE_NSU_Student_Branch(models.Model):
         return str(self.pk)
     
 class Toolkit(models.Model):
+    def validate_file_extension(file):
+        extension=os.path.splitext(file.name)[1]
+        
+        valid_extension_list=['.ai']
+        if not extension in valid_extension_list:
+            raise ValidationError(u'Unsupported file extension. Please use .ai files only!')
+
     title=models.CharField(null=False,blank=False,max_length=100)
     picture=ResizedImageField(null=True,blank=True,upload_to='main_website_files/toolkit_pictures/')
+    ai_files=models.FileField(null=True,blank=True,upload_to='main_website_files/toolkit_ai_files/',validators=[validate_file_extension],verbose_name="Logo AI file")
     color_codes=RichTextField(null=True,blank=True,max_length=500)
+    
     
     class Meta:
         verbose_name="Toolkit"
     def __str__(self) -> str:
         return self.title
 
-class VolunteerOfTheMonth(models.Model):
-    ieee_id=models.ForeignKey(Members,null=False,blank=False,on_delete=models.CASCADE)
-    contributions=RichTextField(null=True,blank=True,max_length=200)
+# class VolunteerOfTheMonth(models.Model):
+#     ieee_id=models.ForeignKey(Members,null=False,blank=False,on_delete=models.CASCADE)
+#     contributions=RichTextField(null=True,blank=True,max_length=200)
     
-    class Meta:
-        verbose_name="Volunteer Of the Month"
-    def __str__(self) -> str:
-        return str(self.ieee_id)
+#     class Meta:
+#         verbose_name="Volunteer Of the Month"
+#     def __str__(self) -> str:
+#         return str(self.ieee_id)
     
     
 class IEEE_Region_10(models.Model):

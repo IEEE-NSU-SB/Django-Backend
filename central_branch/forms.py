@@ -2,6 +2,7 @@ from django import forms
 import os
 from main_website.models import *
 from datetime import date
+from django.forms import ValidationError
 
 class AchievementForm(forms.ModelForm):
     class Meta:
@@ -253,7 +254,7 @@ class ExemplaryMembersForm(forms.ModelForm):
 class ToolkitForm(forms.ModelForm):
     class Meta:
         model=Toolkit
-        fields=['title','picture','color_codes']
+        fields=['title','picture','ai_files','color_codes']
     
     def save(self, commit=True):
         # Get the existing instance from the database
@@ -278,7 +279,7 @@ class ToolkitForm(forms.ModelForm):
             instance.save()
         return instance
 
-class VolunteerOftheMonthForm(forms.ModelForm):
-    class Meta:
-        model=VolunteerOfTheMonth
-        fields=['contributions']
+# class VolunteerOftheMonthForm(forms.ModelForm):
+#     class Meta:
+#         model=VolunteerOfTheMonth
+#         fields=['contributions']

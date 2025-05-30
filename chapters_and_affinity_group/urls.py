@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 app_name="chapters_and_affinity_group"
@@ -39,6 +39,8 @@ urlpatterns = [
     path('<str:primary>/event_details/<int:event_id>/edit/graphics/links',views.event_edit_graphics_form_links_sub_tab,name='event_edit_graphics_form_links_sub_tab'),
     #Event content tab page
     path('<str:primary>/event_details/<int:event_id>/edit/content',views.event_edit_content_form_tab,name='event_edit_content_form_tab'),
+    #Event budget page
+    path('<str:primary>/event_details/<int:event_id>/edit/budget',views.event_edit_budget_form_tab,name='event_edit_budget_form_tab'),
     #Event preview
     path('<str:primary>/event_details/<int:event_id>/preview/',views.event_preview,name='event_preview'),
     #Event Feedback
@@ -49,6 +51,8 @@ urlpatterns = [
     path('<str:primary>/manage_main_website/preview',views.manage_main_website_preview,name="manage_main_website_preview"), 
     #Feed Back
     path('<str:primary>/feedbacks',views.feedbacks,name="feedbacks"),
+    #Event Google Calendar
+    path('<str:primary>/event_details/<int:event_id>/google_calendar/',views.event_google_calendar,name="google_calendar"),
     #Mega Event Creation Form
     path('<str:primary>/events/create_mega_event/',views.mega_event_creation,name="mega_event_creation"), 
     #Mega Events homepage
@@ -58,5 +62,8 @@ urlpatterns = [
     #Add Events to Mega Event
     path('<str:primary>/events/mega_event_add_event/<int:mega_event_id>/',views.mega_event_add_event,name="mega_event_add_event"), 
     #excel generation
-    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag")
+    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag"),
+
+    # Wallet Urls
+    path('<str:primary>/wallet/', include('wallet.urls'), name='wallet'),
 ]

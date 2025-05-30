@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.db import DatabaseError, IntegrityError, InternalError
-from users.models import Members
+import users
+from users.models import MemberSkillSets, Members
 from port.models import Teams
 from system_administration.models import MDT_Data_Access
 from recruitment import renderData
@@ -67,7 +68,7 @@ def md_team_homepage(request):
 @member_login_permission
 def insb_members_list(request):
 
-    try:
+    # try:
 
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -94,7 +95,7 @@ def insb_members_list(request):
             
 
             context={
-                'is_branch':False,
+                'is_branch':True,
                 'all_sc_ag':sc_ag,
                 'members':members,
                 'totalNumber':totalNumber,
@@ -107,10 +108,10 @@ def insb_members_list(request):
         else:
             return render(request,'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
         
-    except Exception as e:
-        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
-        return cv.custom_500(request)
+    # except Exception as e:
+    #     logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+    #     ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+    #     return cv.custom_500(request)
 
 @login_required
 @member_login_permission
@@ -127,6 +128,9 @@ def member_details(request,ieee_id):
         has_access=(renderData.MDT_DATA.insb_member_details_view_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username))
         
         member_data=renderData.MDT_DATA.get_member_data(ieee_id=ieee_id)
+        member_skills = None
+        if MemberSkillSets.objects.filter(member=member_data).exists():
+            member_skills=MemberSkillSets.objects.get(member=member_data)
         try:
             dob = datetime.strptime(str(
                 member_data.date_of_birth), "%Y-%m-%d").strftime("%Y-%m-%d")
@@ -139,18 +143,29 @@ def member_details(request,ieee_id):
         renewal_session=Renewal_Sessions.objects.all().order_by('-id')
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-        
+        # load all skill types
+        all_skills=users.renderData.load_all_skill_types(request)
+        # get member skills
+        try:
+            skill_of_member=member_skills.skills.all()
+        except AttributeError:
+            skill_of_member=None
+            
         context={
-            'is_branch':False,
+            'is_branch':True,
             'all_sc_ag':sc_ag,
             'member_data':member_data,
+            'member_skills':member_skills,
             'dob':dob,
             'sessions':sessions,
             'renewal_session':renewal_session,
             'media_url':settings.MEDIA_URL,
             'active_status':active_status,
             'user_data':user_data,
+            'all_skills':all_skills,
+            'skill_of_member':skill_of_member,
         }
+        
         if request.method=="POST":
             if request.POST.get('save_edit'):
                 nsu_id=request.POST['nsu_id']
@@ -163,9 +178,19 @@ def member_details(request,ieee_id):
                 email_nsu=request.POST['email_nsu']
                 facebook_url=request.POST['facebook_url']
                 home_address=request.POST['home_address']
+                school=request.POST['school_label']
+                department=request.POST['department_label']
                 major=request.POST['major_label']
                 recruitment_session_value=request.POST['recruitment']
                 renewal_session_value=request.POST['renewal']
+                skill_sets=request.POST.getlist('skill_sets')
+                try:
+                    blood_group = request.POST['blood_group']
+                except:
+                    blood_group = "None"
+
+                if date_of_birth == '':
+                    date_of_birth = None
                 
                 #checking if the recruitment and renewal session exists
                 try:
@@ -191,10 +216,24 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=None,
-                                                                last_renewal_session=None 
+                                                                last_renewal_session=None,
+                                                                blood_group = blood_group,
                                                                 )
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
                     
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('membership_development_team:member_details',ieee_id)
@@ -211,10 +250,24 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=recruitment_session.objects.get(id=recruitment_session_value),
-                                                                last_renewal_session=None 
+                                                                last_renewal_session=None,
+                                                                blood_group = blood_group,
                                                                 )
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
                     
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('membership_development_team:member_details',ieee_id)
@@ -232,10 +285,24 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=None,
-                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value) 
+                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value),
+                                                                blood_group = blood_group,
                                                                 )
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
                     
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('membership_development_team:member_details',ieee_id)
@@ -252,10 +319,24 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=recruitment_session.objects.get(id=recruitment_session_value),
-                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value) 
+                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value),
+                                                                blood_group = blood_group,
                                                                 )
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
                     
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('membership_development_team:member_details',ieee_id)
@@ -265,7 +346,7 @@ def member_details(request,ieee_id):
             if request.POST.get('delete_member'):
                 #Deleting a member from database
                 member_to_delete=Members.objects.get(ieee_id=ieee_id)
-                messages.error(request,f"{member_to_delete.ieee_id} was deleted from the INSB Registered Members Database.")
+                messages.error(request,f"{member_to_delete.ieee_id} was deleted from the IEEE NSU SB Registered Members Database.")
                 member_to_delete.delete()
                 return redirect('membership_development_team:members_list')
                 
@@ -486,8 +567,8 @@ def getRenewalStats(request):
         if('sc_ag' in data_type):
             # checking if data type has 'sc_ag' in it. so we know that it is seeking for the stat of SC & AG Renewal.
             
-            # The URL is designed such a way that the last number in the 'data_type' value will be the session_id. So we can extract session data from it.
-            session_id=data_type[-1] 
+            # The URL is designed such a way that the second part in the 'data_type' value will be the session_id. So we can extract session data from it.
+            session_id=data_type[6:] 
             try:
                 pes_renewal_count=Renewal_requests.objects.filter(session_id=session_id,pes_renewal_check=True).count()
                 ras_renewal_count=Renewal_requests.objects.filter(session_id=session_id,ras_renewal_check=True).count()
@@ -760,10 +841,10 @@ def renewal_request_details(request,pk,request_id):
                         )
                         new_member_from_renewal.save()
                     except:
-                        messages.error(request,f"Can not update this application to INSB Registered Members Database!")
+                        messages.error(request,f"Can not update this application to IEEE NSU SB Registered Members Database!")
 
                     #show message
-                    messages.success(request,f"Membership has been renewed!\nThis member with the associated IEEE ID: {ieee_id} was not found in the INSB Registered Member Database!\nHowever, the system kept the Data of renewal!")
+                    messages.success(request,f"Membership has been renewed!\nThis member with the associated IEEE ID: {ieee_id} was not found in the IEEE NSU SB Registered Member Database!\nHowever, the system kept the Data of renewal!")
                     
                     # Send an Email to the Applicants Associated Email
                     email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0]['email_associated'],reciever_name=renewal_request_details[0]['name'])
@@ -856,7 +937,7 @@ def generateExcelSheet_renewal_requestList(request,session_id):
             font_style = xlwt.XFStyle()
 
             # getting all the values of members as rows with same session
-            rows = Renewal_requests.objects.all().values_list('name',
+            rows = Renewal_requests.objects.filter(session_id=session_id).values_list('name',
                                                     'ieee_id',
                                                     'email_associated',
                                                     'email_ieee',
@@ -911,7 +992,7 @@ def generateExcelSheet_membersList(request):
             font_style.font.bold = True
 
             # Defining columns that will stay in the first row
-            columns = ['IEEE ID','NSU ID', 'Name', 'Email (IEEE)','Email (Personal)', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
+            columns = ['IEEE ID','NSU ID', 'Name', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
                     'Facebook URL']
 
             # Defining first column
@@ -927,6 +1008,8 @@ def generateExcelSheet_membersList(request):
                                                     'name',
                                                     'email_ieee',
                                                     'email_personal',
+                                                    'school',
+                                                    'department',
                                                     'major',
                                                     'contact_no',
                                                     'home_address',
@@ -960,7 +1043,8 @@ def data_access(request):
         user_data=current_user.getUserData() #getting user data as dictionary file
         #Only sub eb of that team can access the page
         user=request.user
-        has_access=(Access_Render.team_co_ordinator_access(team_id=renderData.MDT_DATA.get_team_id(),username=user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username))
+        has_eb_admin_access = Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username)
+        has_access=(Access_Render.team_co_ordinator_access(team_id=renderData.MDT_DATA.get_team_id(),username=user.username) or has_eb_admin_access)
         
         data_access=renderData.MDT_DATA.load_mdt_data_access()
         team_members=renderData.MDT_DATA.load_team_members()
@@ -1069,6 +1153,7 @@ def data_access(request):
             'user_data':user_data,
             'all_sc_ag':sc_ag,
             'data_access':data_access,
+            'has_eb_admin_access':has_eb_admin_access,
             'members':team_members,
             'insb_members':all_insb_members,
             'positions':position,      
@@ -1158,8 +1243,9 @@ def site_registration_request_details(request,ieee_id):
         #changing view Status
         Portal_Joining_Requests.objects.filter(ieee_id=ieee_id).update(view_status=True)
         
-        dob = datetime.strptime(str(
-            get_request.date_of_birth), "%Y-%m-%d").strftime("%Y-%m-%d")
+        dob = None
+        if get_request.date_of_birth is not None:
+            dob = datetime.strptime(str(get_request.date_of_birth), "%Y-%m-%d").strftime("%Y-%m-%d")
         
         current_application=Portal_Joining_Requests.objects.get(ieee_id=ieee_id)
         next_application=Portal_Joining_Requests.objects.filter(pk__gt=current_application.ieee_id).first()
@@ -1193,7 +1279,6 @@ def site_registration_request_details(request,ieee_id):
                             major=get_request.major,
                             contact_no=get_request.contact_no,
                             home_address=get_request.home_address,
-                            date_of_birth=get_request.date_of_birth,
                             gender=get_request.gender,
                             facebook_url=get_request.facebook_url,
                             linkedin_url=get_request.linkedin_url,
@@ -1227,7 +1312,6 @@ def site_registration_request_details(request,ieee_id):
                             major=get_request.major,
                             contact_no=get_request.contact_no,
                             home_address=get_request.home_address,
-                            date_of_birth=get_request.date_of_birth,
                             gender=get_request.gender,
                             facebook_url=get_request.facebook_url,
                             linkedin_url=get_request.linkedin_url,
@@ -1235,6 +1319,8 @@ def site_registration_request_details(request,ieee_id):
                             position=Roles_and_Position.objects.get(id=get_request.position.id),
                             user_profile_picture=get_request.user_profile_picture,
                         )
+                        if get_request.date_of_birth is not None:
+                            new_member.date_of_birth=get_request.date_of_birth
                         new_member.save()
 
                         if(email_sending.send_email_on_site_registration_verification_to_user(request,new_member.name,new_member.email_personal)==False):
@@ -1374,10 +1460,12 @@ def site_registration_faculty(request):
                     new_faculty_registration_request=Portal_Joining_Requests.objects.create(
                         name=request.POST['name'],ieee_id=request.POST['ieee_id'],email_personal=request.POST['email_personal'],
                         email_nsu=request.POST['email_nsu'],email_ieee=request.POST['email_ieee'],home_address=request.POST['home_address'],
-                        major=request.POST['major'],contact_no=request.POST['contact_no'],date_of_birth=request.POST['date_of_birth'],
+                        major=request.POST['major'],contact_no=request.POST['contact_no'],
                         facebook_url=request.POST['facebook_url'],linkedin_url=request.POST['linkedin_url'],gender=request.POST['gender'],
                         user_profile_picture=request.FILES['user_picture']
                     )
+                    if request.POST['date_of_birth'] != '':
+                        new_faculty_registration_request.date_of_birth=request.POST['date_of_birth']
                     new_faculty_registration_request.save()
                     mdt_officials = renderData.MDT_DATA.load_officials_of_MDT()
                     for official in mdt_officials:

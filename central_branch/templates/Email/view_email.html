@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Email | IEEE NSU Student Branch</title>
+  <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+
+  {% block common_css %}
+  {% include "common_css.html" %}
+  {% endblock common_css %}
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!--Internal CSS-->
+  <style>
+    body {
+      background: white;
+    }
+
+    .central_body {
+      margin: 3rem;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
+      margin-bottom: 100px;
+    }
+
+    .central_body h1 {
+      font-size: 1.5rem;
+      /* font-weight: bold; */
+      border-bottom: 1px solid gray;
+      padding-bottom: 10px;
+      flex-grow: 1;
+    }
+
+    .heading {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 0px 30px 0px;
+      align-items: flex-start;
+    }
+
+    .heading h2 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      padding-right: 10px;
+    }
+
+    .heading_col1 {
+      display: flex;
+      justify-content: space-between;
+      /* flex-basis: 20%; */
+      align-items: flex-start;
+      width: 90%;
+    }
+
+    .heading_col2 {
+      display: flex;
+      justify-content: space-between;
+      flex-basis: 14%;
+      align-items: center;
+      margin-left: .25rem;
+    }
+
+    .buttons {
+      padding-top: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .reply_button,
+    .forward_button {
+      border: 1px solid gray;
+      border-radius: 20px;
+      padding: .25rem 1rem;
+      font-size: 15px;
+      transition: 0.1s;
+      margin-right: 10px;
+      background-color: white;
+    }
+
+    .reply_button:hover,
+    .forward_button:hover {
+      border-color: black;
+      color: black;
+      cursor: pointer;
+    }
+
+    .send_button {
+      background-color: white;
+      color: #57cc99;
+      border: 1px solid #57cc99;
+      margin-top: 20px;
+      border-radius: 20px;
+      padding: .25rem 1rem;
+      font-size: 15px;
+      transition: 0.1s;
+      margin-right: 10px;
+    }
+
+    .send_button:hover {
+      background-color: #57cc99;
+      color: white;
+    }
+
+
+    .attachments {
+      /* margin-top: 20px;
+            padding: 15px 15px 5px 15px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            background-color: rgb(240, 240, 240);
+            width: 40%; */
+    }
+
+    .attachments ul {
+      list-style-type: none;
+      padding: 0px;
+      padding-left: 10px;
+    }
+
+    .attachments ul li {
+      margin-bottom: 10px;
+    }
+
+    .attachments ul li a {
+      color: #00629b;
+      text-decoration: none;
+      transition: 0.1s;
+    }
+
+    .attachments ul li a:hover {
+      color: #004770;
+    }
+
+    .attachments p {
+      margin-bottom: 10px;
+    }
+
+    .desc {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+      resize: vertical;
+      margin-bottom: 20px;
+      min-height: 200px;
+    }
+
+    /* .textarea{
+      display: none;
+    }
+
+    .textarea h3{
+      font-size: 15px;
+      margin-bottom: 0px;
+    } */
+
+    .dropbtn {
+      color: black;
+      background-color: white;
+      padding: 0px;
+      border:1px solid #f2f2f2;
+      border-radius: 50%;
+      height: 30px;
+      width: 30px;
+      transition: all .3s ease-in-out;
+      font-weight: bold;
+      
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown_content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      /* margin-left: -130px; */
+      border-radius: 0.25rem;
+      transition: all .5s ease-in-out;
+      right: 0px;
+    }
+
+    .dropdown_content a {
+      color: black;
+      padding: 10px 20px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown_content a:hover {
+      background-color: #ddd;
+    }
+
+    .dropdown:hover .dropdown_content {
+      display: block;
+    }
+
+    .dropdown:hover .dropbtn {
+      background-color: #f6f6f6;
+    }
+
+    .email_dp {
+      width: 30%;
+      margin-right: 15px;
+    }
+
+    .return_inbox {
+      font-size: 1.5rem;
+      padding: 0rem 0rem 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .fa-arrow-left {
+      color: #00629b;
+      position: relative;
+      bottom: .25rem;
+    }
+
+
+    .compose_email {
+      /* position: fixed;
+      bottom: 70px;
+      right: 10px; */
+      /* margin: 10px; */
+    }
+
+    .compose_email input[type="text"] {
+      width: 100%;
+      /* padding: 10px 12px; */
+      margin: 3px 0;
+      display: inline-block;
+      border: 0px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .compose_email input::placeholder {
+      color: #4f4f4f;
+    }
+
+    textarea {
+      resize: none;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      width: 100%;
+      padding: 10px;
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #e0e0e0;
+      height: 100px;
+      /* color: black; */
+      box-sizing: border-box;
+    }
+
+    .send {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 10px;
+    }
+
+    .attach_file {
+      /* margin-left: -6px; */
+      font-weight: bold;
+      font-size: 1.25rem;
+      transform: rotate(90deg);
+      color: #646464;
+    }
+
+
+    .ckeditor_view_email {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: .5rem 1rem 1rem;
+    }
+
+    #ck_view_reply_forword {
+      display: none;
+    }
+
+
+
+    @media screen and (max-width:480px) {
+
+      .central_body {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .return_inbox {
+        margin: -10px 0px 10px -10px;
+        font-size: 20px;
+      }
+
+      .heading_col1 {
+        flex-basis: 50%;
+      }
+
+      .heading_col2 {
+        flex-basis: 30%;
+      }
+
+      .attachments {
+        width: 100%;
+      }
+
+      .email_dp {
+        margin-right: 10px;
+      }
+
+    }
+
+    @media screen and (max-width:768px) {
+
+      .attachments {
+        width: 60%;
+      }
+
+      .heading_col2 {
+        flex-basis: 20%;
+      }
+
+      .heading{
+        flex-direction: column;
+      }
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      /* border: 1px solid #ccc; */
+      padding: 5px;
+      /* border-radius: 4px; */
+      min-height: 40px;
+      cursor: text;
+      align-items: center;
+    }
+
+
+    .tag {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      padding: 0 .75rem;
+      margin: 2px;
+      display: flex;
+      align-items: center;
+    }
+
+    .tag span {
+      margin-right: 5px;
+    }
+
+    .tag .remove-tag {
+      cursor: pointer;
+      padding: 2px;
+      color: #888;
+    }
+
+    .tag .remove-tag:hover {
+      color: #000;
+    }
+
+    .tag-input {
+      border: none;
+      outline: none;
+      flex: 1;
+      padding: 5px;
+    }
+
+    .custom-dropdown-container {
+      position: relative;
+      display: inline-block;
+      width: 300px;
+    }
+
+    .custom-dropdown-input {
+      width: 100%;
+      /* padding: 8px; */
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .custom-dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 550px;
+    }
+
+    .custom-dropdown-content div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .custom-dropdown-content div:hover {
+      background-color: #ddd;
+    }
+
+    .custom-tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .custom-tag {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .custom-remove-tag {
+      margin-left: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .alt-dropdown-container {
+      position: relative;
+      display: inline-block;
+      width: 300px;
+    }
+
+    .alt-dropdown-input {
+      width: 100%;
+      /* padding: 8px; */
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .alt-dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 550px;
+    }
+
+    .alt-dropdown-content div {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .alt-dropdown-content div:hover {
+      background-color: #ddd;
+    }
+
+    .alt-tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .alt-tag {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .alt-remove-tag {
+      margin-left: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .fa-arrow-right {
+      color: #888;
+    }
+/* 
+    .fa-arrow-right:hover {
+      color: #b1b0b0;
+    } */
+
+    .ccBccFields h6 {
+      margin-left: .5rem;
+      color: #333;
+    }
+
+    .ccBccFields{
+      position: relative;
+      z-index: 1;
+      height: 0;
+    }
+
+    .ccBccFieldsBox {
+      display: flex;
+      flex-direction: column;
+      transition: all ease-in-out .2s;
+      padding: .75rem;
+      height: auto;       
+      box-shadow: 2px 2px 2px #efefef;
+      background-color: white;
+      border-radius: 4px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+
+    .ccBccFieldsBox::-webkit-scrollbar{
+        width: 4px;
+        height: 4px;
+    }
+    .ccBccFieldsBox::-webkit-scrollbar-thumb{
+        background-color: #e7eeef;
+        transition: all .4s ease-in-out;
+        border-radius: 4px;
+    }
+    .ccBccFieldsBox::-webkit-scrollbar-thumb:hover{
+        background-color: rgb(169, 170, 170);
+    }
+
+    .ccBccFieldsBoxContent{
+      display: grid;
+      grid-template-columns: 40px auto;
+    }
+  </style>
+  <!--Internal CSS End-->
+  <!-- /* File Attachment Section */ -->
+  <style>
+    .attach_file {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      cursor: pointer;
+      position: relative;
+      /* bottom: .5rem; */
+    }
+
+    .attach_file label {
+      font-size: 20px;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.2s ease-in-out;
+    }
+
+    .attach_file label:hover {
+      color: #007bff;
+    }
+
+    #filePreviewContainer {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .file-preview {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ddd;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: white;
+      margin: 5px 0 5px 5px;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .file-preview:hover {
+      background-color: #f1f1f1;
+    }
+
+    .file-icon {
+      font-size: 18px;
+      margin-left: 5px;
+      margin-right: 5px;
+      color: #555;
+    }
+
+    .file-name {
+      font-size: 14px;
+      color: #333;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .remove-file {
+      font-size: 14px;
+      margin-left: 10px;
+      color: black;
+      cursor: pointer;
+      transition: color 0.2s ease-in-out;
+    }
+
+    .remove-file:hover {
+      color: black;
+    }
+
+    #myfile {
+      display: none;
+    }
+
+    {% comment %} button[title="Insert Image"], [title="Upload Files"] {
+      display: none;
+    } {% endcomment %}
+
+    
+    .email_sent_confirm_modal {
+      opacity: 0;
+      position: fixed;
+      z-index: -1;
+      padding-top: 250px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 120%;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: all .3s ease-in-out;
+      transform: translateY(-20px);
+      overflow: auto;
+    }
+
+    .email_sent_content {
+      background-color: #fefefe;
+      margin: auto;
+      border: 1px solid rgb(136, 136, 136);
+      max-width: 550px;
+      height: 100px;
+      border-radius: 6px;
+      box-shadow: 2px 2px 5px 0px #80808054;
+      position: relative;
+      /* left: 100px; */
+      padding-bottom: 5px;
+    }
+
+    .modalClosebtn {
+      color: #000;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px 20px 0;
+    }
+
+    .modalClosebtn:hover,
+    .modalClosebtn:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="app" id="app">
+
+    <!-- ############ LAYOUT START-->
+
+    <!-- aside -->
+    <div id="aside" class="app-aside modal nav-dropdown">
+      {% block sidebar %}
+      {% include 'users/sidebar.html' %}
+      {% endblock %}
+    </div>
+    <!-- / -->
+    <!-- navbar content -->
+    <div id="content" class="app-content box-shadow-z0" role="main">
+      {% block navbar %}
+      {% include 'navbar.html' %}
+      {% endblock navbar %}
+
+    </div>
+    <!--navbar content-->
+
+    <div ui-view class="app-body" id="view" style="justify-content:center;">
+
+      <!-- ############ PAGE START-->
+      <div class="central_body">
+
+        <div class="return_inbox">
+          <a href="{% url 'central_branch:mail' %}" title="Back"><i class="fa fa-arrow-left"></i></a>
+          <h1>{{threads.0.subject}}</h1>
+        </div>
+
+        <div class="heading">
+          <div class="heading_col1">
+            {% comment %} <img class="email_dp" src="{% static 'logos/logo.gif' %}" alt="email_display_picture"> {% endcomment %}
+            <div class="col1_inner">
+              <h2>{% if threads.0.sender_name %}{{threads.0.sender_name}}{% else %}{{threads.0.sender_email}}{% endif %}</h2>
+              <address style="margin: 0px; color: #002855; font-weight: bold;">
+                <a href="#">{{threads.0.sender_email}}</a>
+              </address>
+              <div style="display: flex;">
+                <!-- Arrow Element -->
+                <div id="arrow" onclick="toggleDisplay(this)"><i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </div>
+
+                <!-- CC and BCC Fields (Initially Hidden) -->
+                <div class="ccBccFields" style="opacity: 0;">
+                  <div class="ccBccFieldsBox">
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">to:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.to}}</h6>
+                    </div>  
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">cc:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.cc}}</h6>
+                    </div>
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">bcc:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.bcc}}</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="heading_col2">
+            <p style="margin: 0px; color: gray;">{{threads.0.date|date:"D, d M Y h:i:s A"}}</p>
+            <div class="dropdown">
+              <button class="dropbtn">...</button>
+              <div class="dropdown_content">
+                {% comment %} <a href="#" onclick="myFunction('reply')">Reply</a> {% endcomment %}
+                {% comment %} <a href="#" onclick="myFunction('fwd')">Forward</a> {% endcomment %}
+                <a>Delete this message</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="shadow-host">
+          {% comment %} {{threads.0.body|safe}} {% endcomment %}
+        </div>
+
+        {% if threads.0.files %}
+        <div class="attachments">
+          <p>Attachments:</p>
+          <ul>
+            {% for attachment in threads.0.files %}
+            <li><a href="{% url 'central_branch:get_attachment' attachment.msg_id attachment.attachment_id %}?filename={{attachment.filename}}">{{attachment.filename}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <div class="buttons">
+          <button class="reply_button" onclick="myFunction('reply')"><i class="fa fa-reply" style='margin-right: .5rem;'
+              aria-hidden="true"></i>Reply</button>
+          {% comment %} <button class="forward_button" onclick="myFunction('fwd')"><i class="fa fa-share" style='margin-right: .5rem;'
+              aria-hidden="true"></i>Forward</button> {% endcomment %}
+        </div>
+
+          {% csrf_token %}
+          <!-- reply block -->
+          <div class="compose_email ckeditor_view_email" id="ck_view_reply_forword">
+            <div class="tag-container" id="tagContainer">
+              <p style="margin: 0; margin-right: .25rem; position: relative; right: 2px;">Additional To</p>
+              <input type="text" name="to" class="tag-input" id="tagInput">
+            </div>
+            <hr class="fwd-only1">
+            <div class="custom-dropdown-container fwd-only2">
+              <input type="text" class="custom-dropdown-input" name="cc" placeholder="CC"
+                onclick="customToggleDropdown()">
+              <div class="custom-dropdown-content" id="customDropdown">
+                <div onclick="customSelectOption('All Registered General Members of IEEE NSU SB')">All Registered General Members of IEEE NSU SB</div>
+                <div onclick="customSelectOption('All Officers of IEEE NSU SB')">All Officers of IEEE NSU SB</div>
+                <div onclick="customSelectOption('Executive Panel (Branch Only)')">Executive Panel (Branch Only)</div>
+                <div onclick="customSelectOption('Branch Ex-Com Members')">Branch Ex-Com Members</div>
+                <div onclick="customSelectOption('All Society, Chapters, Affinity Group Executive Body Members')">All Society, Chapters, Affinity Group Executive Body Members</div>
+              </div>
+            </div>
+            <div class="custom-tag-container fwd-only3" id="customTagContainer"></div>
+            <hr class="fwd-only4">
+            <div class="alt-dropdown-container fwd-only5">
+              <input type="text" class="alt-dropdown-input" name="bcc" placeholder="BCC"
+                onclick="altToggleDropdown()">
+              <div class="alt-dropdown-content" id="altDropdown">
+                <div onclick="altSelectOption('All Registered General Members of IEEE NSU SB')">All Registered General Members of IEEE NSU SB</div>
+                <div onclick="altSelectOption('All Officers of IEEE NSU SB')">All Officers of IEEE NSU SB</div>
+                <div onclick="altSelectOption('Executive Panel (Branch Only)')">Executive Panel (Branch Only)</div>
+                <div onclick="altSelectOption('Branch Ex-Com Members')">Branch Ex-Com Members</div>
+                <div onclick="altSelectOption('All Society, Chapters, Affinity Group Executive Body Members')">All Society, Chapters, Affinity Group Executive Body Members</div>
+              </div>
+            </div>
+
+            <div class="alt-tag-container fwd-only6" id="altTagContainer" style="margin-bottom: 1rem;"></div>
+            <!--WFReditor-->
+            {% block WFReditor %}
+            {% include 'WFReditor.html' %}
+            {% endblock WFReditor %}
+            <div style="display: flex; justify-content: space-between;">
+              <div class="attach_file">
+                <label for="myfile"><i class="fa fa-paperclip" style="margin: 6px 9px;"></i></label>
+                <input type="file" id="myfile" name="myfile" hidden multiple>
+              </div>
+              <input type="hidden" id="mail_type">
+
+              <input type="button" class="send_button" onclick="EmailSent('{{threads.0.thread_id}}','{{threads.0.message_id}}')" value="Send">
+            </div>
+          </div>
+        
+
+        {% for thread in threads|slice:"1:" %}
+        <div class="heading">
+          <div class="heading_col1">
+            <!-- <img class="email_dp" src="{% static 'logos/logo.gif' %}" alt="email_display_picture"> -->
+            <div class="col1_inner">
+              <h2>{% if thread.sender_name %}{{thread.sender_name}}{% else %}{{thread.sender_email}}{% endif %}</h2>
+              <address style="margin: 0px; color: #002855; font-weight: bold;">
+                <a href="#">{{thread.sender_email}}</a>
+              </address>
+              <div style="display: flex;">
+                <!-- Arrow Element -->
+                <div id="arrow" onclick="toggleDisplay(this)"><i class="fa fa-arrow-right" aria-hidden="true"></i>
+                </div>
+
+                <!-- CC and BCC Fields (Initially Hidden) -->
+                <div class="ccBccFields" style="opacity: 0;">
+                  <div class="ccBccFieldsBox">
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">to:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.to}}</h6>
+                    </div>  
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">cc:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.cc}}</h6>
+                    </div>
+                    <div class="ccBccFieldsBoxContent">
+                      <h6 style="color: #888;">bcc:</h6>
+                      <h6 style="width: min-content; line-height: 1.3;">{{threads.0.bcc}}</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="heading_col2">
+            <p style="margin: 0px; color: gray;">{{thread.date|date:"D, d M Y h:i:s A"}}</p>
+            <div class="dropdown">
+              <button class="dropbtn">...</button>
+              <div class="dropdown_content">
+                {% comment %} <a href="#" onclick="myFunction('reply')">Reply</a> {% endcomment %}
+                {% comment %} <a href="#" onclick="myFunction('fwd')">Forward</a> {% endcomment %}
+                <a>Delete this message</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="shadow-host-{{forloop.counter}}">
+          {% comment %} {{thread.body|safe}} {% endcomment %}
+        </div>
+
+        {% if thread.files %}
+        <div class="attachments">
+          <p>Attachments:</p>
+          <ul>
+            {% for attachment in thread.files %}
+            <li><a href="{% url 'central_branch:get_attachment' attachment.msg_id attachment.attachment_id %}?filename={{attachment.filename}}">{{attachment.filename}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <!-- ############ PAGE END-->
+    </div>
+    <div id="sentModal" class="email_sent_confirm_modal">
+      <!-- Modal content -->
+      <div class="email_sent_content">
+        <div>
+          <span class="modalClosebtn">&times;</span>
+        </div>
+        <h5 name='msg' style="position: relative;
+              text-align: center;
+              bottom: 15px;">Sending...</h5>
+      </div>
+    </div>
+    <!-- ############ LAYOUT END-->
+
+    <script>
+      let prev = 'none';
+      function myFunction(composeType) {
+        const x = document.getElementById("ck_view_reply_forword");
+
+        if (composeType === 'reply' && (prev === 'none' || prev === 'fwd')){
+          x.style.display = 'block';
+          prev = 'reply';
+          document.querySelector('.fwd-only1').style.display = 'none';
+          document.querySelector('.fwd-only2').style.display = 'none';
+          document.querySelector('.fwd-only3').style.display = 'none';
+          document.querySelector('.fwd-only4').style.display = 'none';
+          document.querySelector('.fwd-only5').style.display = 'none';
+          document.querySelector('.fwd-only6').style.display = 'none';
+          document.getElementById('mail_type').value = 'reply';
+        }else if (composeType === 'fwd' && (prev === 'none' || prev === 'reply')){
+          x.style.display = 'block';
+          prev = 'fwd';
+          document.querySelector('.fwd-only1').style.display = 'block';
+          document.querySelector('.fwd-only2').style.display = 'block';
+          document.querySelector('.fwd-only3').style.display = 'flex';
+          document.querySelector('.fwd-only4').style.display = 'block';
+          document.querySelector('.fwd-only5').style.display = 'block';
+          document.querySelector('.fwd-only6').style.display = 'flex';
+          document.getElementById('mail_type').value = 'fwd';
+        }else{
+          x.style.display = 'none';
+          prev = 'none';
+        }
+      }
+    </script>
+
+    <!-- file attachments -->
+    <script>
+      //for attachments
+      document.getElementById('myfile').addEventListener('change', function (e) {
+        const filePreviewContainer = document.getElementById('filePreviewContainer');
+        Array.from(e.target.files).forEach(file => {
+          const filePreview = document.createElement('div');
+          filePreview.className = 'file-preview';
+
+          const fileIcon = document.createElement('i');
+          fileIcon.className = 'fa fa-file file-icon';
+
+          const fileName = document.createElement('span');
+          fileName.className = 'file-name';
+          fileName.textContent = file.name;
+
+          const removeFile = document.createElement('span');
+          removeFile.className = 'remove-file';
+          removeFile.innerHTML = '&times;';
+
+          removeFile.addEventListener('click', () => {
+            filePreview.remove();
+            // Optional: remove file from the input element as well
+          });
+
+          filePreview.appendChild(fileIcon);
+          filePreview.appendChild(fileName);
+          filePreview.appendChild(removeFile);
+          filePreviewContainer.appendChild(filePreview);
+        });
+      });
+
+      // Send Button click event
+      // document.querySelector('.btnSend').addEventListener('click', function() {
+      //     const files = document.getElementById('myfile').files;
+      //     if (files.length === 0) {
+      //         alert("No files attached.");
+      //         return;
+      //     }
+
+      //     alert(`${files.length} file(s) attached.`);
+      // });
+
+      {% comment %} function handleFileSelect(event) {
+        const fileInput = event.target;
+        const filePreviewContainer = document.getElementById('filePreviewContainer');
+
+        // Clear previous previews
+        //filePreviewContainer.innerHTML = '';
+
+        const files = fileInput.files;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const filePreview = document.createElement('div');
+          filePreview.className = 'file-preview';
+          filePreview.innerHTML = `
+              <span>${file.name}</span>
+              <button onclick="removeFile(${i})">Remove</button>
+          `;
+          filePreviewContainer.appendChild(filePreview);
+        }
+      } {% endcomment %}
+{% comment %} 
+      function removeFile(index) {
+        const fileInput = document.getElementById('myfile');
+        const dt = new DataTransfer();
+
+        const files = fileInput.files;
+        for (let i = 0; i < files.length; i++) {
+          if (i !== index) {
+            dt.items.add(files[i]);
+          }
+        }
+
+        fileInput.files = dt.files;
+        handleFileSelect({ target: fileInput });
+      }
+        {% endcomment %}
+
+      function getAllSelectedTags() {
+        const tags = tagContainer.querySelectorAll('.tag span:first-child');
+        return Array.from(tags).map(tag => tag.textContent);
+      } 
+    </script>
+    <!--input tags-->
+    <script>
+      const tagContainer = document.getElementById('tagContainer');
+      const tagInput = document.getElementById('tagInput');
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex to match 'something@something.something'
+
+      tagInput.addEventListener('keydown', function (event) {
+        if (event.key === ' ' || event.key === ',' || event.key === 'Enter') {
+          event.preventDefault(); // Prevent the space/comma from being typed
+          processInput(tagInput.value);
+          //addTag(tagInput.value.trim());
+          tagInput.value = ''; // Clear the input field
+        }
+      });
+
+      // Handle paste event for multiple values
+      tagInput.addEventListener('paste', function (event) {
+          event.preventDefault(); // Stop default paste behavior
+          const pasteText = (event.clipboardData || window.clipboardData).getData('text');
+          processInput(pasteText.trim());
+          tagInput.value = ''; // Clear the input field after paste
+        });
+
+        function processInput(input) {
+        const items = input.split(/[\s,]+/); // Split by space or comma
+        items.forEach(item => {
+          if (emailRegex.test(item.trim())) {
+            addTag(item.trim(), true);
+          }
+          else {
+            addTag(item.trim(), false);
+          }
+        });
+      }
+
+      function addTag(tagText, isCorrect) {
+        if (tagText === '') return;
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+
+        const span = document.createElement('span');
+        span.textContent = tagText;
+
+        if(!isCorrect) {
+          tag.style.borderColor = 'red';
+          span.style.color = 'red';
+        }
+
+        const removeButton = document.createElement('span');
+        removeButton.className = 'remove-tag';
+        removeButton.innerHTML = '&times;'; // Unicode for a multiplication sign (X)
+        removeButton.onclick = () => {
+          tagContainer.removeChild(tag);
+        };
+
+        tag.appendChild(span);
+        tag.appendChild(removeButton);
+        tagContainer.insertBefore(tag, tagInput); // Add the tag before the input field
+      }
+    </script>
+    <script>
+      const tagContainer1 = document.getElementById('tagContainer1');
+      const tagInput1 = document.getElementById('tagInput1');
+
+      tagInput1.addEventListener('keydown', function (event) {
+        if (event.key === ' ' || event.key === ',' || event.key === 'Enter') {
+          event.preventDefault();
+          addTag1(tagInput1.value.trim());
+          tagInput1.value = '';
+        }
+      });
+
+      function addTag1(tagText) {
+        if (tagText === '') return;
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+
+        const span = document.createElement('span');
+        span.textContent = tagText;
+
+        const removeButton = document.createElement('span');
+        removeButton.className = 'remove-tag';
+        removeButton.innerHTML = '&times;';
+        removeButton.onclick = () => {
+          tagContainer1.removeChild(tag);
+        };
+
+        tag.appendChild(span);
+        tag.appendChild(removeButton);
+        tagContainer1.insertBefore(tag, tagInput1);
+      }
+    </script>
+    <script>
+    function toggleDisplay(element) {
+      // Find the next sibling div (.ccBccFields)
+      const ccBccFields = element.nextElementSibling;
+      console.log(ccBccFields)
+      // Toggle opacity and visibility
+      if (ccBccFields.style.opacity === "0") {
+        ccBccFields.style.opacity = "1";
+        // ccBccFields.style.height = ccBccFields.scrollHeight + 'px';
+      } else {
+        ccBccFields.style.opacity = "0";
+        // ccBccFields.style.height = "0px";
+      }
+    }
+
+    </script>
+
+    <script>
+      const shadowHost = document.getElementById('shadow-host');
+      const shadowRoot = shadowHost.attachShadow({ mode: 'open' });
+      shadowRoot.innerHTML = `
+      {{threads.0.body|safe}}
+      `;
+     
+      {% for thread in threads|slice:"1:" %}
+      const shadowHost{{forloop.counter}} = document.getElementById('shadow-host-{{forloop.counter}}');
+      const shadowRoot{{forloop.counter}} = shadowHost{{forloop.counter}}.attachShadow({ mode: 'open' });
+      shadowRoot{{forloop.counter}}.innerHTML = `
+      {{thread.body|safe}}
+      `;
+
+      {% endfor %}
+    </script>
+    <script>
+        function EmailSent(thread_id, message_id) {
+
+        // Get the modal
+        var sentModal = document.getElementById("sentModal");
+        const mail_type = document.getElementById('mail_type').value;
+        console.log(mail_type);
+        sentModal.style.transform = 'translateY(0px)';
+        sentModal.style.zIndex = '103100';
+        sentModal.style.opacity = '1';
+
+        var body = getEditorContent();
+        var csrf = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        var mssg = document.querySelector('h5[name="msg"]');
+        var attachments = document.querySelector('input[name="myfile"]');
+        const tagInput = document.getElementById('tagInput');
+        mssg.innerHTML = 'Sending...';
+
+        var formData = new FormData();
+        formData.append('to[]', getAllSelectedTags());
+        formData.append('body', body);
+        formData.append('csrfmiddlewaretoken', csrf);
+        formData.append('message_id',message_id);
+
+        // Append each file from the attachments input
+        for (var i = 0; i < attachments.files.length; i++) {
+          console.log('OK');
+          formData.append('attachments', attachments.files[i]);
+        }
+
+        if(mail_type == 'reply') {
+          formData.append('thread_id', thread_id);
+
+          $.ajax({
+            url: "{% url 'central_branch:send_reply_mail_request' %}",
+            type: "POST",
+            data: formData,
+            processData: false,  // Important!
+            contentType: false,  // Importfant!
+            headers: {
+              "X-CSRFToken": csrf
+            },
+            success: function (response) {
+              // Handle the response
+              console.log(response);
+              mssg.innerHTML = response['message'];
+              window.location.replace("{% url 'central_branch:view_mail' threads.0.thread_id %}");
+            },
+            error: function (error) {
+              console.error("Error:", error);
+            }
+          });
+        }
+        else if (mail_type == 'fwd') {
+          $.ajax({
+            url: "{% url 'central_branch:send_forward_mail_request' %}",
+            type: "POST",
+            data: formData,
+            processData: false,  // Important!
+            contentType: false,  // Importfant!
+            headers: {
+              "X-CSRFToken": csrf
+            },
+            success: function (response) {
+              // Handle the response
+              console.log(response);
+              mssg.innerHTML = response['message'];
+              //window.location.replace("{% url 'central_branch:view_mail' threads.0.thread_id %}");
+            },
+            error: function (error) {
+              console.error("Error:", error);
+            }
+          });
+        }
+        else {
+          mssg.innerHTML = "Wrong email type!";
+        }
+
+        // Get the <span> element that closes the modal
+        var closeBtn = document.getElementsByClassName("modalClosebtn")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        closeBtn.onclick = function () {
+          sentModal.style.transform = 'translateY(-50px)';
+          sentModal.style.zIndex = '-100';
+          sentModal.style.opacity = '0';
+        }
+
+        //close reply and forward section
+        const x = document.getElementById("ck_view_reply_forword");
+        x.style.display = 'none';
+        prev = 'none';
+      }
+
+      function hideModal() {
+        var sentModal = document.getElementById("sentModal");
+
+        sentModal.style.transform = 'translateY(-50px)';
+        sentModal.style.zIndex = '-100';
+        sentModal.style.opacity = '0';
+      }
+    </script>
+    <script>
+      // For the CC dropdown
+      let customSelectedTags = [];
+      let customAvailableOptions = ['All Registered General Members of IEEE NSU SB', 'All Officers of IEEE NSU SB', 'Executive Panel (Branch Only)', 'Branch Ex-Com Members' , 'All Society, Chapters, Affinity Group Executive Body Members',{% for session in recruitment_sessions %}'Recruits of - {{session.session}}',{% endfor %}];
+
+      function customToggleDropdown() {
+        const dropdown = document.getElementById("customDropdown");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+      }
+
+      function customSelectOption(option) {
+        if (!customSelectedTags.includes(option)) {
+          customSelectedTags.push(option);
+          customAvailableOptions = customAvailableOptions.filter(item => item !== option);
+          customUpdateDropdown();
+          customUpdateTagContainer();
+        }
+      }
+
+      function customRemoveTag(index) {
+        const removedTag = customSelectedTags.splice(index, 1)[0];
+        customAvailableOptions.push(removedTag);
+        customUpdateDropdown();
+        customUpdateTagContainer();
+      }
+
+      function customUpdateDropdown() {
+        const dropdown = document.getElementById("customDropdown");
+        dropdown.innerHTML = '';
+        customAvailableOptions.forEach(option => {
+          const div = document.createElement('div');
+          div.textContent = option;
+          div.onclick = () => customSelectOption(option);
+          dropdown.appendChild(div);
+        });
+      }
+
+      function customUpdateTagContainer() {
+        const tagContainer = document.getElementById('customTagContainer');
+        tagContainer.innerHTML = ''; // Clear existing tags
+
+        customSelectedTags.forEach((tag, index) => {
+          const tagElement = document.createElement('div');
+          tagElement.className = 'custom-tag';
+          tagElement.innerHTML = `${tag} <span class="custom-remove-tag" onclick="customRemoveTag(${index})">×</span>`;
+          tagContainer.appendChild(tagElement);
+        });
+      }
+
+            // Close dropdown when clicking outside of it
+            window.onclick = function (event) {
+        if (!event.target.matches('.custom-dropdown-input') && !event.target.closest('.custom-dropdown-content')) {
+          document.getElementById("customDropdown").style.display = "none";
+        }
+      };
+
+      // Function to get selected tags
+      function getCustomSelectedTags() {
+
+        // Define a mapping object to map options to their corresponding values
+        const optionMapping = {
+          'All Registered General Members of IEEE NSU SB': 'general_members',
+          'All Officers of IEEE NSU SB': 'officers',
+          'Executive Panel (Branch Only)': 'executive_panel',
+          'Branch Ex-Com Members': 'branch_ex_com',
+          'All Society, Chapters, Affinity Group Executive Body Members': 'society_chapters_executive'
+        };
+
+        function mapOptions(optionsArray) {
+          return optionsArray.map(option => optionMapping[option] || null);
+        }
+
+        const mappedArray = mapOptions(customSelectedTags);
+        console.log(mappedArray);
+        return mappedArray;
+      }
+
+      function customClearAllTags() {
+      // Add all selected tags back to the available options
+      customAvailableOptions = customAvailableOptions.concat(customSelectedTags);
+
+      // Clear the selected tags array
+      customSelectedTags = [];
+
+      // Update both the dropdown and the tag container
+      customUpdateDropdown();
+      customUpdateTagContainer();
+    }
+      // For the BCC dropdown
+      let altSelectedTags = [];
+      let altAvailableOptions = ['All Registered General Members of IEEE NSU SB', 'All Officers of IEEE NSU SB', 'Executive Panel (Branch Only)', 'Branch Ex-Com Members' , 'All Society, Chapters, Affinity Group Executive Body Members',{% for session in recruitment_sessions %}'Recruits of - {{session.session}}',{% endfor %}];
+
+      function altToggleDropdown() {
+        const dropdown = document.getElementById("altDropdown");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+      }
+
+      function altSelectOption(option) {
+        if (!altSelectedTags.includes(option)) {
+          altSelectedTags.push(option);
+          altAvailableOptions = altAvailableOptions.filter(item => item !== option);
+          altUpdateDropdown();
+          altUpdateTagContainer();
+        }
+      }
+
+      function altRemoveTag(index) {
+        const removedTag = altSelectedTags.splice(index, 1)[0];
+        altAvailableOptions.push(removedTag);
+        altUpdateDropdown();
+        altUpdateTagContainer();
+      }
+
+      function altUpdateDropdown() {
+        const dropdown = document.getElementById("altDropdown");
+        dropdown.innerHTML = '';
+        altAvailableOptions.forEach(option => {
+          const div = document.createElement('div');
+          div.textContent = option;
+          div.onclick = () => altSelectOption(option);
+          dropdown.appendChild(div);
+        });
+      }
+
+      function altUpdateTagContainer() {
+        const tagContainer = document.getElementById('altTagContainer');
+        tagContainer.innerHTML = ''; // Clear existing tags
+
+        altSelectedTags.forEach((tag, index) => {
+          const tagElement = document.createElement('div');
+          tagElement.className = 'alt-tag';
+          tagElement.innerHTML = `${tag} <span class="alt-remove-tag" onclick="altRemoveTag(${index})">×</span>`;
+          tagContainer.appendChild(tagElement);
+        });
+      }
+
+        // Close dropdown when clicking outside of it
+        window.onclick = function (event) {
+        if (!event.target.matches('.alt-dropdown-input') && !event.target.closest('.alt-dropdown-content')) {
+          document.getElementById("altDropdown").style.display = "none";
+        }
+      };
+
+      // Function to get selected tags
+      function getAltSelectedTags() {
+        // Define a mapping object to map options to their corresponding values
+        const optionMapping = {
+          'All Registered General Members of IEEE NSU SB': 'general_members',
+          'All Officers of IEEE NSU SB': 'officers',
+          'Executive Panel (Branch Only)': 'executive_panel',
+          'Branch Ex-Com Members': 'branch_ex_com',
+          'All Society, Chapters, Affinity Group Executive Body Members': 'society_chapters_executive'
+        };
+
+        function mapOptions(optionsArray) {
+          return optionsArray.map(option => optionMapping[option] || null);
+        }
+
+        const mappedArray = mapOptions(altSelectedTags);
+        console.log(mappedArray);
+        return mappedArray;
+      }
+
+      function altClearAllTags() {
+        // Add all selected tags back to the available options
+        altAvailableOptions = altAvailableOptions.concat(altSelectedTags);
+
+        // Clear the selected tags array
+        altSelectedTags = [];
+
+        // Update both the dropdown and the tag container
+        altUpdateDropdown();
+        altUpdateTagContainer();
+      }
+
+          // Close dropdown when clicking outside of it for all three dropdowns
+          window.onclick = function (event) {
+      if (!event.target.matches('.custom-dropdown-input') && !event.target.closest('.custom-dropdown-content')) {
+        document.getElementById("customDropdown").style.display = "none";
+      }
+      if (!event.target.matches('.alt-dropdown-input') && !event.target.closest('.alt-dropdown-content')) {
+        document.getElementById("altDropdown").style.display = "none";
+      }
+    };
+
+      </script>
+    {% block common_js %}
+    {% include "common_js.html" %}
+    {% endblock common_js %}
+</body>
+
+</html>

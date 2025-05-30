@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Add members and task | IEEE NSU SB</title>
+    <meta name="description" content="Admin, Dashboard, Bootstrap, Bootstrap 4, Angular, AngularJS" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- style -->
+    <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+    <!--common CSS-->
+    {% block common_css %}
+     {% include "common_css.html" %}
+    {% endblock common_css %}
+    <!-- CKEditor CDN -->
+    <script src="https://cdn.ckeditor.com/4.17.0/standard-all/ckeditor.js"></script>
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+    <style>
+      body, html {
+        margin: 0;
+        align-items: center;
+        justify-content: center;
+        background: white;
+      }
+      .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height:100%;
+      }
+      .btn-container {
+        text-align: center;
+      }
+      .tb_search {
+        border-radius: 4px;
+        box-shadow: 2px 2px 5px 0px #80808054;
+        margin-bottom: 20px;
+      }
+      
+      .btn {
+        max-width: 100%;
+        width: auto;
+        display: inline-block;
+        white-space: normal; /* Allow text to wrap within the button */
+        word-wrap: break-word; /* Break long words if necessary */
+        font-size: 16px; /* Adjust the font size as needed */
+      }
+      .update_button{
+        display : flex;
+        justify-content: space-around;
+
+      }
+      .tooltip-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .tooltip-container.right {
+        float: right; /* Float the container to the right */
+        margin-right: 0; /* Reset the margin for the right-aligned button */
+      }
+
+      .image-button:hover + .tooltip-text {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(10px); /* Adjust the distance from the link */
+      }
+
+      .tooltip-text {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      }
+
+      .image-button img {
+        width: 40px; /* Adjust as needed */
+        height: auto; /* Maintain aspect ratio */
+        border-radius: 50%; /* Add rounded corners if desired */
+        box-shadow: 2px 2px 5px 0px #80808054;
+      }
+      .submission-list {
+        list-style: none;
+        padding: 0;
+      }
+      .submission-item {
+        padding-left: 1rem;
+        display: flex;
+        align-items: center;
+      }
+      /* Styling for the table */
+      .table-class tbody tr:nth-child(odd){
+        background-color: white; /* White color for odd rows */
+      }
+      .table-class tbody tr:nth-child(odd){
+        background-color: white; /* White color for odd rows */
+      }
+      .table-class tbody tr:hover {
+        background-color: #e0e0e0; /* Lighter gray color for hover effect */
+      }
+      .table-responsive {
+        max-height: 600px;
+        overflow-y: auto;
+        border-radius: 4px;
+        min-height: 400px;
+        margin-bottom: 50px;
+      }
+      .table-responsive thead th {
+        position: sticky;
+        top: -2px;
+      }
+      /* Styling for the checkbox */
+      .submission-checkbox {
+        margin-right: 10px;
+      }
+      .option-label{
+        margin: 0;
+        font-size: 15px;
+      }
+      .submission-label{
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+      }
+      .discription{
+        display: none;
+      }
+    
+      /* Media query for smaller screens (adjust the breakpoint as needed) */
+      @media (max-width: 768px) {
+        .btn {
+          width: 100%; /* Make the button full width on smaller screens */
+        }
+        .tb_search{
+          width: 100%;
+        }
+      }
+      .nav a.active {
+        color: #FFA300;
+      }
+      .ckeditor {
+        box-shadow: 2px 2px 5px 0px #80808054;
+      }
+      .ck.ck-editor__editable_inline>:last-child {
+        margin-bottom: var(--ck-spacing-large);
+        height: 10rem;
+      }
+      .forward-task-btn {
+        padding: 5px 15px;
+        color: white;
+        background: #75D481;
+        margin: 16px 4px 16px; 
+        border-radius: 4px;
+        border: 2px solid #75D481;
+        transition: all ease-in-out .3s;
+      }
+      
+      .forward-task-btn:hover {
+        color: #75D481;
+        background: white;
+        border-color: #75D481;
+      }
+      .form-control{
+        border-radius: 4px;
+        box-shadow: 2px 2px 5px 0px #80808054;
+        border: 0px;
+      }
+      .table-responsive::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .table-responsive::-webkit-scrollbar-thumb{
+          background-color: #e7eeef;
+          transition: all .4s ease-in-out;
+          border-radius: 4px;
+      }
+      .table-responsive::-webkit-scrollbar-thumb:hover{
+          background-color: rgb(169, 170, 170);
+      }
+      input[type=checkbox] {
+          height: 20px;
+          width: 20px;
+      }
+      .finish_task_modal_btn{
+        color: #7575d4;
+        background-color: #75d48200;
+        display: inline;
+        padding: 10px;
+        margin: 3px;
+        border: 1px;
+        border-style: solid;
+        border-color: #7575d4;
+        border-radius: 4px;
+        transition-duration: 500ms;
+        }
+        .finish_task_modal_btn:hover{
+        color: #ffffff;
+        background-color: #7575d4;
+        transition-duration: 500ms;
+        cursor: pointer;
+      }
+      .modal-1-content::-webkit-scrollbar{
+            width: 6px;
+            height: 6px;
+        }
+        .modal-1-content::-webkit-scrollbar-thumb{
+            background-color: #e7eeef;
+            transition: all .4s ease-in-out;
+            border-radius: 4px;
+        }
+        .modal-1-content::-webkit-scrollbar-thumb:hover{
+            background-color: rgb(169, 170, 170);
+        }
+      .create_modal{
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 50px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.5);
+        transition: all .3s ease-in-out;
+        transform: translateY(-20px);
+        overflow: auto;
+        }
+        .modal-1-content{
+            background-color: #fefefe;
+            margin: auto;
+            border: 1px solid rgb(136, 136, 136);
+            max-width: 850px;
+            max-height: 70vh;
+            overflow-y: scroll;
+            border-radius: 6px;
+            box-shadow: 2px 2px 5px 0px #80808054;
+            position: relative;
+            left: 100px;
+        }
+
+        .close1{
+            color: #000;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .close1:hover,
+        .close1:focus{
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 1024px) {
+            .modal-1-content {
+                left: 0px;
+                margin: 10%;
+            }
+        }
+        @media screen and (max-width: 500px) {
+            .modal-1-content{
+                margin: 5%;
+            }
+            .image-button img {
+              width: 32px;
+            }
+        }
+        .confirm_start_task_btn{
+            padding: 2px 26px;
+            color: #fff;
+            background: #d33838;
+            border-radius: 4px;
+            border: 1px solid #d33838;
+            transition: all ease-in-out .3s;
+        }
+        .cancel_start_task_btn{
+            padding: 2px 26px;
+            color: #0000008f;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #0000004f;
+            transition: all ease-in-out .3s;
+        }
+        .cancel_start_task_btn:hover{
+            color: white;
+            background: #0000004f;
+            border-color: transparent;
+        }
+        .start_task_modal{
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 50px; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 150%;
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.5);
+        transition: all .3s ease-in-out;
+        transform: translateY(-50px);
+        overflow: auto;
+        }
+        .start-task-modal-content {
+            background-color: #fefefe;
+            margin: auto 44%;
+            padding: 0px 12px 28px;
+            border: 1px solid rgb(136, 136, 136);
+            width: 25%;
+            border-radius: .25rem;
+        }
+        @media screen and (max-width: 1024px) {
+            .start-task-modal-content{
+                width: 50%;
+                margin: auto;
+            }
+        }
+        @media screen and (max-width: 750px){
+            .start-task-modal-content{
+                width: 90%;
+            }
+        }
+        .closeStartModal{
+            color: #000;
+            font-size: 28px;
+            /* font-weight: bold; */
+            display: flex;
+            justify-content: flex-end;
+            cursor: pointer;
+        }
+        .closeStartModal:focus{
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+  </head>
+  {% block preloader %}
+      {% include 'preloader.html' %}
+  {% endblock preloader %}
+    <body>
+      <div class="app" id="app">
+
+
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+          {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+          {% endblock %}
+        </div>
+
+
+        <div id="content" class="app-content" role="main">
+          {% if app_name == "central_branch" %}
+          {% block navbar %}
+           {% include 'navbar.html' %} 
+          {% endblock navbar %}
+          {% else %}
+              {% if web_dev_team %}
+                  {% block web_navbar %}
+                      {% include 'website_development_team/web_navbar.html' %} 
+                  {% endblock web_navbar %}
+              {% elif content_and_writing_team %}
+                  {% block content_navbar %}
+                      {% include 'content_navbar.html' %} 
+                  {% endblock content_navbar %}
+              {% elif event_management_team %}
+                  {% block event_navbar %}
+                      {% include 'emt_navbar.html' %} 
+                  {% endblock event_navbar %}
+              {% elif logistic_and_operation_team %}
+                  {% block logistic_navbar %}
+                      {% include 'logistics_navbar.html' %} 
+                  {% endblock logistic_navbar %}
+              {% elif promotion_team %}
+                  {% block promotion_navbar %}
+                      {% include 'promotions_team/promotions_navbar.html' %} 
+                  {% endblock promotion_navbar %}
+              {% elif public_relation_team %}
+                  {% block public_relation_team_navbar %}
+                      {% include 'public_relation_team/public_relation_navbar.html' %} 
+                  {% endblock public_relation_team_navbar %}
+              {% elif membership_development_team %}
+                  {% block membership_navbar %}
+                      {% include 'mdt_navbar.html' %} 
+                  {% endblock membership_navbar %}
+              {% elif media_team %}
+                  {% block medias_navbar %}
+                      {% include 'media_navbar.html' %} 
+                  {% endblock medias_navbar %}
+              {% elif graphics_team %}
+                  {% block graphicss_navbar %}
+                      {% include 'graphics_navbar.html' %} 
+                  {% endblock graphicss_navbar %}
+              {% elif finance_and_corporate_team %}
+                  {% block finanace_navbar %}
+                      {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+                  {% endblock finanace_navbar %}
+              {% endif %}
+          {% endif %}
+      </div>
+      
+
+        <div id="content" class="app-content" role="main">
+            
+          <div ui-view class="app-body" style="justify-content:center; margin-left:15%; margin-right:15%; padding-top: 3.5rem;" id="view">
+
+            <!-- ############ PAGE START-->
+            <h4 style="justify-content:center;text-align:center;margin-bottom:15px;margin-top:30px;">Add members and task submission type</h4>
+            
+
+            <!--Messages-->
+            <div id="messageContainer" style="display:none; justify-content:center; text-align:center;">
+              <div id="messageBox" class="alert alert-success" role="alert">
+                  <span id="messageText"></span>
+                  <button type="button" class="close" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+            </div>
+
+
+            <!--Messages-->
+            <div class="tooltip-container">
+              {% if team_primary == None or team_primary == "1" %}
+              <a href="{% url 'central_branch:task_edit' task.pk %}" class="image-button">
+              {% else %}
+              <a href="{% url ''|add:app_name|add:':task_edit_team' task.pk team_primary %}" class="image-button">
+              {% endif %}
+                <img src="/static/back-arrow.png" alt="Go back to session">
+              </a>
+              <span class="tooltip-text">Go back</span>
+            </div>
+
+            <!--Messages-->
+            <div style="justify-content:center; text-align:center;">
+              {% if messages %}
+                  {% for message in messages %}
+                      <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
+                  {% endfor %}
+              <br>
+              {% endif %}
+            </div>
+            <div style="display: flex; justify-content: center;">
+              <button type="button" class="finish_task_modal_btn">How To Forward A Task</button>
+            </div>
+
+            <div id="modal1" class="create_modal">
+              <!-- Modal content -->
+              <div class="modal-1-content">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 10px; background: #002855; padding: 10px 20px; position: sticky; top: 0px;">
+                      <h5 style="color: #fff;    position: relative;
+                      top: 3px">How to forward a task?</h5>
+                      <span class="close1" style="color: white;">&times;</span>
+                  </div>
+                      <ol style="font-size: 16px; margin: 15px">
+                          <li>Select the individuals you want to forward the task</li>
+                          <li>After selecting the individuals by selecting checkbox, you have to assign them what type of fields you want them to fill to complete the task from <span style="font-weight: 600;">Select task type</span> (only if you want to forward to volunteers)</li>
+                          <li>Must press <span style="font-weight: 600;">Forward Task</span> button to forward the task to the assigned individuals and then it will send a mail to that assigned individuals</li>
+                          <li>As an Executive Body, if you forward the task to
+                            <ul>
+                              <li>the Team's Incharges, Co-ordinators will get <span style="color:red;font-weight: 600;">25%</span> points of the Task points</li>
+                              <li>the Team's Volunteers, both Co-ordinators and Incharges will get <span style="color:red;font-weight: 600;">10%</span> points of the Task points</li>
+                              <li>Co-ordinator of a particular Team are assigned to this task as a group. So if you forwards it, every Co-ordinators of the Team receives 25% or 10% of the Task points</li>
+                              <li>Once forwarded Co-ordinators can still upload Task materials if necessary, and you can adjust the points later on their upload basis</li>
+                              <li>Same for Incharges</li>
+                            </ul>
+                          </li>
+                          <li>As a Co-ordinator if you forward your task to
+                            <ul>
+                              <li>your Incharges, you will get <span style="color:red;font-weight: 600;">25%</span> points of the Task points</li>
+                              <li>your Volunteers, you will get <span style="color:red;font-weight: 600;">10%</span> points of the Task points</li>
+                              <li>Co-ordinator of a particular Team are assigned to this task as a group. So if any Co-ordinator forwards it, every Co-ordinators receives 25% or 10% of the Task points. They would be notified by an email and notification</li>
+                              <li>Once forwarded you can still upload Task materials if necessary, and EB's can adjust your points later on your upload basis</li>
+                              <li>You can change the assignees of the Task forwarded to your Incharges, if and only if any Incharge <span style="color:red;font-weight: 600;">did not</span> forward it to their Volunteers</li>
+                              <li>If Incharge forwarded it to the Volunteers, then you can change the Volunteers if you want</li>
+                            </ul>
+                          </li>
+                          <li>As an Incharge, if you forward your task to
+                            <ul>
+                              <li>your Volunteers, you will get <span style="color:red;font-weight: 600;">25%</span> points of the Task points</li>
+                              <li>Incharges of a particular Team are assigned to this task as a group. So if any Incharge forwards it, every Incharges receives 25% of the Task points. They would be notified by an email and notification</li>
+                              <li>Once forwarded you can still upload Task materials if necessary, and EB's can adjust your points later on your upload basis</li>
+                              <li>You can change the assignees of the Task forwarded to your Volunteers</li>
+                            </ul>
+                          </li>
+                      </ol>
+              </div>
+          </div>
+          {% if not task.is_task_completed %}
+            <form method="post" id="taskForm">
+
+              <!--forward task btn-->
+              {% if volunteer_members|length > 0%}
+              <div style="text-align: center;">
+                <!-- <button type="submit" class="forward-task-btn" style="cursor: pointer;">Forward Task</button> -->
+                <input type="button" id="start_task" class="forward-task-btn" style="cursor: pointer;" value="Forward Task">
+              </div>
+                <!-- Start Task Modal -->
+                <div id="startTask" class="start_task_modal">
+                  <!-- Modal content -->
+                  <div class="start-task-modal-content">
+                      <div style="display: flex; justify-content: flex-end; ">
+                          <span class="closeStartModal">&times;</span>
+                      </div>
+                      <h5 style="text-align: center; font-weight: bold;margin-bottom: 12px;">Are you sure?</h5>
+                      {% if is_coordinator and not is_task_forwared_to_incharge %}
+                      <h6  style="text-align: center; margin: 0 22px 5px;">If you <span style="color:red;">forward</span>, all of the Co-ordinators (including you) will get <span style="color:red;">25%</span>(if forwarded to Incharges) or <span style="color:red;">10%</span>(if forwarded to Volunteers) points of the Task points</h6>
+                      <h6 style="text-align: center;">Do you want to forward the task?</h6>
+                      {% endif %}
+                      {% if is_coordinator and is_task_forwared_to_incharge and not is_task_forwarded_to_volunteers %}
+                      {% endif %}
+                      {% if is_coordinator and is_task_forwared_to_incharge and is_task_forwarded_to_volunteers %}
+                      {% endif %}
+                      {% if is_officer and is_task_forwared_to_incharge and not is_task_forwarded_to_volunteers %}
+                      <h6  style="text-align: center; margin: 0 22px 5px;">If you <span style="color:red;">forward</span>, all of the Incharges (including you) will get <span style="color:red;">25%</span> points of the Task points</h6>
+                      <h6 style="text-align: center;">Do you want to forward the task?</h6>
+                      {% endif %}
+                      {% if is_officer and is_task_forwared_to_incharge and is_task_forwarded_to_volunteers %}
+                      {% else %}
+                      {% endif %}
+                      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 20px;">
+                          <a href="#" class="cancel_start_task_btn">No</a>
+                          <button type="submit"class="confirm_start_task_btn" style="cursor: pointer;">Forward Task</button>
+                  </div>
+                  </div>
+              </div>
+              {% endif %}
+              {% csrf_token %}
+              <div style="justify-content:center;text-align:center; margin-top:15px;">  
+                <div style="justify-content:center;">
+                  <div class="header_wrap">
+                    <!-- <div class="num_rows">
+                      <div class="form-group">
+                        <select class="form-control" name="state" id="maxRows">
+                          <option value="10">10</option>
+                          <option value="15">15</option>
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                          <option value="5000">Show ALL Rows</option>
+                        </select>
+                      </div>
+                    </div> -->
+
+
+                    
+
+
+                <!--Search bar for individuals-->
+                <div class="tb_search search_input_individuals ">
+                    <input
+                    type="text"
+                    id="search_input_individuals"
+                    onkeyup="filter_individual_table()"
+                    placeholder="Search..."
+                    class="form-control title-box"/>
+                </div>
+                
+                
+                <!--Table for individuals-->
+                <div class="table-responsive individuals-table" >
+                  <table class="table box" id="individuals-table">
+                    <thead style="position: relative; z-index: 101;">
+                        <tr>
+                          <th>Select</th>
+                          <th>Name</th>
+                          {% if task_type_bool == True %}
+                          <th>Task Type</th>
+                          {% endif %}
+                          <th>IEEE ID</th>
+                          <th>Team</th>
+                          <th>Position</th>
+                          <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% if team_primary == None or team_primary == "1" %}
+                      <p style="color:red;">Here All the Assigned Teams Core/Team Volunteers would appear. Core/Team Volunteers won't be shown for the following reasons :-
+                        <ul>
+                          <li>If Co-ordinator of a team starts the task, it can no longer be forwarded to the Incharges or the Volunteers</li>
+                          <li>If Co-ordinator did forward it, but an Incharge of a Team started the task, it can't be forwarded to the Volunteers</li>
+                        </ul>
+                      </p>
+                      {% endif %}
+                      {% for volunteers,types in volunteer_members.items %}
+                      <tr>
+                        <td>
+                          <input type="checkbox" name="member_select" value="{{volunteers.ieee_id}}" {% if volunteers in task.members.all %}checked{% endif %}>
+                        </td>
+                        <td>{{volunteers.name}}</td>
+                        {% if task_type_bool == True %}
+                        <td>
+                          <select name="{{volunteers.ieee_id}}_task_type[]" multiple multiselect-search="true"> 
+                              <option value="permission_paper" {% if types.has_permission_paper %}selected{% endif %}>Yes/No Box </option>
+                              <option value="content" {% if types.has_content  %}selected{% endif %}>Text Field </option>
+                              <option value="file_upload" {% if types.has_file_upload %}selected{% endif %}>File / Permission Paper Upload </option>
+                              <option value="media" {% if types.has_media %}selected{% endif %}>Media Upload </option>
+                              <option value="drive_link" {% if types.has_drive_link %}selected{% endif %}>Link </option>
+                          </select>
+                        </td> 
+                        {% endif %}                 
+                        <td>{{volunteers.ieee_id}}</td>
+                        <td>{{volunteers.team.team_name}}</td>
+                        <td>{{volunteers.position}}</td>
+                        <td>{{volunteers.contact_no}}</td>
+                      </tr>
+                      {% endfor %}
+                      {% else %}
+                      <h1 style="color:red;text-align:center;">Task Already Completed</h1>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            
+          </form>
+          {% endif %} 
+      
+          </div>
+        </div>
+      </div>
+
+      {% block common_js %}
+       {% include "common_js.html" %}
+      {% endblock common_js %}
+
+      <style>
+        /* Highlight rows with missing task type in red */
+        .error-row {
+            background-color: #ffdddd!important; /* Light red background */
+        }
+    </style>
+      <script>
+        
+        function handleSelection() {
+            const teamCheckboxes = document.querySelectorAll('input[name="team_select"]');
+            const individualCheckboxes = document.querySelectorAll('input[name="member_select"]');
+            const taskTypeSelects = document.querySelectorAll('select[name$="_task_type[]"]');
+        
+            // Check for team selection
+            teamCheckboxes.forEach(team => {
+                team.addEventListener('change', () => {
+                    if (team.checked) {
+                        // Uncheck and reset all individual checkboxes
+                        individualCheckboxes.forEach(individual => {
+                            individual.checked = false;
+                            removeErrorHighlight(individual);
+        
+                            // Reset task type dropdown for the individual
+                            const taskType = document.querySelector(`select[name="${individual.value}_task_type[]"]`);
+                            if (taskType) {
+                                taskType.disabled = true;
+                                taskType.selectedIndex = -1; // Clear all selections in dropdown
+                            }
+                        });
+                    }
+                });
+            });
+        
+            // Check for individual selection
+            individualCheckboxes.forEach(individual => {
+                individual.addEventListener('change', () => {
+                    if (individual.checked) {
+                        // Uncheck all team checkboxes
+                        teamCheckboxes.forEach(team => team.checked = false);
+        
+                        // Enable task type dropdown for the selected individual
+                        const taskType = document.querySelector(`select[name="${individual.value}_task_type[]"]`);
+                        if (taskType) {
+                            taskType.disabled = false;
+                        }
+                    } else {
+                        // If unchecked, disable the task type dropdown
+                        const taskType = document.querySelector(`select[name="${individual.value}_task_type[]"]`);
+                        if (taskType) {
+                            taskType.disabled = true;
+                            taskType.selectedIndex = -1; // Clear selection when unchecked
+                        }
+                        removeErrorHighlight(individual);
+                    }
+                });
+            });
+        }
+        
+        // Function to highlight rows with errors
+        function highlightErrorRow(element, addHighlight = true) {
+            const row = element.closest('tr');
+            if (row) {
+                if (addHighlight) {
+                    row.classList.add('error-row');
+                } else {
+                    row.classList.remove('error-row');
+                }
+            }
+        }
+        
+        // Function to remove error highlight from a row
+        function removeErrorHighlight(individual) {
+            const taskType = document.querySelector(`select[name="${individual.value}_task_type[]"]`);
+            highlightErrorRow(individual, false);
+            highlightErrorRow(taskType, false);
+        }
+        
+        // Function to validate form before submission
+        function validateForm(event) {
+            const teamCheckboxes = document.querySelectorAll('input[name="team_select"]');
+            const individualCheckboxes = document.querySelectorAll('input[name="member_select"]');
+            const taskTypeSelects = document.querySelectorAll('select[name$="_task_type[]"]');
+        
+            // Remove any existing error highlights
+            individualCheckboxes.forEach(individual => removeErrorHighlight(individual));
+        
+            // Check if any team or individual is selected
+            const isTeamSelected = Array.from(teamCheckboxes).some(checkbox => checkbox.checked);
+            const isIndividualSelected = Array.from(individualCheckboxes).some(checkbox => checkbox.checked);
+        
+            if (!isTeamSelected && !isIndividualSelected) {
+                alert("Please select either a team or an individual before submitting.");
+                event.preventDefault();
+                return false;
+            }
+        
+            // Check if task types are selected for selected individuals
+            if (isIndividualSelected) {
+                let allTaskTypesSelected = true;
+                individualCheckboxes.forEach(individual => {
+                    if (individual.checked) {
+                        const taskType = document.querySelector(`select[name="${individual.value}_task_type[]"]`);
+                        if (!taskType || taskType.selectedOptions.length === 0) {
+                            // Highlight the row in red if no task type is selected
+                            highlightErrorRow(individual);
+                            highlightErrorRow(taskType);
+                            allTaskTypesSelected = false;
+                        }
+                    }
+                });
+        
+                if (!allTaskTypesSelected) {
+                    alert("Please select a task type for each selected individual.");
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        
+            return true;
+        }
+        
+        // Attach event listeners
+        document.addEventListener("DOMContentLoaded", () => {
+            handleSelection();
+            const form = document.getElementById("taskForm");
+                    form.addEventListener("submit", validateForm);
+                });
+            </script>
+
+      <script>
+        getPagination('#table-id');
+        $('#maxRows').trigger('change');
+        function getPagination (table){
+
+          $('#maxRows').on('change',function(){
+            $('.pagination').html('');						// reset pagination div
+            var trnum = 0 ;									// reset tr counter 
+            var maxRows = parseInt($(this).val());			// get Max Rows from select option
+            
+            var totalRows = $(table+' tbody tr').length;		// numbers of rows 
+          $(table+' tr:gt(0)').each(function(){			// each TR in  table and not the header
+            trnum++;									// Start Counter 
+            if (trnum > maxRows ){						// if tr number gt maxRows
+              
+              $(this).hide();							// fade it out 
+            }if (trnum <= maxRows ){$(this).show();}// else fade in Important in case if it ..
+          });											//  was fade out to fade it in 
+          if (totalRows > maxRows){						// if tr total rows gt max rows option
+            var pagenum = Math.ceil(totalRows/maxRows);	// ceil total(rows/maxrows) to get ..  
+                                  //	numbers of pages 
+            for (var i = 1; i <= pagenum ;){			// for each page append pagination li 
+            $('.pagination').append('<li data-page="'+i+'">\
+                          <span>'+ i++ +'<span class="sr-only">(current)</span></span>\
+                        </li>').show();
+            }											// end for i 
+        
+            
+          } 												// end if row count > max rows
+          $('.pagination li:first-child').addClass('active'); // add active class to the first li 
+            
+            
+            //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
+          showig_rows_count(maxRows, 1, totalRows);
+            //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
+
+            $('.pagination li').on('click',function(e){		// on click each page
+            e.preventDefault();
+            var pageNum = $(this).attr('data-page');	// get it's number
+            var trIndex = 0 ;							// reset tr counter
+            $('.pagination li').removeClass('active');	// remove active class from all li 
+            $(this).addClass('active');					// add active class to the clicked 
+            
+            
+            //SHOWING ROWS NUMBER OUT OF TOTAL
+          showig_rows_count(maxRows, pageNum, totalRows);
+            //SHOWING ROWS NUMBER OUT OF TOTAL
+            
+            
+            
+            $(table+' tr:gt(0)').each(function(){		// each tr in table not the header
+              trIndex++;								// tr index counter 
+              // if tr index gt maxRows*pageNum or lt maxRows*pageNum-maxRows fade if out
+              if (trIndex > (maxRows*pageNum) || trIndex <= ((maxRows*pageNum)-maxRows)){
+                $(this).hide();		
+              }else {$(this).show();} 				//else fade in 
+            }); 										// end of for each tr in table
+              });										// end of on click pagination list
+          });
+          // end of on select change 
+
+          // END OF PAGINATION 
+          
+        }	
+
+
+            
+
+        // SI SETTING
+        $(function(){
+          // Just to append id number for each row  
+        default_index();
+                  
+        });
+
+        //ROWS SHOWING FUNCTION
+        function showig_rows_count(maxRows, pageNum, totalRows) {
+          //Default rows showing
+                var end_index = maxRows*pageNum;
+                var start_index = ((maxRows*pageNum)- maxRows) + parseFloat(1);
+                var string = 'Showing '+ start_index + ' to ' + end_index +' of ' + totalRows + ' entries';               
+                $('.rows_count').html(string);
+        }
+
+        // CREATING INDEX
+        function default_index() {
+          $('table tr:eq(0)').prepend('<th> SL No. </th>')
+
+                  var id = 0;
+
+                  $('table tr:gt(0)').each(function(){	
+                    id++
+                    $(this).prepend('<td>'+id+'</td>');
+                  });
+        }
+
+        // All Table search script
+    function FilterkeyWord_all_table() {
+      // Count td if you want to search on all table instead of specific column
+
+      var count = $(".table")
+        .children("tbody")
+        .children("tr:first-child")
+        .children("td").length;
+
+      // Declare variables
+      var input, filter, table, tr, td, i;
+      input = document.getElementById("search_input_all");
+      var input_value = document.getElementById("search_input_all").value;
+      filter = input.value.toLowerCase();
+      if (input_value != "") {
+        table = document.getElementById("table-id");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 1; i < tr.length; i++) {
+          var flag = 0;
+
+          for (j = 0; j < count; j++) {
+            td = tr[i].getElementsByTagName("td")[j];
+            if (td) {
+              var td_text = td.innerHTML;
+              if (td.innerHTML.toLowerCase().indexOf(filter) > -1) {
+                //var td_text = td.innerHTML;
+                //td.innerHTML = 'shaban';
+                flag = 1;
+              } else {
+                //DO NOTHING
+              }
+            }
+          }
+          if (flag == 1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      } else {
+        //RESET TABLE
+        $("#maxRows").trigger("change");
+      }
+    } 
+      </script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          // Get the current page's URL
+          const currentPageUrl = window.location.href;
+        
+          // Find the links in the navigation bar
+          const navLinks = document.querySelectorAll(".nav a");
+        
+          // Loop through the links and add a "active" class to the matching link
+          navLinks.forEach(function (link) {
+            if (link.href === currentPageUrl) {
+              link.classList.add("active");
+            }
+          });
+        });
+      </script>
+      
+      <script>
+
+          // Get the input elements
+          const ckeckBoxInputs = document.querySelectorAll('.submission-checkbox-others');
+          const otherDescriptionLabel = document.getElementById('other_description');
+
+          // Add event listener to radio inputs
+          ckeckBoxInputs.forEach(input => {
+            input.addEventListener('change', function() {
+              // Check if at least one checkbox is selected
+              var isCheckboxSelected = false;
+
+              ckeckBoxInputs.forEach(function(checkbox) {
+                  if (checkbox.checked) {
+                      isCheckboxSelected = true;
+                  }
+              });
+
+              // If "Others" is selected, show the text field
+              if (isCheckboxSelected) {
+                otherDescriptionLabel.style.display = 'block';
+              } else {
+                otherDescriptionLabel.style.display = 'none';
+              }
+            });
+          });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+          // Replace the textarea with CKEditor instance
+          CKEDITOR.replace("task_description_details", {
+            // Specify CKEditor configuration options here if needed
+          });
+
+          // Attach a function to the change event for CKEditor instance
+          var editor = CKEDITOR.instances["task_description_details"];
+
+          editor.on("change", function () {
+            // Update character count display for CKEditor instance
+            updateCharacterCount();
+          });
+
+          // Update character count initially
+          updateCharacterCount();
+        });
+
+        function updateCharacterCount() {
+          var editorContent = CKEDITOR.instances["task_description_details"].getData();
+
+          // Handle special space representations
+          var cleanedContent = editorContent.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+
+          // Count each character (including spaces)
+          var characterCount = cleanedContent.length;
+
+          var characterCountElement = document.getElementById("task_descriptionCharacterCount");
+
+          // Check conditions and update text color and content
+          if (characterCount === 0) {
+            characterCountElement.style.color = "black";
+            characterCountElement.innerText = "Character Count: 0";
+          } else {
+            characterCountElement.innerText = "Character Count: " + characterCount;
+          }
+        }
+
+
+      </script>
+      <script>
+
+        var forwardBtn = document.querySelectorAll('.confirm_start_task_btn');
+        // forwardBtn.forEach(input => {
+        //   input.addEventListener('change', function() {
+        //     checkSelections();
+        //   });
+        // });
+
+        forwardBtn.onclick = function () {
+          // Check if a radio button is selected
+          var radioButtons = document.querySelectorAll('.table-checkbox');
+          var radioSelected = false;
+
+          radioButtons.forEach(function(radioButton) {
+            if (radioButton.checked) {
+              radioSelected = true;
+            }
+          });
+
+          // Check if at least one checkbox is selected from the table
+          var checkboxes = document.querySelectorAll('.submission-checkbox');
+          var checkboxSelected = false;
+
+          checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+              checkboxSelected = true;
+            }
+          });
+
+          // Display alert messages based on selections
+          if (!radioSelected) {
+            alert('Please select a member to forward task');
+          } else if (!checkboxSelected) {
+            alert('Please select a task submission type');
+          } else {
+            alert('I don\'t know where to go next');
+          }
+        }
+
+      </script>
+          <script>
+            var style = document.createElement('style');
+    style.setAttribute("id","multiselect_dropdown_styles");
+    style.innerHTML = `
+    .multiselect-dropdown{
+      display: inline-block;
+      padding: 2px 5px 0px 5px;
+      border-radius: 4px;
+      border: solid 1px #ced4da;
+      background-color: white;
+      position: relative;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right .75rem center;
+      background-size: 16px 12px;
+    }
+    .multiselect-dropdown span.optext, .multiselect-dropdown span.placeholder{
+      margin-right:0.5em; 
+      margin-bottom:2px;
+      padding:1px 0; 
+      border-radius: 4px; 
+      display:inline-block;
+    }
+    .multiselect-dropdown span.optext{
+      background-color:lightgray;
+      padding:1px 0.75em; 
+    }
+    .multiselect-dropdown span.optext .optdel {
+      float: right;
+      margin: 0 -6px 1px 5px;
+      font-size: 0.7em;
+      margin-top: 2px;
+      cursor: pointer;
+      color: #666;
+    }
+    .multiselect-dropdown span.optext .optdel:hover { color: #c66;}
+    .multiselect-dropdown span.placeholder{
+      color:#ced4da;
+    }
+    .multiselect-dropdown-list-wrapper{
+      box-shadow: gray 0 3px 8px;
+      z-index: 100;
+      padding:2px;
+      border-radius: 4px;
+      border: solid 1px #ced4da;
+      display: none;
+      margin: -1px;
+      position: absolute;
+      top:0;
+      left: 0;
+      right: 0;
+      background: white;
+    }
+    .multiselect-dropdown-list-wrapper .multiselect-dropdown-search{
+      margin-bottom:5px;
+    }
+    .multiselect-dropdown-list{
+      padding:2px;
+      height: 15rem;
+      overflow-y:auto;
+      overflow-x: hidden;
+    }
+    .multiselect-dropdown-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .multiselect-dropdown-list::-webkit-scrollbar-thumb {
+      background-color: #bec4ca;
+      border-radius:3px;
+    }
+    
+    .multiselect-dropdown-list div{
+      padding: 5px;
+    }
+    .multiselect-dropdown-list input{
+      height: 1.15em;
+      width: 1.15em;
+      margin-right: 0.35em;  
+    }
+    .multiselect-dropdown-list div.checked{
+    }
+    .multiselect-dropdown-list div:hover{
+      background-color: #ced4da;
+    }
+    .multiselect-dropdown span.maxselected {width:100%;}
+    .multiselect-dropdown-all-selector {border-bottom:solid 1px #999;}
+    `;
+    document.head.appendChild(style);
+    
+    function MultiselectDropdown(options){
+      var config={
+        search:true,
+        height:'15rem',
+        placeholder:'Select task type',
+        txtSelected:'selected',
+        txtAll:'All',
+        txtRemove: 'Remove',
+        txtSearch:'search',
+        ...options
+      };
+      function newEl(tag,attrs){
+        var e=document.createElement(tag);
+        if(attrs!==undefined) Object.keys(attrs).forEach(k=>{
+          if(k==='class') { Array.isArray(attrs[k]) ? attrs[k].forEach(o=>o!==''?e.classList.add(o):0) : (attrs[k]!==''?e.classList.add(attrs[k]):0)}
+          else if(k==='style'){  
+            Object.keys(attrs[k]).forEach(ks=>{
+              e.style[ks]=attrs[k][ks];
+            });
+           }
+          else if(k==='text'){attrs[k]===''?e.innerHTML='&nbsp;':e.innerText=attrs[k]}
+          else e[k]=attrs[k];
+        });
+        return e;
+      }
+    
+      
+      document.querySelectorAll("select[multiple]").forEach((el,k)=>{
+        
+        var div=newEl('div',{class:'multiselect-dropdown',style:{width:config.style?.width??el.clientWidth+'px',padding:config.style?.padding??''}});
+        el.style.display='none';
+        el.parentNode.insertBefore(div,el.nextSibling);
+        var listWrap=newEl('div',{class:'multiselect-dropdown-list-wrapper'});
+        var list=newEl('div',{class:'multiselect-dropdown-list',style:{height:config.height}});
+        var search=newEl('input',{class:['multiselect-dropdown-search'].concat([config.searchInput?.class??'form-control']),style:{width:'100%',display:el.attributes['multiselect-search']?.value==='true'?'block':'none'},placeholder:config.txtSearch});
+        listWrap.appendChild(search);
+        div.appendChild(listWrap);
+        listWrap.appendChild(list);
+    
+        el.loadOptions=()=>{
+          list.innerHTML='';
+          
+          if(el.attributes['multiselect-select-all']?.value=='true'){
+            var op=newEl('div',{class:'multiselect-dropdown-all-selector'})
+            var ic=newEl('input',{type:'checkbox'});
+            op.appendChild(ic);
+            op.appendChild(newEl('label',{text:config.txtAll}));
+      
+            op.addEventListener('click',()=>{
+              op.classList.toggle('checked');
+              op.querySelector("input").checked=!op.querySelector("input").checked;
+              
+              var ch=op.querySelector("input").checked;
+              list.querySelectorAll(":scope > div:not(.multiselect-dropdown-all-selector)")
+                .forEach(i=>{if(i.style.display!=='none'){i.querySelector("input").checked=ch; i.optEl.selected=ch}});
+      
+              el.dispatchEvent(new Event('change'));
+            });
+            ic.addEventListener('click',(ev)=>{
+              ic.checked=!ic.checked;
+            });
+      
+            list.appendChild(op);
+          }
+    
+          Array.from(el.options).map(o=>{
+            var op=newEl('div',{class:o.selected?'checked':'',optEl:o})
+            var ic=newEl('input',{type:'checkbox',checked:o.selected});
+            op.appendChild(ic);
+            op.appendChild(newEl('label',{text:o.text}));
+    
+            op.addEventListener('click',()=>{
+              op.classList.toggle('checked');
+              op.querySelector("input").checked=!op.querySelector("input").checked;
+              op.optEl.selected=!!!op.optEl.selected;
+              el.dispatchEvent(new Event('change'));
+            });
+            ic.addEventListener('click',(ev)=>{
+              ic.checked=!ic.checked;
+            });
+            o.listitemEl=op;
+            list.appendChild(op);
+          });
+          div.listEl=listWrap;
+    
+          div.refresh=()=>{
+            div.querySelectorAll('span.optext, span.placeholder').forEach(t=>div.removeChild(t));
+            var sels=Array.from(el.selectedOptions);
+            if(sels.length>(el.attributes['multiselect-max-items']?.value??5)){
+              div.appendChild(newEl('span',{class:['optext','maxselected'],text:sels.length+' '+config.txtSelected}));          
+            }
+            else{
+              sels.map(x=>{
+                var c=newEl('span',{class:'optext',text:x.text, srcOption: x});
+                if((el.attributes['multiselect-hide-x']?.value !== 'true'))
+                  c.appendChild(newEl('span',{class:'optdel',text:'🗙',title:config.txtRemove, onclick:(ev)=>{c.srcOption.listitemEl.dispatchEvent(new Event('click'));div.refresh();ev.stopPropagation();}}));
+    
+                div.appendChild(c);
+              });
+            }
+            if(0==el.selectedOptions.length) div.appendChild(newEl('span',{class:'placeholder',text:el.attributes['placeholder']?.value??config.placeholder}));
+          };
+          div.refresh();
+        }
+        el.loadOptions();
+        
+        search.addEventListener('input',()=>{
+          list.querySelectorAll(":scope div:not(.multiselect-dropdown-all-selector)").forEach(d=>{
+            var txt=d.querySelector("label").innerText.toUpperCase();
+            d.style.display=txt.includes(search.value.toUpperCase())?'block':'none';
+          });
+        });
+    
+        div.addEventListener('click',()=>{
+          div.listEl.style.display='block';
+          search.focus();
+          search.select();
+        });
+        
+        document.addEventListener('click', function(event) {
+          if (!div.contains(event.target)) {
+            listWrap.style.display='none';
+            div.refresh();
+          }
+        });    
+      });
+    }
+    
+    window.addEventListener('load',()=>{
+      MultiselectDropdown(window.MultiselectDropdownOptions);
+    });
+        </script>
+        <script>
+            
+              //filtering for individual table
+              function filter_individual_table() {
+                  // Declare variables
+                  var input, filter, table, tr, td, i, txtValue;
+                  input = document.getElementById("search_input_individuals");
+                  filter = input.value.toUpperCase();
+                  table = document.getElementById("individuals-table");
+                  tr = table.getElementsByTagName("tr");
+                  
+                  // Loop through all table rows and hide those that don't match the search query
+                  for (i = 0; i < tr.length; i++) {
+                      // Skip the header row
+                      if (i === 0) continue;
+                      
+                      // Loop through all table cells in the current row
+                      var rowContainsSearchTerm = false;
+                      for (var j = 0; j < tr[i].cells.length; j++) {
+                          td = tr[i].cells[j];
+                          if (td) {
+                              txtValue = td.textContent || td.innerText;
+                          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                              rowContainsSearchTerm = true;
+                              break;
+                          }
+                          }
+                      }
+                      
+                      // Toggle the visibility of the row based on whether it contains the search term
+                      if (rowContainsSearchTerm) {
+                          tr[i].style.display = "";
+                      } else {
+                          tr[i].style.display = "none";
+                      }
+                      }
+              }
+      </script>  
+      <script>
+        // Get the modal
+        var modal1 = document.getElementById("modal1");
+        
+        // Get the button that opens the modal
+        var btn1 = document.querySelector(".finish_task_modal_btn");
+        
+        // Get the <span> element that closes the modal
+        var span1 = document.getElementsByClassName("close1")[0];
+        
+        // When the user clicks the button, open the modal 
+        btn1.onclick = function() {
+        modal1.style.transform = 'translateY(0px)';
+        modal1.style.zIndex = '103100';
+        modal1.style.opacity = '1';
+        }
+    
+        // When the user clicks on <span> (x), close the modal
+        span1.onclick = function() {
+        modal1.style.transform = 'translateY(-50px)';
+        modal1.style.zIndex = '-100';
+        modal1.style.opacity = '0';
+        }
+    
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+         if (event.target == modal1) {
+            modal1.style.transform = 'translateY(-50px)';
+            modal1.style.zIndex = '-100';
+            modal1.style.opacity = '0';
+          }
+        }
+        </script>
+            <script>
+              // popup modal when start task button is clicked
+              // Get the modal
+              const startTaskModal = document.getElementById("startTask");
+              
+              // Get the button that opens the modal
+              const btnClick = document.querySelector("#start_task");
+              
+              // Get the <span> element that closes the modal
+              const closeStartTask = document.getElementsByClassName("closeStartModal")[0];
+      
+              const cancelStartTaskBtn = document.getElementsByClassName('cancel_start_task_btn')[0];
+              
+              // When the user clicks the button, open the modal 
+              btnClick.onclick = function() {
+              //   modal.style.display = "block";
+              startTaskModal.style.transform = 'translateY(0px)';
+              startTaskModal.style.zIndex = '103100';
+              startTaskModal.style.opacity = '1';
+              }
+              
+              // When the user clicks on <span> (x), close the modal
+              closeStartTask.onclick = function() {
+              //   modal.style.display = "none";
+              startTaskModal.style.transform = 'translateY(-50px)';
+              startTaskModal.style.zIndex = '-100';
+              startTaskModal.style.opacity = '0';
+              }
+              
+              // When the user clicks on cancel btn, close the modal
+              cancelStartTaskBtn.onclick = function() {
+              //   modal.style.display = "none";
+              startTaskModal.style.transform = 'translateY(-50px)';
+              startTaskModal.style.zIndex = '-100';
+              startTaskModal.style.opacity = '0';
+              }
+      
+              // When the user clicks anywhere outside of the modal, close it
+              window.onclick = function(event) {
+              if (event.target == startTaskModal) {
+                  startTaskModal.style.transform = 'translateY(-50px)';
+                  startTaskModal.style.zIndex = '-100';
+                  startTaskModal.style.opacity = '0';
+              }
+              }
+          </script>
+    <!-- endbuild -->
+  </body>
+</html>

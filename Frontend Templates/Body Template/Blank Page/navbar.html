@@ -4,6 +4,13 @@
     .nav a.active {
         color: #FFA300;
     }
+    .app-header{
+        position: sticky;
+        margin: 0 0 0 2px;
+    }
+    .app-header ~ .app-body {
+        padding-top: 0rem;
+    }
 </style>
 <!--This is scrip is to get the link of the current page and cross match it with the navlink to change colors-->
 <script>
@@ -93,13 +100,10 @@ document.addEventListener("DOMContentLoaded", function () {
             <i class="material-icons">more_horiz</i>
             </a>
         </li>
-        <li class="nav-item dropdown pos-stc-xs">
-            <a class="nav-link mr-2" href data-toggle="dropdown">
-            <i class="material-icons">&#xe7f5;</i>
-            <span class="label label-sm up warn">3</span>
-            </a>
-            <div ui-include="'../views/blocks/dropdown.notification.html'"></div>
-        </li>
+        <!--notification bell-->
+        {% block bell_notification %}
+            {% include 'users/bell_notification.html' %}
+        {% endblock bell_notification %}
         <li class="nav-item dropdown">
             <a class="nav-link p-0 clear" href="{% url 'users:profile' %}">
             <span class="avatar w-32">

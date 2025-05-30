@@ -1,29 +1,55 @@
+import base64
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from django.core.files.base import ContentFile
+import mimetypes
+from django.template.loader import render_to_string
+import json
 import logging
 import traceback
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
+from django_celery_beat.models import ClockedSchedule
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+import requests
+from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
 from events_and_management_team.renderData import Events_And_Management_Team
+from googleapiclient.http import BatchHttpRequest
+from finance_and_corporate_team.manage_access import FCT_Render_Access
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
+from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
+from django_celery_beat.models import PeriodicTask
 from graphics_team.renderData import GraphicsTeam
 from main_website.renderData import HomepageItems
 from media_team.models import Media_Images, Media_Link
 from media_team.renderData import MediaTeam
+from public_relation_team.tasks import send_scheduled_email
+from .models import Email_Draft
+from public_relation_team.renderData import PRT_Data
+from public_relation_team.render_email import PRT_Email_System
+from system_administration.google_authorisation_handler import GoogleAuthorisationHandler
+from system_administration.models import adminUsers, system
 from system_administration.system_error_handling import ErrorHandling
+from task_assignation.models import Task, Task_Category
+from task_assignation.renderData import Task_Assignation
 from users import renderData
 from port.models import VolunteerAwards,Teams,Chapters_Society_and_Affinity_Groups,Roles_and_Position,Panels
 from django.db import DatabaseError
 from central_branch.renderData import Branch
 from main_website.models import Research_Papers,Blog
-from users.models import Members,Panel_Members
+import users
+from users.models import MemberSkillSets, Members,Panel_Members
 from django.conf import settings
-from users.renderData import LoggedinUser
+from insb_port import settings as Settings
+from users.renderData import LoggedinUser,member_login_permission
 import os
 import xlwt
 from users import renderData as port_render
@@ -36,9 +62,10 @@ from users.renderData import Alumnis
 import logging
 import traceback
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
-from central_events.forms import EventForm
+from central_events.forms import EventForm, EventFormGC
 from .forms import *
 from .website_render_data import MainWebsiteRenderData
+from googleapiclient.discovery import build
 from django.views.decorators.clickjacking import xframe_options_exempt
 import port.forms as PortForms
 from chapters_and_affinity_group.renderData import Sc_Ag
@@ -46,8 +73,9 @@ from recruitment.models import recruitment_session
 from membership_development_team.models import Renewal_Sessions
 from system_administration.render_access import Access_Render
 from django.views import View
-from users.renderData import member_login_permission
-import random
+from task_assignation.models import *
+import re
+from email.utils import getaddresses, parseaddr, parsedate_to_datetime
 
 # Create your views here.
 logger=logging.getLogger(__name__)
@@ -1197,31 +1225,31 @@ def manage_website_homepage(request):
                     return redirect('central_branch:manage_website_home')
 
             '''For Volunteer Recognition'''
-            # get all insb members
-            get_all_insb_members=Members.objects.all()
-            if(request.method=="POST"):
-                volunteer_of_the_month_form=VolunteerOftheMonthForm(request.POST)
-                if(request.POST.get('add_volunteer_of_month')):
-                    ieee_id=request.POST.get('member_select1')
-                    if(volunteer_of_the_month_form.is_valid()):
-                        new_volunteer_of_the_month=VolunteerOfTheMonth.objects.create(
-                            ieee_id=Members.objects.get(ieee_id=ieee_id)
-                        )
-                        new_volunteer_of_the_month.contributions=request.POST['contributions']
-                        new_volunteer_of_the_month.save()
-                        messages.success(request,"A new Volunteer of the month was added!")
-                        return redirect('central_branch:manage_website_home')
-                if(request.POST.get('delete_volunteer_of_month')):
-                    volunteer_to_delete=VolunteerOfTheMonth.objects.get(ieee_id=request.POST['get_volunteer'])
-                    volunteer_to_delete.delete()
-                    messages.warning(request,'Member has been removed from the list of Volunteers of the Month')
-                    return redirect('central_branch:manage_website_home')
+            # # get all insb members
+            # get_all_insb_members=Members.objects.all()
+            # if(request.method=="POST"):
+            #     volunteer_of_the_month_form=VolunteerOftheMonthForm(request.POST)
+            #     if(request.POST.get('add_volunteer_of_month')):
+            #         ieee_id=request.POST.get('member_select1')
+            #         if(volunteer_of_the_month_form.is_valid()):
+            #             new_volunteer_of_the_month=VolunteerOfTheMonth.objects.create(
+            #                 ieee_id=Members.objects.get(ieee_id=ieee_id)
+            #             )
+            #             new_volunteer_of_the_month.contributions=request.POST['contributions']
+            #             new_volunteer_of_the_month.save()
+            #             messages.success(request,"A new Volunteer of the month was added!")
+            #             return redirect('central_branch:manage_website_home')
+            #     if(request.POST.get('delete_volunteer_of_month')):
+            #         volunteer_to_delete=VolunteerOfTheMonth.objects.get(ieee_id=request.POST['get_volunteer'])
+            #         volunteer_to_delete.delete()
+            #         messages.warning(request,'Member has been removed from the list of Volunteers of the Month')
+            #         return redirect('central_branch:manage_website_home')
 
-            else:
-                volunteer_of_the_month_form=VolunteerOftheMonthForm
+            # else:
+            #     volunteer_of_the_month_form=VolunteerOftheMonthForm
             
             # getall volunteers of the month
-            volunteers_of_the_month=VolunteerOfTheMonth.objects.all().order_by('-pk')
+            # volunteers_of_the_month=VolunteerOfTheMonth.objects.all().order_by('-pk')
             context={
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
@@ -1229,9 +1257,9 @@ def manage_website_homepage(request):
                 'bannerPictureWithNumbers':existing_banner_picture_with_numbers,
                 'media_url':settings.MEDIA_URL,
                 'all_thoughts':all_thoughts,
-                'insb_members':get_all_insb_members,
-                'volunteer_of_the_month_form':volunteer_of_the_month_form,
-                'all_volunteer_of_month':volunteers_of_the_month,
+                # 'insb_members':get_all_insb_members,
+                # 'volunteer_of_the_month_form':volunteer_of_the_month_form,
+                # 'all_volunteer_of_month':volunteers_of_the_month,
             }
             return render(request,'Manage Website/Homepage/manage_web_homepage.html',context)
         else:
@@ -1289,36 +1317,36 @@ def manage_website_homepage_top_banner_update(request, pk):
         return custom_500(request)
 
 
-@login_required
-@member_login_permission
-def update_volunteer_of_month(request,pk):
+# @login_required
+# @member_login_permission
+# def update_volunteer_of_month(request,pk):
 
-    try:
+#     try:
 
-        has_access = Branch_View_Access.get_manage_web_access(request)
-        if has_access:
-            volunteer_to_be_updated=VolunteerOfTheMonth.objects.get(pk=pk)
-            if(request.method=="POST"):
-                volunteer_update_form=VolunteerOftheMonthForm(request.POST,instance=volunteer_to_be_updated)
-                if(request.POST.get('update_vom')):
-                    if(volunteer_update_form.is_valid()):
-                        volunteer_update_form.save()
-                        messages.success(request,"Volunteer Information was updated!")
-                        return redirect('central_branch:manage_website_home')
-            else:
-                volunteer_update_form=VolunteerOftheMonthForm(instance=volunteer_to_be_updated)
+#         has_access = Branch_View_Access.get_manage_web_access(request)
+#         if has_access:
+#             volunteer_to_be_updated=VolunteerOfTheMonth.objects.get(pk=pk)
+#             if(request.method=="POST"):
+#                 volunteer_update_form=VolunteerOftheMonthForm(request.POST,instance=volunteer_to_be_updated)
+#                 if(request.POST.get('update_vom')):
+#                     if(volunteer_update_form.is_valid()):
+#                         volunteer_update_form.save()
+#                         messages.success(request,"Volunteer Information was updated!")
+#                         return redirect('central_branch:manage_website_home')
+#             else:
+#                 volunteer_update_form=VolunteerOftheMonthForm(instance=volunteer_to_be_updated)
             
-            context={
-                'volunteer':volunteer_to_be_updated,
-                'form':volunteer_update_form
-            }
-            return render(request,'Manage Website/Homepage/update_volunteer_of_the_month.html',context)
-        else:
-            return render(request,'access_denied2.html')
-    except Exception as e:
-        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
-        return custom_500(request)
+#             context={
+#                 'volunteer':volunteer_to_be_updated,
+#                 'form':volunteer_update_form
+#             }
+#             return render(request,'Manage Website/Homepage/update_volunteer_of_the_month.html',context)
+#         else:
+#             return render(request,'access_denied2.html')
+#     except Exception as e:
+#         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+#         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+#         return custom_500(request)
 
 
 @login_required
@@ -2488,11 +2516,19 @@ def manage_view_access(request):
                     # Setting Data Access Fields to false initially
                     create_event_access=False
                     event_details_page_access=False
+                    create_individual_task_access=False
+                    create_team_task_access=False
                     create_panels_access=False
-                    panel_memeber_add_remove_access=False
+
+                    #############  MEME :) ################
+                    panel_memeber_add_remove_access=False #
+                    #######################################
+
                     team_details_page=False
                     manage_web_access=False
                     manage_award_access=False
+                    manage_custom_notification_access = False
+                    manage_email_access = False
 
                     # Getting values from check box
                     
@@ -2500,6 +2536,10 @@ def manage_view_access(request):
                         create_event_access=True
                     if(request.POST.get('event_details_page_access')):
                         event_details_page_access=True
+                    if(request.POST.get('create_individual_task_access')):
+                        create_individual_task_access=True
+                    if(request.POST.get('create_team_task_access')):
+                        create_team_task_access=True
                     if(request.POST.get('create_panels_access')):
                         create_panels_access=True
                     if(request.POST.get('panel_memeber_add_remove_access')):
@@ -2510,12 +2550,20 @@ def manage_view_access(request):
                         manage_web_access=True
                     if(request.POST.get('manage_award_access')):
                         manage_award_access=True
+                    if(request.POST.get('manage_custom_notification_access')):
+                        manage_custom_notification_access=True
+                    if(request.POST.get('manage_email_access')):
+                        manage_email_access=True
                     
                     # ****The passed keys must match the field name in the models. otherwise it wont update access
                     if(Branch.update_member_to_branch_view_access(request=request,ieee_id=ieee_id,kwargs={'create_event_access':create_event_access,
                                                             'event_details_page_access':event_details_page_access,
+                                                            'create_individual_task_access':create_individual_task_access,
+                                                            'create_team_task_access':create_team_task_access,
                                                             'create_panels_access':create_panels_access,'panel_memeber_add_remove_access':panel_memeber_add_remove_access,
-                                                            'team_details_page':team_details_page,'manage_web_access':manage_web_access,'manage_award_access':manage_award_access})):
+                                                            'team_details_page':team_details_page,'manage_web_access':manage_web_access,'manage_award_access':manage_award_access,
+                                                            'manage_custom_notification_access':manage_custom_notification_access,
+                                                            'manage_email_access':manage_email_access})):
                         return redirect('central_branch:manage_access')
                     
                 if(request.POST.get('add_member_to_access')):
@@ -2570,13 +2618,13 @@ def event_control_homepage(request):
             'has_access_to_create_event':has_access_to_create_event,
             'is_branch':is_branch,
             'all_event_years':all_event_years,
-            'common_access':Branch_View_Access.common_access(request.user.username)
+            'common_access':Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username)
             
         }
 
         if(request.method=="POST"):
-            if request.POST.get('create_new_event'):
-                print("Create")
+            if request.POST.get('authorise'):
+                return redirect('port:authorize')
             
             #Creating new event type for Group 1 
             elif request.POST.get('add_event_type'):
@@ -3074,7 +3122,7 @@ def event_edit_form(request, event_id):
                     else:
                         registration_fee_amount=event_details.registration_fee_amount
                     #Check if the update request is successful
-                    if(Branch.update_event_details(event_id=event_id, event_name=event_name, event_description=event_description, super_event_id=super_event_id, event_type_list=event_type_list,publish_event = publish_event, event_start_date=event_start_date, event_end_date=event_end_date, inter_branch_collaboration_list=inter_branch_collaboration_list, intra_branch_collaboration=intra_branch_collaboration, venue_list_for_event=venue_list_for_event,
+                    if(Branch.update_event_details(request=request, event_id=event_id, event_name=event_name, event_description=event_description, super_event_id=super_event_id, event_type_list=event_type_list,publish_event = publish_event, event_start_date=event_start_date, event_end_date=event_end_date, inter_branch_collaboration_list=inter_branch_collaboration_list, intra_branch_collaboration=intra_branch_collaboration, venue_list_for_event=venue_list_for_event,
                                                             flagship_event = flagship_event,registration_fee = registration_fee,registration_fee_amount=registration_fee_amount,more_info_link=more_info_link,form_link = form_link,is_featured_event= is_featured)):
                         messages.success(request,f"EVENT: {event_name} was Updated successfully")
                         return redirect('central_branch:event_edit_form', event_id) 
@@ -3084,7 +3132,7 @@ def event_edit_form(request, event_id):
                     
                 if request.POST.get('delete_event'):
                     ''' To delete event from databse '''
-                    if(Branch.delete_event(event_id=event_id)):
+                    if(Branch.delete_event(request=request, event_id=event_id)):
                         messages.success(request,f"Event with EVENT ID {event_id} was Removed successfully")
                         return redirect('central_branch:event_control')
                     else:
@@ -3461,6 +3509,130 @@ def event_preview(request, event_id):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_edit_budget_form_tab(request, event_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary filee
+    
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
+        has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
+        event = Events.objects.get(id=event_id)
+
+        # Not good fix!!!
+        if Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username):
+            has_access = 'Edit'
+        else:
+            if event.event_organiser.primary != 1:
+                has_access = 'Restricted'
+
+        if has_access != 'Restricted':
+            if request.method == "POST":
+                if 'save_budget' in request.POST:
+                    cst_item = request.POST.getlist('cst_item[]')
+                    cst_quantity = request.POST.getlist('cst_quantity[]')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                    cst_total = request.POST.getlist('cst_total[]')
+
+                    rev_item = request.POST.getlist('rev_item[]')
+                    rev_quantity = request.POST.getlist('rev_quantity[]')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                    rev_total = request.POST.getlist('rev_total[]')
+
+                    saved_rate = request.POST.get('saved_rate')
+                    show_usd_rates = request.POST.get('show_usd_rates')
+                    
+                    if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                        if FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                            messages.success(request, 'Budget created successfully!')
+                        else:
+                            messages.warning(request, 'Could not create budget!')
+                    else:
+                        budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+                            messages.success(request, 'Budget edited successfully!')
+                        else:
+                            messages.warning(request, 'Could not update budget!')
+                    
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+                    budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+            fct_team_member_accesses = []
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+                if eb_common_access:
+                    fct_team_members = Branch.load_team_members(team_primary=11)
+
+                    for member in fct_team_members:
+                        access = BudgetSheetAccess.objects.filter(sheet_id=budget_sheet.id, member=member)
+                        member_access_type = access[0].access_type if access.exists() else None
+
+                        fct_team_member_accesses.append({
+                            'member': {
+                                'ieee_id':member.ieee_id,
+                                'name': member.name,
+                                'position': member.position.role
+                            },
+                            'access_type': member_access_type
+                        })
+            else:
+                budget_sheet = None  
+
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            usd_rate = None
+            if budget_sheet:
+
+                if budget_sheet.total_cost > budget_sheet.total_revenue:
+                    deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+                elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                    surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = round(json.loads(currency_data_response.text)['usd']['bdt'],2)
+                else:
+                    usd_rate = None             
+            
+            context = {
+                'is_branch' : True,
+                'event_id' : event_id,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type':has_access,
+                'eb_common_access':eb_common_access,
+                'fct_team_member_accesses':fct_team_member_accesses,
+                'deficit':deficit,
+                'surplus':surplus,
+                'event':event,
+                'usd_rate':usd_rate
+            }
+
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission
@@ -3601,7 +3773,6 @@ def event_feedback(request, event_id):
 
         has_access = Branch_View_Access.get_event_edit_access(request)
         if has_access:
-            event = Events.objects.get(id=event_id)
             event_feedbacks = Branch.get_all_feedbacks(event_id=event_id)
 
             context = {
@@ -3623,6 +3794,72 @@ def event_feedback(request, event_id):
 
 @login_required
 @member_login_permission
+def event_google_calendar(request, event_id):
+
+    try:
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        sc_ag=PortData.get_all_sc_ag(request=request)
+
+        has_access = Branch_View_Access.get_event_edit_access(request)
+        if has_access:
+            if(request.method == "POST"):
+                if('update_event_gc' in request.POST):
+                    google_calendar_publish_event_status = request.POST.get('publish_event_gc')
+                    attendeeOption = request.POST.getlist('attendeeList')
+                    event_description_for_gc = request.POST.get('event_description_for_gc')
+                    add_attendee_names = request.POST.getlist('attendee_name')
+                    add_attendee_emails = request.POST.getlist('attendee_email')
+
+                    documents = None
+                    if request.FILES.get('document'):
+                        documents = request.FILES.getlist('document')
+
+                    publish_event_gc = Branch.button_status(google_calendar_publish_event_status)
+                    Branch.update_event_google_calendar(request=request, event_id=event_id, description=event_description_for_gc, publish_event_gc=publish_event_gc, attendeeOption=attendeeOption, add_attendee_names=add_attendee_names, add_attendee_emails=add_attendee_emails, documents=documents)
+                if('remove_attachment') in request.POST:
+                    attachment_id = request.POST.get('remove_attachment')
+                    Branch.delete_attachment(request, attachment_id)
+
+            event = Events.objects.get(id=event_id)
+            event_gc_attachments = Google_Calendar_Attachments.objects.filter(event_id=event)
+            form = EventFormGC({'event_description_for_gc' : event.event_description_for_gc})
+            is_event_published_gc = event.publish_in_google_calendar
+            additional_attendees = event.additional_attendees
+            recruitment_sessions=PRT_Data.getAllRecruitmentSessions()
+            if event.selected_attendee_list:
+                selected_attendee_list = event.selected_attendee_list.split(',')
+                selected_attendee_list_for_recruits = [re.findall(r'\d+', item)[0] for item in selected_attendee_list if re.findall(r'\d+', item)]
+            else:
+                selected_attendee_list = None
+                selected_attendee_list_for_recruits = None
+
+            context = {
+                'is_branch':True,
+                'user_data':user_data,
+                'all_sc_ag':sc_ag,
+                'event':event,
+                'is_event_published_gc':is_event_published_gc,
+                'event_id':event_id,
+                'form':form,
+                'event_gc_attachments':event_gc_attachments,
+                'additional_attendees':additional_attendees,
+                'recruitment_sessions':recruitment_sessions,
+                'selected_attendee_list':selected_attendee_list,
+                'selected_attendee_list_for_recruits':selected_attendee_list_for_recruits,
+            }
+
+            return render(request, 'Events/event_edit_google_calendar.html', context)
+        else:
+            return render(request,'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
+@member_login_permission
 def insb_members_list(request):
     
     try:
@@ -3634,6 +3871,10 @@ def insb_members_list(request):
         if request.method=="POST":
             if request.POST.get("site_register"):
                 return redirect('membership_development_team:site_registration')
+            if(request.POST.get('add_new_skill')):
+                skill_name=request.POST['skillset']
+                if(renderData.add_new_skill_type(request,skill_name)):
+                    return redirect('central_branch:members_list')
             
         members=Members.objects.all()
         totalNumber=Members.objects.all().count()
@@ -3642,6 +3883,9 @@ def insb_members_list(request):
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
 
+        # load all skill types
+        get_all_skills=renderData.load_all_skill_types(request)
+                
         context={
             'is_branch':True,
             'user_data':user_data,
@@ -3650,7 +3894,8 @@ def insb_members_list(request):
             'totalNumber':totalNumber,
             'has_view_permission':has_view_permission,
             'user_data':user_data,
-            'is_MDT':False
+            'is_MDT':False,
+            'all_skills':get_all_skills,
         }
         
         return render(request,'INSB Members/members_list.html',context=context)
@@ -3674,6 +3919,11 @@ def member_details(request,ieee_id):
         
         member_data=renderData.MDT_DATA.get_member_data(ieee_id=ieee_id)
         try:
+            member_skills=MemberSkillSets.objects.get(member=member_data)
+        except:
+            member_skills=None
+
+        try:
             dob = datetime.strptime(str(
                 member_data.date_of_birth), "%Y-%m-%d").strftime("%Y-%m-%d")
         except:
@@ -3685,17 +3935,27 @@ def member_details(request,ieee_id):
         renewal_session=Renewal_Sessions.objects.all().order_by('-id')
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
+        # load all skill types
+        all_skills=users.renderData.load_all_skill_types(request)
+        # get member skills
+        try:
+            skill_of_member=member_skills.skills.all()
+        except AttributeError:
+            skill_of_member=None
         
         context={
             'is_branch':True,
             'all_sc_ag':sc_ag,
             'member_data':member_data,
+            'member_skills':member_skills,
             'dob':dob,
             'sessions':sessions,
             'renewal_session':renewal_session,
             'media_url':settings.MEDIA_URL,
             'active_status':active_status,
             'user_data':user_data,
+            'all_skills':all_skills,
+            'skill_of_member':skill_of_member,
         }
         if request.method=="POST":
             if request.POST.get('save_edit'):
@@ -3709,10 +3969,20 @@ def member_details(request,ieee_id):
                 email_nsu=request.POST['email_nsu']
                 facebook_url=request.POST['facebook_url']
                 home_address=request.POST['home_address']
+                school = request.POST['school_label']
+                department= request.POST['department_label']
                 major=request.POST['major_label']
                 recruitment_session_value=request.POST['recruitment']
                 renewal_session_value=request.POST['renewal']
                 profile_picture = request.FILES.get('update_picture')
+                skill_sets=request.POST.getlist('skill_sets')
+                try:
+                    blood_group = request.POST['blood_group']
+                except:
+                    blood_group = "None"
+
+                if date_of_birth == '':
+                    date_of_birth = None
                 
                 #checking if the recruitment and renewal session exists
                 try:
@@ -3738,15 +4008,31 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school = school,
+                                                                department=department,
                                                                 major=major,
                                                                 session=None,
-                                                                last_renewal_session=None 
+                                                                last_renewal_session=None,
+                                                                blood_group = blood_group, 
                                                                 )
                         #checking to see if user wants to update picture or not
                         if profile_picture == None:
                             pass
                         else:
                             Branch.update_profile_picture(profile_picture,ieee_id)
+                            
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('central_branch:member_details',ieee_id)
                     except Members.DoesNotExist:
@@ -3762,15 +4048,31 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=recruitment_session.objects.get(id=recruitment_session_value),
-                                                                last_renewal_session=None 
+                                                                last_renewal_session=None,
+                                                                blood_group = blood_group, 
                                                                 )
                         #checking to see if user wants to update picture or not
                         if profile_picture == None:
                             pass
                         else:
                             Branch.update_profile_picture(profile_picture,ieee_id)
+                        
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('central_branch:member_details',ieee_id)
                     except Members.DoesNotExist:
@@ -3788,15 +4090,31 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school = school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=None,
-                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value) 
+                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value),
+                                                                blood_group = blood_group, 
                                                                 )
                         #checking to see if user wants to update picture or not
                         if profile_picture == None:
                             pass
                         else:
                             Branch.update_profile_picture(profile_picture,ieee_id)
+                        
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                            
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('central_branch:member_details',ieee_id)
                     except Members.DoesNotExist:
@@ -3812,15 +4130,31 @@ def member_details(request,ieee_id):
                                                                 email_nsu=email_nsu,
                                                                 facebook_url=facebook_url,
                                                                 home_address=home_address,
+                                                                school=school,
+                                                                department = department,
                                                                 major=major,
                                                                 session=recruitment_session.objects.get(id=recruitment_session_value),
-                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value) 
+                                                                last_renewal_session=Renewal_Sessions.objects.get(id=renewal_session_value),
+                                                                blood_group = blood_group, 
                                                                 )
                         #checking to see if user wants to update picture or not
                         if profile_picture == None:
                             pass
                         else:
                             Branch.update_profile_picture(profile_picture,ieee_id)
+                        
+                        if MemberSkillSets.objects.filter(member=ieee_id).exists():
+                            member_skills = MemberSkillSets.objects.get(member=ieee_id)
+                            member_skills.skills.clear()
+                            if skill_sets[0] != 'null':
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+                        else:
+                            if skill_sets[0] != 'null':
+                                member_skills = MemberSkillSets.objects.create(member=Members.objects.get(ieee_id=ieee_id))
+                                member_skills.skills.add(*skill_sets)
+                                member_skills.save()
+
                         messages.info(request,"Member Info Was Updated. If you want to update the Members IEEE ID please contact the System Administrators")
                         return redirect('central_branch:member_details',ieee_id)
                     except Members.DoesNotExist:
@@ -3829,7 +4163,7 @@ def member_details(request,ieee_id):
             if request.POST.get('delete_member'):
                 #Deleting a member from database
                 member_to_delete=Members.objects.get(ieee_id=ieee_id)
-                messages.error(request,f"{member_to_delete.ieee_id} was deleted from the INSB Registered Members Database.")
+                messages.error(request,f"{member_to_delete.ieee_id} was deleted from the IEEE NSU SB Registered Members Database.")
                 member_to_delete.delete()
                 return redirect('central_branch:members_list')
                 
@@ -3897,7 +4231,10 @@ def generateExcelSheet_events_by_year(request,year):
                 sl_num += 1
                 workSheet.write(row_num,0 , sl_num,  center_alignment)
                 workSheet.write(row_num,1 , event.event_name,  center_alignment)
-                workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                if event.event_date:
+                    workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                else:
+                    workSheet.write(row_num,2 , event.start_date.strftime('%Y-%m-%d'),  center_alignment)
                 workSheet.write(row_num,3 , event.event_organiser.group_name,  center_alignment)
                 collaborations_text = ""
                 for collabs in collaborations:
@@ -4120,7 +4457,7 @@ def panel_and_award_specific_page(request,panel_pk,award_pk):
         # get access value
         has_access=Branch_View_Access.get_manage_award_access(request=request)
         
-         # get all sc ag for sidebar
+        # get all sc ag for sidebar
         sc_ag=PortData.get_all_sc_ag(request=request)
         # get user data for side bar
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -4390,3 +4727,2085 @@ class AwardRanking(View):
                 "volunteer_award_name": i.volunteer_award_name,
             })
         return data
+
+@login_required
+@member_login_permission
+def create_task(request,team_primary = None):
+
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        #app name for proper redirecting
+        app_name = "central_branch"
+        permission_for_co_ordinator_and_incharges_to_create_task = None
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            permission_for_co_ordinator_and_incharges_to_create_task = "Team"
+            
+
+        #modifty this functions so that incharge and coordinator gets access by passing a team_primary
+        #parameter
+        #Done:
+        create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
+        create_team_task_access = Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
+
+        if create_individual_task_access or create_team_task_access:
+            
+            if request.method == 'POST':
+                title = request.POST.get('task_title')
+                description = request.POST.get('task_description_details')
+                task_category = request.POST.get('task_category')
+                deadline = request.POST.get('deadline')
+                task_type = request.POST.get('task_type')
+
+                team_select = None
+                member_select = None
+                task_types_per_member = {}
+                coordinators_per_team = {}
+                #Checking task types and get list accordingly
+                if task_type == "Team":
+                    team_select = request.POST.getlist('team_select')
+                    print(team_select)
+                    for team_id in team_select:
+                        coordinators_name = request.POST.getlist(team_id+'_coordinator_select[]')
+                        coordinators_per_team[team_id] = coordinators_name
+                    print("printing team and coordinators")
+                    print(coordinators_per_team)
+                elif task_type == "Individuals":
+                    member_select = request.POST.getlist('member_select')
+                    for member_id in member_select:
+                        member_name = request.POST.getlist(member_id + '_task_type[]')
+                        task_types_per_member[member_id] = member_name
+            
+                task_of = 1 #Setting task_of as 1 for Branch primary
+                if(Task_Assignation.create_new_task(request, current_user, task_of, team_primary, title, description, task_category, deadline, task_type, team_select, member_select,task_types_per_member,coordinators_per_team)):
+                    messages.success(request,"Task Created successfully!")
+                else:
+                    messages.warning(request,"Something went wrong while creating the task!")
+
+                #redirecting 
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:task_home')
+                else:
+                    return redirect(f'{app_name}:task_home_team',team_primary)
+            
+            task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
+            
+            #loads central branch if none or if is 1
+            if team_primary == None or team_primary == "1":
+
+                #This is for central bracnh where Team or individual task can be created
+                teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1) #loading all the teams of Branch
+                all_members = Task_Assignation.load_insb_members_for_task_assignation(request)
+
+                #fetching all team and the coordinators of the team as a dictionary
+                teams_and_coordinators = {}
+                current_panel = Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+                co_ordinator_position = Roles_and_Position.objects.filter(role_of = Chapters_Society_and_Affinity_Groups.objects.get(primary=1),is_co_ordinator = True,is_officer=True)
+                for team in teams:
+                    team_coordinator_members = []
+                    for position in co_ordinator_position:
+                        members = Panel_Members.objects.filter(team=team,position=position,tenure=current_panel)
+                        team_coordinator_members+=members
+                    teams_and_coordinators[team] = team_coordinator_members
+                
+                print(teams_and_coordinators)
+    
+
+                context = {
+                    'is_new_task':True, #Task is being created. Use it to disable some ui in the template
+                    'task_categories':task_categories,
+                    'teams':teams,
+                    'all_members':all_members,
+                    'all_sc_ag':sc_ag,
+                    'user_data':user_data,
+                    'create_individual_task_access':create_individual_task_access,
+                    'create_team_task_access':create_team_task_access,
+                    'teams_and_coordinators':teams_and_coordinators,
+
+                    'app_name':app_name,
+                }
+
+                return render(request,"create_task.html",context)
+            else:
+
+                #This is where team can create task for their individual members
+                teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1) #loading all the teams of Branch
+                all_members = Task_Assignation.load_insb_members_for_task_assignation(request,team_primary)
+                nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+
+
+                context = {
+                    'is_new_task':True, #Task is being created. Use it to disable some ui in the template
+                    'task_categories':task_categories,
+                    'teams':teams,
+                    'all_members':all_members,
+                    'all_sc_ag':sc_ag,
+                    'user_data':user_data,
+                    'create_individual_task_access':create_individual_task_access,
+                    'create_team_task_access':False,
+
+                    #loading navbars as per page
+                    'web_dev_team':nav_bar["web_dev_team"],
+                    'content_and_writing_team':nav_bar["content_and_writing_team"],
+                    'event_management_team':nav_bar["event_management_team"],
+                    'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+                    'promotion_team':nav_bar["promotion_team"],
+                    'public_relation_team':nav_bar["public_relation_team"],
+                    'membership_development_team':nav_bar["membership_development_team"],
+                    'media_team':nav_bar["media_team"],
+                    'graphics_team':nav_bar["graphics_team"],
+                    'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+                    'team_primary':team_primary,
+                    'app_name':app_name,
+                }
+                return render(request,"create_task.html",context)
+        else:
+            return render(request,'access_denied2.html')
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
+@member_login_permission
+def task_home(request,team_primary = None):
+
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        app_name = "central_branch"
+        permission_for_co_ordinator_and_incharges_to_create_task = None
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            permission_for_co_ordinator_and_incharges_to_create_task = "Team"
+        #getting all task categories
+        all_task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
+        all_branch_panels = Branch.load_all_panels()
+        branch_panel = None
+
+        if request.method == "POST":
+
+            if request.POST.get('add_task_type'):
+
+                task_name = request.POST.get('task_type_name')
+                task_point = request.POST.get('task_point')
+
+                if Task_Assignation.add_task_category(task_name,task_point):
+                    messages.success(request,"Task Category Created successfully!")
+                else:
+                    messages.warning(request,"Something went wrong while creating the task category!")
+
+            elif request.POST.get('reset_task_points'):
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
+                else:
+                    if Task_Assignation.reset_task_points(selected_panel):
+                        messages.success(request,"Task Points were saved and reset successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while resetting/saving the task points!")
+            
+            elif request.POST.get('reinstate_task_points'):
+                selected_panel = request.POST.get('selected_panel')
+                if not selected_panel:
+                    messages.warning(request,"Please select a panel!")
+                else:
+                    if Task_Assignation.reinstate_task_points(selected_panel):
+                        messages.success(request,"Task Points were reinstated successfully!")
+                    else:
+                        messages.warning(request,"Something went wrong while reinstating the task points!")
+
+        #modify this so that team incharge and volunteer both can create task in respective team
+        #so modify the funtions with a team_primary parameter
+        #########################################
+        ###Done:Arman Task###
+        #########
+        has_task_create_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task) or Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
+        #########
+        try:
+            if request.GET.get('panel') and request.GET.get('panel') != '':
+                panel = request.GET.get('panel')
+                branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            else:
+                branch_panel = Branch.load_current_panel()
+        except:
+            branch_panel = None
+
+        all_tasks = Task_Assignation.load_task_for_home_page(team_primary, branch_panel)
+               
+
+        if team_primary == None or team_primary == "1":
+
+            
+
+            context = {
+            'all_tasks':all_tasks,
+            'all_sc_ag':sc_ag,
+            'user_data':user_data,
+            'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
+            'has_task_create_access':has_task_create_access,
+            'branch_panel':branch_panel,
+            'app_name':app_name,
+            }
+
+            return render(request,"task_home.html",context)
+        
+        else:
+            team = Teams.objects.get(primary=team_primary)
+            desired_team = Task_Assignation.get_team_app_name(team_primary)
+            
+            #getting nav_bar_name
+            nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+
+            context = {
+            'all_tasks':all_tasks,
+            'all_sc_ag':sc_ag,
+            'user_data':user_data,
+            'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
+            'has_task_create_access':has_task_create_access,
+            'branch_panel':branch_panel,
+
+            #loading navbars as per page
+            'web_dev_team':nav_bar["web_dev_team"],
+            'content_and_writing_team':nav_bar["content_and_writing_team"],
+            'event_management_team':nav_bar["event_management_team"],
+            'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+            'promotion_team':nav_bar["promotion_team"],
+            'public_relation_team':nav_bar["public_relation_team"],
+            'membership_development_team':nav_bar["membership_development_team"],
+            'media_team':nav_bar["media_team"],
+            'graphics_team':nav_bar["graphics_team"],
+            'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+            'team_primary':team_primary,
+            'app_name':app_name,
+            }
+
+            return render(request,"task_home_team.html",context)
+
+        
+
+        
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+
+@login_required
+@member_login_permission
+def upload_task(request, task_id,team_primary = None):
+  
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        #for proper navbar and redirection
+        app_name = "central_branch"
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            #getting nav_bar_name
+            nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+        
+        task = Task.objects.get(id=task_id)
+        user = request.user.username
+        create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,task.task_type,task)
+        create_team_task_access = Branch_View_Access.get_create_team_task_access(request, team_primary,task.task_type,task)
+        this_is_users_task = False
+        comments = None
+        has_coordinator_access_or_incharge_access_for_team_task = False
+        view_access = Task_Assignation.check_task_upload_view(request,task)
+
+        print(create_individual_task_access)
+        print(create_team_task_access)
+        #to check if this is users task
+        try:
+            logged_in_user = Members.objects.get(ieee_id = user)
+            if logged_in_user in task.members.all():
+                this_is_users_task = True
+                create_individual_task_access = False
+                create_team_task_access = False
+                comments = Member_Task_Point.objects.get(task=task, member=str(logged_in_user.ieee_id)).comments
+        except:
+            pass
+
+        if team_primary == None or team_primary == "1":
+            pass
+        else:
+            has_coordinator_access_or_incharge_access_for_team_task = Task_Assignation.upload_task_page_access_for_team_task(request,task,team_primary)
+
+        has_access = Branch_View_Access.common_access(user) or task.task_created_by == request.user.username or this_is_users_task or has_coordinator_access_or_incharge_access_for_team_task or Task_Assignation.is_co_ordinator_or_is_officer_of_team(request)
+
+        if has_access:
+
+
+            #####################################
+            ## Start Checking submission types ##
+            #####################################
+            try:
+                member_task_type = Member_Task_Upload_Types.objects.get(task = task,task_member = logged_in_user)
+                if this_is_users_task and not member_task_type.is_task_started_by_member and not has_coordinator_access_or_incharge_access_for_team_task:
+                    member_task_type.is_task_started_by_member = True
+                    member_task_type.save()
+            except:
+                #else admin who can see all
+                member_task_type = None
+            try:
+                permission_paper_loaded = Permission_Paper.objects.get(task=task,uploaded_by = logged_in_user.ieee_id)
+            except:
+                permission_paper_loaded = None
+            try:
+                content_loaded = Task_Content.objects.get(task=task,uploaded_by = logged_in_user.ieee_id)
+            except:
+                content_loaded = None
+            try:
+                drive_link_loaded = Task_Drive_Link.objects.get(task=task,uploaded_by = logged_in_user.ieee_id)
+            except:
+                drive_link_loaded = None
+            try:
+                file_uploads = Task_Document.objects.filter(task=task,uploaded_by = logged_in_user.ieee_id)
+                media_uploads = Task_Media.objects.filter(task=task,uploaded_by = logged_in_user.ieee_id)
+            except:
+                file_uploads= None
+                media_uploads = None        
+            ###################################
+            ## End Checking submission types ##
+            ###################################
+
+            task_type_per_member = Task_Assignation.load_all_task_upload_type(task)
+
+            if request.method == 'POST':
+
+                if not task.is_task_completed:
+                    if request.POST.get('save_task'):
+
+                        file_upload = None
+                        media = None
+
+                        if member_task_type.has_permission_paper:
+                            permission_paper = request.POST.get('permission_paper')
+                            if permission_paper != None:
+                                permission_paper_loaded = permission_paper
+                        if member_task_type.has_content:
+                            content = request.POST.get('content_details')
+                            if content != None:
+                                content_loaded = content 
+                        if member_task_type.has_drive_link:
+                            drive_link = request.POST.get('content_drive')
+                            if drive_link != None:
+                                drive_link_loaded = drive_link
+                        if member_task_type.has_file_upload:
+                            file_upload = request.FILES.getlist('document')
+                        if member_task_type.has_media:
+                            media = request.FILES.getlist('images')            
+
+                        if Task_Assignation.save_task_uploads(task,logged_in_user,permission_paper_loaded,media,content_loaded,file_upload,drive_link_loaded):
+                            messages.success(request,"Task Saved! Please finish it as soon as you can")
+                        else:
+                            messages.warning(request,"Something went wrong while saving the task!")
+
+                        if team_primary == None or team_primary == "1":
+
+                            return redirect('central_branch:upload_task',task_id)
+                        else:
+                            return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+
+                    elif request.POST.get('add_comment'):
+                        member_id = request.POST.get('comments_member')
+                        comments = request.POST.get('comments_details')
+
+                        if Task_Assignation.add_comments(request,task, member_id, comments):
+                            messages.success(request,f"Comments added for {member_id} successfully!")
+                        else:
+                            messages.warning(request,"Something went wrong while adding the comments!")
+                        
+                        if team_primary == None or team_primary == "1":
+
+                            return redirect('central_branch:upload_task',task_id)
+                        else:
+                            return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+                    
+                    elif request.POST.get('finish_task'):
+
+                        file_upload = None
+                        media = None
+
+                        if member_task_type.has_permission_paper:
+                            permission_paper = request.POST.get('permission_paper')
+                            if permission_paper != None:
+                                permission_paper_loaded = permission_paper
+                        if member_task_type.has_content:
+                            content = request.POST.get('content_details')
+                            if content != None:
+                                content_loaded = content 
+                        if member_task_type.has_drive_link:
+                            drive_link = request.POST.get('content_drive')
+                            if drive_link != None:
+                                drive_link_loaded = drive_link
+                        if member_task_type.has_file_upload:
+                            file_upload = request.FILES.getlist('document')
+                        if member_task_type.has_media:
+                            media = request.FILES.getlist('images')            
+
+                        if Task_Assignation.save_task_uploads(task,logged_in_user,permission_paper_loaded,media,content_loaded,file_upload,drive_link_loaded):
+                            
+                            if Task_Assignation.task_email_to_eb(request,task,logged_in_user,team_primary):
+                                messages.success(request,"You task has been requested for reviewing!")
+                            else:
+                                messages.warning(request,"Something went wrong while saving!")
+                        else:
+                            messages.warning(request,"Something went wrong while saving the task!")
+                
+                        if team_primary == None or team_primary == "1":
+
+                            return redirect('central_branch:upload_task',task_id)
+                        else:
+                            return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+                    
+                    elif request.POST.get('delete_doc'):
+                        doc = Task_Document.objects.get(id=request.POST.get('doc_id'))
+                        if(Task_Assignation.delete_task_document(doc)):
+                            messages.success(request,"Document deleted successfully!")
+                        else:
+                            messages.warning(request,"Something went wrong while deleting the document!")
+                        if team_primary == None or team_primary == "1":
+
+                            return redirect('central_branch:upload_task',task_id)
+                        else:
+                            return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+                    
+                    elif request.POST.get('delete_image'):
+                        media = Task_Media.objects.get(id=request.POST.get('image_id'))
+                        if(Task_Assignation.delete_task_media(media)):
+                            messages.success(request,"Media deleted successfully!")
+                        else:
+                            messages.warning(request,"Something went wrong while deleting the media!")
+                        if team_primary == None or team_primary == "1":
+
+                            return redirect('central_branch:upload_task',task_id)
+                        else:
+                            return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+                else:
+                    messages.error(request,"Task Marked Completed. Cannot Submit Now")
+                    if team_primary == None or team_primary == "1":
+                        return redirect('central_branch:upload_task',task_id)
+                    else:
+                        return redirect(f'{app_name}:upload_task_team',task_id,team_primary)
+
+            if team_primary == None or team_primary == "1":
+                context = {
+                    'all_sc_ag':sc_ag,
+                    'user_data':user_data,
+                    'task':task,
+                    'members_task_type':member_task_type,
+                    'permission_paper_loaded':permission_paper_loaded,
+                    'content_loaded':content_loaded,
+                    'drive_link_loaded':drive_link_loaded,
+                    'file_uploads':file_uploads,
+                    'media_uploads':media_uploads,
+                    'task_type_per_member':task_type_per_member,
+                    'media_url':settings.MEDIA_URL,
+                    'comments':comments,
+                    'create_individual_task_access':create_individual_task_access,
+                    'create_team_task_access':create_team_task_access,
+
+                    'app_name':app_name,
+                    'view_access':view_access,
+
+
+                }
+            else:
+                context = {
+                    'all_sc_ag':sc_ag,
+                    'user_data':user_data,
+                    'task':task,
+                    'members_task_type':member_task_type,
+                    'permission_paper_loaded':permission_paper_loaded,
+                    'content_loaded':content_loaded,
+                    'drive_link_loaded':drive_link_loaded,
+                    'file_uploads':file_uploads,
+                    'media_uploads':media_uploads,
+                    'task_type_per_member':task_type_per_member,
+                    'media_url':settings.MEDIA_URL,
+                    'comments':comments,
+                    'create_individual_task_access':create_individual_task_access,
+                    'create_team_task_access':create_team_task_access,
+
+                    'app_name':app_name,
+                    #loading navbars as per page
+                    'web_dev_team':nav_bar["web_dev_team"],
+                    'content_and_writing_team':nav_bar["content_and_writing_team"],
+                    'event_management_team':nav_bar["event_management_team"],
+                    'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+                    'promotion_team':nav_bar["promotion_team"],
+                    'public_relation_team':nav_bar["public_relation_team"],
+                    'membership_development_team':nav_bar["membership_development_team"],
+                    'media_team':nav_bar["media_team"],
+                    'graphics_team':nav_bar["graphics_team"],
+                    'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+                    'team_primary':team_primary,
+                    'view_access':view_access,
+
+                }
+
+            return render(request,"task_page.html",context)
+        else:
+            return render(request,"access_denied2.html")
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
+@member_login_permission
+def add_task(request, task_id,team_primary = None,by_coordinators = 0):
+
+    try:
+
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        task = Task.objects.get(id=task_id)
+
+        #for proper navbar and redirection
+        app_name = "central_branch"
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            #getting nav_bar_name
+            nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+
+        if request.method == 'POST':
+
+            task_types_per_member = {}
+            member_select = request.POST.getlist('member_select')
+            for member_id in member_select:
+                member_name = request.POST.getlist(member_id + '_task_type[]')
+                task_types_per_member[member_id] = member_name
+            
+            #If task is completed then do not update task params
+            if(task.is_task_completed):
+                messages.info(request,'Task is completed already!')
+                if team_primary:
+                    return redirect(f'{app_name}:team_add_task',team_primary,task_id)
+                else:
+                    return redirect('central_branch:add_task',task_id)
+            print(task_types_per_member)
+
+            if(Task_Assignation.forward_task(request,task_id,task_types_per_member,team_primary,by_coordinators)):
+
+                #If it is a team task and no members were selected then show message but save other params
+                if(not member_select):
+                    messages.info(request,'Saved changes. Please select a member to forward tasks!')
+                else:
+                    #Else members were selected
+                    messages.success(request,"Task Forwarded Successfully!")
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:add_task',task_id)
+                else:
+                    return redirect(f'{app_name}:add_task_team',task_id,team_primary,by_coordinators)
+            else:
+                messages.warning(request,"Error occured while forwarding task")
+
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:add_task',task_id)
+                else:
+                    return redirect(f'{app_name}:add_task_team',task_id,team_primary,by_coordinators)
+
+        
+        
+        members = Task_Assignation.load_volunteers_for_task_assignation(task,team_primary)
+        is_coordinator = Task_Assignation.is_coordinator(request,team_primary)
+        is_task_forwared_to_incharge = Task_Assignation.is_task_forwarded_to_incharge(task,team_primary)
+        is_officer = Task_Assignation.is_officer(request,team_primary)
+        is_task_forwarded_to_volunteers=Task_Assignation.is_task_forwarded_to_core_or_team_volunteer(task,team_primary)
+
+        print("printing details")
+        print(is_coordinator)
+        print(is_task_forwared_to_incharge)
+        print(is_officer)
+        print(is_task_forwarded_to_volunteers)       
+        if team_primary == None or team_primary == "1":
+            context = {
+                'task':task,
+                'volunteer_members':members,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+
+                'app_name':app_name,
+                'team_primary':team_primary,
+                'task_type_bool':True,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+
+            }
+        else:
+            context = {
+                'task':task,
+                'volunteer_members':members,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+
+                'app_name':app_name,
+                #loading navbars as per page
+                'web_dev_team':nav_bar["web_dev_team"],
+                'content_and_writing_team':nav_bar["content_and_writing_team"],
+                'event_management_team':nav_bar["event_management_team"],
+                'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+                'promotion_team':nav_bar["promotion_team"],
+                'public_relation_team':nav_bar["public_relation_team"],
+                'membership_development_team':nav_bar["membership_development_team"],
+                'media_team':nav_bar["media_team"],
+                'graphics_team':nav_bar["graphics_team"],
+                'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+                'team_primary':team_primary,
+                'task_type_bool':True,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+
+            }
+            
+
+        return render(request,"task_forward_to_members.html",context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+    
+@login_required
+@member_login_permission
+def forward_to_incharges(request,task_id,team_primary = None):
+
+    try:
+
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        task = Task.objects.get(id=task_id)
+
+        #for proper navbar and redirection
+        app_name = "central_branch"
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            #getting nav_bar_name
+            nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+
+        if request.method == 'POST':
+
+            task_types_per_member = {}
+            member_select = request.POST.getlist('member_select')
+            # for member_id in member_select:
+            #     member_name = request.POST.getlist(member_id + '_task_type[]')
+            #     task_types_per_member[member_id] = member_name
+            
+            #If task is completed then do not update task params
+            if(task.is_task_completed):
+                messages.info(request,'Task is completed already!')
+                if team_primary:
+                    return redirect(f'{app_name}:team_add_task',team_primary,task_id)
+                else:
+                    return redirect('central_branch:add_task',task_id)
+            print(task_types_per_member)
+
+            flag = Task_Assignation.forward_task_to_incharges(request,task,team_primary,member_select)
+
+            if(flag[0]):
+
+                #If it is a team task and no members were selected then show message but save other params
+                if(not member_select):
+                    messages.info(request,'Saved changes. Please select a member to forward tasks!')
+                else:
+                    #Else members were selected
+                    messages.success(request,"Task Forwarded Successfully!")
+                if app_name == "central_branch":
+                    return redirect('central_branch:forward_to_incharges',task_id,team_primary)
+                else:
+                    return redirect(f'{app_name}:forward_to_incharges',task_id,team_primary)
+            else:
+                messages.warning(request,flag[1])
+
+                if app_name == "central_branch":
+                    return redirect('central_branch:forward_to_incharges',task_id,team_primary)
+                else:
+                    return redirect(f'{app_name}:forward_to_incharges',task_id,team_primary)
+
+        
+        
+        members = Task_Assignation.load_incharges_for_task_assignation(task,team_primary)
+        is_coordinator = Task_Assignation.is_coordinator(request,team_primary)
+        is_task_forwared_to_incharge = Task_Assignation.is_task_forwarded_to_incharge(task,team_primary)
+        is_officer = Task_Assignation.is_officer(request,team_primary)
+        is_task_forwarded_to_volunteers=Task_Assignation.is_task_forwarded_to_core_or_team_volunteer(task,team_primary)
+        print("printing details")
+        print(is_coordinator)
+        print(is_task_forwared_to_incharge)
+        print(is_officer)
+        print(is_task_forwarded_to_volunteers)  
+        if team_primary == None or team_primary == "1":
+            context = {
+                'task':task,
+                'volunteer_members':members,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+
+                'app_name':app_name,
+                'team_primary':team_primary,
+                'task_type_bool':False,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+            }
+        else:
+            context = {
+                'task':task,
+                'volunteer_members':members,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+
+                'app_name':app_name,
+                #loading navbars as per page
+                'web_dev_team':nav_bar["web_dev_team"],
+                'content_and_writing_team':nav_bar["content_and_writing_team"],
+                'event_management_team':nav_bar["event_management_team"],
+                'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+                'promotion_team':nav_bar["promotion_team"],
+                'public_relation_team':nav_bar["public_relation_team"],
+                'membership_development_team':nav_bar["membership_development_team"],
+                'media_team':nav_bar["media_team"],
+                'graphics_team':nav_bar["graphics_team"],
+                'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+                'team_primary':team_primary,
+                'task_type_bool':False,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+            }
+            
+
+        return render(request,"task_forward_to_members.html",context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
+@member_login_permission
+def task_edit(request,task_id,team_primary = None):
+
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        user = request.user.username
+        task = Task.objects.get(id=task_id)
+    
+
+        create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request,team_primary,task.task_type)
+        create_team_task_access = Branch_View_Access.get_create_team_task_access(request,team_primary,task.task_type)
+        is_coordinator = Task_Assignation.is_coordinator(request,team_primary)
+        is_task_forwared_to_incharge = Task_Assignation.is_task_forwarded_to_incharge(task,team_primary)
+        is_officer = Task_Assignation.is_officer(request,team_primary)
+        is_task_forwarded_to_volunteers=Task_Assignation.is_task_forwarded_to_core_or_team_volunteer(task,team_primary)
+        is_task_of_teams_individuals = Task_Assignation.is_task_of_teams_individuals(request,task,team_primary)
+        is_task_started_by_any_coordinator = False
+        is_task_started_by_any_incharge = False
+        
+        print(is_task_of_teams_individuals)
+        print(is_task_forwarded_to_volunteers)
+        print("checking")
+        #app name for proper redirecting
+        app_name = "central_branch"
+        if team_primary != None and team_primary!="1":
+            app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
+            #this function will check whether current user is coordinator or not
+            team_p = Teams.objects.get(primary = int(team_primary))
+            is_task_started_by_any_coordinator = Task_Assignation.is_task_started_by_a_coodinator_for_a_team(task,team_p)
+            is_task_started_by_any_incharge = Task_Assignation.is_task_started_by_a_incharge_for_a_team(task,team_p)
+
+        #Check if the user came from my task page. If yes then the back button will point to my tasks page
+        my_task = False
+        is_user_redirected = False
+        is_task_started_by_member = False
+
+        if 'HTTP_REFERER' in request.META:
+            if request.META['HTTP_REFERER'][-9:] == 'my_tasks/':
+                my_task = True
+            
+            if request.META['HTTP_REFERER'][-12:] == 'upload_task/':
+                is_user_redirected = True
+        else:
+            my_task = True
+
+        #Check if the user is a member or an admin
+        try:
+            logged_in_user = Members.objects.get(ieee_id = user)
+            try:
+                is_task_started_by_member = Member_Task_Upload_Types.objects.get(task=task, task_member=logged_in_user).is_task_started_by_member
+                if logged_in_user.position.is_co_ordinator and logged_in_user.position.is_officer:
+                    pass
+                elif logged_in_user.position.is_officer and not logged_in_user.position.is_co_ordinator:
+                    pass
+                elif task.members.contains(logged_in_user) and is_task_started_by_member and not is_user_redirected:
+                    return redirect('central_branch:upload_task',task.pk)
+            except:
+                pass
+        except:
+            logged_in_user = adminUsers.objects.get(username=user)
+
+        print("before post")
+        
+        if request.method == 'POST':
+            print("post")
+            if 'update_task' in request.POST:
+                print("HERERERERERER")
+                title = request.POST.get('task_title')
+                description = request.POST.get('task_description_details')
+                task_category = request.POST.get('task_category')
+                deadline = request.POST.get('deadline')
+                task_type = request.POST.get('task_type')
+                is_task_completed = request.POST.get('task_completed_toggle_switch')
+                print(title)
+                print("printing is task completed")
+                print(is_task_completed)
+                team_select = None
+                member_select = None
+                task_types_per_member = {}
+                coordinators_per_team = {}
+                #Checking task types and get list accordingly
+                if task_type == "Team":
+                    team_select = request.POST.getlist('team_select')
+                    print(team_select)
+                    for team_id in team_select:
+                        coordinators_name = request.POST.getlist(team_id+'_coordinator_select[]')
+                        coordinators_per_team[team_id] = coordinators_name
+                    print("printing team and coordinators")
+                    print(coordinators_per_team)
+                elif task_type == "Individuals":
+                    member_select = request.POST.getlist('member_select')
+                    for member_id in member_select:
+                        member_name = request.POST.getlist(member_id + '_task_type[]')
+                        task_types_per_member[member_id] = member_name
+
+                task_of = 1
+                #checking for team's individual tas
+                if len(task.team.all()) == 1 and task.task_type == "Individuals":
+                    team = task.team.all()
+                    team_select = [team[0].primary]
+                    
+                if(Task_Assignation.update_task(request, task_id,task_of, title, description, task_category, deadline, task_type, team_select, member_select, is_task_completed,task_types_per_member,coordinators_per_team)):
+                    messages.success(request,"Task Updated successfully!")
+                else:
+                    messages.warning(request,"Something went wrong while updating the task!")
+                
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:task_edit',task_id)
+                else:
+                    return redirect(f'{app_name}:task_edit_team',task_id,team_primary)
+
+            elif 'delete_task' in request.POST:
+                if(Task_Assignation.delete_task(task_id=task_id)):
+                    messages.success(request,"Task deleted successfully!")
+                else:
+                    messages.warning(request,"Something went wrong while deleting the task!")
+
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:task_home')
+                else:
+                    return redirect(f'{app_name}:task_home_team',team_primary)
+
+            elif '0' in request.POST or '2' in request.POST or '3' in request.POST or '4' in request.POST or '5' in request.POST or '6' in request.POST or '7' in request.POST or '8' in request.POST or '9' in request.POST or '10' in request.POST or '11' in request.POST or 'forward_to_team_incharges' in request.POST:
+
+                team_clicked = request.POST.get('teamclicked')
+
+                if Task_Assignation.forward_task_to_incharges(request,task,team_clicked,team_primary):
+                    messages.success(request,"Task Forwarded to Incharges Successfully!")
+                else:
+                    messages.warning(request,"Something went wrong while forwarding task. Try again!")
+        
+                if team_primary == None or team_primary == "1":
+                    return redirect('central_branch:task_edit',task_id)
+                else:
+                    return redirect(f'{app_name}:task_edit_team',task_id,team_primary)
+                
+        task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
+        #getting all task logs for this task
+        task_logs = Task_Log.objects.get(task_number = task)
+
+        #checking to see if points to be deducted
+        late = Task_Assignation.deduct_points_for_members(request,task)
+
+        is_member_view = logged_in_user in task.members.all()
+        #If it is a task member view or a regular view then override the access
+        if (is_member_view or task.task_created_by != request.user.username) and not Branch_View_Access.common_access(request.user.username) and not Branch_View_Access.get_create_team_task_access(request,team_primary):
+            create_individual_task_access = False
+            create_team_task_access = False
+        if is_task_of_teams_individuals:
+            create_individual_task_access = True
+            create_team_task_access = True
+        print("sakib")
+        print(create_individual_task_access)
+        print(create_team_task_access)
+
+        all_members_in_task = task.members.all()
+        if team_primary == None or team_primary == "1":
+
+            
+            teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1) #loading all the teams of Branch
+            all_members = Task_Assignation.load_insb_members_with_upload_types_for_task_assignation(request, task)
+           
+            #this is being done to ensure that he can click start button only if it is his task
+
+            #fetching all team and the coordinators of the team as a dictionary
+            teams_and_coordinators = {}
+            current_panel = Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+            co_ordinator_position = Roles_and_Position.objects.filter(role_of = Chapters_Society_and_Affinity_Groups.objects.get(primary=1),is_co_ordinator = True,is_officer=True)
+            for team in teams:
+                team_coordinator_members = []
+                for position in co_ordinator_position:
+                    members = Panel_Members.objects.filter(team=team,position=position,tenure=current_panel)
+                    team_coordinator_members+=members
+                teams_and_coordinators[team] = team_coordinator_members
+
+            context = {
+                'task':task,
+                'task_categories':task_categories,
+                'teams':teams,
+                'all_members':all_members,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'logged_in_user':logged_in_user,
+                'is_late':late,
+                'my_task':my_task,
+                'task_logs':task_logs.task_log_details,
+                'create_individual_task_access':create_individual_task_access,
+                'create_team_task_access':create_team_task_access,
+                'is_member_view':is_member_view,
+                'is_task_started_by_member':is_task_started_by_member,
+                'teams_and_coordinators': teams_and_coordinators,
+                'all_members_in_task':all_members_in_task,
+
+                'app_name':app_name,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+                'is_task_of_teams_individuals':is_task_of_teams_individuals,
+                'is_task_started_by_any_coordinator':is_task_started_by_any_coordinator,
+                'is_task_started_by_any_incharge':is_task_started_by_any_incharge,
+            }
+        else:
+
+            nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
+            all_members = Task_Assignation.load_insb_members_with_upload_types_for_task_assignation(request, task,team_primary)
+  
+            
+
+            context = {
+                'task':task,
+                'task_categories':task_categories,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'logged_in_user':logged_in_user,
+                'is_late':late,
+                'my_task':my_task,
+                'task_logs':task_logs.task_log_details,
+                'create_individual_task_access':create_individual_task_access,
+                'create_team_task_access':create_team_task_access,
+                'is_member_view':is_member_view,
+                'is_task_started_by_member':is_task_started_by_member,
+                'all_members_in_task':all_members_in_task,
+
+                #loading navbars as per page
+                'web_dev_team':nav_bar["web_dev_team"],
+                'content_and_writing_team':nav_bar["content_and_writing_team"],
+                'event_management_team':nav_bar["event_management_team"],
+                'logistic_and_operation_team':nav_bar["logistic_and_operation_team"],
+                'promotion_team':nav_bar["promotion_team"],
+                'public_relation_team':nav_bar["public_relation_team"],
+                'membership_development_team':nav_bar["membership_development_team"],
+                'media_team':nav_bar["media_team"],
+                'graphics_team':nav_bar["graphics_team"],
+                'finance_and_corporate_team':nav_bar["finance_and_corporate_team"],
+                'app_name':app_name,
+                'team_primary':team_primary,
+                'is_coordinator':is_coordinator,
+                'is_task_forwared_to_incharge':is_task_forwared_to_incharge,
+                'is_officer':is_officer,
+                'is_task_forwarded_to_volunteers':is_task_forwarded_to_volunteers,
+                'is_task_of_teams_individuals':is_task_of_teams_individuals,
+                'all_members':all_members,
+                'is_task_started_by_any_coordinator':is_task_started_by_any_coordinator,
+                'is_task_started_by_any_incharge':is_task_started_by_any_incharge,
+            }
+
+
+        return render(request,"edit_task.html",context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+class GetTaskCategoryPointsAjax(View):
+    def get(self,request):
+        task_category_name = request.GET.get('selectedTaskCategory')
+        try:
+            category = Task_Category.objects.get(name=task_category_name)
+            if category.enabled:
+                return JsonResponse({'points':category.points})
+            else:
+                return JsonResponse({'points':0})
+        except:
+            return JsonResponse('Something went wrong!',safe=False)
+
+class SaveMemberTaskPointsAjax(View):
+    def get(self,request,team_primary = None):
+        try:
+
+            try:
+                logged_in_user = Members.objects.get(ieee_id = request.user.username)
+            except:
+                logged_in_user = adminUsers.objects.get(username=request.user.username)
+
+            task_id = request.GET.get('task_id')
+            member_id = request.GET.get('member_id')
+            marks = request.GET.get('completed_points')
+
+            task = Task.objects.get(id=task_id)
+            create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request,team_primary,task.task_type,task)
+            create_team_task_access = Branch_View_Access.get_create_team_task_access(request,team_primary,task.task_type,task)
+
+            if (create_individual_task_access or create_team_task_access) and not logged_in_user in task.members.all():
+                #checking to see if mark provided is negative or not if so send error message
+                if float(marks)<0:
+                    message = "Please provide 0 but not negative marks!"
+                    return JsonResponse({'message':message})
+                
+                if Task_Assignation.update_marks(task,member_id,marks):
+                    message = f"Member {member_id}'s mark updated to {marks}"
+                else:
+                    message = "Something went wrong while updating!"
+
+                return JsonResponse({'points':marks,'message':message})
+            else:
+                return JsonResponse('Access Denied',safe=False)
+        except:
+            return JsonResponse('Something went wrong!',safe=False)
+        
+# task history
+def individual_task_history(request, ieee_id):
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        has_common_access = Branch_View_Access.common_access(username=request.user.username)
+
+        if has_common_access:
+            member = Members.objects.get(ieee_id=ieee_id)
+            all_tasks_of_member_with_points = Member_Task_Point.objects.filter(member=member.ieee_id, task__is_task_completed=True).order_by('-task__deadline')
+
+            context = {
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'member': member,
+                'all_tasks_of_member_with_points': all_tasks_of_member_with_points,
+                'media_url': Settings.MEDIA_URL
+            }
+
+            return render(request,"Task History/per_individual_task_history.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag, 'user_data':user_data})
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+def team_task_history(request, team_primary):
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        has_common_access = Branch_View_Access.common_access(username=request.user.username)
+
+        if has_common_access:
+            team = Teams.objects.get(primary=team_primary)
+            all_tasks_of_team_with_points = Team_Task_Point.objects.filter(team=team, task__is_task_completed=True).order_by('-task__deadline')
+
+            context = {
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'team_details': team,
+                'all_tasks_of_team_with_points': all_tasks_of_team_with_points
+            }
+
+            return render(request,"Task History/per_team_task_history.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag, 'user_data':user_data})
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+def task_leaderboard(request):
+    try:
+        # get all sc ag for sidebar
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        # get user data for side bar
+        current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        has_common_access = Branch_View_Access.common_access(username=request.user.username)
+        branch_panel = None
+
+        if request.GET.get('panel') and request.GET.get('panel') != '':
+            panel = request.GET.get('panel')
+            branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            if not branch_panel.current:
+                all_members = Member_Task_Points_History.objects.filter(panel_of=branch_panel).exclude(points=0).order_by('-points')
+                all_teams = Team_Task_Points_History.objects.filter(team__team_of__primary=1, panel_of=branch_panel).order_by('-points')
+            else:
+                all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+                all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+        else:
+            branch_panel = Branch.load_current_panel()
+            all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+            all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+
+        all_panels_of_branch = Branch.load_all_panels()
+
+        context = {
+            'all_sc_ag':sc_ag,
+            'user_data':user_data,
+            'all_members': all_members,
+            'all_teams': all_teams,
+            'all_panels_of_branch': all_panels_of_branch,
+            'branch_panel': branch_panel,
+            'has_common_access': has_common_access
+        }
+
+        return render(request,"LeaderBoards/task_leaderboard.html",context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+    
+@login_required
+@member_login_permission
+def export_task_contents(request):
+
+    try:
+        username = request.user.username
+        has_access = Access_Render.system_administrator_superuser_access(username=username) or Access_Render.system_administrator_staffuser_access(username=username)
+        
+        if has_access:
+            zip_filepath = Task_Assignation.export()
+
+            if os.path.exists(zip_filepath):
+                return FileResponse(open(zip_filepath, "rb"), as_attachment=True, filename="exported_content.zip")
+            else:
+                return HttpResponse("File not found.", status=404)
+        else:
+            return redirect('central_branch:task_home')
+        
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+    
+@login_required
+@member_login_permission
+def mail(request):
+
+    try:
+        has_access=Branch_View_Access.get_manage_email_access(request)
+        
+        if has_access:
+            error_message = ''
+
+            if request.session.get('pg_token') and not request.GET.get('navigate_to'):
+                del request.session['pg_token']
+                if request.GET.get('pg_range'):
+                    del request.session['pg_range']
+                request.session.modified = True
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                section = request.GET.get('section')
+                tokens = request.session.get('pg_token')
+                print(tokens)
+                if tokens:
+                    pg_token = tokens[-1]
+                else:
+                    pg_token = ''
+
+                global gmail_service
+
+                if not gmail_service:
+                    credentials = GoogleAuthorisationHandler.get_credentials(request)
+                    if not credentials:
+                        error_message = 'Google Authorization Required! Please contact Web Team'
+                        print("NOT OK")
+                        return None
+                    # try:
+                    gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                    print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+
+                query = request.GET.get('query')
+                thread_data = []
+
+                if section == 'inbox':
+                    if query:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
+                    else:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                elif section == 'sent':
+                    if query:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} in:sent -label:dev-mail",pageToken=pg_token).execute()
+                    else:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken=pg_token).execute()
+                elif section =='dev_mail':
+                    if Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username):
+                        if query:
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} label:dev-mail",pageToken=pg_token).execute()
+                        else:
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken=pg_token).execute()
+                    else:
+                        if query:
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
+                        else:
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                elif section =='starred':
+                    if query:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} is:starred",pageToken=pg_token).execute()
+                    else:
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="is:starred",pageToken=pg_token).execute()
+                else:
+                    threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                
+                
+                if not request.session.get('pg_token'):
+                    if 'nextPageToken' in threads:
+                        request.session['pg_token'] = [threads['nextPageToken']]
+                        request.session.modified = True
+                    request.session['pg_range'] = '1 - 10'
+
+                # Function to handle each response from the batch request
+                def handle_batch_response(request_id, response, exception):
+                    messagess = response.get('messages', [])
+
+                    if messagess:
+                        if section == 'sent':
+                            # Only get the first message for this section
+                            last_message = messagess[0]
+                        else:
+                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+
+                        headers = last_message['payload'].get('headers', [])
+                        snippet = last_message.get('snippet', '')
+                        labels = last_message.get('labelIds', [])
+                        message_id = last_message['threadId']
+
+                        # Extract relevant fields from headers
+                        header_dict = {header['name']: header['value'] for header in headers}
+                        sender = header_dict.get('From')
+                        subject = header_dict.get('Subject', '(No Subject)')
+                        subject = '(No Subject)' if subject == '' else subject
+                        date = header_dict.get('Date')
+
+                        if date:
+                            date = parsedate_to_datetime(date)
+                        else:
+                            date = None
+
+                        thread_data.append({
+                            'message_id':message_id,
+                            'sender': sender,
+                            'subject': subject,
+                            'date': date,
+                            'labels': labels,
+                            'snippet': snippet,
+                            'internal_date':int(last_message['internalDate'])
+                        })
+
+                # Create a batch request
+                batch = BatchHttpRequest(callback=handle_batch_response)
+                
+
+                    # if exception is not None:
+                    #     print(f'Failed to delete draft with ID {request_id}. Error: {exception}')
+                    # else:
+                    #     print(f'Deleted draft with ID: {request_id}')
+
+                if threads.get('threads'):
+                    for thread in threads['threads']:
+                        thread_id = thread['id']
+
+                        # Fetch the required details for each message
+                        batch.add(gmail_service.users().threads().get(
+                            userId='me',
+                            id=thread_id,
+                            format='metadata',
+                            metadataHeaders=['From', 'Subject', 'Date', 'internalDate']
+                        ), request_id=thread_id)
+
+                batch._batch_uri = 'https://www.googleapis.com/batch/gmail/v1'
+
+                batch.execute()
+
+                thread_data = sorted(thread_data, key=lambda x: x['internal_date'], reverse=True)
+
+                # except Exception as e:
+                #     print(e)
+                #     print(f'Failed to create service instance for gmail')
+                                                
+                    
+                context={
+                    'threads':thread_data,
+                    'error_message':error_message
+                }
+                
+                # Render the row.html template with the data
+                html = render(request, 'Email/email_row.html', context).content.decode('utf-8')
+                
+                # Return the HTML as a JSON response
+                return JsonResponse({'html': html,'nextPageToken':threads.get('nextPageToken'),'pg_range':request.session['pg_range'], 'message':'success'})
+            
+            else:
+                
+                sc_ag=PortData.get_all_sc_ag(request=request)
+                current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+                user_data=current_user.getUserData() #getting user data as dictionary file
+                recruitment_sessions=PRT_Data.getAllRecruitmentSessions()
+                under_maintainance = system.objects.all().first()
+
+                section = request.GET.get('section')
+                thread_data = []
+
+                credentials = GoogleAuthorisationHandler.get_credentials(request)
+                if not credentials:
+                    print("NOT OK")
+                    error_message = 'Google Authorization Required! Please contact Web Team'
+                    return render(request,'Email/compose_email.html',{'all_sc_ag':sc_ag,
+                                                                      'user_data':user_data,
+                                                                      'section':section,
+                                                                      'error_message':error_message})
+                try:
+                    gmail_service = build(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                    print(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+
+                    if section == 'inbox':
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+                    elif section == 'sent':
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken='').execute()
+                    elif section == 'dev_mail':
+                        if Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username):
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken='').execute()
+                        else:
+                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+                    elif section =='starred':
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="is:starred -label:dev-mail",pageToken='').execute()
+                    else:
+                        section = 'inbox'
+                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+
+
+                    if 'nextPageToken' in threads:
+                        request.session['pg_token'] = [threads['nextPageToken']]
+                        request.session['pg_range'] = '1 - 10'
+                        request.session.modified = True
+                        
+                    # Function to handle each response from the batch request
+                    def handle_batch_response(request_id, response, exception):
+                        messagess = response.get('messages', [])
+
+                        if messagess:
+                            if section == 'sent':
+                                # Only get the first message for this section
+                                last_message = messagess[0]
+                            else:
+                                last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                                
+                            headers = last_message['payload'].get('headers', [])
+                            snippet = last_message.get('snippet', '')
+                            labels = last_message.get('labelIds', [])
+                            message_id = last_message['threadId']
+
+                            # Extract relevant fields from headers
+                            header_dict = {header['name']: header['value'] for header in headers}
+                            sender = header_dict.get('From')
+                            subject = header_dict.get('Subject', '(No Subject)')
+                            subject = '(No Subject)' if subject == '' else subject
+                            date = header_dict.get('Date')
+
+                            if date:
+                                date = parsedate_to_datetime(date)
+                            else:
+                                date = None
+
+                            thread_data.append({
+                                'message_id':message_id,
+                                'sender': sender,
+                                'subject': subject,
+                                'date': date,
+                                'labels': labels,
+                                'snippet': snippet,
+                                'internal_date':int(last_message['internalDate'])
+                            })
+
+                    # Create a batch request
+                    batch = BatchHttpRequest(callback=handle_batch_response)
+                    
+
+                        # if exception is not None:
+                        #     print(f'Failed to delete draft with ID {request_id}. Error: {exception}')
+                        # else:
+                        #     print(f'Deleted draft with ID: {request_id}')
+
+                    if threads.get('threads'):
+                        for thread in threads['threads']:
+                            thread_id = thread['id']
+
+                            # Fetch the required details for each message
+                            batch.add(gmail_service.users().threads().get(
+                                userId='me',
+                                id=thread_id,
+                                format='metadata',
+                                metadataHeaders=['From', 'Subject', 'Date', 'internalDate']
+                            ), request_id=thread_id)
+
+                    batch._batch_uri = 'https://www.googleapis.com/batch/gmail/v1'
+
+                    batch.execute()
+
+                    thread_data = sorted(thread_data, key=lambda x: x['internal_date'], reverse=True)
+                            
+                        
+                except Exception as e:
+                    print(e)
+                    print(f'Failed to create service instance for gmail')
+                                                
+                context={
+                    'all_sc_ag':sc_ag,
+                    'user_data':user_data,
+                    'section':section,
+                    'media_url':settings.MEDIA_URL,
+                    'recruitment_sessions':recruitment_sessions,
+                    'under_maintenance':under_maintainance,
+                    'threads':thread_data,
+                    'error_message':error_message,
+                    'dev_access':Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username)
+                }
+                return render(request,'Email/compose_email.html',context)
+        else:
+            sc_ag=PortData.get_all_sc_ag(request=request)
+            current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+            user_data=current_user.getUserData() #getting user data as dictionary file
+            return render(request,'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+
+            
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        messages.warning(request,"Something went wrong while sending the email! The error has been reported to us, we will be fixing it soon!")
+        return custom_500(request)
+
+def extract_name_and_email(from_header):
+    # Use regular expression to extract name and email
+    match = re.match(r'(.*)\s<(.+)>', from_header)
+    if match:
+        name = match.group(1)
+        email = match.group(2)
+    else:
+        # If no match, it's possible that the name part is missing and only the email is provided
+        name = None
+        email = from_header
+    
+    return name, email
+
+@login_required
+@member_login_permission
+def view_mail(request, mail_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        has_access=Branch_View_Access.get_manage_email_access(request)
+
+        if has_access:
+            global gmail_service
+
+            credentials = GoogleAuthorisationHandler.get_credentials(request)
+            if not credentials:
+                print("NOT OK")
+                return None
+            gmail_service = build(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+            print(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+
+            thread_data = []
+
+            thread_id = mail_id
+
+            # Fetch the required details for each message
+            thread_details = gmail_service.users().threads().get(
+                userId='me',
+                id=thread_id,
+                format='full',
+            ).execute()
+            
+            messagess = thread_details.get('messages', [])
+
+            if messagess:
+                for i in range(len(messagess),0,-1):
+                    last_message = messagess[i-1]  # Get the last message in the thread
+                    headers = last_message['payload'].get('headers', [])
+                    body = ''
+                    files = []
+                    # Check if the message has a 'payload' and 'parts'
+                    if 'parts' in last_message['payload']:
+                        def extract_parts(part):
+                            """ Recursively extract parts from a message """
+                            parts = []
+                            mime_type = part['mimeType']
+                            print(mime_type)
+                            
+                            if mime_type == 'text/plain' or mime_type == 'text/html':
+                                data = part['body'].get('data')
+                                if data:
+                                    decoded_data = base64.urlsafe_b64decode(data).decode('utf-8')
+                                    parts.append({'mimeType': mime_type, 'content': decoded_data})
+                            elif mime_type == 'multipart/alternative' or mime_type == 'multipart/related' or mime_type == 'multipart/report' or mime_type == 'multipart/mixed':
+                                for subpart in part.get('parts', []):
+                                    parts.extend(extract_parts(subpart))
+                                    
+                            # Check if the part is an attachment
+                            elif part.get('filename'):
+                                attachment_id = part['body'].get('attachmentId')
+                                if attachment_id:
+
+                                    # Add the attachment URL to parts
+                                    files.append({
+                                        'msg_id':last_message['id'],
+                                        'mimeType': mime_type,
+                                        'filename': part.get('filename'),
+                                        'attachment_id': attachment_id
+                                    })
+
+                            return parts
+                        
+                    
+                        #Start extraction from the root message part
+                        email_parts = extract_parts(last_message['payload'])
+                        
+                        # Separate HTML and plain text
+                        content_parts = {part['mimeType']: part.get('content') for part in email_parts}
+                        body = content_parts.get('text/html')
+                        plain_text_body = content_parts.get('text/plain')
+                        # # Remove previous replies (common patterns to strip off replies)
+                        # body = re.split(r"(On\s.*wrote:)", body)[0]
+
+                        # # You can also strip off quoted text that starts with '>'
+                        # body = re.sub(r'(>.*\n)', '', body)
+
+                        if body == None:
+                            # # Remove previous replies (common patterns to strip off replies)
+                            # plain_text_body = re.split(r"(On\s.*wrote:)", plain_text_body)[0]
+
+                            # # You can also strip off quoted text that starts with '>'
+                            # plain_text_body = re.sub(r'(>.*\n)', '', plain_text_body)
+                            body = plain_text_body
+                        
+                    else:
+                        # If there are no 'parts', it means the message is simple and not multipart
+                        if last_message['payload']['mimeType'] == 'text/plain':
+                            body = base64.urlsafe_b64decode(last_message['payload']['body']['data']).decode('utf-8')
+                        elif last_message['payload']['mimeType'] == 'text/html':
+                            body = base64.urlsafe_b64decode(last_message['payload']['body']['data']).decode('utf-8')
+
+                        # # Remove previous replies (common patterns to strip off replies)
+                        # body = re.split(r"(On\s.*wrote:)", body)[0]
+
+                        # # You can also strip off quoted text that starts with '>'
+                        # body = re.sub(r'(>.*\n)', '', body)
+                    labels = last_message.get('labelIds', [])
+
+                    # Extract relevant fields from headers
+                    header_dict = {header['name']: header['value'] for header in headers}
+
+                    sender_name, sender_email = extract_name_and_email(header_dict.get('From'))
+                    To = header_dict.get('To')
+                    Cc = header_dict.get('Cc')
+                    Bcc = header_dict.get('Bcc')
+                    subject = header_dict.get('Subject', '(No Subject)')
+                    subject = '(No Subject)' if subject == '' else subject
+                    date = header_dict.get('Date')
+
+                    if date:
+                        date = parsedate_to_datetime(date)
+                    else:
+                        date = None
+
+                    thread_data.append({
+                        'message_id':last_message['id'],
+                        'thread_id':thread_id,
+                        'sender_name': sender_name,
+                        'sender_email': sender_email,
+                        'to':To,
+                        'cc':Cc,
+                        'bcc':Bcc,
+                        'subject': subject,
+                        'date': date,
+                        'labels': labels,
+                        'body':body,
+                        'files':files
+                    })
+
+                # Fetch the required details for each message
+                thread_details = gmail_service.users().threads().modify(
+                    userId='me',
+                    id=thread_id,
+                    body={
+                        'removeLabelIds': ['UNREAD']
+                    }
+                ).execute()
+
+            # except Exception as e:
+            #     print(thread_data)
+            #     print(f'Failed to create service instance for gmail')
+
+            context = {
+                'threads':thread_data
+            }
+
+            return render(request,'Email/view_email.html',context)
+        else:
+            return render(request,'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        messages.warning(request,"Something went wrong while sending the email! The error has been reported to us, we will be fixing it soon!")
+        return custom_500(request)
+    
+class SendMailAjax(View):
+    def post(self, request):
+        try:
+            '''
+            The recruitment sessions "option value" from html comes
+            as "recruits_{session_id}. Applied an algorithm that will retrieve
+            session_id from this.
+            
+            If no option is selected, backend will recieve an empty string as value.
+            
+            Settled value for the options in HTML:
+                All Registered Members - "general_members"
+                ALL officers of IEEE NSU SB - "all_officers",
+                Executive Panel (Branch Only) - "eb_panel",
+                Branch Ex-Com Members - "excom_branch",
+                All, Society, Chapters, Affinity Group Ebs - "scag_eb"
+            
+            '''
+            
+            email_single_email = ''
+            if request.POST.get('to[]'):
+                email_single_email=request.POST.getlist('to[]')
+            email_to_list = ['']
+            if request.POST.getlist('sendTo[]'):
+                email_to_list=request.POST.getlist('sendTo[]')
+
+            email_cc_list = ['']
+            if request.POST.getlist('cc[]'): 
+                email_cc_list=request.POST.getlist('cc[]')
+            
+            email_bcc_list = ['']
+            if request.POST.getlist('bcc[]'):
+                email_bcc_list=request.POST.getlist('bcc[]')
+            email_subject=request.POST['subject']
+            email_body=request.POST['body']
+            email_attachment=request.FILES.getlist('attachments')                       
+            email_schedule_date_time = request.POST['dateTime']
+            print("HERE COMING")
+            response = GmailHandler.send_mail(request, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time)
+            
+            return response
+        
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+    
+class PaginationAjax(View):
+    def get(self, request):
+        try:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                navigate_to = request.GET.get('navigate_to')
+                section = request.GET.get('section')
+
+                response = GmailHandler.get_pagination(request, section, navigate_to)
+
+                return response
+            else:
+                return HttpResponse('Access Denied!')
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+
+class ReadUnreadEmailAjax(View):
+    def post(self, request):
+        try:
+            message_id = request.POST.get('message_id')
+            action = request.POST.get('action')
+            message_ids = message_id.split(',')
+            
+            response = GmailHandler.perform_read_unread_mail(request, message_ids, action)
+        
+            return response           
+                
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+
+class StarUnstarEmailAjax(View):
+    def post(self, request):
+        try:
+            message_id = request.POST.get('message_id')
+            action = request.POST.get('action')
+            
+            response = GmailHandler.perform_star_unstar_mail(request, message_id, action)
+
+            return response
+                
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+        
+class DeleteEmailAjax(View):
+    def post(self, request):
+        try:
+            message_ids = request.POST.get('message_id')
+            message_ids = message_ids.split(',')
+            
+            response = GmailHandler.perform_delete_mail(request, message_ids)
+
+            return response   
+                
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+
+class GetScheduledEmailInfoAjax(View):
+    def get(self, request):
+        scheduled_emails = {}
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            drafts = Email_Draft.objects.all()
+            for draft in drafts:
+                task = PeriodicTask.objects.get(name=draft.email_unique_id)
+                scheduled_emails.update({draft.email_unique_id:{'id':draft.email_unique_id,'subject':draft.subject,'schedule_datetime':task.schedule.clocked_time,'schedule_status':draft.status}})
+
+        html =  render(request, 'Email/scheduled_email_row.html', {'scheduled_emails':scheduled_emails}).content.decode('utf-8')
+        return JsonResponse({'html':html})
+
+def get_attachment(request, message_id, attachment_id):
+    # Fetch the attachment from Gmail API
+    filename = request.GET.get('filename')
+    global gmail_service
+
+    if not gmail_service:
+        credentials = GoogleAuthorisationHandler.get_credentials(request)
+        if not credentials:
+            print("NOT OK")
+            return None
+        
+        gmail_service = build(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+
+    attachment = gmail_service.users().messages().attachments().get(
+        userId='me',
+        messageId=message_id,
+        id=attachment_id
+    ).execute()
+
+    # Decode the attachment data
+    attachment_data = base64.urlsafe_b64decode(attachment['data'].encode('utf-8'))
+
+    # Get the MIME type based on the file extension
+    mime_type, _ = mimetypes.guess_type(filename)
+    if not mime_type:
+        mime_type = 'application/octet-stream'  # Fallback for unknown types
+
+    # Create the response
+    response = HttpResponse(attachment_data, content_type=mime_type)
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+class UpdateScheduledEmailOptionsAjax(View):
+    def post(self, request):
+        message = 'test'
+
+        try:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                unique_id = request.POST.get('id')
+                new_datetime = request.POST.get('new_schedule_datetime')
+                status = request.POST.get('status')
+
+                task = PeriodicTask.objects.get(name=unique_id)
+                if new_datetime:
+                    clocked_schedule, created = ClockedSchedule.objects.get_or_create(clocked_time=datetime.strptime(new_datetime, '%Y-%m-%dT%H:%M'))
+                    task.clocked = clocked_schedule
+                    task.enabled = True
+                    task.save()
+
+                    # Convert string to datetime object (including timezone info)
+                    dt = datetime.fromisoformat(str(task.schedule.clocked_time))
+                    formatted_dt = dt.strftime('%a, %d %b %Y %I:%M:%S %p')
+
+                    message = f'Email is successfully scheduled on {formatted_dt}'
+                elif status:
+                    draft = Email_Draft.objects.get(email_unique_id=unique_id)
+                    if status == 'pause_schedule':
+                        task.enabled = False
+                        draft.status = 'Paused'
+                        task.save()
+                        draft.save()
+                        message = 'Email schedule paused successfully'
+                    elif status == 'restart_schedule':
+                        task.enabled = True
+                        draft.status = 'Scheduled'
+                        task.save()
+                        draft.save()
+                        message = 'Email schedule has restarted successfully'
+                    elif status == 'cancel_schedule':
+                        task.enabled = False
+                        task.save()
+                        draft.delete()
+                        message = 'Email schedule is cancelled'
+                    elif status == 'send_now':
+                        send_scheduled_email(json.dumps(request.user.username), json.dumps(unique_id))
+                        task.enabled = False
+                        task.save()
+                        message = "Email sent successfully"
+
+            return JsonResponse({'message':message})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+        
+
+class SendReplyMailAjax(View):
+    def post(self, request):
+
+        try:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                body = request.POST.get('body')
+                original_message_id = request.POST.get('message_id')
+                thread_id = request.POST.get('thread_id')
+                email_attachment = None
+                if request.FILES.get('attachments'):
+                    email_attachment=request.FILES.getlist('attachments')
+                to_email_additional = ''
+                if request.POST.get('to[]'):
+                    to_email_additional=request.POST.get('to[]')
+                
+                print(to_email_additional)
+
+                response = GmailHandler.send_reply_mail(request, thread_id, original_message_id, body, to_email_additional, email_attachment)
+
+                return response
+            else:
+                return HttpResponse('Access Denied')
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+        
+class SendForwardMailAjax(View):
+    def post(self, request):
+        msg = 'test'
+
+        try:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                body = request.POST.get('body')
+                original_message_id = request.POST.get('message_id')
+                email_attachment = None
+                if request.FILES.get('attachments'):
+                    email_attachment=request.FILES.getlist('attachments')
+                to_email_additional = ''
+                if request.POST.get('to[]'):
+                    to_email_additional=request.POST.get('to[]')
+                
+                print(to_email_additional)
+
+                global gmail_service
+
+                if not gmail_service:
+                    credentials = GoogleAuthorisationHandler.get_credentials(request)
+                    if not credentials:
+                        print("NOT OK")
+                        return None
+                    
+                    gmail_service = build(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+
+                # Get the original email
+                original_message = gmail_service.users().messages().get(userId='me', id=original_message_id).execute()
+
+                # Extract original details
+                original_payload = original_message['payload']
+                headers = {h['name']: h['value'] for h in original_payload['headers']}
+
+                message=MIMEMultipart()
+
+                message["From"] = "ieeensusb.portal@gmail.com"
+                message['To'] = to_email_additional
+                # message['Cc'] = headers.get('Cc')
+                subject = headers.get('Subject', '(No Subject)')
+                if subject[:4] == 'Fwd:':
+                    message['Subject'] = subject
+                else:
+                    message['Subject'] = 'Fwd: ' + subject
+
+                original_message_body = ''
+                original_message_body_plain_text = ''
+                files = []
+                # Check if the message has a 'payload' and 'parts'
+                if 'parts' in original_message['payload']:
+                    def extract_parts(part):
+                        """ Recursively extract parts from a message """
+                        parts = []
+                        mime_type = part['mimeType']
+                        print(mime_type)
+                        
+                        if mime_type == 'text/plain' or mime_type == 'text/html':
+                            data = part['body'].get('data')
+                            if data:
+                                decoded_data = base64.urlsafe_b64decode(data).decode('utf-8')
+                                parts.append({'mimeType': mime_type, 'content': decoded_data})
+                        elif mime_type == 'multipart/alternative' or mime_type == 'multipart/related' or mime_type == 'multipart/report' or mime_type == 'multipart/mixed':
+                            for subpart in part.get('parts', []):
+                                parts.extend(extract_parts(subpart))
+                                
+                        # # Check if the part is an attachment
+                        # elif part.get('filename'):
+                        #     attachment_id = part['body'].get('attachmentId')
+                        #     if attachment_id:
+
+                        #         # Add the attachment URL to parts
+                        #         files.append({
+                        #             'msg_id':original_message['id'],
+                        #             'mimeType': mime_type,
+                        #             'filename': part.get('filename'),
+                        #             'attachment_id': attachment_id
+                        #         })
+
+                        return parts
+                    
+                
+                    #Start extraction from the root message part
+                    email_parts = extract_parts(original_message['payload'])
+                    
+                    # Separate HTML and plain text
+                    content_parts = {part['mimeType']: part.get('content') for part in email_parts}
+                    original_message_body = content_parts.get('text/html')
+                    original_message_body_plain_text = content_parts.get('text/plain')
+                    # # Remove previous replies (common patterns to strip off replies)
+                    # body = re.split(r"(On\s.*wrote:)", body)[0]
+
+                    # # You can also strip off quoted text that starts with '>'
+                    # body = re.sub(r'(>.*\n)', '', body)
+
+                    if original_message_body == None:
+                        # # Remove previous replies (common patterns to strip off replies)
+                        # plain_text_body = re.split(r"(On\s.*wrote:)", plain_text_body)[0]
+
+                        # # You can also strip off quoted text that starts with '>'
+                        # plain_text_body = re.sub(r'(>.*\n)', '', plain_text_body)
+                        original_message_body = original_message_body_plain_text
+                    
+                else:
+                    # If there are no 'parts', it means the message is simple and not multipart
+                    if original_message['payload']['mimeType'] == 'text/plain':
+                        original_message_body = base64.urlsafe_b64decode(original_message['payload']['body']['data']).decode('utf-8')
+                    elif original_message['payload']['mimeType'] == 'text/html':
+                        original_message_body = base64.urlsafe_b64decode(original_message['payload']['body']['data']).decode('utf-8')
+                            
+                
+                # Assuming headers is a dictionary that contains email headers
+                to_header = headers.get('To')
+                from_header = headers.get('From')
+                cc_header = headers.get('Cc')
+
+                # Use getaddresses to parse multiple recipients in the 'To' field
+                to_addresses = getaddresses([to_header])
+                from_name, from_email = parseaddr(from_header)
+
+                # Format 'To' field with all recipients
+                to = ', '.join([f'{name} &lt;<a href="mailto:{email}">{email}</a>&gt;' for name, email in to_addresses])
+
+                # Handle the 'Cc' field (if it exists)
+                cc = ''
+                if cc_header:
+                    cc_addresses = getaddresses([cc_header])
+                    cc = ', '.join([f'{name} &lt;<a href="mailto:{email}">{email}</a>&gt;' for name, email in cc_addresses])
+                    cc = f'<br>Cc: <span>{cc}</span>'
+                
+                # Attach the main message body along with the forwarded body
+                message.attach(MIMEText(f'''{body}
+<br>---------- Forwarded message ---------
+<br>From: <span>{from_name} &lt;<a href="mailto:{from_email}">{from_email}</a>&gt;</span>
+<br>To: <span>{to}</span>
+{cc if cc else ''}
+<br><br>
+{original_message_body}''', 'html'))
+
+                if email_attachment:
+                    for attachment in email_attachment:
+                        content_file = ContentFile(attachment.read())
+                        content_file.name = attachment.name
+                        part = MIMEBase('application', 'octet-stream')
+                        part.set_payload(content_file.read())
+                        encoders.encode_base64(part)
+                        part.add_header(
+                            'Content-Disposition',
+                            f'attachment; filename={content_file.name}',
+                        )
+                        message.attach(part)
+
+                # encoded message
+                encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+                
+                create_message = {"raw": encoded_message}
+
+                send_message = gmail_service.users().messages().send(userId='me', body=create_message).execute()
+                msg = 'Email forwarded successfully!'
+
+            return JsonResponse({'message':msg})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'message':'Something went wrong!'})
+        
+# DO NOT MOVE/CHANGE THIS LINE OF CODE!!
+from central_branch.google_mail_handler import GmailHandler, gmail_service

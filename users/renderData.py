@@ -1,6 +1,8 @@
-from users.models import Members
+from notification.models import MemberNotifications
+from task_assignation.models import Member_Task_Point
+from users.models import Members,MemberSkillSets
 from system_administration.models import adminUsers
-from port.models import Roles_and_Position,Teams
+from port.models import Roles_and_Position, SkillSetTypes,Teams
 import os
 from django.conf import settings
 from django.db import DatabaseError
@@ -8,7 +10,6 @@ from PIL import Image
 from recruitment.models import recruitment_session,recruited_members
 from central_events.models import Events,Event_Category,InterBranchCollaborations
 from system_administration.render_access import Access_Render
-from datetime import datetime
 from django.db.models import Q
 from users.models import User_IP_Address
 from recruitment.models import recruited_members
@@ -29,6 +30,8 @@ from port.renderData import PortData
 from functools import wraps
 from django.contrib.auth.models import User,auth
 from django.shortcuts import render,redirect
+from django.utils.dateformat import format
+from insb_port import settings
 
 class LoggedinUser:
     
@@ -40,6 +43,18 @@ class LoggedinUser:
         ieee_id=self.user.username
         try:
             get_Member_details=Members.objects.get(ieee_id=ieee_id)
+            try:
+                member_notifications = MemberNotifications.objects.filter(member=get_Member_details).order_by('-notification__timestamp')[:7]
+                latest_notification_timestamp = MemberNotifications.objects.filter(member=get_Member_details).order_by('-notification__timestamp').first()
+                latest_notification_timestamp = latest_notification_timestamp.notification.timestamp
+                latest_notification_timestamp = format(latest_notification_timestamp, 'Y-m-d\\TH:i:s')
+                unread_notification_count = MemberNotifications.objects.filter(member=get_Member_details,is_read = False).order_by('-notification__timestamp').count()
+                admin = adminUsers.objects.get(username = "insbdevs")
+            except:
+                member_notifications = None
+                latest_notification_id = None
+                unread_notification_count = 0
+                admin = None
             return {
             'is_admin_user': False,
             'name':get_Member_details.name,
@@ -60,7 +75,19 @@ class LoggedinUser:
             'facebook_url':get_Member_details.facebook_url,
             'linkedin_url':get_Member_details.linkedin_url,
             'profile_picture':'/media_files/'+str(get_Member_details.user_profile_picture),
-        
+            'notifications':member_notifications,
+            'latest_timestamp':latest_notification_timestamp,
+            'unread_notification_count':unread_notification_count,
+            'media_url':settings.MEDIA_URL,
+            'admin':admin,
+            'blood_group':get_Member_details.blood_group,
+            'FIREBASE_API_KEY':settings.FIREBASE_API_KEY,
+            'FIREBASE_AUTH_DOMAIN':settings.FIREBASE_AUTH_DOMAIN,
+            'FIREBASE_PROJECT_ID':settings.FIREBASE_PROJECT_ID,
+            'FIREBASE_STORAGE_BUCKET':settings.FIREBASE_STORAGE_BUCKET,
+            'FIREBASE_MESSAGING_SENDER_ID':settings.FIREBASE_MESSAGING_SENDER_ID,
+            'FIREBASE_APP_ID':settings.FIREBASE_APP_ID,
+            'FIREBASE_MEASUREMENT_ID':settings.FIREBASE_MEASUREMENT_ID
         }
         except Members.DoesNotExist:
             try:
@@ -177,7 +204,7 @@ class LoggedinUser:
             except adminUsers.DoesNotExist:
                 return False
     
-    def update_user_data(self, name, nsu_id, home_address, date_of_birth, email_personal, gender, email_nsu, email_ieee, contact_no, major, facebook_url, linkedin_url):
+    def update_user_data(self, name, nsu_id, home_address, date_of_birth, email_personal, gender, email_nsu, email_ieee, contact_no, major, facebook_url, linkedin_url,blood_group):
         ''' This function updates the user profile information. It takes name, nsu_id, home_address, date_of_birth, email_personal, gender, email_nsu, email_ieee, contact_no, major, facebook_url and linkedin_url '''
         try:
             #Get user details from database
@@ -194,7 +221,8 @@ class LoggedinUser:
                             contact_no=contact_no,
                             major=major,
                             facebook_url=facebook_url,
-                            linkedin_url=linkedin_url)           
+                            linkedin_url=linkedin_url,
+                            blood_group=blood_group)           
             return True
         except Members.DoesNotExist:
             return False
@@ -328,9 +356,14 @@ def getEventNumberStat(request,primary):
             #when event year is found removing increasing count value and removing it from list 
             #to loawer time complexity
             try:
-                if event.event_date.year == year-i:
-                    count+=1
-                    events.remove(event)
+                if event.start_date:
+                    if event.start_date.year == year-i:
+                        count+=1
+                        events.remove(event)
+                else:
+                    if event.event_date.year == year-i:
+                        count+=1
+                        events.remove(event)
             except:
                 pass
         #assiging the number of events occured in a year to the list
@@ -465,8 +498,64 @@ def getMonthName(numb: int)->str:
     elif numb==12:
         return "December"
 
+def getMonthlyTopMembers():
+    ''' This functions returns a list of all members who has the highest task points completed in that month '''
 
+    monthly_members = Member_Task_Point.objects.all().order_by('-completion_points','member')
+    monthly_top_members = {}
+
+    current_month = datetime.datetime.now().month
+    current_year = datetime.datetime.now().year
+
+    for member in monthly_members :
+        if member.completion_date and member.completion_date.month == current_month and member.completion_date.year == current_year:
+            if (not member.member in monthly_top_members.keys()):
+                monthly_top_members[member.member] = [Members.objects.get(ieee_id=member.member), member.completion_points]
+            else:
+                monthly_top_members[member.member][1] += member.completion_points
     
+    return list(monthly_top_members.values())
+
+def add_new_skill_type(request,skill_type):
+    try:
+        new_skill_type=SkillSetTypes.objects.create(skill_type=skill_type)
+        new_skill_type.save()
+        messages.success(request,"New Skillset type was added.")
+        return True
+    except Exception as e:
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        messages.error(request,"Something went wrong while adding new skill type")
+        return False
+
+def load_all_skill_types(request):
+    try:
+        all_skills=SkillSetTypes.objects.all()
+        return all_skills
+    except Exception as e:
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        messages.error(request,"Something went wrong while loading all skill type")
+        return False
+
+
+def get_top_5_performers(request):
+
+    '''This function will return top 5 performers of all time'''
+
+    performers = list(Members.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5])
+    while len(performers) < 5:
+        performers.append(None)
+
+    return performers
+
+def get_top_5_teams(request):
+
+    '''This function will return the top 3 teams'''
+    
+    teams = list(Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5])
+    while len(teams) < 5:
+        teams.append(None)
+        
+    return teams
 
 class PanelMembersData:
     logger=logging.getLogger(__name__)
@@ -556,10 +645,9 @@ class PanelMembersData:
                 # check if Member already exists in the Panel
                 check_member=Panel_Members.objects.filter(tenure=panel_info.pk,member=i).exists()
                 if(check_member):
-                    # update Members Position and Teams
+                    # update Members Position and Teams in current panel
                     Panel_Members.objects.filter(tenure=panel_info.pk,member=i).update(position=Roles_and_Position.objects.get(id=position),team=Teams.objects.get(primary=team_primary))
                     messages.info(request,f"{i} already existed in the Panel. Positions and Team were updated.")
-                    return True
                 # if not then add members to the Panel members table
                 else:
                     new_panel_member=Panel_Members.objects.create(tenure=Panels.objects.get(id=panel_info.pk),member=Members.objects.get(ieee_id=i),position=Roles_and_Position.objects.get(id=position),team=Teams.objects.get(primary=team_primary))
@@ -713,3 +801,4 @@ class Alumnis:
             Alumnis.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
             ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
             return False
+        

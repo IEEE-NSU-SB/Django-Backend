@@ -277,11 +277,11 @@
                                         
                                         {% if data_access.insb_member_details %}
                                         <input type="checkbox" checked="True" class="checkbox" value="insb_member_details" name="insb_member_details">
-                                        <label for="insb_member_details">INSB Registered Member Details Permission
+                                        <label for="insb_member_details">IEEE NSU SB Registered Member Details Permission
                                         </label><br>
                                         {% else %}
                                         <input type="checkbox" class="checkbox" value="insb_member_details" name="insb_member_details">
-                                        <label for="insb_member_details">INSB Registered Member Details Permission</label><br>
+                                        <label for="insb_member_details">IEEE NSU SB Registered Member Details Permission</label><br>
                                         {% endif %}
 
 
@@ -303,6 +303,7 @@
                                         {% endif %}
 
 
+                                        {% comment %}{% if has_eb_admin_access %}{% endcomment %}
                                         {% if data_access.renewal_data_access %}
                                         <input type="checkbox" checked="True" class="checkbox" value="renewal_data_access" name="renewal_data_access">
                                         <label for="renewal_data_access">Membership Renewal Data Access Permission</label><br>
@@ -310,6 +311,7 @@
                                         <input type="checkbox" class="checkbox" value="renewal_data_access" name="renewal_data_access">
                                         <label for="renewal_data_access">Membership Renewal Data Access Permission</label><br>
                                         {% endif %}
+                                        {% comment %}{% endif %}{% endcomment %}
                                             
                                     </td>
                                 

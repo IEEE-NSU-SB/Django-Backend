@@ -67,8 +67,8 @@ class Renewal_Form_Info(models.Model):
     ieee_ias_membership_amount=models.CharField(null=True,blank=True,max_length=50)
     ieee_wie_membership_amount=models.CharField(null=True,blank=True,max_length=50)
     #payment method details
-    bkash_payment_number=models.CharField(null=True,blank=True,max_length=20)
-    nagad_payment_number=models.CharField(null=True,blank=True,max_length=20)
+    bkash_payment_number=models.CharField(null=True,blank=True,max_length=45)
+    nagad_payment_number=models.CharField(null=True,blank=True,max_length=45)
     #further contact member id
     further_contact_member_id=models.CharField(null=True,blank=True,max_length=50)
     # form accepting response
@@ -111,3 +111,10 @@ class Portal_Joining_Requests(models.Model):
         return str(self.ieee_id)
     def get_absolute_url(self):
         return reverse('joining_requests',kwargs={'member_id':self.iee_id})
+    
+class Birthday_Email_Records(models.Model):
+    
+    confirm_message = models.TextField(null=True,blank=True)
+
+    class Meta:
+        verbose_name = "Birthday Email Records"

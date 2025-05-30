@@ -80,7 +80,9 @@
         }
     </style>
 </head>
-
+{% block preloader %}
+{% include 'preloader.html' %}
+{% endblock preloader %}
 <body>
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
@@ -196,6 +198,10 @@
                                 <li class="list">
                                     <h1 class="basic_info_label">Contact:</h1>
                                     <span class="basic_info_info">{{ user_data.contact_no }}</span>
+                                </li>
+                                <li class="list">
+                                    <h1 class="basic_info_label">Blood Group:</h1>
+                                    <span class="basic_info_info">{{ user_data.blood_group }}</span>
                                 </li>
                                 <li class="list">
                                     <h1 class="basic_info_label">Date of Birth:</h1>

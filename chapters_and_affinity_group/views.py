@@ -1,7 +1,12 @@
+import json
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+import requests
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
+from finance_and_corporate_team.manage_access import FCT_Render_Access
+from finance_and_corporate_team.models import BudgetSheet
+from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
 from graphics_team.renderData import GraphicsTeam
 from insb_port import settings
@@ -9,6 +14,7 @@ from main_website.renderData import HomepageItems
 from media_team.models import Media_Images, Media_Link
 from media_team.renderData import MediaTeam
 from port.renderData import PortData
+from public_relation_team.renderData import PRT_Data
 from users import renderData
 from users.renderData import Alumnis,PanelMembersData
 from django.utils.datastructures import MultiValueDictKeyError
@@ -27,8 +33,8 @@ from django.contrib.auth.decorators import login_required
 from membership_development_team.models import Renewal_Sessions,Renewal_requests
 from central_branch.view_access import Branch_View_Access
 from django.contrib import messages
-from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
-from central_events.forms import EventForm
+from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from central_events.forms import EventForm, EventFormGC
 from events_and_management_team.renderData import Events_And_Management_Team
 from port.models import Chapters_Society_and_Affinity_Groups,Roles_and_Position
 from users.models import Alumni_Members
@@ -38,6 +44,7 @@ from central_branch import views as cv
 from users.renderData import LoggedinUser,member_login_permission
 import xlwt
 from system_administration.render_access import Access_Render
+import re
 
 # Create your views here.
 logger=logging.getLogger(__name__)
@@ -1412,7 +1419,7 @@ def event_edit_form(request, primary, event_id):
                         registration_fee_amount = event_details.registration_fee_amount
 
                     #Check if the update request is successful
-                    if(Branch.update_event_details(event_id=event_id, event_name=event_name, event_description=event_description, super_event_id=super_event_id, event_type_list=event_type_list,publish_event = publish_event, event_start_date=event_start_date, event_end_date=event_end_date, inter_branch_collaboration_list=inter_branch_collaboration_list, intra_branch_collaboration=intra_branch_collaboration, venue_list_for_event=venue_list_for_event,
+                    if(Branch.update_event_details(request=request, event_id=event_id, event_name=event_name, event_description=event_description, super_event_id=super_event_id, event_type_list=event_type_list,publish_event = publish_event, event_start_date=event_start_date, event_end_date=event_end_date, inter_branch_collaboration_list=inter_branch_collaboration_list, intra_branch_collaboration=intra_branch_collaboration, venue_list_for_event=venue_list_for_event,
                                                 flagship_event = flagship_event,registration_fee = registration_fee,registration_fee_amount=registration_fee_amount,more_info_link=more_info_link,form_link = form_link,is_featured_event=is_featured)):
                         messages.success(request,f"EVENT: {event_name} was Updated successfully")
                         return redirect('chapters_and_affinity_group:event_edit_form',primary, event_id) 
@@ -1422,7 +1429,7 @@ def event_edit_form(request, primary, event_id):
                 
                 if('delete_event' in request.POST):
                     ''' To delete event from databse '''
-                    if(Branch.delete_event(event_id=event_id)):
+                    if(Branch.delete_event(request=request, event_id=event_id)):
                         messages.info(request,f"Event with EVENT ID {event_id} was Removed successfully")
                         return redirect('chapters_and_affinity_group:event_control_homepage',primary)
                     else:
@@ -1482,6 +1489,77 @@ def event_edit_form(request, primary, event_id):
         else:
             return redirect('main_website:event_details', event_id)
         
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_google_calendar(request, primary, event_id):
+
+    try:
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+
+        has_access = SC_Ag_Render_Access.access_for_event_details_edit(request, primary)
+        if has_access:
+            if(request.method == "POST"):
+                if('update_event_gc' in request.POST):
+                    google_calendar_publish_event_status = request.POST.get('publish_event_gc')
+                    attendeeOption = request.POST.getlist('attendeeList')
+                    event_description_for_gc = request.POST.get('event_description_for_gc')
+                    add_attendee_names = request.POST.getlist('attendee_name')
+                    add_attendee_emails = request.POST.getlist('attendee_email')
+
+                    documents = None
+                    if request.FILES.get('document'):
+                        documents = request.FILES.getlist('document')
+
+                    publish_event_gc = Branch.button_status(google_calendar_publish_event_status)
+                    Branch.update_event_google_calendar(request=request, event_id=event_id, description=event_description_for_gc, publish_event_gc=publish_event_gc, attendeeOption=attendeeOption, add_attendee_names=add_attendee_names, add_attendee_emails=add_attendee_emails, documents=documents)
+                if('remove_attachment') in request.POST:
+                    attachment_id = request.POST.get('remove_attachment')
+                    Branch.delete_attachment(request, attachment_id)
+
+            event = Events.objects.get(id=event_id)
+            event_gc_attachments = Google_Calendar_Attachments.objects.filter(event_id=event)
+            form = EventFormGC({'event_description_for_gc' : event.event_description_for_gc})
+            is_event_published_gc = event.publish_in_google_calendar
+            additional_attendees = event.additional_attendees
+            recruitment_sessions=PRT_Data.getAllRecruitmentSessions()       
+            if event.selected_attendee_list:
+                selected_attendee_list = event.selected_attendee_list.split(',')
+                selected_attendee_list_for_recruits = [re.findall(r'\d+', item)[0] for item in selected_attendee_list if re.findall(r'\d+', item)]
+            else:
+                selected_attendee_list = None
+                selected_attendee_list_for_recruits = None
+
+
+            context = {
+                'is_branch':False,
+                'primary' : primary,
+                'user_data':user_data,
+                'all_sc_ag':sc_ag,
+                'sc_ag_info':get_sc_ag_info,
+                'event':event,
+                'has_access_for_sc_ag_updates':True,
+                'is_event_published_gc':is_event_published_gc,
+                'event_id':event_id,
+                'form':form,
+                'event_gc_attachments':event_gc_attachments,
+                'additional_attendees':additional_attendees,
+                'recruitment_sessions':recruitment_sessions,
+                'selected_attendee_list':selected_attendee_list,
+                'selected_attendee_list_for_recruits':selected_attendee_list_for_recruits
+            }
+
+            return render(request, 'Events/event_edit_google_calendar.html', context)
+        else:
+            return render(request, 'access_denied.html', { 'all_sc_ag':sc_ag })
+    
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
@@ -1838,6 +1916,97 @@ def event_edit_content_form_tab(request,primary,event_id):
     
 @login_required
 @member_login_permission
+def event_edit_budget_form_tab(request, primary, event_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        
+        has_access = SC_Ag_Render_Access.access_for_sc_ag_budget(request, event_id, primary)
+
+        if has_access != 'Restricted':
+            if request.method == "POST":
+                cst_item = request.POST.getlist('cst_item[]')
+                cst_quantity = request.POST.getlist('cst_quantity[]')
+                cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                cst_total = request.POST.getlist('cst_total[]')
+
+                rev_item = request.POST.getlist('rev_item[]')
+                rev_quantity = request.POST.getlist('rev_quantity[]')
+                rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                rev_total = request.POST.getlist('rev_total[]')
+
+                saved_rate = request.POST.get('saved_rate')
+                show_usd_rates = request.POST.get('show_usd_rates')
+                
+                if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                    if Sc_Ag.create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                        messages.success(request, 'Budget created successfully!')
+                    else:
+                        messages.warning(request, 'Could not create budget!')
+                else:
+                    budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+                        messages.success(request, 'Budget updated successfully!')
+                    else:
+                        messages.warning(request, 'Could not update budget!')
+                
+                return redirect('chapters_and_affinity_group:event_edit_budget_form_tab', primary, event_id)
+                
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+            else:
+                budget_sheet = None
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            usd_rate = None
+            if budget_sheet:
+
+                if budget_sheet.total_cost > budget_sheet.total_revenue:
+                    deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+                elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                    surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+                
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+                else:
+                    usd_rate = None
+
+            event = Events.objects.get(id=event_id)
+
+            context = {
+                'is_branch' : False,
+                'primary' : primary,
+                'event_id' : event_id,
+                'all_sc_ag':sc_ag,
+                'sc_ag_info':get_sc_ag_info,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type': has_access if has_access == 'ViewOnly' else 'Edit',
+                'deficit':deficit,
+                'surplus':surplus,
+                'event':event,
+                'usd_rate':usd_rate
+            }
+
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
+
+    
+@login_required
+@member_login_permission
 @xframe_options_exempt
 def event_preview(request, primary, event_id):
     ''' This function displays a preview of an event regardless of it's published status '''
@@ -2046,7 +2215,7 @@ def feedbacks(request,primary):
         #rendering all the data to be loaded on the page
         sc_ag=PortData.get_all_sc_ag(request=request)
         get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
-        has_access = SC_Ag_Render_Access.access_for_event_details_edit(request, primary)
+        has_access = SC_Ag_Render_Access.access_for_manage_web(request, primary)
         #getting all the feedbacks for the particular societies and affinity groups
         all_feedbacks = Sc_Ag.get_all_feedbacks(request,primary)
         if(has_access):
@@ -2169,7 +2338,10 @@ def generateExcelSheet_events_by_year_sc_ag(request,primary,year):
                 sl_num += 1
                 workSheet.write(row_num,0 , sl_num,  center_alignment)
                 workSheet.write(row_num,1 , event.event_name,  center_alignment)
-                workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                if event.event_date:
+                    workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                else:
+                    workSheet.write(row_num,2 , event.start_date.strftime('%Y-%m-%d'),  center_alignment)
                 workSheet.write(row_num,3 , event.event_organiser.group_name,  center_alignment)
                 collaborations_text = ""
                 for collabs in collaborations:

@@ -9,6 +9,10 @@ from chapters_and_affinity_group.models import SC_AG_Members
 import os
 from insb_port import settings
 from PIL import Image
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 # System Model
@@ -18,6 +22,7 @@ class system(models.Model):
     portal_under_maintenance=models.BooleanField(null=False,blank=False,default=False)
     scheduling_under_maintenance = models.BooleanField(null=False,blank=False,default=False)
     restrict_sc_ag_updates = models.BooleanField(null=False,blank=False,default=False)
+    count_down = models.DateTimeField(null=True,blank=True)
     
     class Meta:
         verbose_name="System Handling"
@@ -96,11 +101,15 @@ class Branch_Data_Access(models.Model):
     ieee_id=models.OneToOneField(Members,null=False,blank=False,on_delete=models.CASCADE)
     create_event_access=models.BooleanField(null=False,blank=False,default=False)
     event_details_page_access=models.BooleanField(null=False,blank=False,default=False)
+    create_individual_task_access=models.BooleanField(null=False,blank=False,default=False)
+    create_team_task_access=models.BooleanField(null=False,blank=False,default=False)
     create_panels_access=models.BooleanField(null=False,blank=False,default=False)
     panel_memeber_add_remove_access=models.BooleanField(null=False,blank=False,default=False)
     team_details_page=models.BooleanField(null=False,blank=False,default=False)
     manage_award_access=models.BooleanField(null=False,blank=False,default=False)
     manage_web_access=models.BooleanField(null=False,blank=False,default=False)
+    manage_custom_notification_access=models.BooleanField(null=False,blank=False,default=False)
+    manage_email_access=models.BooleanField(null=False,blank=False,default=False)
 
     class Meta:
         verbose_name="Branch Data Access"
@@ -210,7 +219,8 @@ class Graphics_Data_Access(models.Model):
 class FCT_Data_Access(models.Model):
 
     ieee_id = models.ForeignKey(Members,null=False,blank=False,on_delete=models.CASCADE,verbose_name="IEEE ID")
-    manage_team_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Access")
+    manage_team_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Manage Team Permission")
+    create_budget_access = models.BooleanField(default=False,null=False,blank=False,verbose_name="Create Budget Access")
 
     class Meta:
 
@@ -298,3 +308,20 @@ class SystemErrors(models.Model):
         verbose_name="System Error"
     def __str__(self) -> str:
         return str(self.pk)
+    
+class General_Log(models.Model):
+
+    content_type = models.ForeignKey(ContentType,null=True,blank=True, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField(null=True,blank=True)
+    log_of=GenericForeignKey("content_type", "object_id")
+    log_details = models.JSONField()
+    update_number = models.IntegerField(null=True,blank=True,default = 0)
+    
+    class Meta:
+        verbose_name = "General Log"
+
+    def __str__(self) ->str:
+        return str(self.pk)
+    
+
+  

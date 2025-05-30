@@ -78,7 +78,6 @@
             background-color: #002855;
             padding: 4px 10px;
             margin-top: 18px;
-            margin-bottom: 25px;
             border: 1px solid white;
             border-radius: 1px;
             transition: all .4s ease-in-out;
@@ -133,7 +132,9 @@
         
     </style>
 </head>
-
+{% block preloader %}
+    {% include 'preloader.html' %}
+{% endblock preloader %}
 <body data-rsssl=1 class="home page-template-default page page-id-5368 _masterslider _msp_version_3.2.7">
     <div class="body-wrapper  float-menu">
 
@@ -159,7 +160,16 @@
                         <div class="toolcard_p text-center">
                             {{i.color_codes | safe}}
                         </div>
+                        {% if i.ai_files %}
                         <a href="{% url 'main_website:toolkit' %}" onclick="downloadImage('/media_files/{{i.picture}}', '{{i.title}}.png');">Download PNG</a>
+                        {% else %}
+                        <a style="margin-bottom: 25px;" href="{% url 'main_website:toolkit' %}" onclick="downloadImage('/media_files/{{i.picture}}', '{{i.title}}.png');">Download PNG</a>
+                        {% endif %}
+
+                        {% if i.ai_files %}
+                        <a style="margin-bottom: 25px;" href="{% url 'main_website:toolkit' %}" onclick="downloadFile('/media_files/{{i.ai_files}}', '{{i.title}}.ai');">Download AI File</a>
+                        {% endif %}
+
                     </div>
                 {% endfor %}
             </section>
@@ -175,6 +185,16 @@
         function downloadImage(imageUrl, fileName) {
             var a = document.createElement('a');
             a.href = imageUrl;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+    <script>
+        function downloadFile(fileUrl, fileName) {
+            var a = document.createElement('a');
+            a.href = fileUrl;
             a.download = fileName;
             document.body.appendChild(a);
             a.click();

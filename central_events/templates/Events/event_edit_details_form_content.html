@@ -1,6 +1,6 @@
 {% load static %}
 {% block event_details_form %}
-<script src="https://cdn.ckeditor.com/4.17.0/standard-all/ckeditor.js"></script>
+<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 
 <style>
     .publish-switch {
@@ -37,6 +37,32 @@
         transition: all 0.5s 
         ease-in-out;
     }
+    .icon_position{
+        position: relative;
+        bottom: 30px;
+        left: 95%;
+      }
+    
+    .update_cancel{
+        text-align: center;
+        position: sticky;
+        top: 88px;
+        background: white;
+        padding-top: 16px;
+        z-index: 1000;
+    }
+    .publish_google_calendar{
+        margin: 0;
+        text-align: center;
+        padding: .25rem;
+        cursor: pointer;
+        width: 320px;
+        color: #f0f0f0;
+        background: #2a9d8f;
+        border-radius: .25rem;
+        border: 1px solid #2a9d8f;
+        transition: all .3s ease-in-out;
+    }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     
@@ -52,18 +78,32 @@
         <form id="myForm" method = "POST">
         {% csrf_token %}
             <div class="box-body">
-                <div class="publish-switch">
-                    <label class="form-control-label slider-checkbox">Publish Event:</label>
-                    <span>                                            
-                        <label class="ui-switch m-t-xs m-r">
-                            <input name="publish_event" type="checkbox" {% if is_event_published %} checked {% endif %}>
-                                <i></i>
-                        </label>                
-                    </span>
+                <div class="update_cancel">
+                    
+                    {% if is_branch %}
+                    <input type="submit" name="update_event" class="btn btn-outline b-success text-success mb-2" value="Update Changes">
+                    <a href="{% url 'central_branch:event_control' %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
+                    {% else %}
+                        {% if has_access_for_sc_ag_updates %}
+                        <input type="submit" name="update_event" class="btn btn-outline b-success text-success mb-2" value="Update Changes">
+                        {% endif %}
+                    <a href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
+                    {% endif %}
                 </div>
-                <div class="form-group">
-                    <label>Event Name: <span style="color:red">*<span></label> 
-                    <input
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: .75rem 0">
+                    <div class="publish-switch">
+                        <label class="form-control-label slider-checkbox">Publish Event:</label>
+                        <span>                                            
+                            <label class="ui-switch m-t-xs m-r">
+                                <input name="publish_event" type="checkbox" {% if is_event_published %} checked {% endif %}>
+                                <i></i>
+                            </label>                
+                        </span>
+                    </div>
+                    </div>
+                        <div class="form-group">
+                            <label>Event Name: <span style="color:red">*<span></label> 
+                                <input
                         placeholder="Event Name"
                         class="form-control"
                         type="text"
@@ -123,14 +163,15 @@
                 {% endif %}
                 <br>
                 <div class="form-group">
-                    <label for="exampleInputPassword3">Add a (tentative) start date for the Event: </label>
-                    <input type="datetime-local" id="date_time" name="start_date_time" required value = "{{event_details.start_date|date:"Y-m-d\TH:i" }}">
+                    <label for="startDateTime">Add a (tentative) start date for the Event: </label>
+                    <input type="datetime-local" id="startDateTime" name="start_date_time" required value = "{{event_details.start_date|date:"Y-m-d\TH:i" }}">
                 </div>
                 <br>
                 <div class="form-group">
-                    <label for="exampleInputPassword3">Add a end date for the Event (if any): </label>
-                    <input type="datetime-local" id="date_time" name="end_date_time" value = "{{event_details.end_date|date:"Y-m-d\TH:i" }}">
+                    <label for="endDateTime">Add a end date for the Event (if any): </label>
+                    <input type="datetime-local" id="endDateTime" name="end_date_time" value = "{{event_details.end_date|date:"Y-m-d\TH:i" }}">
                 </div>
+                <div id="error-message" style="color: red; display: none;"></div><br>
                 <br>
                 <div class="form-group">
                     <label>Inter Branch Collaboration With: (Press CTRL to select multiple options) </label>
@@ -246,7 +287,7 @@
                         value="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}"
                         name="more_info_link"
                         />
-                        
+                        <a href="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}" class="icon_position"><i class="fa fa-external-link" aria-hidden="true"></i></i></a>
                     </span>
                 </div>
                 <div class="form-group">
@@ -261,24 +302,11 @@
                         value="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}"
                         name="drive_link_of_event"
                         />
-                        
+                        <a href="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}" class="icon_position"><i class="fa fa-external-link" aria-hidden="true"></i></i></a>
                     </span>
                 </div>
                 
                 <br>
-                <div style="text-align: center;">
-                    
-                    {% if is_branch %}
-                    <input type="submit" name="update_event" class="btn btn-outline b-success text-success mb-2" value="Update Changes">
-                    <a href="{% url 'central_branch:event_control' %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
-                    {% else %}
-                        {% if has_access_for_sc_ag_updates %}
-                        <input type="submit" name="update_event" class="btn btn-outline b-success text-success mb-2" value="Update Changes">
-                        {% endif %}
-                    <a href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
-                    {% endif %}
-                </div>
-                <br> 
 
             </div>
         </form>
@@ -362,6 +390,28 @@
             checkbox.change();
         });
     </script>
-    
+    <script>
+        const form = document.getElementById('myForm');
+        const startDateTimeInput = document.getElementById('startDateTime');
+        const endDateTimeInput = document.getElementById('endDateTime');
+        const errorMessage = document.getElementById('error-message');
+
+        form.addEventListener('submit', function(event) {
+            const startDateTime = new Date(startDateTimeInput.value);
+            const endDateTime = new Date(endDateTimeInput.value);
+
+            // Reset error message
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            if (startDateTime > endDateTime) {
+                // Prevent form submission
+                event.preventDefault();
+                // Show error message
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Start date/time cannot be after the end date/time.';
+            }
+        });
+    </script>
     
 {% endblock event_details_form %}

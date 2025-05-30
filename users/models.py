@@ -23,6 +23,8 @@ class Members(models.Model):
     email_ieee=models.EmailField(null=True,blank=True)
     email_personal=models.EmailField(null=True,blank=True)
     email_nsu=models.EmailField(null=True,blank=True)
+    school=models.CharField(null=True,blank=True,max_length=50,default="SEPS")
+    department = models.CharField(null=True,blank=True,max_length=50,default="ECE")
     major=models.CharField(null=True,blank=True,max_length=50)
     contact_no=models.CharField(null=True,blank=True,max_length=16)
     home_address=models.CharField(null=True,blank=True,max_length=200)
@@ -37,6 +39,8 @@ class Members(models.Model):
     last_renewal_session=models.ForeignKey(Renewal_Sessions,null=True,blank=True,on_delete=models.CASCADE) #last renewal session    
     is_active_member = models.BooleanField(null=False,blank=False,default=True)
     is_blocked = models.BooleanField(null=False,blank=False,default=False)
+    completed_task_points = models.FloatField(null=False,blank=False,default=0)
+    blood_group = models.CharField(max_length=10,null=True,blank=True,default="None")
 
     def save(self, *args, **kwargs):
 
@@ -101,9 +105,18 @@ class Members(models.Model):
     
     def get_image_url(self):
         return self.user_profile_picture
-    
-    
 
+
+class MemberSkillSets(models.Model):
+    
+    '''This stores all the skill sets for Members'''
+    member=models.ForeignKey(Members,null=True,blank=True,on_delete=models.CASCADE)
+    skills=models.ManyToManyField(SkillSetTypes,blank=True)
+    
+    class Meta:
+        verbose_name="Member Skill Sets"
+    def __str__(self) -> str:
+        return str(self.pk)
 
 '''This table will be used to get the data of the EX Panel Members of IEEE NSU SB '''
 
@@ -112,7 +125,7 @@ class Alumni_Members(models.Model):
     picture=ResizedImageField(null=True,blank=True,default='user_profile_pictures/default_profile_picture.png',upload_to='panel_profile_pictures/')
     linkedin_link=models.URLField(null=True,blank=True,max_length=100)
     facebook_link=models.URLField(null=True,blank=True,max_length=100)
-    email=models.URLField(null=True,blank=True,max_length=50)
+    email=models.EmailField(null=True,blank=True)
     contact_no=models.CharField(null=True,blank=True,max_length=50)
     ieee_collaboratec=models.URLField(null=True,blank=True,max_length=100)
     

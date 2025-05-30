@@ -109,7 +109,21 @@
         width: 100%; /* Make the button full width on smaller screens */
       }
     }
-    
+      .app-header{
+      position: sticky;
+      margin: 0 0 0 2px;
+  }
+  .app-header ~ .app-body {
+    padding-top: 0rem;
+}
+.form-check{
+  font-size: larger;
+  position: relative;
+  left: 20px;
+}
+.form-check label{
+  padding: 0;
+}
   </style>
 </head>
 <body>
@@ -154,7 +168,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="{% url 'membership_development_team:members_list' %}">
                       <i class="fa fa-user text-muted"></i>
-                      <span>INSB Members</span>
+                      <span>IEEE NSU SB Members</span>
                     </a>
                     <div ui-include="'../views/blocks/dropdown.new.html'"></div>
                 </li>
@@ -200,13 +214,10 @@
                   <i class="material-icons">more_horiz</i>
                 </a>
               </li>
-              <li class="nav-item dropdown pos-stc-xs">
-                <a class="nav-link mr-2" href data-toggle="dropdown">
-                  <i class="material-icons">&#xe7f5;</i>
-                  <span class="label label-sm up warn">3</span>
-                </a>
-                <div ui-include="'../views/blocks/dropdown.notification.html'"></div>
-              </li>
+              <!--notification bell-->
+              {% block bell_notification %}
+                  {% include 'users/bell_notification.html' %}
+              {% endblock bell_notification %}
               <li class="nav-item dropdown">
                 <a class="nav-link p-0 clear" href="{% url 'users:profile' %}">
                   <span class="avatar w-32">
@@ -255,7 +266,7 @@
     </div>
     {% else %}
     <div class="text-center">
-        <p style="color:#BA0C2F;">Member is not yet Updated in IEEE NSU SB Database. To Update Member to the INSB Database, Please complete the IEEE Payment and Enter IEEE ID and then Update!<p>
+        <p style="color:#BA0C2F;">Member is not yet Updated in IEEE NSU SB Database. To Update Member to the IEEE NSU SB Database, Please complete the IEEE Payment and Enter IEEE ID and then Update!<p>
     </div>
     {% endif %}
 
@@ -280,10 +291,7 @@
                                     <div class="form-group">
                                         <div class="row m-b">
                                             <div class="col-sm-6">
-                                                <label>NSU ID</label>
-                                                <input
-                                                    class="form-control"
-                                                    type="number" placeholder="NSU ID" required name="nsu_id" value="{{data.nsu_id}}"/>
+                                                <h5 class="box-header col-md-12">NSU ID: {{data.nsu_id}}</h5>
                                             </div>
                                             <div class="col-sm-6">
                                                 <label>IEEE ID</label>
@@ -351,13 +359,13 @@
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Email (NSU)</label>
-                        <input class="form-control" type="text" placeholder="Enter NSU E-Mail" name="email_nsu" value="{{ data.email_nsu }}"/>
+                        <input class="form-control" type="email" placeholder="Enter NSU E-Mail" name="email_nsu" value="{{ data.email_nsu }}"/>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Email (Personal)</label>
-                        <input class="form-control" type="text" placeholder="Personal E-Mail" name="email_personal" value="{{ data.email_personal }}"/>
+                        <input class="form-control" type="email" placeholder="Personal E-Mail" name="email_personal" value="{{ data.email_personal }}"/>
                       </div>
                     </div>
                   </div>
@@ -380,14 +388,82 @@
                     <label for="exampleInputPassword1">Address</label>
                     <input class="form-control" type="text" placeholder="Enter Address" name="home_address" value="{{address}}"/>
                   </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Gender</label>
-                    <input class="form-control" type="text" placeholder="Gender" name="gender" value="{{data.gender}}"/>
+                  <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Gender<span style="color:red;"> *</span></label>
+                    <div class="col-sm-10">
+                      <label class="radio-inline">
+                        <input
+                            type="radio"
+                            name="gender"
+                            id="male"
+                            value="Male"
+                            {% if data.gender == 'Male' %}checked{% endif %}
+                        > Male
+                      </label>
+                      <label class="radio-inline">
+                        <input 
+                            type="radio"
+                            name="gender"
+                            id="female"
+                            value="Female"
+                            {% if data.gender == 'Female' %}checked{% endif %}> Female
+                      </label>
+                      <label class="radio-inline">
+                        <input
+                            type="radio"
+                            name="gender"
+                            id="other"
+                            value="Other"
+                            {% if data.gender == 'Other' %}checked{% endif %}> Other
+                      </label>
+                    </div>
+                </div>
+                  <div class="form-group w-50">
+                    <label for="blood_group">Blood Group</label>
+                    <select class="form-control" name="blood_group" value="{{ data.blood_group }}">
+                        <option value="None" disabled {% if data.blood_group == "None" %}selected{% endif %}>-------------------</option>
+                        <option value="A+" {% if data.blood_group == "A+" %}selected{% endif %}>A+</option>
+                        <option value="A-" {% if data.blood_group == "A-" %}selected{% endif %}>A-</option>
+                        <option value="B+" {% if data.blood_group == "B+" %}selected{% endif %}>B+</option>
+                        <option value="B-" {% if data.blood_group == "B-" %}selected{% endif %}>B-</option>
+                        <option value="O+" {% if data.blood_group == "O+" %}selected{% endif %}>O+</option>
+                        <option value="O-" {% if data.blood_group == "O-" %}selected{% endif %}>O-</option>
+                        <option value="AB+" {% if data.blood_group == "AB+" %}selected{% endif %}>AB+</option>
+                        <option value="AB-" {% if data.blood_group == "AB-" %}selected{% endif %}>AB-</option>
+                    </select>
                   </div>
+                  <div class="form-group">
+                    <label>Skillsets:</label>
+                    {% for skill in all_skills %}
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="skill_sets" value="{{ skill.id }}" {% if skill in data.skills.all %}checked{% endif %}>
+                            <label class="form-check-label">{{ skill.skill_type }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                
                   <div class="box-header" style="text-align:center;">
                     <h1>Academic Details</h1>
                   </div>
                   <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>School</label>
+                        <input
+                            class="form-control"
+                            type="text" placeholder="Enter School" required name="school" value="{{ data.school }}"
+                        />
+                    </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Department</label>
+                        <input
+                            class="form-control"
+                            type="text" placeholder="Enter Department" required name="department" value="{{ data.department }}"
+                        />
+                    </div>
+                    </div>
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Major</label>
@@ -508,7 +584,7 @@
                     <div class="modal-dialog" id="animate">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title">Registering Member to INSB Database!</h5>
+                          <h5 class="modal-title">Registering Member to IEEE NSU SB Database!</h5>
                         </div>
                         <div class="modal-body text-left p-lg">
                           <p>Are you sure that you want to register {{data.first_name}} {{data.last_name}} in the IEEE NSU SB Members Database?</p>

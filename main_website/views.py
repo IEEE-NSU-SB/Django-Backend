@@ -27,6 +27,8 @@ from central_branch.renderData import Branch
 from central_branch import views as cv
 from central_events.models import InterBranchCollaborations,IntraBranchCollaborations
 from django.views import View
+from pytz import timezone as tz
+from system_administration.models import system
 
 
 logger=logging.getLogger(__name__)
@@ -47,13 +49,27 @@ def homepage(request):
         # get featured events of branch
         get_featured_events=HomepageItems.load_featured_events(sc_ag_primary=1)
         # get volunteer of the months
-        get_volunteers_of_the_month=VolunteerOfTheMonth.objects.all().order_by('-pk')
+        # get_volunteers_of_the_month=VolunteerOfTheMonth.objects.all().order_by('-pk')
 
         # get current panel of Branch
         current_panel_pk=PortData.get_current_panel()
         # get awards for the current panel
         awards_of_current_panel=HandleVolunteerAwards.load_awards_for_panels(request=request,panel_pk=current_panel_pk)
-        
+
+        #only for countdown
+        countdown = system.objects.first()
+        if countdown.count_down is not None:
+            local_timezone = tz('Asia/Dhaka')
+            start_time = countdown.count_down.astimezone(local_timezone)
+            start_time = start_time.replace(tzinfo=None)
+        else:
+            start_time = None
+
+        button_enabled = False
+        if request.user.is_superuser or request.user.is_staff:
+            button_enabled = True
+
+    
         context={
             'banner_item':bannerItems,
             'banner_pic_with_stat':bannerWithStat,
@@ -66,8 +82,10 @@ def homepage(request):
             'recent_blogs':get_recent_blogs,
             'branch_teams':PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1), #loading all the teams of Branch
             'all_thoughts':all_thoughts,
-            'all_vom':get_volunteers_of_the_month,
+            # 'all_vom':get_volunteers_of_the_month,
             'awards':awards_of_current_panel,
+            'start_time':start_time,#only for countdown
+            'button_enabled':button_enabled,
         }
         return render(request,"LandingPage/homepage.html",context)
     except Exception as e:
@@ -85,13 +103,35 @@ class LoadAwards(View):
             # get the highest ranked award
             highest_ranked_award_in_the_panel=VolunteerAwards.objects.filter(panel=Panels.objects.get(pk=current_panel_pk)).first()
             if(highest_ranked_award_in_the_panel is None):
-                
+                topFivePerformers = HomepageItems.get_top_5_performers()
+
+                data = []
+                for performer in topFivePerformers:
+                    data.append({
+                        "picture":str(performer.user_profile_picture),
+                        "name":performer.name,
+                        "team":str(performer.team),
+                        "position":str(performer.position),
+                        "points":str(performer.completed_task_points)
+                    })
+
+                json_data = {
+                    'award_name':'Top Five Performers',
+                    'winners':data
+                }
+
                 return JsonResponse(
-                    {
-                    'message':message,
-                    }
-                    ,status=200,safe=False
+                    data=json_data,
+                    status=200,
+                    safe=False
                 )
+                
+                # return JsonResponse(
+                #     {
+                #     'message':message,
+                #     }
+                #     ,status=200,safe=False
+                # )
             else:
                 award_winners=HandleVolunteerAwards.load_award_winners(award_pk=highest_ranked_award_in_the_panel.pk,request=request)
                 if(award_winners==False):
@@ -149,6 +189,55 @@ class LoadAwards(View):
                     safe=False
                 )
             
+class LoadTopPerformers(View):
+    def get(self, request):
+        performer_type = request.GET.get('performer_type')
+
+        if performer_type == 'members':
+            topFivePerformers = HomepageItems.get_top_5_performers()
+
+            data = []
+            for performer in topFivePerformers:
+                data.append({
+                    "picture":str(performer.user_profile_picture),
+                    "name":performer.name,
+                    "team":str(performer.team),
+                    "position":str(performer.position),
+                    "points":str(performer.completed_task_points)
+                })
+
+            json_data = {
+                'name':'Top Five Performers',
+                'topFivePerformers':data
+            }
+
+            return JsonResponse(
+                data=json_data,
+                status=200,
+                safe=False
+            )
+        elif performer_type == 'teams':
+            topThreeTeams = HomepageItems.get_top_5_teams()
+
+            data = []
+            for team in topThreeTeams:
+                data.append({
+                    "picture":str(team.team_picture),
+                    "name":team.team_name,
+                    "points":str(team.completed_task_points)
+                })
+
+            json_data = {
+                'name':'Top Five Teams',
+                'topThreeTeams':data
+            }
+
+            return JsonResponse(
+                data=json_data,
+                status=200,
+                safe=False
+            )
+            
 
 ##################### EVENT WORKS ####################
 
@@ -189,7 +278,14 @@ def event_homepage(request):
         get_years=get_yearly_events[0]
         # prepare event counts according to years
         get_yearly_event_count=get_yearly_events[1]
-        
+
+        if upcoming_event:
+            local_timezone = tz('Asia/Dhaka')
+            modified_start_time = upcoming_event.start_date.astimezone(local_timezone)
+            modified_start_time = modified_start_time.replace(tzinfo=None)
+        else:
+            modified_start_time = None
+
         context = {
             'page_title':"Events",
             'page_subtitle':"IEEE NSU Student Branch",
@@ -205,7 +301,8 @@ def event_homepage(request):
             'yearly_event_count':get_yearly_event_count,
             'all_mega_events':all_mega_events,
             'has_mega_events':has_mega_events,
-            'all_categories':all_categories
+            'all_categories':all_categories,
+            'modified_start_time':modified_start_time,
         }
 
         return render(request,'Events/events_homepage.html',context)
@@ -656,6 +753,13 @@ def events_for_sc_ag(request,primary):
         # prepare event counts according to years
         get_yearly_event_count=get_yearly_events[1]
 
+        if upcoming_event:
+            local_timezone = tz('Asia/Dhaka')
+            modified_start_time = upcoming_event.start_date.astimezone(local_timezone)
+            modified_start_time = modified_start_time.replace(tzinfo=None)
+        else:
+            modified_start_time = None
+
         context = {
             'is_sc_ag':True,
             'society':society,
@@ -674,7 +778,8 @@ def events_for_sc_ag(request,primary):
             'yearly_event_count':get_yearly_event_count,
             'has_mega_events':has_mega_events,
             'organised_events':organised_events,
-            'all_categories':all_categories
+            'all_categories':all_categories,
+            'modified_start_time':modified_start_time,
         }
 
 
@@ -1040,6 +1145,10 @@ def panel_members_page(request,year):
 
         get_all_panels=Branch.load_all_panels()
         get_panel=Branch.get_panel_by_year(year)
+        
+        if not get_panel:
+            return redirect('main_website:panel_members')
+        
         get_panel_members=Branch.load_panel_members_by_panel_id(panel_id=get_panel.pk)
         # TODO:add algo to add SC AG Faculty and EB
         branch_counselor=[]
@@ -1103,7 +1212,7 @@ def panel_members_page(request,year):
     
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc() + "<br>year = " + year)
         return cv.custom_500(request)
 
 def officers_page(request):
@@ -1565,7 +1674,7 @@ def join_insb(request):
         #loading all the teams of Branch
         branch_teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1)
         context={
-                'page_title':"Join INSB",
+                'page_title':"Join IEEE NSU SB",
                 'branch_teams':branch_teams,
             }
     
@@ -1690,7 +1799,7 @@ def sc_ag_panel_members(request,sc_ag_primary,panel_pk,panel_year):
     sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
     
     # get all the panels of sc ag
-    get_all_panels=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-year')
+    get_all_panels=Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),display=True).order_by('-year')
 
 
     # get the panel
@@ -1760,3 +1869,17 @@ def sc_ag_panel_members(request,sc_ag_primary,panel_pk,panel_year):
     
     
     return render(request,"Members/Panel/SC_AG/sc_ag_panel_members.html",context=context)
+def update_count_down(request):
+        if request.method == 'POST':
+        # Handle the POST request data
+            key = request.POST.get('key')
+            
+            if key == "launch":
+                change = system.objects.first()
+                change.count_down = None
+                change.save()
+
+            return JsonResponse({'status': 'success'})
+        
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')

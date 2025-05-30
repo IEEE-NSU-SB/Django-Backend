@@ -1,4 +1,6 @@
 from django.contrib import messages
+
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from .models import SC_AG_Members,SC_AG_FeedBack
 from users.models import Members,Panel_Members
 from port.models import Panels,Chapters_Society_and_Affinity_Groups,Teams,Roles_and_Position
@@ -27,18 +29,50 @@ class Sc_Ag:
         count=0
         try:
             for ieee_id in ieee_id_list:
+                updated_team = None
+                updated_position = None
+
+                if team_pk is not None:
+                    updated_team=Teams.objects.get(pk=team_pk)
+                if position_id is not None:
+                    updated_position=Roles_and_Position.objects.get(id=position_id)
+
                 if(SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=ieee_id)).exists()):
-                    messages.info(request,f"Member with IEEE ID: {ieee_id} already exists in Database")
+                    
+                    if updated_team is not None or updated_position is not None:
+                        sc_ag_member = SC_AG_Members.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=ieee_id))
+                        sc_ag_panel_member = Panel_Members.objects.filter(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=sc_ag_member.member, team=sc_ag_member.team, position=sc_ag_member.position)
+                        sc_ag_member.team = updated_team
+                        if updated_position:
+                            sc_ag_member.position = updated_position
+                        sc_ag_member.save()
+
+                        if(len(sc_ag_panel_member)>0):
+                            sc_ag_panel_member[0].team = sc_ag_member.team
+                            if updated_position:
+                                sc_ag_panel_member[0].position = sc_ag_member.position
+                            sc_ag_panel_member[0].save()
+                            
+                        elif updated_position:
+                            Panel_Members.objects.create(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=sc_ag_member.member, team=sc_ag_member.team, position=sc_ag_member.position)
+                    
+                        messages.info(request,f"Member with IEEE ID: {ieee_id} already exists in Database")
+                        messages.info(request,f"Team and Position data updated")
+
                 else:
                     new_sc_ag_member=SC_AG_Members.objects.create(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
                                                                 ,member=Members.objects.get(ieee_id=ieee_id))
-                    if team_pk is not None:
-                        new_sc_ag_member.team=Teams.objects.get(pk=team_pk)
-                    if position_id is not None:
-                        new_sc_ag_member.position=Roles_and_Position.objects.get(id=position_id)
+                    
+                    new_sc_ag_member.team=updated_team
+                    if updated_position:
+                        new_sc_ag_member.position=updated_position
+
+                        Panel_Members.objects.create(tenure=SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary)[0], member=new_sc_ag_member.member, team=new_sc_ag_member.team, position=new_sc_ag_member.position)                        
                     new_sc_ag_member.save()
+
                     count+=1
-            messages.success(request,f"{count} new members were added to the Member List of {get_sc_ag.group_name} ")
+
+            messages.success(request,f"{count} new members were added to the Member List of {get_sc_ag.group_name} and also to panels if selected")
             return True
         except Exception as e:
             Sc_Ag.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
@@ -79,7 +113,7 @@ class Sc_Ag:
             get_panel_members=Panel_Members.objects.filter(tenure=Panels.objects.get(pk=panel_id))
             for member in get_panel_members:
                 if member.member:
-                    SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(position=None,team=None)
+                    SC_AG_Members.objects.filter(sc_ag=Panels.objects.get(pk=panel_id).panel_of,member=Members.objects.get(ieee_id=member.member.ieee_id)).update(position=None,team=None)
 
             return True
         except Exception as e:
@@ -136,9 +170,9 @@ class Sc_Ag:
                     if member.member:
                         if member.team is None:
                             # update team as none
-                            SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=None,position=Roles_and_Position.objects.get(id=member.position.id))                
+                            SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=None,position=Roles_and_Position.objects.get(id=member.position.id))                
                         else:
-                            SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=Teams.objects.get(primary=member.team.primary),position=Roles_and_Position.objects.get(id=member.position.id))
+                            SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=Teams.objects.get(primary=member.team.primary),position=Roles_and_Position.objects.get(id=member.position.id))
                 #now update the panel
                 panel_to_update.current=True
                 panel_to_update.year=panel_tenure
@@ -594,12 +628,103 @@ class Sc_Ag:
             return False
 
 
+    def create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+        
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                if cost:
+                    total_cost += float(cost)
 
+            total_revenue = 0
+            for revenue in rev_total:
+                if revenue:
+                    total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            if event_id:
+                event = Events.objects.get(id=event_id)
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
+                                        sheet_of=event.event_organiser,
+                                        event=event,
+                                        costBreakdownData=cost_data,
+                                        revenueBreakdownData=revenue_data,
+                                        total_cost=total_cost,
+                                        total_revenue=total_revenue)           
+            else:
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget Of XYZ',
+                                                        sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=primary),
+                                                        costBreakdownData=cost_data,
+                                                        revenueBreakdownData=revenue_data,
+                                                        total_cost=total_cost,
+                                                        total_revenue=total_revenue)
+
+            try:   
+                username = request.user.username
+                member = Members.objects.get(ieee_id=username)
+                panel_member = Panel_Members.objects.filter(tenure__current=True, tenure__panel_of__primary=primary, member=member)
+                if panel_member.exists():
+                    if not panel_member[0].position.is_eb_member:
+                        BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+            except:
+                pass
+                
+            return budget_sheet
+        
+        except:
+            return False
+        
+    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                if cost:
+                    total_cost += float(cost)
+
+            total_revenue = 0
+            for revenue in rev_total:
+                if revenue:
+                    total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+            budget_sheet.costBreakdownData = cost_data
+            budget_sheet.revenueBreakdownData = revenue_data
+            budget_sheet.total_cost = total_cost
+            budget_sheet.total_revenue = total_revenue
+
+            if saved_rate:
+                budget_sheet.usd_rate = saved_rate
+            else:
+                budget_sheet.usd_rate = None
+
+            if show_usd_rates == 'on':
+                budget_sheet.show_usd_rates = True
+            else:
+                budget_sheet.show_usd_rates = False
+
+            budget_sheet.save()
+            return True
+        
+        except:
+            return False
         
         
-    
-    
-
 
     
     

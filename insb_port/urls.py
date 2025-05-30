@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('system/',include('system_administration.urls',namespace="system")),
     path('portal/users/',include('users.urls',namespace="users")),
+    path('portal/notifications/',include('notification.urls',namespace="notification")),
     path('portal/recruitment/',include('recruitment.urls',namespace="recruitment")),
     path('portal/central_branch/',include('central_branch.urls',namespace='central_branch')),
     path('portal/membership_development_team/',include('membership_development_team.urls',namespace='membership_development_team')),

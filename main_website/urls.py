@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import LoadAwards
+from .views import LoadAwards, LoadTopPerformers
 from . import views
 
 app_name = "main_website"
@@ -8,6 +8,7 @@ urlpatterns = [
     path('',views.homepage,name="homepage"),
     # get award winners
     path('award_winners/',LoadAwards.as_view(),name="load_awards"),
+    path('top_performers/',LoadTopPerformers.as_view(),name="load_top_performers"),
     #ACTIVITY URLS
     # Event
     path('events/',views.event_homepage,name="event_homepage"),
@@ -67,4 +68,10 @@ urlpatterns = [
     
     # path('hello',views.test_view,name="404"),
     path('mega_event/<int:mega_event_id>',views.mega_event_description_page,name="mega_event_description_page"),
+
+
+    #for countdown
+    path('count_down/',views.update_count_down,name="count_down"),
+
+    path('dev/privacy_policy/',views.privacy_policy,name='privacy_policy')
 ]

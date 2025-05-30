@@ -2,6 +2,7 @@ from django.urls import path,include
 from django.contrib.auth.views import LogoutView
 from . import views
 from django.conf import settings
+from central_branch.views import upload_task, task_edit
 
 
 app_name='users'
@@ -12,7 +13,7 @@ urlpatterns = [
     #include default auth urls
     #path('', include('django.contrib.auth.urls')),
     #loginpage
-    path('login',views.login, name='login'),
+    path('login/',views.login, name='login'),
     # signup user validation
     path('signup/validation/',views.signup_user_validation,name="signup_validation"),
     #signup page
@@ -33,6 +34,9 @@ urlpatterns = [
     path('reset_password/<str:username>/<str:token>/',views.forgotPassword_resetPassword,name="reset_password"),
     #Invalid URL Handling
     path('invalid_url',views.invalidURL,name="invalid_url"), #this page will prompt if an user has used an "used" or invalid url
-
+    #my task url
+    path('my_tasks/',views.my_tasks,name="my_tasks"),
+    path('my_tasks/<int:task_id>/',task_edit,name="edit_task_user"),
+    path('my_tasks/<int:task_id>/upload_tasks/',upload_task,name="upload_task_user"),
  
 ]
