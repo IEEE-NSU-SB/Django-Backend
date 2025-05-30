@@ -291,7 +291,7 @@ class NotificationHandler:
                     send_mail(subject=subject, message='', from_email=email_from, recipient_list=recipient_list, html_message=message)
                 else:
                     while len(recipient_list)!=0:
-                        send_mail(subject=subject, message=message, from_email=email_from, recipient_list=recipient_list[:40], html_message=message)
+                        send_mail(subject=subject, message='', from_email=email_from, recipient_list=recipient_list[:40], html_message=message)
                         recipient_list = recipient_list[40:]
 
             return True
