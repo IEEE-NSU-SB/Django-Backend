@@ -247,7 +247,7 @@ class NotificationHandler:
         
         notification.save()
 
-        NotificationHandler.email_custom_notification(notification.title, notification.general_message, selected_member_ids)
+        NotificationHandler.email_custom_notification(notification.title, notification.general_message, notification.inside_link, selected_member_ids)
         
         for member_id in selected_member_ids:
             member = Members.objects.get(ieee_id = member_id)
@@ -274,11 +274,11 @@ class NotificationHandler:
         
         return notification_dict
     
-    def email_custom_notification(title, body, recipient_ids):
+    def email_custom_notification(title, body, general_link, recipient_ids):
         
         try:
             subject=f"Notification : {title}"
-            message=body
+            message=f'Hello,\nYou got a notification from IEEE NSU SB Portal\nlink: {general_link}\n{body}'
             email_from=settings.EMAIL_HOST_USER
             recipient_list=[]
 
