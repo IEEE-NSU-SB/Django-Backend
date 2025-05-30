@@ -277,7 +277,7 @@ class NotificationHandler:
     def email_custom_notification(title, body, recipient_ids):
         
         try:
-            subject=f"Notification: {title}"
+            subject=f"Notification : {title}"
             message=body
             email_from=settings.EMAIL_HOST_USER
             recipient_list=[]
