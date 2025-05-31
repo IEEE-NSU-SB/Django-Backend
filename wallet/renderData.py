@@ -257,7 +257,6 @@ class WalletManager:
 
         # End of the current month = one second before the next month starts
         end = next_month - timedelta(seconds=1)
-        print(end)
 
         # Fetch daily entries for the current month
         entries = WalletEntry.objects.filter(
