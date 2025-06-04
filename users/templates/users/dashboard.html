@@ -82,7 +82,7 @@
 			position: relative;
 			width: 100%;
 			height: 400px;
-			margin: 20px 0;
+			
 			min-height: 300px;
 		}
 				
@@ -2826,81 +2826,62 @@ async function initializeCircleChart2(){
   
 </script>
 <script>
-		const chartData = {
-			events: {
-				title: "Events over 5 Years",
-				labels: ['2021', '2022', '2023', '2024', '2025'],
-				data: [45, 67, 89, 123, 156],
-				backgroundColor: '#3980c0',
-				borderColor: '#2968a3'
-			},
-			visitors2025: {
-				title: "Website Visitors (2025)",
-				labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-				data: [1200, 1450, 1680, 1920, 2100, 2350, 2200, 2450, 2680, 2850, 2950, 3100],
-				backgroundColor: '#3980c0',
-				borderColor: '#2968a3'
-			},
-			visitors5years: {
-				title: "Website Visitors (5 Years)",
-				labels: ['2021', '2022', '2023', '2024', '2025'],
-				data: [8500, 12300, 15600, 19200, 24500],
-				backgroundColor: '#33a186',
-				borderColor: '#2a8a6e'
-			},
-			combined: {
-				title: "Combined Analytics Overview",
-				labels: ['2021', '2022', '2023', '2024', '2025'],
-				datasets: [
-					{
-						label: 'Events',
-						data: [45, 67, 89, 123, 156],
-						backgroundColor: '#3980c0',
-						borderColor: '#2968a3',
-						borderWidth: 2
-					},
-					{
-						label: 'Website Visitors (Thousands)',
-						data: [8.5, 12.3, 15.6, 19.2, 24.5],
-						backgroundColor: '#33a186',
-						borderColor: '#2a8a6e',
-						borderWidth: 2
-					}
-				]
-			}
-		};
+// Sample data - replace with your actual data
+const chartData = {
+    events: {
+        title: "Events over 5 Years",
+        labels: ['2021', '2022', '2023', '2024', '2025'],
+        data: [45, 67, 89, 123, 156],
+        backgroundColor: '#3980c0',
+        borderColor: '#2968a3'
+    },
+    visitors2025: {
+        title: "Website Visitors (2025)",
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        data: [1200, 1450, 1680, 1920, 2100, 2350, 2200, 2450, 2680, 2850, 2950, 3100],
+        backgroundColor: '#3980c0',
+        borderColor: '#2968a3'
+    },
+    visitors5years: {
+        title: "Website Visitors (5 Years)",
+        labels: ['2021', '2022', '2023', '2024', '2025'],
+        data: [8500, 12300, 15600, 19200, 24500],
+        backgroundColor: '#33a186',
+        borderColor: '#2a8a6e'
+    }
+    // Removed the 'combined' dataset
+};
 
-		let currentChart = null;
+let currentChart = null;
 
-		function showLoading() {
-			document.getElementById('loading').style.display = 'block';
-			document.getElementById('mainChart').style.opacity = '0.3';
-		}
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('mainChart').style.opacity = '0.3';
+}
 
-		function hideLoading() {
-			document.getElementById('loading').style.display = 'none';
-			document.getElementById('mainChart').style.opacity = '1';
-		}
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('mainChart').style.opacity = '1';
+}
 
-		function createChart(type) {
+function createChart(type) {
     showLoading();
     
     setTimeout(() => {
         const ctx = document.getElementById('mainChart').getContext('2d');
         const data = chartData[type];
         
+        // Destroy existing chart
         if (currentChart) {
             currentChart.destroy();
         }
         
+        // Update title
         document.getElementById('chartTitle').textContent = data.title;
         
         const chartConfig = {
             type: 'bar',
-            data: type === 'combined' ? {
-                labels: data.labels,
-                datasets: data.datasets
-            } : {
+            data: {
                 labels: data.labels,
                 datasets: [{
                     label: data.title,
@@ -2908,41 +2889,54 @@ async function initializeCircleChart2(){
                     backgroundColor: data.backgroundColor,
                     borderColor: data.borderColor,
                     borderWidth: 2,
-                    borderRadius: 4
+                    borderRadius: 4,
+                    borderSkipped: false,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        bottom: 20 // Extra space for labels
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
                     }
                 },
                 scales: {
-                    x: {
-                        ticks: {
-                            autoSkip: false,
-                            color: '#333',
-                            font: {
-                                size: window.innerWidth < 576 ? 10 : 12
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
                     y: {
                         beginAtZero: true,
                         grid: {
                             color: 'rgba(0,0,0,0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: window.innerWidth < 576 ? 10 : 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: window.innerWidth < 576 ? 10 : 12
+                            },
+                            maxRotation: window.innerWidth < 576 ? 45 : 0
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: type === 'combined'
-                    }
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
                 }
             }
         };
@@ -2952,29 +2946,29 @@ async function initializeCircleChart2(){
     }, 300);
 }
 
-		// Initialize dropdown_dash change handler
-		document.getElementById('chartSelector').addEventListener('change', function() {
-			const selectedValue = this.value;
-			createChart(selectedValue);
-		});
+// Initialize dropdown change handler
+document.getElementById('chartSelector').addEventListener('change', function() {
+    const selectedValue = this.value;
+    createChart(selectedValue);
+});
 
-		// Handle window resize for responsive charts
-		window.addEventListener('resize', function() {
-			if (currentChart) {
-				const selectedValue = document.getElementById('chartSelector').value;
-				// Debounce resize events
-				clearTimeout(window.resizeTimeout);
-				window.resizeTimeout = setTimeout(() => {
-					createChart(selectedValue);
-				}, 150);
-			}
-		});
+// Handle window resize for responsive charts
+window.addEventListener('resize', function() {
+    if (currentChart) {
+        const selectedValue = document.getElementById('chartSelector').value;
+        // Debounce resize events
+        clearTimeout(window.resizeTimeout);
+        window.resizeTimeout = setTimeout(() => {
+            createChart(selectedValue);
+        }, 150);
+    }
+});
 
-		// Initialize with first chart
-		document.addEventListener('DOMContentLoaded', function() {
-			createChart('events');
-		})
-
-    </script>
+// Initialize with first chart
+document.addEventListener('DOMContentLoaded', function() {
+    createChart('events');
+});
+</script>
+    
 </body>
 </html>
