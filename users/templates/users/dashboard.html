@@ -53,15 +53,15 @@
         }
         
         .dropdown_dash {
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-            width: 100%;
-            max-width: 400px;
-            transition: border-color 0.3s ease;
+            padding: 6px 16px;
+			border: 2px solid #e9ecef;
+			border-radius: 6px;
+			font-size: 10px;
+			background: white;
+			cursor: pointer;
+			/* width: 100%; */
+			max-width: 400px;
+			transition: border-color 0.3s ease;
         }
         
         .dropdown_dash:focus {
@@ -71,7 +71,7 @@
         
         .chart-title {
             text-align: center;
-            color: #495057;
+            color: #000;
             margin-bottom: 20px;
             font-size: clamp(1.2rem, 4vw, 1.8rem);
             font-weight: 600;
@@ -136,11 +136,7 @@
         /* Mobile First Responsive Breakpoints */
         
         /* Extra Small devices (phones, 576px and down) */
-        @media (max-width: 576px) {
-            body {
-                padding: 10px;
-            }
-            
+        @media (max-width: 576px) {            
             .card_dash {
                 padding: 15px;
                 border-radius: 8px;
@@ -444,7 +440,7 @@
 
 	.body_top_per {
 		overflow-y: scroll;
-		height: 408px;
+		height: 418px;
 		width: 100%;
 	}
 	.headline_top_performers_together{
@@ -612,7 +608,6 @@
 		}
 	}
 	canvas {
-      margin: 40px auto;
       display: block !important;
     }
   </style>
@@ -1223,21 +1218,23 @@
 				<div class="col-xl-6">
 				 <div class="container_dash">
 							<div class="card_dash">
-								<div class="dropdown_dash-container_dash">
-									
-									<select id="chartSelector" class="dropdown_dash">
-										<option value="events">Events over 5 Years</option>
-										<option value="visitors2025">Website Visitors (2025)</option>
-										<option value="visitors5years">Website Visitors (5 Years)</option>
+								<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+									<div id="chartTitle" class="chart-title">Events over 5 Years</div>
+									<div class="dropdown_dash-container_dash">
 										
-									</select>
+										<select id="chartSelector" class="dropdown_dash">
+											<option value="events">Events over 5 Years</option>
+											<option value="visitors2025">Website Visitors (2025)</option>
+											<option value="visitors5years">Website Visitors (5 Years)</option>
+											
+										</select>
+									</div>
 								</div>
 								
 								<div class="loading" id="loading">
 									<p>Loading chart...</p>
 								</div>
 								
-								<div id="chartTitle" class="chart-title">Events over 5 Years</div>
 								<div class="chart-container_dash">
 									<canvas id="mainChart"></canvas>
 								</div>
