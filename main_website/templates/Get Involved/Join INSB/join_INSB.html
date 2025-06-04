@@ -185,14 +185,15 @@
                         <img src="{% static 'upload/hourglass.gif' %}" alt="">
                     </div>
                     <div class="timer_container">
-                        <h1 class="join_msg">Recruitment Ongoing!</h1>
+                        {% comment %} <h1 class="join_msg">Recruitment Ongoing!</h1> {% endcomment %}
+                        <h1 class="join_msg">Recruitment process will be announced soon</h1>
                         <div id="countdown">
-                        <ul style="margin-left: 0;">
+                        {% comment %} <ul style="margin-left: 0;">
                             <li><span id="days"></span> days</li>
                             <li><span id="hours"></span> Hours</li>
                             <li><span id="minutes"></span> Minutes</li>
                             <li><span id="seconds"></span> Seconds</li>
-                        </ul>
+                        </ul> {% endcomment %}
                         </div>
                     </div>
                     </div>
@@ -209,9 +210,9 @@
     {% include "common_js_includes.html" %}
     {% endblock %}
 
-    <script>
+    {% comment %} <script>
         (function () {
-        const second = 1000,
+        const second = 0,
                 minute = second * 60,
                 hour = minute * 60,
                 day = hour * 24;
@@ -244,7 +245,7 @@
             
         }, 1000);
         })();
-    </script>
+    </script> {% endcomment %}
 
 
 </body>
