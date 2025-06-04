@@ -6806,6 +6806,9 @@ class SendForwardMailAjax(View):
         except Exception as e:
             print(e)
             return JsonResponse({'message':'Something went wrong!'})
+
+def contact(request):
+    return render(request,'Manage Website/About/Contact/contact.html')
         
 # DO NOT MOVE/CHANGE THIS LINE OF CODE!!
 from central_branch.google_mail_handler import GmailHandler, gmail_service
