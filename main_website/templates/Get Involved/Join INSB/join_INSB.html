@@ -148,15 +148,16 @@
         }
         @media all and (max-width: 768px) {
         .timer_container h1 {
-            font-size: calc(1.5rem * var(--smaller));
+            font-size: 1rem;
+            margin-bottom: 8px;
         }
         
         .timer_container li {
-            font-size: calc(1.125rem * var(--smaller));
+            font-size: .75rem;
         }
         
         .timer_container li span {
-            font-size: calc(3.375rem * var(--smaller));
+            font-size: .75rem;
         }
         }
     </style>
@@ -186,7 +187,7 @@
                     <div class="timer_container">
                         <h1 class="join_msg">Recruitment Ongoing!</h1>
                         <div id="countdown">
-                        <ul>
+                        <ul style="margin-left: 0;">
                             <li><span id="days"></span> days</li>
                             <li><span id="hours"></span> Hours</li>
                             <li><span id="minutes"></span> Minutes</li>
