@@ -32,22 +32,6 @@
             /* margin: 30px 15px; */
         }
 
-        .join_container .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .join_container h1 {
-            color: #002855;
-            font-weight: 600;
-            position: relative;
-            margin-bottom: -20px;
-            margin-top: 30px;
-            z-index: 2;
-            border: 1px solid white;
-        }
-
         .gif {
             max-width: 500px;
             max-height: 500px;
@@ -114,6 +98,67 @@
                 bottom: -25px;
             }
         }
+        #timer{
+            font-size: 24px;
+            background: #002855;
+            color: white;
+            padding: 6px 20px;
+            border-radius: 4px;
+            width: 300px;
+        }
+        .timer_container {
+        color: #333;
+        margin: 0 auto;
+        text-align: center;
+        }
+
+        .timer_container h1 {
+        font-weight: normal;
+        letter-spacing: .125rem;
+        text-transform: uppercase;
+        }
+
+        .timer_container li {
+        display: inline-block;
+        font-size: 1.5em;
+        list-style-type: none;
+        padding: 1em;
+        text-transform: uppercase;
+        }
+
+        .timer_container li span {
+        display: block;
+        font-size: 4.5rem;
+        }
+
+        .join_container .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .join_container h1 {
+            color: #002855;
+            font-weight: 600;
+            position: relative;
+            margin-bottom: -20px;
+            margin-top: 30px;
+            z-index: 2;
+            border: 1px solid white;
+        }
+        @media all and (max-width: 768px) {
+        .timer_container h1 {
+            font-size: calc(1.5rem * var(--smaller));
+        }
+        
+        .timer_container li {
+            font-size: calc(1.125rem * var(--smaller));
+        }
+        
+        .timer_container li span {
+            font-size: calc(3.375rem * var(--smaller));
+        }
+        }
     </style>
 </head>
 {% block preloader %}
@@ -135,11 +180,21 @@
         <section class="centering">
             <div class="max-width join_container">
                 <div class="container">
-                    <div class="gif"><img src="{% static 'upload/hourglass.gif' %}" alt=""></div>
-                    <div class="join_msg">
-                        <h1>Recruitment process will be announced soon</h1>
+                    <div class="gif">
+                        <img src="{% static 'upload/hourglass.gif' %}" alt="">
                     </div>
-                </div>
+                    <div class="timer_container">
+                        <h1 class="join_msg">Recruitment Ongoing!</h1>
+                        <div id="countdown">
+                        <ul>
+                            <li><span id="days"></span> days</li>
+                            <li><span id="hours"></span> Hours</li>
+                            <li><span id="minutes"></span> Minutes</li>
+                            <li><span id="seconds"></span> Seconds</li>
+                        </ul>
+                        </div>
+                    </div>
+                    </div>
             </div>
         </section>
         <!--Page end-->
@@ -152,6 +207,45 @@
     {% block common_js %}
     {% include "common_js_includes.html" %}
     {% endblock %}
+
+    <script>
+        (function () {
+        const second = 1000,
+                minute = second * 60,
+                hour = minute * 60,
+                day = hour * 24;
+
+        // Set countdown for 24 hours from now
+        const countDown = new Date().getTime() + minute;
+
+        // Initially hide the GIF
+        document.querySelector(".gif").style.display = "none";
+
+        const x = setInterval(function () {
+            const now = new Date().getTime(),
+                distance = countDown - now;
+
+            if (distance <= 0) {
+            clearInterval(x);
+
+            // Show message and GIF, hide timer
+            document.querySelector(".join_msg").innerText = "Recruitment process will be announced soon";
+            document.getElementById("countdown").style.display = "none";
+            document.querySelector(".gif").style.display = "block";
+            return;
+            }
+
+            // Update countdown display
+            document.getElementById("days").innerText = Math.floor(distance / day);
+            document.getElementById("hours").innerText = Math.floor((distance % day) / hour);
+            document.getElementById("minutes").innerText = Math.floor((distance % hour) / minute);
+            document.getElementById("seconds").innerText = Math.floor((distance % minute) / second);
+            
+        }, 1000);
+        })();
+    </script>
+
+
 </body>
 
 </html>
