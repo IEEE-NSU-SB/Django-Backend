@@ -211,27 +211,28 @@
                 <!--for error messages end-->
 
                 <form method="POST" class="contact_container">
+                    {% csrf_token %}
                     <div class="contact_label">    
                         <label for="address">Address</label>
-                        <input type="text" name="address">
+                        <input type="text" name="address" value="{% if contact_info.address %}{{contact_info.address}}{% endif %}">
                     </div>
                     <div class="contact_label">
                     <label for="nsu_ieee_email">NSU IEEE Email</label>
-                    <input type="email" name="nsu_ieee_email">
+                    <input type="text" name="nsu_ieee_email" value="{% if contact_info.nsu_ieee_email %}{{contact_info.nsu_ieee_email}}{% endif %}">
                     </div>
                     <div class="contact_label">
                     <label for="chair_email">Chair Email</label>
-                    <input type="email" name="chair_email">
+                    <input type="text" name="chair_email" value="{% if contact_info.chair_email %}{{contact_info.chair_email}}{% endif %}">
                     </div>
                     <div class="contact_label">
                     <label for="membership_num">Membership Queries Number</label>
-                    <input type="number" name="membership_num">
+                    <input type="text" name="membership_queries_number" value="{% if contact_info.membership_queries_number %}{{contact_info.membership_queries_number}}{% endif %}">
                     </div>
                     <div class="contact_label">
-                    <label for="corporate_num">Coorporate Engagement Number</label>
-                    <input type="number" name="corporate_num">
+                    <label for="corporate_num">Corporate Engagement Number</label>
+                    <input type="text" name="corporate_engagement_number" value="{% if contact_info.corporate_engagement_number %}{{contact_info.corporate_engagement_number}}{% endif %}">
                     </div>
-                    <input type="submit" value="Save" class="save_btn" style="border: 1px solid #6495ED;">
+                    <input type="submit" value="Save" name="save_info" class="save_btn" style="border: 1px solid #6495ED;">
                 </form>
             </div>
 
