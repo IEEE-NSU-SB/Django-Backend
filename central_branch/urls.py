@@ -167,4 +167,5 @@ urlpatterns = [
 
     # Wallet Urls
     path('wallet/', include('wallet.urls'), name='wallet'),
+    path('manage_website/about/contact/',views.contact,name = "contact"),
 ]
