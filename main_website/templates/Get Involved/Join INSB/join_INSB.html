@@ -181,23 +181,26 @@
         <section class="centering">
             <div class="max-width join_container">
                 <div class="container">
+                    {% if recruit_session %}
+                    <h1 class="join_msg">Recruitment Ongoing!</h1>
+                    <h1 class="join_msg">Meet us in front of recreation hall</h1>
+                    <div class="timer_container">
+                        <div id="countdown">
+                            <ul style="margin-left: 0;">
+                                <li><span id="days">00</span> days</li>
+                                <li><span id="hours">00</span> Hours</li>
+                                <li><span id="minutes">00</span> Minutes</li>
+                                <li><span id="seconds">00</span> Seconds</li>
+                            </ul>
+                        </div>
+                    {% else %}
                     <div class="gif">
                         <img src="{% static 'upload/hourglass.gif' %}" alt="">
                     </div>
-                    <div class="timer_container">
-                        <h1 class="join_msg">Recruitment Ongoing!</h1>
-                        <h1 class="join_msg">Meet us in front of recreation hall</h1>
-                        <h1 class="join_msg">Recruitment process will be announced soon</h1>
-                        <div id="countdown">
-                        <ul style="margin-left: 0;">
-                            <li><span id="days"></span> days</li>
-                            <li><span id="hours"></span> Hours</li>
-                            <li><span id="minutes"></span> Minutes</li>
-                            <li><span id="seconds"></span> Seconds</li>
-                        </ul>
-                        </div>
-                    </div>
-                    </div>
+                    <h1 class="join_msg">Recruitment process will be announced soon!</h1>
+                    {% endif %}
+                </div>
+                </div>
             </div>
         </section>
         <!--Page end-->
@@ -211,15 +214,17 @@
     {% include "common_js_includes.html" %}
     {% endblock %}
 
+
+{% if recruit_session %}
 <script>
-    (function () {
-        // Use the upcomingEventDate from template variable
-        const upcomingEventDate = new Date('2025-06-10T15:30:00Z');
+    // Use the upcomingEventDate from template variable
+    const upcomingEventDate = new Date({% if recruit_session.session_end_date_time %}{{recruit_session.session_end_date_time|date:"U"}}{% endif %}*1000);
 
-        const x = setInterval(function () {
-            const now = new Date();
-            const distance = upcomingEventDate - now;
-
+    function updateCountdown() {
+        const now = new Date();
+        const distance = upcomingEventDate - now;
+        
+        if (distance > 0) {
             // Time calculations
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
@@ -231,10 +236,13 @@
             document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
             document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
             document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+    }
 
-        }, 1000);
-    })();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 </script>
+{% endif %}
 
 
 

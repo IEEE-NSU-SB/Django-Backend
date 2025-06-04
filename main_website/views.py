@@ -7,6 +7,7 @@ from main_website.models import Research_Papers,Blog,Achievements,News
 from membership_development_team.renderData import MDT_DATA
 from port.renderData import PortData,HandleVolunteerAwards
 from port.models import Teams,Panels,Chapters_Society_and_Affinity_Groups,VolunteerAwards
+from recruitment.models import recruitment_session
 from .renderData import HomepageItems
 from django.conf import settings
 from users.models import Panel_Members, User_IP_Address,Members
@@ -1675,9 +1676,17 @@ def join_insb(request):
 
         #loading all the teams of Branch
         branch_teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1)
+        active_recruit_sessions = recruitment_session.objects.filter(is_active=True)
+
+        if len(active_recruit_sessions) > 0:
+            recruit_session = active_recruit_sessions[0]
+        else:
+            recruit_session = None
+
         context={
                 'page_title':"Join IEEE NSU SB",
                 'branch_teams':branch_teams,
+                'recruit_session':recruit_session
             }
     
         return render(request,"Get Involved/Join INSB/join_INSB.html",context=context)
