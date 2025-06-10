@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from . import renderData
-from meeting_minutes.renderData import team_mm_info,branch_mm_info
+# from . import renderData
+# from meeting_minutes.renderData import team_mm_info,branch_mm_info
 
 # Create your views here.
 def meeting_minutes_homepage(request):
@@ -41,5 +41,10 @@ def branch_meeting_minutes(request):
         'team':branch_mm_list
     }
     return render(request,'branch_meeting_minutes.html')
+
+
+    #meeting_minutes_edit
+def meeting_minutes_edit(request):
+    return render(request, 'meeting_minutes_edit.html')
 
 
