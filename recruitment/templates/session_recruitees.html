@@ -403,6 +403,7 @@
         </div>
     </div>
     <form method="POST">
+      {% csrf_token %}
       <div id="modal_1" class="recuitment_modal">
         <!-- Modal content -->
         <div class="modal-1-content">
@@ -411,20 +412,20 @@
             </div>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; align-items: center; padding: 8px;" class="">
                           <label for="recruitment_date" style="font-style: 16px; margin: 0;font-weight: bold;">Set Recruitment Deadline:</label>
-                          <input type="date" style="border: none;" name="recruitment_date">
+                          <input type="datetime-local" style="border: none;" name="recruitment_end_datetime" {% if session.session.session_end_date_time %}value="{{session.session.session_end_date_time|date:'Y-m-d\\TH:i'}}"{% endif %}>
                           <div class="toggle">
                         <div style="display: flex; margin: 0 10px;">
-                            <p class="on_text" style="color: #75D481;">ON!</p>
+                            <p class="on_text" style="color: #000000a2;">Is Active?</p>
                             <!-- <p class="on_text" style="color: #000000a2;">OFF</p> -->
                             <label class="switch">
-                                <input type="checkbox" name="wallet_event_update_status">
+                                <input type="checkbox" name="is_active" {% if session.session.is_active %}checked{% endif %}>
                                 <span class="slider round"></span>
                             </label>      
                         </div>
                       </div>
             </div>
             <div style="display: flex; justify-self: flex-end;">
-              <button type="submit" class="save_button">Save</button>
+              <button type="submit" class="save_button" name="save_details">Save</button>
             </div>
           </div>
       </div>
