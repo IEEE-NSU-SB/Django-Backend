@@ -152,3 +152,20 @@ class Recruitment:
 
     def generate_random_string():
         return random.randint(100, 999)
+    
+    def update_session_details(session_id, recruitment_end_datetime, is_active):
+        try:
+            recruit_session = recruitment_session.objects.get(id=session_id)
+            if recruitment_end_datetime:
+                recruit_session.session_end_date_time = recruitment_end_datetime
+
+            if is_active == 'on':
+                recruit_session.is_active = True
+            else:
+                recruit_session.is_active = False
+
+            recruit_session.save()
+
+            return True
+        except:
+            return False

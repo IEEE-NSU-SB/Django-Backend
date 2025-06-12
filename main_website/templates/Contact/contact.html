@@ -575,18 +575,18 @@
           <div>
             <h4>Address</h4>
           </div>
-            <div>
-              <input type="text" name="address" value="Plot-15, Block-B, Bashundhara, Dhaka – 1229, Bangladesh" required style="width: 100%; text-align: center; border: none; background: transparent; font-size: small;"/>
-            </div>
+          <div>
+            <p>{{contact_info.address}}</p>
+          </div>
         </div>
         <div class="contact-card">
           <div><i class="fa-solid fa-envelope email-icon"></i></div>
           <div>
             <h4>Email Address</h4>
           </div>
-            <div>
-              <input type="email" name="email1" value="sb-nsu@ieee.org" required style="width: 100%; text-align: center; border: none; background: transparent; font-size: small; margin-bottom: 5px;"/>
-            <input type="email" name="email2" value="iftekharbin.ashraf@ieee.org" required style="width: 100%; text-align: center; border: none; background: transparent; font-size: small;"/>
+          <div>
+            <p>{{contact_info.nsu_ieee_email}}</p>
+            <p>{{contact_info.chair_email}}</p>
           </div>
         </div>
         <div class="contact-card">
@@ -597,9 +597,9 @@
             <h4>Mobile Number</h4>
           </div>
           <div>
-            <input type="text" name="membership_phone" value="For Membership Queries : 01980-243533 | 01775-452647" required style="width: 100%; text-align: center; border: none; background: transparent; font-size: small; margin-bottom: 5px;"/>
-          <input type="text" name="corporate_phone" value="For Corporate Engagement : 01886-503931 | 01630-941492" required style="width: 100%; text-align: center; border: none; background: transparent; font-size: small;"/>
-        </div>
+            <p>For Membership Queries : {{contact_info.membership_queries_number}}</p>
+            <p>For Corporate Engagement : {{contact_info.corporate_engagement_number}}</p>
+          </div>
         </div>
         <div class="contact-card">
           <div><i class="fa-solid fa-share-nodes share-icon"></i></div>
