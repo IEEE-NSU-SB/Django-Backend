@@ -2760,28 +2760,25 @@ function createChart(type) {
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)'
-                        },
-                        ticks: {
-                            font: {
-                                size: window.innerWidth < 576 ? 10 : 12
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
+					yAxes: [{
+						gridLines: {
+							color: 'rgba(0,0,0,0.1)'
+						},
+						ticks: {
+							beginAtZero: false,
+							min: 0,
+							fontSize: window.innerWidth < 576 ? 10 : 12
+						}
+					}],
+                    xAxes: [{
+                        gridLines: {
                             display: false
                         },
                         ticks: {
-                            font: {
-                                size: window.innerWidth < 576 ? 10 : 12
-                            },
+                            fontSize: window.innerWidth < 576 ? 10 : 12,
                             maxRotation: window.innerWidth < 576 ? 45 : 0
                         }
-                    }
+                    }]
                 },
                 animation: {
                     duration: 1000,
