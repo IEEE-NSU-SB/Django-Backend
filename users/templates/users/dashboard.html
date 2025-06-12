@@ -2823,8 +2823,8 @@ async function initializeCircleChart2(){
 const chartData = {
     events: {
         title: "Events over 5 Years",
-        labels: ['2021', '2022', '2023', '2024', '2025'],
-        data: {{event_number_over_5_years}},
+        labels: [{% for year in event_number_over_5_years.0 %}'{{year}}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        data: [{% for data in event_number_over_5_years.1 %}{{data}}{% if not forloop.last %},{% endif %}{% endfor %}],
         backgroundColor: '#3980c0',
         borderColor: '#2968a3'
     },
