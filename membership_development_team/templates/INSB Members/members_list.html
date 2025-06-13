@@ -64,9 +64,329 @@
   }
   .app-header ~ .app-body {
     padding-top: 0rem;
+  }
+ 
+  /* Edit button css starts*/
+  .button-17 { 
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  display: inline-flex;
+  fill: currentcolor;
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: .25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform,opacity;
+  z-index: 0;
 }
+
+.button-17:hover {
+  background: #F6F9FE;
+  color: #174ea6;
+}
+
+.button-17:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.button-17:focus {
+  outline: none;
+  border: 2px solid #4285f4;
+}
+
+.button-17:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.button-17:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+}
+
+.button-17:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.button-17:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+}
+
+.button-17:disabled {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+/* Edit button css ends*/
+
+/*Edit search bar starts*/
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* Search input */
+.styled-search {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+/* Icon inside input */
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 16px;
+}
+
+/* Focus effect */
+.styled-search:focus {
+  border-color: #4285f4;
+  box-shadow: 0 0 3px rgba(66, 133, 244, 0.5);
+}
+/*Edit search bar ends*/
+
+/*Edit Drop Down Css starts*/
+#maxRows {
+  width: 100%;
+  max-width: 180px;
+  padding: 10px 40px 10px 15px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='10'%20viewBox='0%200%2014%2010'%3E%3Cpath%20fill='%23666'%20d='M1%201l6%206%206-6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  height: 40px;
+  line-height: 20px;
+  box-sizing: border-box;
+}
+#maxRows:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+}
+
+/*Edit Drop Down Css Ends*/
+
+/*Edit Paginatioon Starts*/
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 20px 0;
+}
+
+.pagination .page-item {
+  display: inline-block;
+}
+
+.pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px; /* square-ish with rounded corners */
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #00089e;
+  border: 1px solid #d0d0d0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination .page-link:hover {
+  background-color: #e6f9f9; /* light tint */
+  color: #3300ff;
+  border-color: #000397;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0800ff;
+  color: #fff;
+  border-color: #0019da;
+  font-weight: 600;
+}
+
+.pagination .page-item.disabled .page-link {
+  cursor: default;
+  color: #bbb;
+  background: transparent;
+  border-color: #eee;
+}
+
+.pagination .page-ellipsis .page-link {
+  background: none;
+  cursor: default;
+  pointer-events: none;
+  font-weight: normal;
+  color: #999;
+  border: none;
+}
+
+
+/*Edit Paginaiton Ends*/
+
+/*edit table starts*/
+/* Modern Responsive Table */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.table thead {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+}
+
+.table thead th {
+  padding: 14px 18px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.3s ease;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #e6f4ff;
+}
+
+.table tbody td {
+  padding: 14px 18px;
+  font-size: 14px;
+  color: #333;
+  word-wrap: break-word;
+}
+
+.table a {
+  color: #00629B;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.table a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .table thead {
+    display: none;
+  }
+
+  .table, .table tbody, .table tr, .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    padding-right: 10px;
+    font-weight: bold;
+    text-align: left;
+    color: #555;
+  }
+}
+
+
+/*edit table ends*/
+
+/*edit modern count starts*/
+/* Modern Row Count Style */
+/* Modern Row Count Style */
+/* Minimal Elegant Entry Counter */
+.rows_count.slim-count {
+  font-size: 14px;
+  font-weight: 400;
+  color: #00629B;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.rows_count .count-number {
+  font-weight: 600;
+  color: #004c78;
+}
+
+
+/*edit modern count ends*/
+
+
+
   </style>
 </head>
+
 <body>
   <div class="app" id="app">
 
@@ -120,16 +440,16 @@
         <div>
           <form method="POST">
             {% csrf_token %}
-            <input type="submit" name="refresh_member_status" class="btn btn-outline b-info text-info" value="Refresh Membership Status of IEEE NSU SB Members">
+            <input type="submit" name="refresh_member_status" class="button-17" value="Refresh Membership Status of IEEE NSU SB Members"> <!--edit button-->
           </form>          
         </div>
         {% if is_branch %}
         <div style="margin-left:5px;">
-          <a href="{% url 'central_branch:user_access' %}" class="btn btn-outline b-danger text-danger">Restrict Users</a>
+          <a href="{% url 'central_branch:user_access' %}" class="button-17">Restrict Users</a> <!--edit button-->
         </div>
         {% endif %}        
         <div style="margin-left:5px;">
-          <button type="submit" class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-s" ui-toggle-class="bounce" ui-target="#animate">Add a new type of Skillset</button>
+          <button type="submit" class="button-17" data-toggle="modal" data-target="#m-s-s" ui-toggle-class="bounce" ui-target="#animate">Add a new type of Skillset</button> <!--edit button-->
         </div>
       </div>
     </div>
@@ -149,53 +469,59 @@
               <option value="15">15</option>
               <option value="20">20</option>
               <option value="50">50</option>
-              <option value="5000">Show ALL Rows</option>
+              <option value="5000">ALL</option>
             </select>
     
           </div>
         </div>
-        <div class="tb_search">
-          <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
+        <div class="tb_search"> <!--edit table search-->
+          <span class="search-icon"><i class="fa fa-search"></i></span>
+          <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search..." class="styled-search" />
         </div>
       </div>
       <div class="table-responsive">
         <table class="table table-striped table-class" id="table-id">
       
           <thead>
-            <tr>
-              <th data-priority="1">IEEE ID</th>
-              <th data-priority="1">NSU ID</th>
-              <th data-priority="1">Name</th>
-              <th data-priority="1">Email</th>
-              <th data-priority="1">Current Position</th>
-              <th data-priority="1">Current Team</th>
-              <th data-priority="1">Blood Group</th>
-              {% if has_view_permission %}
-              <th data-priority="1">Contact No</th>
-              {% endif %}
-            </tr>
-          </thead>
+  <tr>
+    <th data-priority="1">SL<br>No.</th>
+    <th data-priority="1">IEEE<br>ID</th>
+    <th data-priority="1">NSU<br>ID</th>
+    <th data-priority="1">Name</th>
+    <th data-priority="1">Email</th>
+    <th data-priority="1">Current<br>Position</th>
+    <th data-priority="1">Current<br>Team</th>
+    <th data-priority="1">Blood<br>Group</th>
+  </tr>
+</thead>
           <tbody>
-            {% for member in members %}
-                              
-              <tr>
-              
-                  <td style="color:#00629B"><a href="{% if has_view_permission %} {% if is_branch %}{% url 'central_branch:member_details' member.ieee_id %}{% else %}{% url 'membership_development_team:member_details' member.ieee_id %}{% endif %} {% else %} {% url 'main_website:member_profile' member.ieee_id %} {% endif %}">{{ member.ieee_id  }}</a></td>
-                  <td>{{ member.nsu_id }}</td>
-                  <td>{{ member.name  }}</td>
-                  <td>{{ member.email_ieee }}</td>
-                  <td>{{ member.position.role }}</td>
-                  <td>{{ member.team.team_name }}</td>
-                  <td>{{ member.blood_group }}</td>
-                  {% if has_view_permission %}
-                  <td>{{ member.contact_no }}</td>
-                  {% endif %}
-                                
-              </tr>
-      
-            {% endfor %}
-      
-          <tbody>
+  {% for member in members %}
+    <tr>
+      <td>{{ forloop.counter }}</td> <!-- Serial Number -->
+      <td style="color:#00629B">
+        <a href="{% if has_view_permission %} {% if is_branch %}
+          {% url 'central_branch:member_details' member.ieee_id %}
+        {% else %}
+          {% url 'membership_development_team:member_details' member.ieee_id %}
+        {% endif %} {% else %}
+          {% url 'main_website:member_profile' member.ieee_id %}
+        {% endif %}">
+        {{ member.ieee_id }}
+        </a>
+      </td>
+      <td>{{ member.nsu_id }}</td>
+      <td>{{ member.name }}</td>
+      <td>{{ member.email_ieee }}</td>
+      <td>{{ member.position.role }}</td>
+      <td>{{ member.team.team_name }}</td>
+      <td>{{ member.blood_group }}</td>
+      <!--{% if has_view_permission %}-->
+      <!--<td>{{ member.contact_no }}</td>-->
+      <!--{% endif %}-->
+    </tr>
+  {% endfor %}
+</tbody>
+
         </table>
       </div>
       <!--		Start Pagination -->
@@ -206,7 +532,14 @@
           </ul>
         </nav>
       </div>
-      <div class="rows_count">Showing 11 to 20 of 91 entries</div>    
+      <!--Edit Modern Count-->
+  <div class="rows_count modern-count">
+  <span class="count-prefix">Showing</span>
+  <span class="count-range">1</span> <span class="count-to">to</span> <span class="count-range">10</span>
+  <span class="count-suffix">of</span> <span class="count-total">518</span> <span class="count-suffix">entries</span>
+</div>
+
+    
             
     </div>
   </div>
@@ -337,148 +670,100 @@
   <!-- ajax -->
   {% comment %} <script src="{% static 'script/jquery.pjax.js'%}"></script> {% endcomment %}
   <script src="{% static 'script/ajax.js'%}"></script>
-  <script>
-    getPagination('#table-id');
-	$('#maxRows').trigger('change');
-	function getPagination (table){
+  <script> /*Edit pagination*/
+    function renderPagination(totalPages, currentPage) {
+  const pagination = document.querySelector(".pagination");
+  pagination.innerHTML = "";
 
-		  $('#maxRows').on('change',function(){
-		  	$('.pagination').html('');						// reset pagination div
-		  	var trnum = 0 ;									// reset tr counter 
-		  	var maxRows = parseInt($(this).val());			// get Max Rows from select option
-        
-		  	var totalRows = $(table+' tbody tr').length;		// numbers of rows 
-			 $(table+' tr:gt(0)').each(function(){			// each TR in  table and not the header
-			 	trnum++;									// Start Counter 
-			 	if (trnum > maxRows ){						// if tr number gt maxRows
-			 		
-			 		$(this).hide();							// fade it out 
-			 	}if (trnum <= maxRows ){$(this).show();}// else fade in Important in case if it ..
-			 });											//  was fade out to fade it in 
-			 if (totalRows > maxRows){						// if tr total rows gt max rows option
-			 	var pagenum = Math.ceil(totalRows/maxRows);	// ceil total(rows/maxrows) to get ..  
-			 												//	numbers of pages 
-			 	for (var i = 1; i <= pagenum ;){			// for each page append pagination li 
-			 	$('.pagination').append('<li data-page="'+i+'">\
-								      <span>'+ i++ +'<span class="sr-only">(current)</span></span>\
-								    </li>').show();
-			 	}											// end for i 
-     
-         
-			} 												// end if row count > max rows
-			$('.pagination li:first-child').addClass('active'); // add active class to the first li 
-        
-        
-        //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
-       showig_rows_count(maxRows, 1, totalRows);
-        //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
+  function createItem(page, label = null, isActive = false, isDisabled = false, isEllipsis = false) {
+    const li = document.createElement("li");
+    li.classList.add("page-item");
+    if (isActive) li.classList.add("active");
+    if (isDisabled) li.classList.add("disabled");
+    if (isEllipsis) li.classList.add("page-ellipsis");
 
-        $('.pagination li').on('click',function(e){		// on click each page
-        e.preventDefault();
-				var pageNum = $(this).attr('data-page');	// get it's number
-				var trIndex = 0 ;							// reset tr counter
-				$('.pagination li').removeClass('active');	// remove active class from all li 
-				$(this).addClass('active');					// add active class to the clicked 
-        
-        
-        //SHOWING ROWS NUMBER OUT OF TOTAL
-       showig_rows_count(maxRows, pageNum, totalRows);
-        //SHOWING ROWS NUMBER OUT OF TOTAL
-        
-        
-        
-				 $(table+' tr:gt(0)').each(function(){		// each tr in table not the header
-				 	trIndex++;								// tr index counter 
-				 	// if tr index gt maxRows*pageNum or lt maxRows*pageNum-maxRows fade if out
-				 	if (trIndex > (maxRows*pageNum) || trIndex <= ((maxRows*pageNum)-maxRows)){
-				 		$(this).hide();		
-				 	}else {$(this).show();} 				//else fade in 
-				 }); 										// end of for each tr in table
-					});										// end of on click pagination list
-		});
-											// end of on select change 
-		 
-								// END OF PAGINATION 
-    
-	}	
+    const span = document.createElement("span");
+    span.classList.add("page-link");
+    span.textContent = label || page;
 
+    if (!isDisabled && !isEllipsis) {
+      li.dataset.page = page;
+      li.appendChild(span);
+      li.addEventListener("click", function () {
+        paginateToPage(parseInt(this.dataset.page));
+      });
+    } else {
+      li.appendChild(span);
+    }
 
-			
+    pagination.appendChild(li);
+  }
 
-// SI SETTING
-$(function(){
-	// Just to append id number for each row  
-default_index();
-					
+  // ← Prev Arrow
+  createItem(currentPage - 1, "‹", false, currentPage === 1);
+
+  // First page
+  createItem(1, "1", currentPage === 1);
+
+  // Left Ellipsis
+  if (currentPage > 4) createItem(null, "...", false, true, true);
+
+  // Middle pages
+  for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+    if (i > 1 && i < totalPages) {
+      createItem(i, i.toString(), i === currentPage);
+    }
+  }
+
+  // Right Ellipsis
+  if (currentPage < totalPages - 3) createItem(null, "...", false, true, true);
+
+  // Last page
+  if (totalPages > 1) createItem(totalPages, totalPages.toString(), currentPage === totalPages);
+
+  // → Next Arrow
+  createItem(currentPage + 1, "›", false, currentPage === totalPages);
+}
+
+function paginateToPage(pageNum) {
+  const maxRows = parseInt(document.getElementById("maxRows").value);
+  const rows = document.querySelectorAll("#table-id tbody tr");
+  const totalRows = rows.length;
+  const totalPages = Math.ceil(totalRows / maxRows);
+  if (pageNum < 1 || pageNum > totalPages) return;
+
+  rows.forEach((row, index) => {
+    row.style.display = (index >= (pageNum - 1) * maxRows && index < pageNum * maxRows) ? "" : "none";
+  });
+
+  renderPagination(totalPages, pageNum);
+  showig_rows_count(maxRows, pageNum, totalRows);
+}
+
+function showig_rows_count(maxRows, pageNum, totalRows) {
+  var end_index = maxRows * pageNum;
+  var start_index = ((maxRows * pageNum) - maxRows) + 1;
+  if (end_index > totalRows) end_index = totalRows;
+  var string = 'Showing ' + start_index + ' to ' + end_index + ' of ' + totalRows + ' entries';
+  document.querySelector('.rows_count').innerHTML = ` 
+  <span class="count-prefix">Showing</span>
+  <span class="count-range">${start_index}</span> 
+  <span class="count-to">to</span> 
+  <span class="count-range">${end_index}</span> 
+  <span class="count-suffix">of</span> 
+  <span class="count-total">${totalRows}</span> 
+  <span class="count-suffix">entries</span>
+`; /*edit modern counter*/
+
+}
+
+document.getElementById("maxRows").addEventListener("change", function () {
+  paginateToPage(1);
 });
 
-//ROWS SHOWING FUNCTION
-function showig_rows_count(maxRows, pageNum, totalRows) {
-   //Default rows showing
-        var end_index = maxRows*pageNum;
-        var start_index = ((maxRows*pageNum)- maxRows) + parseFloat(1);
-        var string = 'Showing '+ start_index + ' to ' + end_index +' of ' + totalRows + ' entries';               
-        $('.rows_count').html(string);
-}
-
-// CREATING INDEX
-function default_index() {
-  $('table tr:eq(0)').prepend('<th> SL No. </th>')
-
-					var id = 0;
-
-					$('table tr:gt(0)').each(function(){	
-						id++
-						$(this).prepend('<td>'+id+'</td>');
-					});
-}
-
-// All Table search script
-function FilterkeyWord_all_table() {
-  
-// Count td if you want to search on all table instead of specific column
-
-  var count = $('.table').children('tbody').children('tr:first-child').children('td').length; 
-
-        // Declare variables
-  var input, filter, table, tr, td, i;
-  input = document.getElementById("search_input_all");
-  var input_value =     document.getElementById("search_input_all").value;
-        filter = input.value.toLowerCase();
-  if(input_value !=''){
-        table = document.getElementById("table-id");
-        tr = table.getElementsByTagName("tr");
-
-        // Loop through all table rows, and hide those who don't match the search query
-        for (i = 1; i < tr.length; i++) {
-          
-          var flag = 0;
-           
-          for(j = 0; j < count; j++){
-            td = tr[i].getElementsByTagName("td")[j];
-            if (td) {
-             
-                var td_text = td.innerHTML;  
-                if (td.innerHTML.toLowerCase().indexOf(filter) > -1) {
-                //var td_text = td.innerHTML;  
-                //td.innerHTML = 'shaban';
-                  flag = 1;
-                } else {
-                  //DO NOTHING
-                }
-              }
-            }
-          if(flag==1){
-                     tr[i].style.display = "";
-          }else {
-             tr[i].style.display = "none";
-          }
-        }
-    }else {
-      //RESET TABLE
-      $('#maxRows').trigger('change');
-    }
-}
+window.addEventListener("DOMContentLoaded", () => {
+  paginateToPage(1);
+});
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
