@@ -8,10 +8,12 @@
 
     <script src="https://kit.fontawesome.com/ab83dacc87.js" crossorigin="anonymous"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+
     {% block common_css %}
         {% include "common_css.html" %}
     {% endblock common_css %}
-
+    
 <script>
   let agendaCount = 1;
 
@@ -66,7 +68,7 @@
             justify-content: center;
         }
         .h1{
-            color: gray;
+            color: black;
             font-size: 30px;
             padding: 0px 20px 5px 20px;
             border: none;
@@ -91,7 +93,7 @@
             color: black;
             background-color: white;
         }
-        .delete_btn{
+        .modal_btn{
             padding: 0px 30px;
             color: #e74c3c;
             background-color: #fadbd8;
@@ -101,7 +103,7 @@
             font-size: 15px;
             transition: 0.5s;
         }
-        .delete_btn:hover{
+        .modal_btn:hover{
             background-color: #e74c3c;
             color: #fadbd8;
         }
@@ -120,6 +122,7 @@
             text-decoration: none;
             border-radius: 5px;
             padding: 2px 20px;
+            transition: 0.5s;
         }
         .location_fld_ip:hover, .plus_minus_btn:hover{
             background-color: #d6eaf8;
@@ -142,7 +145,7 @@
             border-bottom: 1px solid #ccc;
             color: black;
         }
-        .desc_fld{
+        /* .desc_fld{
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -150,7 +153,7 @@
             resize: vertical;
             margin: 5px 0px;
             min-height: 100px;
-        }
+        } */
         .save_btn{
             padding: 5px 50px;
             color: #2ecc71;
@@ -169,19 +172,19 @@
         }   
 
         .container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
         .time_fld, .text_fld {
-        display: grid;
-        grid-template-columns: 0.65fr 10px 1fr;
-        align-items: center;
-        width: 100%;
-        gap: 10px;
+            display: grid;
+            grid-template-columns: 0.65fr 10px 1fr;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
         }
         .time_fld_ip, .text_fld_ip{
             flex: 1;
@@ -189,33 +192,72 @@
             border-bottom: 1px solid #ccc;
         }
         .colon {
-        font-size: 20px;
-        text-align: center;
+            font-size: 20px;
+            text-align: center;
         }
         .location_fld_ip {
-        display: inline-block;
-        padding: 5px 20px;
-        border: 1px solid #3498db;
-        border-radius: 5px;
-        background-color: white;
-        color: #3498db;
-        cursor: pointer;
-        user-select: none;
-        transition: 0.5s;
+            display: inline-block;
+            padding: 5px 20px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            background-color: white;
+            color: #3498db;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.5s;
         }
         input[type="radio"]:checked + .location_fld_ip {
-        background-color: #3498db;
-        color: white;
+            background-color: #3498db;
+            color: white;
         }
         input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
+        .delete_btn, .close_btn{
+            color: #3498db;
+            background-color: white;
+            border: 1px solid #3498db;
+            text-decoration: none;
+            border-radius: 5px;
+            padding: 5px 30px;
+            transition: 0.5s;      
+        }
+        .delete_btn:hover, .close_btn:hover{
+            background-color: #3498db;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 40vh;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+        }
+
+        .modal_content {
+            background-color: white;
+            width: 30%;
+            border-radius: 10px;
+            padding: 30px 0px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            margin: auto;
+        }
+
         @media (max-width: 1024px){
             .body{
-                margin: 20px;
-                padding: 20px;
+                margin: 30px;
+                padding: 30px;
+            }
+            .modal_content {
+            width: 40%;
             }
         }
         @media (max-width: 600px){
@@ -235,11 +277,18 @@
             .h1{
             padding: 0px 10px 5px 10px;
             }
+            .modal_content {
+            width: 70%;
+            }
+
         }
 
         @media (max-width: 425px){
             .location_fld_ip{
                 margin-bottom: 5px;
+            }
+            .modal_content {
+            width: 70%;
             }
         }
 
@@ -267,7 +316,7 @@
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
             {% block navbar %}
-                {% include 'website_development_team/web_navbar.html' %}
+                {% include 'users/navbar.html' %}
             {% endblock navbar %}
 
         </div>
@@ -275,21 +324,21 @@
 
     <!-- ############ PAGE START-->
     <section class="body">
-        <form method="post"> <!--form starts-->
-        {% csrf_token %}
-        <div class="div0"> <!--title-->
-            <input type="text" placeholder="Meeting Name" class="h1" required>
-        </div>
+        <form method="post" id="form"> <!--form starts-->
+            {% csrf_token %}
+            <div class="div0"> <!--title-->
+                <input type="text" placeholder="Meeting Name" class="h1" required>
+            </div>
 
-        <div class="div1"> <!--return and delete btns-->
-            <a href="#" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
-            <button type="submit" class="delete_btn">Delete</button>
-        </div>
+            <div class="div1"> <!--return and delete btns-->
+                <a href="#" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+                <button type="button" class="modal_btn">Delete</button>
+            </div>
 
-        <div class="div2">
+            <div class="div2">
                 <div class="container">
                     <div class="location_fld"><!--location-->
-                        <h2 style="font-size: 20px; margin: 0px;">Location</h2>
+                        <h2 style="font-size: 20px; margin: 0px; display: flex;">Location<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
 
                         <div id="location-buttons">
@@ -312,13 +361,13 @@
                     <div class="space"></div>
 
                         <div class="time_fld"><!--start time--> 
-                            <h2 style="font-size: 20px; margin: 0px;">Start time</h2>
+                            <h2 style="font-size: 20px; margin: 0px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
                             <div class="colon">:</div>
                             <input type="time" class="time_fld_ip" required>
                         </div>
                         
                         <div class="time_fld"><!--end time-->  
-                            <h2 style="font-size: 20px; margin: 0px;">End time</h2>
+                            <h2 style="font-size: 20px; margin: 0px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
                             <div class="colon">:</div>
                             <input type="time" class="time_fld_ip" required>
                         </div>
@@ -330,7 +379,7 @@
                         </div>    
                         
                         <div class="text_fld"><!--total attendee--> 
-                        <h2 style="font-size: 20px; margin: 0px;">Total Attendee</h2>
+                        <h2 style="font-size: 20px; margin: 0px; display: flex;">Total Attendee<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
                         <input type="text" class="text_fld_ip" required>
                         </div>
@@ -350,7 +399,7 @@
 
 
                     <div class="agenda" id="agenda-controls"><!--add/delete agenda btns--> 
-                        <h2 style="font-size: 20px;">Agenda:</h2>
+                        <h2 style="font-size: 20px; display: flex;">Agenda<div style="color: #e74c3c;">*</div></h2>
                         <div>
                             <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
                             <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
@@ -365,11 +414,12 @@
                     </div>
 
                     <div><!--discussion--> 
-                        <h2 style="font-size: 20px; margin-top: 40px;">Discussion</h2>
-                        <textarea name="discussion" class="desc_fld" style="margin-bottom: 40px;" required></textarea>
+                        <h2 style="font-size: 20px; margin-top: 40px; display: flex;">Discussion<div style="color: #e74c3c;">*</div></h2>
+                        <!-- <textarea name="discussion" class="desc_fld" required></textarea> -->
+                        <textarea id="summernote" name="discussion"></textarea>
                     </div>
 
-                    <div class="container">
+                    <div class="container" style="margin-top: 40px;">
                         <div class="text_fld"><!--host-->   
                         <h2 style="font-size: 20px; margin:0px;">Host</h2>
                         <div class="colon">:</div>
@@ -395,19 +445,83 @@
                         <div class="space"></div>
 
                         <div class="text_fld"><!--written by-->  
-                            <h2 style="font-size: 20px; margin:0px;">Written by</h2>
+                            <h2 style="font-size: 20px; margin:0px; display: flex;">Written by<div style="color: #e74c3c;">*</div></h2>
                             <div class="colon">:</div>
                             <input type="text" class="text_fld_ip" required>
                         </div>
                         </div>
 
-                        <div style="display: flex; justify-content: center; margin-top: 20px;"><!--save btn--> 
+                    <div style="display: flex; justify-content: center; margin-top: 20px;"><!--save btn--> 
                             <button type="submit" class="save_btn">Save</button>
+                    </div>
+
+                    <!-- modal-->
+                    <div id="myModal" class="modal">
+                        <div class="modal_content">
+                                <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
+                                <div style="display: flex; justify-content: center;">        
+                                    <!-- delete btn -->
+                                    <button type="button" class="delete_btn" style="margin-right: 10px;">Yes</button>
+                                    <span><button type="button" class="close_btn">No</button></span>
+                                </div>
                         </div>
-            </form>
-        </div>
+                    </div>
+        </form>
      </section>
 
      <div style="height: 20px;"></div>
+
+     <script>
+        const modal = document.getElementById("myModal");
+        // const deleteForm = document.querySelector("#myModal form");
+        const deleteBtns = document.querySelectorAll(".modal_btn");
+        const closeBtn = document.querySelector(".close_btn");
+
+        deleteBtns.forEach(button => {
+            button.addEventListener("click", () => {
+            // const url = button.getAttribute("data-url");
+            // deleteForm.setAttribute("action", url);
+            modal.style.display = "block";
+            });
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+            modal.style.display = "none";
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
+    <script>
+      $('#summernote').summernote({
+        placeholder:  'Write discussion here...',
+        tabsize: 2,
+        height: 120,
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['bold', 'underline', 'clear']],
+          ['color', ['color']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['table', ['table']],
+          ['insert', ['link', 'picture', 'video']],
+          ['view', ['fullscreen', 'codeview', 'help']]
+        ]
+      });
+
+        document.getElementById('form').addEventListener('submit',(e)=>{
+        if ($('#summernote').summernote('isEmpty')) {
+        e.preventDefault();
+        alert("Please fill in the description field.");
+        }
+    });
+    </script>
+    
 </body>
 </html>
