@@ -44,6 +44,8 @@ urlpatterns = [
     path('portal/SC_AG/',include("chapters_and_affinity_group.urls",namespace="sc_ag")),
     re_path(r'^media_files/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+
+    path('portal/meeting_minutes/', include("meeting_minutes.urls", namespace="meeting_minutes"))
 ]
 urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
