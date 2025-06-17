@@ -117,6 +117,22 @@
 .app-aside {
   z-index: 1020;
 }
+.nav-icon{
+  position: relative;
+  z-index: 2;
+}
+.nav-icon-society{
+  float: left;
+  line-height: inherit;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  top: 0;
+  min-width: 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  left: 8px;
+}
 </style>
     <!-- fluid app aside -->
   <div class="left navside dark dk" data-layout="column">
@@ -636,7 +652,7 @@
                     <ul class="nav-sub nav-mega nav-mega-3">
                       {% for i in all_sc_ag %}
                       <li style="margin-left:5px;">
-                        <span class="nav-icon" >
+                        <span class="nav-icon-society" >
                           <img src="/media_files/{{i.logo}}" width="40px" height="40px">
                           <i class="fa-fa-user"></i>
                         </span>
