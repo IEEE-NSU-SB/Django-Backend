@@ -1,22 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meeting Minutes</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <title>Meeting Minutes</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+     <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       display: flex;
       height: 100vh;
-    }
-
-    .sidebar {
-      width: 200px;
-      background-color: #002B5B;
-      color: white;
-      padding: 100px;
     }
 
     .content {
@@ -138,6 +140,34 @@
 
     }
 
+    .create_btn{
+        border-radius: 4px;
+        border: 1px solid transparent;
+        color: rgb(76, 171, 92);
+        background-color: rgb(213, 251, 219);
+        padding: 3px 16px;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+        margin: 0;
+    }
+    .create_btn:hover{
+        background-color: rgb(149, 255, 165);
+        /* color: rgb(213, 251, 219); */
+    }
+    .download_btn{
+        border-radius: 4px;
+        border: 1px solid #0cc2aa;
+        color: #0cc2aa;
+        background-color: #c5fcf5;
+        padding: 4px 16px;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+        margin: 0;
+    }
+    .download_btn:hover{
+        background-color: #0cc2aa;
+        color: #c5fcf5;
+    }
     @media (max-width: 600px) {
       .search-filter {
         flex-direction: column;
@@ -151,44 +181,72 @@
     }
   </style>
 </head>
-<body>
-  <div class="sidebar">
-    
-  </div>
-  <div class="content">
-    <div class="header">Meeting Minutes</div>
-    <div class="search-filter">
-      <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
-      <div>
-        <button class="filter-button" onclick="toggleFilterOptions()">Filter</button>
-        <div id="filterOptions" class="filter-options">
-          <label for="tenureInput">By Tenure</label>
-          <input type="text" id="tenureInput" placeholder="e.g., 2025">
-          <label for="monthInput">By Month</label>
-          <input type="text" id="monthInput" placeholder="e.g., May">
-          <label for="locationInput">By Location</label>
-          <input type="text" id="locationInput" placeholder="e.g., Dhaka">
-          <button onclick="applyCustomFilters()">Apply Filters</button>
-        </div>
-      </div>
-    </div>
-    <br>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>SL</th>
-            <th>Meeting Name</th>
-            <th>Date</th>
-            <th>Download</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </div>
+<body style="background-color: white;">
 
-  <script>
+        <!-- ############ LAYOUT START-->
+        <div class="app" id="app" style="background-color: white;">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+              {% block sidebar %} 
+              {% include 'users/sidebar.html' %} 
+              {% endblock %}
+            </div>
+            <!-- aside end -->
+      
+
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+                {% block navbar %}
+                    {% include 'navbar.html' %}
+                {% endblock navbar %}
+            </div>
+            <!--navbar content end-->
+      
+
+            <!-- ############ PAGE START-->
+            <div ui-view class="app-body" style="justify-content: center;" id="view">
+            <!--START PAGE CODE-->
+            <div class="content">
+              <div class="header">Meeting Minutes</div>
+              <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
+                <div>
+                  <button class="create_btn" id="create-account-btn">Create Meeting Minutes</button>
+                  <button class="filter-button" onclick="toggleFilterOptions()">Filter</button>
+                  <div id="filterOptions" class="filter-options">
+                    <label for="tenureInput">By Tenure</label>
+                    <input type="text" id="tenureInput" placeholder="e.g., 2025">
+                    <label for="monthInput">By Month</label>
+                    <input type="text" id="monthInput" placeholder="e.g., May">
+                    <label for="locationInput">By Location</label>
+                    <input type="text" id="locationInput" placeholder="e.g., Dhaka">
+                    <button onclick="applyCustomFilters()">Apply Filters</button>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>SL</th>
+                      <th>Meeting Name</th>
+                      <th>Date</th>
+                      <th>Download</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            </div>
+        </div>
+</body>
+    {% block common_js %} 
+    {% include "common_js.html" %} 
+    {% endblock common_js %}
+    <script>
     const dummyData = [
       { name: "Venue Selection for upcoming event", date: "June 25, 2025, 7:34 p.m.", tenure: "2025", month: "June", location: "Tangail" },
       { name: "GBM", date: "May 25, 2024, 7:34 p.m.", tenure: "2024", month: "May", location: "Mymensingh" },
@@ -212,7 +270,7 @@
           <td>${index + 1}</td>
           <td><span class="ellipsis">${item.name}</span></td>
           <td>${item.date}</td>
-          <td><span class="download-icon" onclick="confirmDownload(${index + 1})"><img src="circle.svg" alt=""></span></td>
+          <td class="download-icon fa fa-download" onclick="confirmDownload(${index + 1})"></td>
         `;
         tbody.appendChild(row);
       });
@@ -253,5 +311,4 @@
       toggleFilterOptions();
     }
   </script>
-</body>
 </html>
