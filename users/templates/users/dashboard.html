@@ -599,7 +599,7 @@
 		font-weight: bold;
 	}
 	@media screen and (max-width:700px){
-		.outer_box{
+		.outer_box, .stat_box{
 			width: 100%;
 		}
 	}
@@ -2438,146 +2438,6 @@ function getChartColorsArray(chartId) {
 			});
 		}
 	}
-	async function initializeMiniChart1() {
-		try {
-			var barchartColors = getChartColorsArray("mini-1");
-			var options = {
-				series: [{
-				  data: {{event_number_over_5_years}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-1"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart1();
-
-	  async function initializeMiniChart3() {
-		try {
-			var barchartColors = getChartColorsArray("mini-3");
-			var options = {
-				series: [{
-				  data: {{hit_count_monthly_data}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-3"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart3();
-
-	  async function initializeMiniChart4() {
-		try {
-			var barchartColors = getChartColorsArray("mini-4");
-			var options = {
-				series: [{
-				  data: {{hit_count_over_5_years}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-4"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart4();
 async function initializeCircleChart2(){
 	try {
 		Chart.pluginService.register({
@@ -2823,8 +2683,8 @@ async function initializeCircleChart2(){
 const chartData = {
     events: {
         title: "Events over 5 Years",
-        labels: ['2021', '2022', '2023', '2024', '2025'],
-        data: {{event_number_over_5_years}},
+        labels: [{% for year in event_number_over_5_years.0 %}'{{year}}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        data: [{% for data in event_number_over_5_years.1 %}{{data}}{% if not forloop.last %},{% endif %}{% endfor %}],
         backgroundColor: '#3980c0',
         borderColor: '#2968a3'
     },
@@ -2900,28 +2760,25 @@ function createChart(type) {
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)'
-                        },
-                        ticks: {
-                            font: {
-                                size: window.innerWidth < 576 ? 10 : 12
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
+					yAxes: [{
+						gridLines: {
+							color: 'rgba(0,0,0,0.1)'
+						},
+						ticks: {
+							beginAtZero: false,
+							min: 0,
+							fontSize: window.innerWidth < 576 ? 10 : 12
+						}
+					}],
+                    xAxes: [{
+                        gridLines: {
                             display: false
                         },
                         ticks: {
-                            font: {
-                                size: window.innerWidth < 576 ? 10 : 12
-                            },
+                            fontSize: window.innerWidth < 576 ? 10 : 12,
                             maxRotation: window.innerWidth < 576 ? 45 : 0
                         }
-                    }
+                    }]
                 },
                 animation: {
                     duration: 1000,
