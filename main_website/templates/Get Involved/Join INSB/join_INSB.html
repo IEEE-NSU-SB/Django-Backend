@@ -144,7 +144,6 @@
             margin-bottom: -20px;
             margin-top: 30px;
             z-index: 2;
-            border: 1px solid white;
         }
         @media all and (max-width: 768px) {
         .timer_container h1 {
@@ -159,6 +158,23 @@
         .timer_container li span {
             font-size: .75rem;
         }
+        }
+        .event_link{
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+            border: 4px solid #00629B;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 24px;
+            color: #00629B;
+            position: relative;
+            margin-bottom: 0px;
+            margin-top: 50px;
+            z-index: 2;
+        }
+        .event_link:hover{
+            color: #FFC72C;
+            border: 4px solid #FFC72C;
         }
     </style>
 </head>
@@ -182,8 +198,11 @@
             <div class="max-width join_container">
                 <div class="container">
                     {% if recruit_session %}
-                    <h1 class="join_msg">Recruitment Ongoing!</h1>
-                    <h1 class="join_msg">Meet us in front of recreation hall</h1>
+                    <h1>Recruitment Ongoing!</h1>
+                    <h1>Meet us in front of recreation hall</h1>
+                    <h4 class="event_link" onclick="window.location.href='#'">
+                        <i aria-hidden="true" class="fas fa-external-link-alt"></i>
+                        Recruitment Event Link</h4>
                     <div class="timer_container">
                         <div id="countdown">
                             <ul style="margin-left: 0;">
