@@ -259,7 +259,7 @@
               <div class="search-filter">
                 <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
                 <div class="buttons">
-                  <button type="button" class="create_btn" id="create-account-btn" onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_edit' %}'">Create Meeting Minutes</button>
+                  <button type="button" class="create_btn" id="create-account-btn" onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_create' %}'">Create Meeting Minutes</button>
                   <p class="filter" onclick="toggleFilterOptions()">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
                   <div id="filterOptions" class="filter-options">
                     <label for="tenureInput">By Tenure</label>

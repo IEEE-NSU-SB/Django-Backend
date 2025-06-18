@@ -1,9 +1,9 @@
-# from django.db import models
-# from django.urls import reverse
-# from port.models import Teams, Chapters_Society_and_Affinity_Groups
-# # Create your models here.
+from django.db import models
+from django.urls import reverse
+from port.models import Teams, Chapters_Society_and_Affinity_Groups
+# Create your models here.
 
-# # meeting minutes' information
+# meeting minutes' information
 # class team_meeting_minutes(models.Model):
 #     team_id=models.ForeignKey(Teams,null=False,blank=False,on_delete=models.CASCADE) #team foreign key from each chapters
 #     team_meeting_title=models.CharField(null=False,blank=False,max_length=150)
@@ -47,3 +47,23 @@
 #         return self.meeting_title
 #     def get_absolute_url(self):
 #         return reverse("branch_meeting_minutes", kwargs={"meeting_title": self.meeting_title})
+
+
+class MeetingMinutes(models.Model):
+    meeting_name = models.CharField(max_length=255)
+    location = models.CharField(max_length=50)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    venue = models.CharField(max_length=255, blank=True, null=True)
+    total_attendees = models.IntegerField()
+    ieee_attendees = models.IntegerField(blank=True, null=True)
+    non_ieee_attendees = models.IntegerField(blank=True, null=True)
+    agendas = models.TextField()  # Store agenda as a single string (can also use JSON if needed)
+    discussion = models.TextField()
+    host = models.CharField(max_length=255, blank=True, null=True)
+    co_host = models.CharField(max_length=255, blank=True, null=True)
+    guest = models.CharField(max_length=255, blank=True, null=True)
+    written_by = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.meeting_name
