@@ -1,9 +1,9 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="{% static 'logos/logo.gif' %}" />
     <title>Meeting Minutes</title>
 
@@ -27,16 +27,16 @@
       color: #00629b;
     }
 
-    .search-filter {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin: bottom;
-      position: relative;
-    }
+      .search-filter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: bottom;
+        position: relative;
+      }
 
     .search-filter input {
       text-decoration: none;
@@ -63,38 +63,38 @@
         background-color: rgb(155, 155, 255);
     }
 
-    .filter-options {
-      position: absolute;
-      right: 0;
-      top: 30px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: none;
-      flex-direction: column;
-      z-index: 2;
-      padding: 2px;
-    }
+      .filter-options {
+        position: absolute;
+        right: 0;
+        top: 30px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 2;
+        padding: 2px;
+      }
 
-    .filter-options label {
-      margin-bottom: 5px;
-    }
+      .filter-options label {
+        margin-bottom: 5px;
+      }
 
-    .filter-options input {
-      margin-bottom: 10px;
-      padding: 10px;
-      width: 88%;
-    }
+      .filter-options input {
+        margin-bottom: 10px;
+        padding: 10px;
+        width: 88%;
+      }
 
-    .filter-options button {
-      background: #002B5B;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+      .filter-options button {
+        background: #002b5b;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
 
     .table-container {
       max-height: 400px;
@@ -109,12 +109,12 @@
       /* table-layout: fixed; */
     }
 
-    thead tr {
-      background-color: #ffffff;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
+      thead tr {
+        background-color: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
 
     th, td {
       padding: 10px 16px;
@@ -141,23 +141,22 @@
       max-width: 100%;
     }
 
-    .download-icon {
-      cursor: pointer;
-      font-size: 18px;
+      .download-icon {
+        cursor: pointer;
+        font-size: 18px;
+      }
 
-    }
-
-    .create_btn{
+      .create_btn {
         border-radius: 4px;
         border: 1px solid transparent;
         color: rgb(76, 171, 92);
         background-color: rgb(213, 251, 219);
         padding: 3px 16px;
-        transition: all .3s ease-in-out;
+        transition: all 0.3s ease-in-out;
         cursor: pointer;
         margin: 0;
-    }
-    .create_btn:hover{
+      }
+      .create_btn:hover {
         background-color: rgb(149, 255, 165);
         /* color: rgb(213, 251, 219); */
     }
@@ -246,14 +245,11 @@
             <!-- aside end -->
       
 
-            <!-- navbar content -->
-            <div id="content" class="app-content box-shadow-z0" role="main">
-                {% block navbar %}
-                    {% include 'navbar.html' %}
-                {% endblock navbar %}
-            </div>
-            <!--navbar content end-->
-      
+      <!-- navbar content -->
+      <div id="content" class="app-content box-shadow-z0" role="main">
+        {% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
+      </div>
+      <!--navbar content end-->
 
             <!-- ############ PAGE START-->
             <div ui-view class="app-body" style="justify-content: center;" id="view">
@@ -263,7 +259,7 @@
               <div class="search-filter">
                 <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
                 <div class="buttons">
-                  <button class="create_btn" id="create-account-btn">Create Meeting Minutes</button>
+                  <button type="button" class="create_btn" id="create-account-btn" onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_edit' %}'">Create Meeting Minutes</button>
                   <p class="filter" onclick="toggleFilterOptions()">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
                   <div id="filterOptions" class="filter-options">
                     <label for="tenureInput">By Tenure</label>
@@ -277,8 +273,6 @@
                 </div>
               </div>
               <br>
-         
-
               <div class="table-responsive table_box table-container">
                 <table class="meeting-minutes-table  table" id="event">
                     <thead style="position: relative; z-index: 101;">
@@ -292,7 +286,6 @@
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
-
             </div>
 
             </div>
@@ -303,16 +296,76 @@
     {% endblock common_js %}
     <script>
     const dummyData = [
-      { name: "Venue Selection for upcoming event", date: "June 25, 2025, 7:34 p.m.", tenure: "2025", month: "June", location: "Tangail" },
-      { name: "GBM", date: "May 25, 2024, 7:34 p.m.", tenure: "2024", month: "May", location: "Mymensingh" },
-      { name: "Tenure discussion", date: "April 25, 2025, 7:34 p.m.", tenure: "2025", month: "April", location: "Jamalpur" },
-      { name: "Sub Executives discussion", date: "March 24, 2023, 7:34 p.m.", tenure: "2023", month: "March", location: "Dhaka" },
-      { name: "Venue Selection for upcoming event", date: "May 23, 2025, 7:34 p.m.", tenure: "2025", month: "May", location: "Rajshahi" },
-      { name: "Venue Selection for upcoming event", date: "April 22, 2025, 7:34 p.m.", tenure: "2025", month: "April", location: "Chittagong" },
-      { name: "Venue Selection for upcoming event", date: "March 21, 2025, 7:34 p.m.", tenure: "2025", month: "March", location: "Khulna" },
-      { name: "Venue Selection for upcoming event", date: "February 20, 2025, 7:34 p.m.", tenure: "2025", month: "February", location: "Sylhet" },
-      { name: "Venue Selection for upcoming event", date: "January 19, 2024, 7:34 p.m.", tenure: "2024", month: "January", location: "Barisal" },
-      { name: "Venue Selection for upcoming event", date: "December 18, 2023, 7:34 p.m.", tenure: "2023", month: "December", location: "Rangpur" }
+      {
+        name: "Venue Selection for upcoming event",
+        date: "June 25, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "June",
+        location: "Tangail",
+      },
+      {
+        name: "GBM",
+        date: "May 25, 2024, 7:34 p.m.",
+        tenure: "2024",
+        month: "May",
+        location: "Mymensingh",
+      },
+      {
+        name: "Tenure discussion",
+        date: "April 25, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "April",
+        location: "Jamalpur",
+      },
+      {
+        name: "Sub Executives discussion",
+        date: "March 24, 2023, 7:34 p.m.",
+        tenure: "2023",
+        month: "March",
+        location: "Dhaka",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "May 23, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "May",
+        location: "Rajshahi",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "April 22, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "April",
+        location: "Chittagong",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "March 21, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "March",
+        location: "Khulna",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "February 20, 2025, 7:34 p.m.",
+        tenure: "2025",
+        month: "February",
+        location: "Sylhet",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "January 19, 2024, 7:34 p.m.",
+        tenure: "2024",
+        month: "January",
+        location: "Barisal",
+      },
+      {
+        name: "Venue Selection for upcoming event",
+        date: "December 18, 2023, 7:34 p.m.",
+        tenure: "2023",
+        month: "December",
+        location: "Rangpur",
+      },
     ];
 
     const tbody = document.getElementById("tableBody");
@@ -335,12 +388,16 @@
 
     function searchTable() {
       const filter = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = dummyData.filter(item => item.name.toLowerCase().includes(filter));
+      const filtered = dummyData.filter((item) =>
+        item.name.toLowerCase().includes(filter)
+      );
       renderTable(filtered);
     }
 
     function confirmDownload(id) {
-      const confirmed = confirm("Do you want to download meeting minutes for SL #" + id + "?");
+      const confirmed = confirm(
+        "Do you want to download meeting minutes for SL #" + id + "?"
+      );
       if (confirmed) {
         alert("Download initiated for SL #" + id);
       }
@@ -348,7 +405,8 @@
 
     function toggleFilterOptions() {
       const options = document.getElementById("filterOptions");
-      options.style.display = options.style.display === "flex" ? "none" : "flex";
+      options.style.display =
+        options.style.display === "flex" ? "none" : "flex";
     }
 
     function applyCustomFilters() {
@@ -356,10 +414,12 @@
       const month = document.getElementById("monthInput").value.trim();
       const location = document.getElementById("locationInput").value.trim();
 
-      const filtered = dummyData.filter(item => {
-        return (!tenure || item.tenure.toLowerCase() === tenure.toLowerCase()) &&
-               (!month || item.month.toLowerCase() === month.toLowerCase()) &&
-               (!location || item.location.toLowerCase() === location.toLowerCase());
+      const filtered = dummyData.filter((item) => {
+        return (
+          (!tenure || item.tenure.toLowerCase() === tenure.toLowerCase()) &&
+          (!month || item.month.toLowerCase() === month.toLowerCase()) &&
+          (!location || item.location.toLowerCase() === location.toLowerCase())
+        );
       });
 
       renderTable(filtered);
