@@ -200,9 +200,11 @@
                     {% if recruit_session %}
                     <h1>Recruitment Ongoing!</h1>
                     <h1>Meet us in front of recreation hall</h1>
-                    <h4 class="event_link" onclick="window.location.href='#'">
+                    {% if recruit_session.recruitment_event_link %}
+                    <h4 class="event_link" onclick="window.location.href='{{recruit_session.recruitment_event_link}}'">
                         <i aria-hidden="true" class="fas fa-external-link-alt"></i>
                         Recruitment Event Link</h4>
+                    {% endif %}
                     <div class="timer_container">
                         <div id="countdown">
                             <ul style="margin-left: 0;">

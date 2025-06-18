@@ -9,6 +9,7 @@ class recruitment_session(models.Model):
     session=models.CharField(null=False,blank=False,max_length=100)
     session_time=models.DateField(null=True,blank=True)
     session_end_date_time=models.DateTimeField(null=True, blank=True)
+    recruitment_event_link=models.CharField(null=True, blank=True,max_length=100)
     is_active=models.BooleanField(null=False, blank=False, default=False)
     
     class Meta:

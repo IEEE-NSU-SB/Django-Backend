@@ -422,7 +422,7 @@
               <input type="datetime-local" style="border: none;" name="recruitment_end_datetime" {% if session.session.session_end_date_time %}value="{{session.session.session_end_date_time|date:'Y-m-d\\TH:i'}}"{% endif %}>
               <div>
                 <label for="recruitment-link" style="font-style: 16px; margin: 0;font-weight: bold;">Recruitment Event Link:</label>
-                <input type="text" name="recruitment-link" id="recruitment-link" placeholder="Event Link">
+                <input type="text" name="recruitment_event_link" id="recruitment-link" placeholder="Event Link" {% if session.session.recruitment_event_link %}value="{{session.session.recruitment_event_link}}"{% endif %}>
               </div>
               <div class="toggle">
                         <div style="display: flex; margin: 0 10px;">
