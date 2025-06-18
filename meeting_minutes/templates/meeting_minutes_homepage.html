@@ -40,7 +40,7 @@
 
     .search-filter input {
       text-decoration: none;
-      border-radius: 6px;
+      border-radius: 4px;
       border: 1px solid transparent;
       height: 26px;
       padding: 16px;
@@ -66,15 +66,15 @@
       .filter-options {
         position: absolute;
         right: 0;
-        top: 30px;
+        top: 40px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 5px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         display: none;
         flex-direction: column;
-        z-index: 2;
-        padding: 2px;
+        z-index: 102;
+        padding: 16px;
       }
 
       .filter-options label {
@@ -84,7 +84,7 @@
       .filter-options input {
         margin-bottom: 10px;
         padding: 10px;
-        width: 88%;
+        width: 100%;
       }
 
       .filter-options button {
@@ -376,7 +376,7 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${index + 1}.</td>
-          <td><span class="ellipsis">${item.name}</span></td>
+          <td style="cursor:pointer;"><span class="ellipsis">${item.name}</span></td>
           <td>${item.date}</td>
           <td class="download-icon fa fa-download download-btn" style="display:revert;" onclick="confirmDownload(${index + 1})"></td>
         `;

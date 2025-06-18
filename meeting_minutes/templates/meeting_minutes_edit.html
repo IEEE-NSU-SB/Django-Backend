@@ -56,8 +56,13 @@
 </script>
 
     <style>
-        .body{
-            margin: 50px 100px 0px 100px;
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .meeting_minutes_container{
+            margin: 50px 0;
             padding: 50px;
             background-color: white;
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -171,7 +176,7 @@
             color: #d5f5e3;
         }   
 
-        .container {
+        .label-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
@@ -268,7 +273,7 @@
             .space{
                 display: none;
             }
-            .container {
+            .label-container {
                 grid-template-columns: 1fr;
             }
             .location_fld_ip{
@@ -315,15 +320,13 @@
   
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
-            {% block navbar %}
-                {% include 'users/navbar.html' %}
-            {% endblock navbar %}
-
+        {% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
         </div>
         <!--navbar content-->   
 
     <!-- ############ PAGE START-->
-    <section class="body">
+     <div class="container">
+    <section class="meeting_minutes_container">
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
@@ -336,7 +339,7 @@
             </div>
 
             <div class="div2">
-                <div class="container">
+                <div class="label-container">
                     <div class="location_fld"><!--location-->
                         <h2 style="font-size: 20px; margin: 0px; display: flex;">Location<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
@@ -419,7 +422,7 @@
                         <textarea id="summernote" name="discussion"></textarea>
                     </div>
 
-                    <div class="container" style="margin-top: 40px;">
+                    <div class="label-container" style="margin-top: 40px;">
                         <div class="text_fld"><!--host-->   
                         <h2 style="font-size: 20px; margin:0px;">Host</h2>
                         <div class="colon">:</div>
@@ -468,8 +471,7 @@
                     </div>
         </form>
      </section>
-
-     <div style="height: 20px;"></div>
+</div>
 
      <script>
         const modal = document.getElementById("myModal");
