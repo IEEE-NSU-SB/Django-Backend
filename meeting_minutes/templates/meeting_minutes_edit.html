@@ -233,7 +233,7 @@
             background-color: #3498db;
             color: white;
         }
-        .modal {
+        .delete_modal {
             display: none;
             position: fixed;
             z-index: 1;
@@ -304,7 +304,7 @@
 {% endblock preloader %}
 
 
-<body>
+<body style="background-color: white;">
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
 
@@ -324,6 +324,7 @@
         </div>
         <!--navbar content-->   
 
+        <div ui-view class="app-body" style="justify-content: center;" id="view">
     <!-- ############ PAGE START-->
      <div class="container">
     <section class="meeting_minutes_container">
@@ -459,7 +460,7 @@
                     </div>
 
                     <!-- modal-->
-                    <div id="myModal" class="modal">
+                    <div id="myModal" class="delete_modal">
                         <div class="modal_content">
                                 <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
                                 <div style="display: flex; justify-content: center;">        
@@ -472,7 +473,7 @@
         </form>
      </section>
 </div>
-
+</div>
      <script>
         const modal = document.getElementById("myModal");
         // const deleteForm = document.querySelector("#myModal form");
