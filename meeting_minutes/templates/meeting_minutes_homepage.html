@@ -16,22 +16,21 @@
      <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       display: flex;
       height: 100vh;
     }
 
-    .content {
-      flex-grow: 1;
-      padding: 40px;
-      background-color: #f8f9fa;
-      overflow: auto;
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     .header {
       font-size: 2em;
       text-align: center;
       margin-bottom: 20px;
+      color: #00629b;
     }
 
     .search-filter {
@@ -46,21 +45,28 @@
     }
 
     .search-filter input {
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      width: 250px;
-      box-shadow: 0px 4px 8px 0px #00000040;
+      text-decoration: none;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      height: 26px;
+      padding: 16px;
+      border: 1px solid #D9D9D9;
+      padding: 16px 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .filter-button {
-      padding: 10px 70px;
-      background-color: #e2e2ff;
-      color: #4C4CAB;
-
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .filter{
+        border-radius: 4px;
+        /* border: 1px solid rgb(76 76 171); */
+        color: rgb(76 76 171);
+        background-color: rgb(206, 206, 254);
+        padding: 3px 16px;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+        margin: 0;
+    }
+    .filter:hover{
+        background-color: rgb(155, 155, 255);
     }
 
     .filter-options {
@@ -100,13 +106,13 @@
       max-height: 400px;
       overflow-y: auto;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
+      /* table-layout: fixed; */
     }
 
     thead tr {
@@ -117,15 +123,22 @@
     }
 
     th, td {
-      padding: 8px 10px;
+      padding: 10px 16px;
       text-align: center;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid rgba(120, 130, 140, 0.045);
     }
     th {
-      background: #cfcfcf;
+      background: #f0f0f0;
       font-weight: bold;
+      color: #333;
     }
 
+    table tr:nth-child(even) {
+      background-color: white;
+    }
+    table tr {
+      background-color: white;
+    }
     td .ellipsis {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -154,19 +167,48 @@
         background-color: rgb(149, 255, 165);
         /* color: rgb(213, 251, 219); */
     }
-    .download_btn{
-        border-radius: 4px;
-        border: 1px solid #0cc2aa;
-        color: #0cc2aa;
-        background-color: #c5fcf5;
-        padding: 4px 16px;
-        transition: all .3s ease-in-out;
-        cursor: pointer;
-        margin: 0;
+    .buttons{
+        display: flex;
+        gap: 10px;
+        align-items: center;
     }
-    .download_btn:hover{
-        background-color: #0cc2aa;
-        color: #c5fcf5;
+    .table-responsive{
+        overflow-x: hidden;
+        max-height: 400px;
+    }
+    .table-responsive th{
+        position: sticky;
+        top: -2px;
+    }
+    .meeting-minutes-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 6px;
+    }
+    
+    .meeting-minutes-table th, .meeting-minutes-table td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .meeting-minutes-table th {
+        background-color: #f0f0f0;
+    }
+    
+    .meeting-minutes-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    .download-btn {
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: transparent;
+        color: #00629b;
     }
     @media (max-width: 600px) {
       .search-filter {
@@ -178,6 +220,22 @@
         position: static;
         width: 100%;
       }
+    }
+    @media screen and (max-width: 700px) {
+        .table-responsive{
+            overflow-x: scroll;
+            width: 500px;
+        }
+    }
+    @media screen and (max-width: 600px) {
+        .table-responsive{
+            width: 400px;
+        }
+    }
+    @media screen and (max-width: 450px) {
+        .table-responsive{
+            width: 350px;
+        }
     }
   </style>
 </head>
@@ -206,13 +264,13 @@
             <!-- ############ PAGE START-->
             <div ui-view class="app-body" style="justify-content: center;" id="view">
             <!--START PAGE CODE-->
-            <div class="content">
+            <div class="container">
               <div class="header">Meeting Minutes</div>
               <div class="search-filter">
                 <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
-                <div>
+                <div class="buttons">
                   <button class="create_btn" id="create-account-btn">Create Meeting Minutes</button>
-                  <button class="filter-button" onclick="toggleFilterOptions()">Filter</button>
+                  <p class="filter" onclick="toggleFilterOptions()">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
                   <div id="filterOptions" class="filter-options">
                     <label for="tenureInput">By Tenure</label>
                     <input type="text" id="tenureInput" placeholder="e.g., 2025">
@@ -225,19 +283,22 @@
                 </div>
               </div>
               <br>
-              <div class="table-container">
-                <table>
-                  <thead>
+         
+
+          <div class="table-responsive table_box table-container">
+            <table class="meeting-minutes-table  table" id="event">
+                <thead style="position: relative; z-index: 101;">
                     <tr>
-                      <th>SL</th>
-                      <th>Meeting Name</th>
-                      <th>Date</th>
-                      <th>Download</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tableBody"></tbody>
-                </table>
-              </div>
+                          <th>SL</th>
+                          <th>Meeting Name</th>
+                          <th>Date</th>
+                          <th>Download</th>
+                      </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
             </div>
 
             </div>
@@ -267,10 +328,10 @@
       data.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${index + 1}</td>
+          <td>${index + 1}.</td>
           <td><span class="ellipsis">${item.name}</span></td>
           <td>${item.date}</td>
-          <td class="download-icon fa fa-download" onclick="confirmDownload(${index + 1})"></td>
+          <td class="download-icon fa fa-download download-btn" style="display:revert;" onclick="confirmDownload(${index + 1})"></td>
         `;
         tbody.appendChild(row);
       });
