@@ -363,40 +363,40 @@
 
         <!-- Time Fields -->
         <div class="time_fld">
-          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+          <h2 style="font-size: 20px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
         </div>
 
         <div class="time_fld">
-          <h2>End time<div style="color: #e74c3c;">*</div></h2>
+          <h2 style="font-size: 20px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
         </div>
 
         <!-- Venue -->
         <div class="text_fld">
-          <h2>Venue</h2>
+          <h2 style="font-size: 20px; display: flex;">Venue</h2>
           <div class="colon">:</div>
           <input type="text" name="venue" class="text_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
         </div>
 
         <!-- Total Attendee -->
         <div class="text_fld">
-          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+          <h2 style="font-size: 20px; display: flex;">Total Attendee<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="text" name="total_attendee" class="text_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
         </div>
 
         <!-- IEEE & Non-IEEE -->
         <div class="text_fld">
-          <h2>IEEE Attendee</h2>
+          <h2 style="font-size: 20px; display: flex;">IEEE Attendee</h2>
           <div class="colon">:</div>
           <input type="text" name="ieee_attendee" class="text_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
         </div>
 
         <div class="text_fld">
-          <h2>Non-IEEE Attendee</h2>
+          <h2 style="font-size: 20px; display: flex;">Non-IEEE Attendee</h2>
           <div class="colon">:</div>
           <input type="text" name="non_ieee_attendee" class="text_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
         </div>
@@ -404,7 +404,7 @@
 
       <!-- Agenda Controls -->
       <div class="agenda" id="agenda-controls">
-        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
+        <h2 style="font-size: 20px; display: flex;">Agenda<div style="color: #e74c3c;">*</div></h2>
         <div>
           <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
           <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
@@ -422,7 +422,7 @@
           {% endfor %}
         {% else %}
           <div class="agenda_fld">
-            <h2>1.</h2>
+            <h2 style="font-size: 20px;">1.</h2>
             <input type="text" class="agenda_fld_ip" name="agenda[]" required>
           </div>
         {% endif %}
@@ -430,21 +430,21 @@
 
       <!-- Discussion -->
       <div>
-        <h2 style="margin-top: 40px;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <h2 style="font-size: 20px; margin-top: 40px; display: flex;">Discussion<div style="color: #e74c3c;">*</div></h2>
         <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
       </div>
 
-                    <div class="container" style="margin-top: 40px;">
-                        <div class="text_fld"><!--host-->   
-                        <h2 style="font-size: 20px; margin:0px;">Host</h2>
-                        <div class="colon">:</div>
-                        <input type="text"  name="host" class="text_fld_ip"  value="{{ meeting.host|default_if_none:'' }}">
-                        </div>
+        <div class="label-container" style="margin-top: 40px;">
+            <div class="text_fld"><!--host-->   
+            <h2 style="font-size: 20px; margin:0px;">Host</h2>
+            <div class="colon">:</div>
+            <input type="text"  name="host" class="text_fld_ip"  value="{{ meeting.host|default_if_none:'' }}">
+        </div>
 
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2>Co-host</h2>
+          <h2 style="font-size: 20px; margin:0px;">Co-host</h2>
           <div class="colon">:</div>
           <input type="text" name="co_host" class="text_fld_ip" value="{{ meeting.co_host|default_if_none:'' }}">
         </div>
@@ -452,7 +452,7 @@
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2>Guest</h2>
+          <h2 style="font-size: 20px; margin:0px;">Guest</h2>
           <div class="colon">:</div>
           <input type="text" name="guest" class="text_fld_ip" value="{{ meeting.guest|default_if_none:'' }}">
         </div>
@@ -460,7 +460,7 @@
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2>Written by<div style="color: #e74c3c;">*</div></h2>
+          <h2 style="font-size: 20px; margin:0px;">Written by<span style="color: #e74c3c;">*</span></h2>
           <div class="colon">:</div>
           <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
         </div>
