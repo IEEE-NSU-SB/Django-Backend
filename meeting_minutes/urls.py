@@ -19,7 +19,10 @@ urlpatterns = [
     # #branch_meeting_minutes_list
     # path('branch_meeting_minutes_list',views.branch_meeting_minutes_list,name='branch_meeting_minutes_list'),
     
-    #meeting_minutes_edit
-    path('meeting_minutes_edit', views.meeting_minutes_edit, name="meeting_minutes_edit"),
+    # Create a new meeting
+    path('meeting_minutes_edit/', views.meeting_minutes_edit, name="meeting_minutes_create"),
+
+    # Edit an existing meeting
+    path('meeting_minutes_edit/<int:pk>/', views.meeting_minutes_edit, name="meeting_minutes_edit"),
 ]              
     

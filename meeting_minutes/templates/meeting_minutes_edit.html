@@ -326,18 +326,20 @@
 
         <div ui-view class="app-body" style="justify-content: center;" id="view">
     <!-- ############ PAGE START-->
-     <div class="container">
+<div class="container">
     <section class="meeting_minutes_container">
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
-                <input type="text" placeholder="Meeting Name" class="h1" required>
+                <input type="text" name="title" placeholder="Meeting Name" class="h1" required  value="{{ meeting.title|default_if_none:'' }}">
             </div>
 
-            <div class="div1"> <!--return and delete btns-->
-                 <a href="{% url 'meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
-                <button type="button" class="modal_btn">Delete</button>
-            </div>
+    <div class="div1">
+      <a href="{% url 'meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% if meeting %}
+        <button type="button" class="modal_btn">Delete</button>
+      {% endif %}
+    </div>
 
             <div class="div2">
                 <div class="label-container">
@@ -346,134 +348,147 @@
                         <div class="colon">:</div>
 
                         <div id="location-buttons">
-                            <input type="radio" id="virtual" name="location" value="Virtual" required>
+                            <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
                             <label for="virtual" class="location_fld_ip">Virtual</label>
 
-                            <input type="radio" id="hybrid" name="location" value="Hybrid">
-                            <label for="hybrid" class="location_fld_ip">Hybrid</label>
+            <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
+            <label for="hybrid" class="location_fld_ip">Hybrid</label>
 
-                            <input type="radio" id="inperson" name="location" value="In-person">
-                            <label for="inperson" class="location_fld_ip">In-person</label>
-                        </div>
-                        <!-- <div>
-                        <input type="button" value="Virtual" class="location_fld_ip">
-                        <input type="button" value="Hybrid" class="location_fld_ip">
-                        <input type="button" value="In-person" class="location_fld_ip">
-                        </div> -->
-                    </div>
+            <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
+            <label for="inperson" class="location_fld_ip">In-person</label>
+          </div>
+        </div>
 
-                    <div class="space"></div>
+        <div class="space"></div>
 
-                        <div class="time_fld"><!--start time--> 
-                            <h2 style="font-size: 20px; margin: 0px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
-                            <div class="colon">:</div>
-                            <input type="time" class="time_fld_ip" required>
-                        </div>
-                        
-                        <div class="time_fld"><!--end time-->  
-                            <h2 style="font-size: 20px; margin: 0px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
-                            <div class="colon">:</div>
-                            <input type="time" class="time_fld_ip" required>
-                        </div>
+        <!-- Time Fields -->
+        <div class="time_fld">
+          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
+        </div>
 
-                        <div class="text_fld"><!--venue-->   
-                            <h2 style="font-size: 20px; margin: 0px;">Venue</h2>
-                            <div class="colon">:</div>
-                            <input type="text" class="text_fld_ip">
-                        </div>    
-                        
-                        <div class="text_fld"><!--total attendee--> 
-                        <h2 style="font-size: 20px; margin: 0px; display: flex;">Total Attendee<div style="color: #e74c3c;">*</div></h2>
-                        <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" required>
-                        </div>
+        <div class="time_fld">
+          <h2>End time<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
+        </div>
 
-                        <div class="text_fld"><!--ieee attendee-->   
-                            <h2 style="font-size: 20px; margin: 0px;">IEEE Attendee</h2>
-                            <div class="colon">:</div>
-                            <input type="text" class="text_fld_ip">
-                        </div>    
-                        
-                        <div class="text_fld"><!--non ieee attendee--> 
-                        <h2 style="font-size: 20px; margin: 0px;">Non-IEEE Attendee</h2>
-                        <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip">
-                        </div> 
-                    </div>
+        <!-- Venue -->
+        <div class="text_fld">
+          <h2>Venue</h2>
+          <div class="colon">:</div>
+          <input type="text" name="venue" class="text_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+        </div>
 
+        <!-- Total Attendee -->
+        <div class="text_fld">
+          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="text" name="total_attendee" class="text_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+        </div>
 
-                    <div class="agenda" id="agenda-controls"><!--add/delete agenda btns--> 
-                        <h2 style="font-size: 20px; display: flex;">Agenda<div style="color: #e74c3c;">*</div></h2>
-                        <div>
-                            <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
-                            <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
-                        </div>
-                    </div>
+        <!-- IEEE & Non-IEEE -->
+        <div class="text_fld">
+          <h2>IEEE Attendee</h2>
+          <div class="colon">:</div>
+          <input type="text" name="ieee_attendee" class="text_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+        </div>
 
-                    <div id="agenda-items"><!--agenda--> 
-                    <div class="agenda_fld">
-                        <h2 style="font-size: 20px;">1.</h2>
-                        <input type="text" class="agenda_fld_ip" required>
-                    </div>
-                    </div>
+        <div class="text_fld">
+          <h2>Non-IEEE Attendee</h2>
+          <div class="colon">:</div>
+          <input type="text" name="non_ieee_attendee" class="text_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+        </div>
+      </div>
 
-                    <div><!--discussion--> 
-                        <h2 style="font-size: 20px; margin-top: 40px; display: flex;">Discussion<div style="color: #e74c3c;">*</div></h2>
-                        <!-- <textarea name="discussion" class="desc_fld" required></textarea> -->
-                        <textarea id="summernote" name="discussion"></textarea>
-                    </div>
+      <!-- Agenda Controls -->
+      <div class="agenda" id="agenda-controls">
+        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
+        <div>
+          <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
+          <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
+        </div>
+      </div>
 
-                    <div class="label-container" style="margin-top: 40px;">
+      <!-- Agenda Items -->
+      <div id="agenda-items">
+        {% if meeting.agenda %}
+          {% for item in meeting.agenda %}
+            <div class="agenda_fld">
+              <h2>{{ forloop.counter }}.</h2>
+              <input type="text" class="agenda_fld_ip" name="agenda[]" required value="{{ item }}">
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="agenda_fld">
+            <h2>1.</h2>
+            <input type="text" class="agenda_fld_ip" name="agenda[]" required>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Discussion -->
+      <div>
+        <h2 style="margin-top: 40px;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
+      </div>
+
+                    <div class="container" style="margin-top: 40px;">
                         <div class="text_fld"><!--host-->   
                         <h2 style="font-size: 20px; margin:0px;">Host</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip">
+                        <input type="text"  name="host" class="text_fld_ip"  value="{{ meeting.host|default_if_none:'' }}">
                         </div>
 
-                        <div class="space"></div>
+        <div class="space"></div>
 
-                        <div class="text_fld"><!--co host-->  
-                        <h2 style="font-size: 20px; margin:0px;">Co-host</h2>
-                        <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip">
-                        </div>
+        <div class="text_fld">
+          <h2>Co-host</h2>
+          <div class="colon">:</div>
+          <input type="text" name="co_host" class="text_fld_ip" value="{{ meeting.co_host|default_if_none:'' }}">
+        </div>
 
-                        <div class="space"></div>
+        <div class="space"></div>
 
-                        <div class="text_fld"><!--guest-->  
-                            <h2 style="font-size: 20px; margin:0px;">Guest</h2>
-                            <div class="colon">:</div>
-                            <input type="text" class="text_fld_ip">
-                        </div>
+        <div class="text_fld">
+          <h2>Guest</h2>
+          <div class="colon">:</div>
+          <input type="text" name="guest" class="text_fld_ip" value="{{ meeting.guest|default_if_none:'' }}">
+        </div>
 
-                        <div class="space"></div>
+        <div class="space"></div>
 
-                        <div class="text_fld"><!--written by-->  
-                            <h2 style="font-size: 20px; margin:0px; display: flex;">Written by<div style="color: #e74c3c;">*</div></h2>
-                            <div class="colon">:</div>
-                            <input type="text" class="text_fld_ip" required>
-                        </div>
-                        </div>
+        <div class="text_fld">
+          <h2>Written by<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
+        </div>
+      </div>
 
-                    <div style="display: flex; justify-content: center; margin-top: 20px;"><!--save btn--> 
-                            <button type="submit" class="save_btn">Save</button>
-                    </div>
+      <!-- Save -->
+      <div style="display: flex; justify-content: center; margin-top: 20px;">
+        <button type="submit" class="save_btn">Save</button>
+      </div>
 
                     <!-- modal-->
+                    {% if meeting %}
                     <div id="myModal" class="delete_modal">
                         <div class="modal_content">
                                 <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
                                 <div style="display: flex; justify-content: center;">        
                                     <!-- delete btn -->
-                                    <button type="button" class="delete_btn" style="margin-right: 10px;">Yes</button>
+                                    <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
                                     <span><button type="button" class="close_btn">No</button></span>
                                 </div>
                         </div>
                     </div>
+                {% endif %}
+            </div>
         </form>
      </section>
-</div>
-</div>
+
+
      <script>
         const modal = document.getElementById("myModal");
         // const deleteForm = document.querySelector("#myModal form");
