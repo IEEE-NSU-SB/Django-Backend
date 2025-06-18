@@ -385,20 +385,20 @@
         <div class="text_fld">
           <h2 style="font-size: 20px; display: flex;">Total Attendee<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="text" name="total_attendee" class="text_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+          <input type="number" name="total_attendees" class="text_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
         </div>
 
         <!-- IEEE & Non-IEEE -->
         <div class="text_fld">
           <h2 style="font-size: 20px; display: flex;">IEEE Attendee</h2>
           <div class="colon">:</div>
-          <input type="text" name="ieee_attendee" class="text_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+          <input type="number" name="ieee_attendee" class="text_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
         </div>
 
         <div class="text_fld">
           <h2 style="font-size: 20px; display: flex;">Non-IEEE Attendee</h2>
           <div class="colon">:</div>
-          <input type="text" name="non_ieee_attendee" class="text_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+          <input type="number" name="non_ieee_attendee" class="text_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
         </div>
       </div>
 

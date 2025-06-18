@@ -55,10 +55,10 @@ class MeetingMinutes(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     venue = models.CharField(max_length=255, blank=True, null=True)
-    total_attendees = models.IntegerField()
-    ieee_attendees = models.IntegerField(blank=True, null=True)
-    non_ieee_attendees = models.IntegerField(blank=True, null=True)
-    agendas = models.TextField()  # Store agenda as a single string (can also use JSON if needed)
+    total_attendee = models.IntegerField()
+    ieee_attendee = models.IntegerField(blank=True, null=True)
+    non_ieee_attendee = models.IntegerField(blank=True, null=True)
+    agendas = models.TextField()  
     discussion = models.TextField()
     host = models.CharField(max_length=255, blank=True, null=True)
     co_host = models.CharField(max_length=255, blank=True, null=True)
@@ -66,4 +66,4 @@ class MeetingMinutes(models.Model):
     written_by = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.meeting_name
+        return str(self.pk)

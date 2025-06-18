@@ -1,3 +1,4 @@
+from datetime import datetime, time
 from django.shortcuts import get_object_or_404, redirect, render
 
 from central_branch import renderData
@@ -61,10 +62,23 @@ def meeting_minutes_edit(request, pk=None):
     if request.method == 'POST':
         # Extract values from form fields
         location = request.POST.get('location')
-        start_time = request.POST.get('start_time')
-        end_time = request.POST.get('end_time')
+        # Strip date if it's included (e.g., "2025-06-19T02:24")
+        start_time_raw = request.POST.get('start_time')
+        end_time_raw = request.POST.get('end_time')
+
+        # Extract time part only
+        if 'T' in start_time_raw:
+            start_time = datetime.fromisoformat(start_time_raw).time()
+        else:
+            start_time = datetime.strptime(start_time_raw, '%H:%M').time()
+
+        if 'T' in end_time_raw:
+            end_time = datetime.fromisoformat(end_time_raw).time()
+        else:
+            end_time = datetime.strptime(end_time_raw, '%H:%M').time()
         venue = request.POST.get('venue')
         total_attendee = request.POST.get('total_attendee')
+        total_attendee = int(total_attendee) if total_attendee else 0  # or raise validation error
         ieee_attendee = request.POST.get('ieee_attendee')
         non_ieee_attendee = request.POST.get('non_ieee_attendee')
         agendas = request.POST.getlist('agenda[]')
@@ -83,7 +97,7 @@ def meeting_minutes_edit(request, pk=None):
             meeting.total_attendee = total_attendee
             meeting.ieee_attendee = ieee_attendee
             meeting.non_ieee_attendee = non_ieee_attendee
-            meeting.agenda = agendas
+            meeting.agendas = agendas
             meeting.discussion = discussion
             meeting.host = host
             meeting.co_host = co_host
@@ -100,7 +114,7 @@ def meeting_minutes_edit(request, pk=None):
                 total_attendee=total_attendee,
                 ieee_attendee=ieee_attendee,
                 non_ieee_attendee=non_ieee_attendee,
-                agenda=agendas,
+                agendas=agendas,
                 discussion=discussion,
                 host=host,
                 co_host=co_host,
