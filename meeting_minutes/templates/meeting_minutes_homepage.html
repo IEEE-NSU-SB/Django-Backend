@@ -10,22 +10,20 @@
     <!--Sweet Alert-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {% block common_css %} 
-    {% include "common_css.html" %} 
-    {% endblock common_css %}
-     <style>
-    .container {
+    {% block common_css %} {% include "common_css.html" %} {% endblock common_css %}
+    <style>
+      .container {
         width: 90%;
         max-width: 1200px;
         margin: 0 auto;
-    }
+      }
 
-    .header {
-      font-size: 2em;
-      text-align: center;
-      margin-bottom: 20px;
-      color: #00629b;
-    }
+      .header {
+        font-size: 2em;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #00629b;
+      }
 
       .search-filter {
         display: flex;
@@ -38,30 +36,30 @@
         position: relative;
       }
 
-    .search-filter input {
-      text-decoration: none;
-      border-radius: 4px;
-      border: 1px solid transparent;
-      height: 26px;
-      padding: 16px;
-      border: 1px solid #D9D9D9;
-      padding: 16px 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+      .search-filter input {
+        text-decoration: none;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        height: 26px;
+        padding: 16px;
+        border: 1px solid #d9d9d9;
+        padding: 16px 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    .filter{
+      .filter {
         border-radius: 4px;
         /* border: 1px solid rgb(76 76 171); */
         color: rgb(76 76 171);
         background-color: rgb(206, 206, 254);
         padding: 3px 16px;
-        transition: all .3s ease-in-out;
+        transition: all 0.3s ease-in-out;
         cursor: pointer;
         margin: 0;
-    }
-    .filter:hover{
+      }
+      .filter:hover {
         background-color: rgb(155, 155, 255);
-    }
+      }
 
       .filter-options {
         position: absolute;
@@ -96,18 +94,18 @@
         cursor: pointer;
       }
 
-    .table-container {
-      max-height: 400px;
-      overflow-y: auto;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+      .table-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      /* table-layout: fixed; */
-    }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        /* table-layout: fixed; */
+      }
 
       thead tr {
         background-color: #ffffff;
@@ -116,30 +114,31 @@
         z-index: 1;
       }
 
-    th, td {
-      padding: 10px 16px;
-      text-align: center;
-      border-bottom: 1px solid rgba(120, 130, 140, 0.045);
-    }
-    th {
-      background: #f0f0f0;
-      font-weight: bold;
-      color: #333;
-    }
+      th,
+      td {
+        padding: 10px 16px;
+        text-align: center;
+        border-bottom: 1px solid rgba(120, 130, 140, 0.045);
+      }
+      th {
+        background: #f0f0f0;
+        font-weight: bold;
+        color: #333;
+      }
 
-    table tr:nth-child(even) {
-      background-color: white;
-    }
-    table tr {
-      background-color: white;
-    }
-    td .ellipsis {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: block;
-      max-width: 100%;
-    }
+      table tr:nth-child(even) {
+        background-color: white;
+      }
+      table tr {
+        background-color: white;
+      }
+      td .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        max-width: 100%;
+      }
 
       .download-icon {
         cursor: pointer;
@@ -159,40 +158,41 @@
       .create_btn:hover {
         background-color: rgb(149, 255, 165);
         /* color: rgb(213, 251, 219); */
-    }
-    .buttons{
+      }
+      .buttons {
         display: flex;
         gap: 10px;
         align-items: center;
-    }
-    .table-responsive{
+      }
+      .table-responsive {
         overflow-x: hidden;
         max-height: 400px;
-    }
-    .table-responsive th{
+      }
+      .table-responsive th {
         position: sticky;
         top: -2px;
-    }
-    .meeting-minutes-table {
+      }
+      .meeting-minutes-table {
         width: 100%;
         border-collapse: collapse;
         border-radius: 6px;
-    }
-    
-    .meeting-minutes-table th, .meeting-minutes-table td {
+      }
+
+      .meeting-minutes-table th,
+      .meeting-minutes-table td {
         padding: 10px;
         text-align: center;
         border-bottom: 1px solid #ddd;
-    }
-    
-    .meeting-minutes-table th {
+      }
+
+      .meeting-minutes-table th {
         background-color: #f0f0f0;
-    }
-    
-    .meeting-minutes-table tr:hover {
+      }
+
+      .meeting-minutes-table tr:hover {
         background-color: #f9f9f9;
-    }
-    .download-btn {
+      }
+      .download-btn {
         border: none;
         padding: 0.5rem;
         cursor: pointer;
@@ -202,48 +202,44 @@
         gap: 0.5rem;
         background-color: transparent;
         color: #00629b;
-    }
-    @media (max-width: 600px) {
-      .search-filter {
-        flex-direction: column;
-        align-items: flex-start;
       }
+      @media (max-width: 600px) {
+        .search-filter {
+          flex-direction: column;
+          align-items: flex-start;
+        }
 
-      .filter-options {
-        position: static;
-        width: 100%;
+        .filter-options {
+          position: static;
+          width: 100%;
+        }
       }
-    }
-    @media screen and (max-width: 700px) {
-        .table-responsive{
-            overflow-x: scroll;
-            width: 500px;
+      @media screen and (max-width: 700px) {
+        .table-responsive {
+          overflow-x: scroll;
+          width: 500px;
         }
-    }
-    @media screen and (max-width: 600px) {
-        .table-responsive{
-            width: 400px;
+      }
+      @media screen and (max-width: 600px) {
+        .table-responsive {
+          width: 400px;
         }
-    }
-    @media screen and (max-width: 450px) {
-        .table-responsive{
-            width: 350px;
+      }
+      @media screen and (max-width: 450px) {
+        .table-responsive {
+          width: 350px;
         }
-    }
-  </style>
-</head>
-<body style="background-color: white;">
-
-        <!-- ############ LAYOUT START-->
-        <div class="app" id="app" style="background-color: white;">
-            <!-- aside -->
-            <div id="aside" class="app-aside modal nav-dropdown">
-              {% block sidebar %} 
-              {% include 'users/sidebar.html' %} 
-              {% endblock %}
-            </div>
-            <!-- aside end -->
-      
+      }
+    </style>
+  </head>
+  <body style="background-color: white">
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app" style="background-color: white">
+      <!-- aside -->
+      <div id="aside" class="app-aside modal nav-dropdown">
+        {% block sidebar %} {% include 'users/sidebar.html' %} {% endblock %}
+      </div>
+      <!-- aside end -->
 
       <!-- navbar content -->
       <div id="content" class="app-content box-shadow-z0" role="main">
@@ -251,179 +247,88 @@
       </div>
       <!--navbar content end-->
 
-            <!-- ############ PAGE START-->
-            <div ui-view class="app-body" style="justify-content: center;" id="view">
-            <!--START PAGE CODE-->
-            <div class="container">
-              <div class="header">Meeting Minutes</div>
-              <div class="search-filter">
-                <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
-                <div class="buttons">
-                  <button type="button" class="create_btn" id="create-account-btn" onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_create' %}'">Create Meeting Minutes</button>
-                  <p class="filter" onclick="toggleFilterOptions()">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
-                  <div id="filterOptions" class="filter-options">
-                    <label for="tenureInput">By Tenure</label>
-                    <input type="text" id="tenureInput" placeholder="e.g., 2025">
-                    <label for="monthInput">By Month</label>
-                    <input type="text" id="monthInput" placeholder="e.g., May">
-                    <label for="locationInput">By Location</label>
-                    <input type="text" id="locationInput" placeholder="e.g., Dhaka">
-                    <button onclick="applyCustomFilters()">Apply Filters</button>
-                  </div>
-                </div>
+      <!-- ############ PAGE START-->
+      <div ui-view class="app-body" style="justify-content: center" id="view">
+        <!--START PAGE CODE-->
+        <div class="container">
+          <div class="header">Meeting Minutes</div>
+          <div class="search-filter">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search..."
+              onkeyup="searchTable()"
+            />
+            <div class="buttons">
+              <button
+                type="button"
+                class="create_btn"
+                id="create-account-btn"
+                onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_create' %}'">
+                Create Meeting Minutes
+              </button>
+              <p class="filter" onclick="toggleFilterOptions()">
+                Filter <i class="fa fa-filter" aria-hidden="true"></i>
+              </p>
+              <div id="filterOptions" class="filter-options">
+                <label for="tenureInput">By Tenure</label>
+                <input type="text" id="tenureInput" placeholder="e.g., 2025" />
+                <label for="monthInput">By Month</label>
+                <input type="text" id="monthInput" placeholder="e.g., May" />
+                <label for="locationInput">By Location</label>
+                <input
+                  type="text"
+                  id="locationInput"
+                  placeholder="e.g., Dhaka"
+                />
+                <button onclick="applyCustomFilters()">Apply Filters</button>
               </div>
-              <br>
-              <div class="table-responsive table_box table-container">
-                <table class="meeting-minutes-table  table" id="event">
-                    <thead style="position: relative; z-index: 101;">
-                        <tr>
-                              <th>SL</th>
-                              <th>Meeting Name</th>
-                              <th>Date</th>
-                              <th>Download</th>
-                          </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
             </div>
-            </div>
-
-            </div>
+          </div>
+          <br />
+          <div class="table-responsive table_box table-container">
+            <table class="meeting-minutes-table table" id="event">
+              <thead style="position: relative; z-index: 101">
+                <tr>
+                  <th>SL</th>
+                  <th>Meeting Name</th>
+                  <th>Date</th>
+                  <th>Download</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for meeting in meetings %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+                      <a href="{% url 'meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="text-decoration: none">
+                      {{ meeting.meeting_name }}
+                        </a>
+                  </td>
+                  <td>{{ meeting.start_time }}</td>
+                  <td>
+                    <a
+                      href="#"
+                    >
+                      <i class="fa fa-download download-icon"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4">No meeting minutes found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
-</body>
-    {% block common_js %} 
-    {% include "common_js.html" %} 
-    {% endblock common_js %}
-    <script>
-    const dummyData = [
-      {
-        name: "Venue Selection for upcoming event",
-        date: "June 25, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "June",
-        location: "Tangail",
-      },
-      {
-        name: "GBM",
-        date: "May 25, 2024, 7:34 p.m.",
-        tenure: "2024",
-        month: "May",
-        location: "Mymensingh",
-      },
-      {
-        name: "Tenure discussion",
-        date: "April 25, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "April",
-        location: "Jamalpur",
-      },
-      {
-        name: "Sub Executives discussion",
-        date: "March 24, 2023, 7:34 p.m.",
-        tenure: "2023",
-        month: "March",
-        location: "Dhaka",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "May 23, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "May",
-        location: "Rajshahi",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "April 22, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "April",
-        location: "Chittagong",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "March 21, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "March",
-        location: "Khulna",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "February 20, 2025, 7:34 p.m.",
-        tenure: "2025",
-        month: "February",
-        location: "Sylhet",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "January 19, 2024, 7:34 p.m.",
-        tenure: "2024",
-        month: "January",
-        location: "Barisal",
-      },
-      {
-        name: "Venue Selection for upcoming event",
-        date: "December 18, 2023, 7:34 p.m.",
-        tenure: "2023",
-        month: "December",
-        location: "Rangpur",
-      },
-    ];
-
-    const tbody = document.getElementById("tableBody");
-
-    function renderTable(data) {
-      tbody.innerHTML = "";
-      data.forEach((item, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${index + 1}.</td>
-          <td style="cursor:pointer;"><span class="ellipsis">${item.name}</span></td>
-          <td>${item.date}</td>
-          <td class="download-icon fa fa-download download-btn" style="display:revert;" onclick="confirmDownload(${index + 1})"></td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    renderTable(dummyData);
-
-    function searchTable() {
-      const filter = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = dummyData.filter((item) =>
-        item.name.toLowerCase().includes(filter)
-      );
-      renderTable(filtered);
-    }
-
-    function confirmDownload(id) {
-      const confirmed = confirm(
-        "Do you want to download meeting minutes for SL #" + id + "?"
-      );
-      if (confirmed) {
-        alert("Download initiated for SL #" + id);
-      }
-    }
-
-    function toggleFilterOptions() {
-      const options = document.getElementById("filterOptions");
-      options.style.display =
-        options.style.display === "flex" ? "none" : "flex";
-    }
-
-    function applyCustomFilters() {
-      const tenure = document.getElementById("tenureInput").value.trim();
-      const month = document.getElementById("monthInput").value.trim();
-      const location = document.getElementById("locationInput").value.trim();
-
-      const filtered = dummyData.filter((item) => {
-        return (
-          (!tenure || item.tenure.toLowerCase() === tenure.toLowerCase()) &&
-          (!month || item.month.toLowerCase() === month.toLowerCase()) &&
-          (!location || item.location.toLowerCase() === location.toLowerCase())
-        );
-      });
-
-      renderTable(filtered);
-      toggleFilterOptions();
-    }
+      </div>
+    </div>
+  </body>
+  {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
+  <script>
+    
+    
   </script>
 </html>

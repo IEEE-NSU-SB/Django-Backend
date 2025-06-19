@@ -331,7 +331,7 @@
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
-                <input type="text" name="title" placeholder="Meeting Name" class="h1" required  value="{{ meeting.title|default_if_none:'' }}">
+                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.title|default_if_none:'' }}">
             </div>
 
     <div class="div1">
@@ -413,8 +413,8 @@
 
       <!-- Agenda Items -->
       <div id="agenda-items">
-        {% if meeting.agenda %}
-          {% for item in meeting.agenda %}
+        {% if meeting.agendas %}
+          {% for item in meeting.agendas %}
             <div class="agenda_fld">
               <h2>{{ forloop.counter }}.</h2>
               <input type="text" class="agenda_fld_ip" name="agenda[]" required value="{{ item }}">

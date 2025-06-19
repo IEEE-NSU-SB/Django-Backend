@@ -9,14 +9,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def meeting_minutes_homepage(request):
-    return render(request,'meeting_minutes_homepage.html')
+    meetings = MeetingMinutes.objects.all().order_by('-date')
+    return render(request, 'meeting_minutes_homepage.html', {'meetings': meetings})
 
 def team_meeting_minutes(request):
     '''
     Loads all the teams' exisitng meeting minutes
     Gives option to add or delete a meeting minutes
     '''
-    
+     
     #load teams' meeting minutes from database
     
     teams_mm=renderData.team_meeting_minutes.load_all_team_mm()
@@ -49,27 +50,22 @@ def branch_meeting_minutes(request):
 
 
     #meeting_minutes_edit
-def meeting_minutes_edit(request):
-    return render(request, 'meeting_minutes_edit.html')
 
 
-def meeting_minutes_edit(request, pk=None):
-    if pk:
-        meeting = get_object_or_404(MeetingMinutes, pk=pk)  # Edit mode
-    else:
-        meeting = None  # Create mode
 
+
+def meeting_minutes_create(request):
     if request.method == 'POST':
-        # Extract values from form fields
         location = request.POST.get('location')
-        # Strip date if it's included (e.g., "2025-06-19T02:24")
         start_time_raw = request.POST.get('start_time')
         end_time_raw = request.POST.get('end_time')
 
-        # Extract time part only
         if 'T' in start_time_raw:
-            start_time = datetime.fromisoformat(start_time_raw).time()
+            dt_obj = datetime.fromisoformat(start_time_raw)
+            date = dt_obj.date()
+            start_time = dt_obj.time()
         else:
+            date = datetime.today().date()
             start_time = datetime.strptime(start_time_raw, '%H:%M').time()
 
         if 'T' in end_time_raw:
@@ -77,8 +73,7 @@ def meeting_minutes_edit(request, pk=None):
         else:
             end_time = datetime.strptime(end_time_raw, '%H:%M').time()
         venue = request.POST.get('venue')
-        total_attendee = request.POST.get('total_attendee')
-        total_attendee = int(total_attendee) if total_attendee else 0  # or raise validation error
+        total_attendee = int(request.POST.get('total_attendees', 0))
         ieee_attendee = request.POST.get('ieee_attendee')
         non_ieee_attendee = request.POST.get('non_ieee_attendee')
         agendas = request.POST.getlist('agenda[]')
@@ -87,43 +82,62 @@ def meeting_minutes_edit(request, pk=None):
         co_host = request.POST.get('co_host')
         guest = request.POST.get('guest')
         written_by = request.POST.get('written_by')
+        meeting_name = request.POST.get('meeting_name')
 
-        if meeting:
-            # Update existing
-            meeting.location = location
-            meeting.start_time = start_time
-            meeting.end_time = end_time
-            meeting.venue = venue
-            meeting.total_attendee = total_attendee
-            meeting.ieee_attendee = ieee_attendee
-            meeting.non_ieee_attendee = non_ieee_attendee
-            meeting.agendas = agendas
-            meeting.discussion = discussion
-            meeting.host = host
-            meeting.co_host = co_host
-            meeting.guest = guest
-            meeting.written_by = written_by
-            meeting.save()
+        MeetingMinutes.objects.create(
+            meeting_name=meeting_name,
+            location=location,
+            start_time=start_time,
+            end_time=end_time,
+            date=date,
+            venue=venue,
+            total_attendee=total_attendee,
+            ieee_attendee=ieee_attendee,
+            non_ieee_attendee=non_ieee_attendee,
+            agendas=agendas,
+            discussion=discussion,
+            host=host,
+            co_host=co_host,
+            guest=guest,
+            written_by=written_by
+        )
+
+        return redirect('meeting_minutes:meeting_minutes_homepage')
+
+    return render(request, 'meeting_minutes_edit.html', {'meeting': None})
+
+
+def meeting_minutes_edit(request, pk):
+    meeting = get_object_or_404(MeetingMinutes, pk=pk)
+
+    if request.method == 'POST':
+        location = request.POST.get('location')
+        start_time_raw = request.POST.get('start_time')
+        end_time_raw = request.POST.get('end_time')
+
+        start_time = datetime.fromisoformat(start_time_raw).time() if 'T' in start_time_raw else datetime.strptime(start_time_raw, '%H:%M').time()
+        end_time = datetime.fromisoformat(end_time_raw).time() if 'T' in end_time_raw else datetime.strptime(end_time_raw, '%H:%M').time()
+
+        meeting.meeting_name = request.POST.get('meeting_name')
+        meeting.location = location
+        meeting.start_time = start_time
+        meeting.end_time = end_time
+        meeting.venue = request.POST.get('venue')
+        meeting.total_attendee = int(request.POST.get('total_attendees', 0))
+        meeting.ieee_attendee = request.POST.get('ieee_attendee')
+        meeting.non_ieee_attendee = request.POST.get('non_ieee_attendee')
+        meeting.agendas = request.POST.getlist('agenda[]')
+        meeting.discussion = request.POST.get('discussion')
+        meeting.host = request.POST.get('host')
+        meeting.co_host = request.POST.get('co_host')
+        meeting.guest = request.POST.get('guest')
+        meeting.written_by = request.POST.get('written_by')
+
+        if 'delete' in request.POST:
+            meeting.delete()
         else:
-            # Create new
-            MeetingMinutes.objects.create(
-                location=location,
-                start_time=start_time,
-                end_time=end_time,
-                venue=venue,
-                total_attendee=total_attendee,
-                ieee_attendee=ieee_attendee,
-                non_ieee_attendee=non_ieee_attendee,
-                agendas=agendas,
-                discussion=discussion,
-                host=host,
-                co_host=co_host,
-                guest=guest,
-                written_by=written_by
-            )
+            meeting.save()
 
-        return redirect("meeting_minutes:meeting_minutes_homepage")
+        return redirect('meeting_minutes:meeting_minutes_homepage')
 
-    return render(request, 'meeting_minutes_edit.html', {
-        'meeting': meeting
-    })
+    return render(request, 'meeting_minutes_edit.html', {'meeting': meeting})

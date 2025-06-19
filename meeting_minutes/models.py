@@ -52,6 +52,7 @@ from port.models import Teams, Chapters_Society_and_Affinity_Groups
 class MeetingMinutes(models.Model):
     meeting_name = models.CharField(max_length=255)
     location = models.CharField(max_length=50)
+    date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
     venue = models.CharField(max_length=255, blank=True, null=True)
