@@ -367,13 +367,13 @@
         <div class="time_fld">
           <h2 style="font-size: 20px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="datetime" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
+          <input type="datetime-local" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
         </div>
 
         <div class="time_fld">
           <h2 style="font-size: 20px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="datetime" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
+          <input type="datetime-local" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
         </div>
 
         <!-- Venue -->
