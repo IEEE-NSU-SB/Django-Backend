@@ -1,9 +1,14 @@
 from datetime import datetime, time
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-
+import os
 from central_branch import renderData
+from insb_port import settings
 from meeting_minutes.models import MeetingMinutes
 from django.views.decorators.csrf import csrf_exempt
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 # from . import renderData
 # from meeting_minutes.renderData import team_mm_info,branch_mm_info
 
@@ -141,3 +146,86 @@ def meeting_minutes_edit(request, pk):
         return redirect('meeting_minutes:meeting_minutes_homepage')
 
     return render(request, 'meeting_minutes_edit.html', {'meeting': meeting})
+
+
+def download_meeting_pdf(request, pk):
+    # Try to fetch the meeting by primary key
+    try:
+        meeting = MeetingMinutes.objects.get(pk=pk)
+    except MeetingMinutes.DoesNotExist:
+        return HttpResponse("Meeting not found.", status=404)
+
+    # Set up HTTP response headers for PDF download
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="meeting_{pk}.pdf"'
+
+    # Create a canvas object for drawing the PDF
+    p = canvas.Canvas(response, pagesize=A4)
+    width, height = A4  # Page size
+
+    # Start position from the top of the page
+    y = height - 100
+    line_height = 30  # Space between lines
+    
+    logo_path = os.path.join(settings.BASE_DIR, 'core', 'static', 'images', 'logo.jpg')  
+    if os.path.exists(logo_path):
+        p.drawImage(
+    ImageReader(logo_path),
+    x=500, y=height - 100,  # Position
+    width=80, height=80,   # Size
+    preserveAspectRatio=True,
+    mask='auto'            
+)
+        
+    print("LOGO PATH:", logo_path)
+    print("Exists:", os.path.exists(logo_path))    
+
+   
+    p.saveState()
+    p.setFont("Helvetica", 40)
+    p.setFillColorRGB(0.7, 0.9, 1.0, alpha=0.5)
+    p.drawCentredString(width / 2, height / 2, "IEEE NSU Student Branch")
+    p.restoreState()
+
+    # Helper function to draw each field in the PDF
+    def draw_line(label, value):
+        nonlocal y
+        p.setFont("Helvetica", 16)
+        p.drawString(50, y, f"{label}: {value}")
+        y -= line_height
+
+   # Write meeting fields to PDF
+    draw_line("Meeting Name", meeting.meeting_name)
+    draw_line("Date", meeting.date.strftime("%Y-%m-%d"))
+    draw_line("Time", f"{meeting.start_time.strftime('%H:%M')} - {meeting.end_time.strftime('%H:%M')}")
+    draw_line("Location", meeting.location)
+    draw_line("Venue", meeting.venue or "N/A")
+    draw_line("Total Attendees", str(meeting.total_attendee))
+    draw_line("IEEE Attendees", str(meeting.ieee_attendee) if meeting.ieee_attendee is not None else "N/A")
+    draw_line("Non-IEEE Attendees", str(meeting.non_ieee_attendee) if meeting.non_ieee_attendee is not None else "N/A")
+    draw_line("Agendas", meeting.agendas)
+    
+    draw_line("Host", meeting.host or "N/A")
+    draw_line("Co-host", meeting.co_host or "N/A")
+    draw_line("Guest", meeting.guest or "N/A")
+    draw_line("Written by", meeting.written_by)
+    # Add the "Discussion" section
+    p.drawString(50, y, "Discussion:")
+    y -= line_height
+
+    # Begin text block for discussion content (multi-line)
+    text_object = p.beginText(50, y)
+    text_object.setFont("Helvetica", 12)
+
+    # Write each line of discussion to the PDF
+    for line in meeting.discussion.splitlines():
+        text_object.textLine(line)
+
+    p.drawText(text_object)
+
+    # Finalize and close the PDF document
+    p.showPage()
+    p.save()
+
+    # Return the response as a downloadable PDF
+    return response

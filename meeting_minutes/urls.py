@@ -24,5 +24,6 @@ urlpatterns = [
 
     # Edit an existing meeting
     path('meeting_minutes_edit/<int:pk>/', views.meeting_minutes_edit, name="meeting_minutes_edit"), # needs pk
+    path('meeting-minutes/<int:pk>/pdf/', views.download_meeting_pdf, name='download_meeting_pdf'),
 ]              
     
