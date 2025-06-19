@@ -37,6 +37,7 @@
     const input = document.createElement("input");
     input.type = "text";
     input.className = "agenda_fld_ip";
+    input.name = "agenda[]";
 
     agendaDiv.appendChild(number);
     agendaDiv.appendChild(input);
@@ -79,6 +80,7 @@
             border: none;
             border-bottom: 1px solid #ccc;
             text-align: center;
+            width: 100%;
         }
         .div1{
             display: flex;
@@ -331,7 +333,7 @@
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
-                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.title|default_if_none:'' }}">
+                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
             </div>
 
     <div class="div1">
@@ -540,6 +542,7 @@
         }
     });
     </script>
-    
+    {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
+
 </body>
 </html>
