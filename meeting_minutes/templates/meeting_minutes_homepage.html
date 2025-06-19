@@ -308,7 +308,7 @@
                   <td>{{ meeting.start_time }}</td>
                   <td>
                     <a
-                      href="#"
+                      href="{% url 'meeting_minutes:download_meeting_pdf' meeting.pk %}"
                     >
                       <i class="fa fa-download download-icon"></i>
                     </a>
