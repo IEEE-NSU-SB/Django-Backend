@@ -337,7 +337,7 @@
             </div>
 
     <div class="div1">
-      <a href="{% url 'meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
       {% if meeting %}
         <button type="button" class="modal_btn">Delete</button>
       {% endif %}
@@ -363,17 +363,23 @@
 
         <div class="space"></div>
 
+        <div class="time_fld">
+          <h2 style="font-size: 20px; display: flex;">Meeting Date<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|default_if_none:'' }}">
+        </div>
+
         <!-- Time Fields -->
         <div class="time_fld">
           <h2 style="font-size: 20px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="datetime-local" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
+          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
         </div>
 
         <div class="time_fld">
           <h2 style="font-size: 20px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="datetime-local" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
+          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
         </div>
 
         <!-- Venue -->
@@ -470,24 +476,27 @@
 
       <!-- Save -->
       <div style="display: flex; justify-content: center; margin-top: 20px;">
-        <button type="submit" class="save_btn">Save</button>
+        <button type="submit" name="save" class="save_btn">Save</button>
       </div>
+    </form>
 
                     <!-- modal-->
                     {% if meeting %}
                     <div id="myModal" class="delete_modal">
-                        <div class="modal_content">
-                                <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
-                                <div style="display: flex; justify-content: center;">        
-                                    <!-- delete btn -->
-                                    <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
-                                    <span><button type="button" class="close_btn">No</button></span>
-                                </div>
-                        </div>
-                    </div>
+                      <div class="modal_content">
+                                <form method="POST">
+                                  {% csrf_token %}
+                                  <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
+                                  <div style="display: flex; justify-content: center;">        
+                                      <!-- delete btn -->
+                                      <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
+                                      <span><button type="button" class="close_btn">No</button></span>
+                                    </div>
+                                </form>
+                          </div>
+                      </div>
                 {% endif %}
             </div>
-        </form>
      </section>
 
 

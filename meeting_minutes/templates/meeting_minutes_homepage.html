@@ -264,7 +264,7 @@
                 type="button"
                 class="create_btn"
                 id="create-account-btn"
-                onclick="window.location.href='{% url 'meeting_minutes:meeting_minutes_create' %}'">
+                onclick="window.location.href='{% url 'central_branch:meeting_minutes:meeting_minutes_create' %}'">
                 Create Meeting Minutes
               </button>
               <p class="filter" onclick="toggleFilterOptions()">
@@ -301,14 +301,14 @@
                 <tr>
                   <td>{{ forloop.counter }}</td>
                   <td>
-                      <a href="{% url 'meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="text-decoration: none">
+                      <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="text-decoration: none">
                       {{ meeting.meeting_name }}
                         </a>
                   </td>
                   <td>{{ meeting.start_time }}</td>
                   <td>
                     <a
-                      href="{% url 'meeting_minutes:download_meeting_pdf' meeting.pk %}"
+                      href="{% url 'central_branch:meeting_minutes:download_meeting_pdf' meeting.pk %}"
                     >
                       <i class="fa fa-download download-icon"></i>
                     </a>
