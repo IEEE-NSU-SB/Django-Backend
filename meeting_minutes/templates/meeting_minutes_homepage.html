@@ -296,7 +296,7 @@
                   <th>Download</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="tableBody">
                 {% for meeting in meetings %}
                 <tr>
                   <td>{{ forloop.counter }}</td>
@@ -328,7 +328,39 @@
   </body>
   {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
   <script>
+    function searchTable() {
+      const filter = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#tableBody tr");
+
+      rows.forEach((row) => {
+        const meetingNameCell = row.querySelector("td:nth-child(2)");
+        if (meetingNameCell) {
+          const text = meetingNameCell.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
+        }
+      });
+    }
     
-    
+    function toggleFilterOptions() {
+      const options = document.getElementById("filterOptions");
+      options.style.display =
+        options.style.display === "flex" ? "none" : "flex";
+    }
+
+    function applyCustomFilters() {
+      const tenure = document.getElementById("tenureInput").value.trim();
+      const month = document.getElementById("monthInput").value.trim();
+      const location = document.getElementById("locationInput").value.trim();
+
+      const filtered = dummyData.filter((item) => {
+        return (
+          (!tenure || item.tenure.toLowerCase() === tenure.toLowerCase()) &&
+          (!month || item.month.toLowerCase() === month.toLowerCase()) &&
+          (!location || item.location.toLowerCase() === location.toLowerCase())
+        );
+      });
+
+      toggleFilterOptions();
+    }
   </script>
 </html>
