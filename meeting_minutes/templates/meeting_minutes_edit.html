@@ -31,7 +31,6 @@
     agendaDiv.className = "agenda_fld";
 
     const number = document.createElement("h2");
-    number.style.fontSize = "20px";
     number.textContent = `${agendaCount}.`;
 
     const input = document.createElement("input");
@@ -57,17 +56,13 @@
 </script>
 
     <style>
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
         .meeting_minutes_container{
-            margin: 50px 0;
+            margin: 50px auto;
             padding: 50px;
             background-color: white;
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             border-radius: 10px;
+            max-width: 896px;
         }
         .div0{
             display: flex;
@@ -75,7 +70,7 @@
         }
         .h1{
             color: black;
-            font-size: 30px;
+            font-size: 1.5rem;
             padding: 0px 20px 5px 20px;
             border: none;
             border-bottom: 1px solid #ccc;
@@ -89,7 +84,7 @@
             margin: 20px 0px 40px 0px;
         }
         .return_btn i{
-            font-size: 20px;
+            font-size: 1rem;
             transition: 0.5s;
             color: white;
             background-color: black;
@@ -101,7 +96,7 @@
             background-color: white;
         }
         .modal_btn{
-            padding: 0px 30px;
+            padding: 0px 14px;
             color: #e74c3c;
             background-color: #fadbd8;
             text-decoration: none;
@@ -122,22 +117,22 @@
             gap: 10px;
         }
         
-        .location_fld_ip, .plus_minus_btn{
-            color: #3498db;
-            background-color: white;
-            border: 1px solid #3498db;
-            text-decoration: none;
-            border-radius: 5px;
-            padding: 2px 20px;
-            transition: 0.5s;
+        .plus_minus_btn{
+          color: #727272;
+          background-color: white;
+          border: 1px solid #dfe0e0;
+          text-decoration: none;
+          border-radius: 4px;
+          transition: 0.5s;
         }
         .location_fld_ip:hover, .plus_minus_btn:hover{
-            background-color: #d6eaf8;
+            background-color: #e1e1e1;
         }
         .agenda{
             display: flex;
             justify-content: space-between;
             margin-top: 30px;
+            align-items: center;
         }
         .agenda_fld{
             display: flex;
@@ -149,7 +144,7 @@
             width: 100%;
             margin-left: 10px;
             border: none;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #ebebeb;
             color: black;
         }
         /* .desc_fld{
@@ -168,7 +163,7 @@
             text-decoration: none;
             border: none;
             border-radius: 5px;
-            font-size: 20px;
+            font-size: 1rem;
             transition: 0.5s;
             margin-top: 10px;
             
@@ -193,18 +188,21 @@
             width: 100%;
             gap: 10px;
         }
+        .text_fld {
+            grid-template-columns: 0.35fr 10px 1fr;
+        }
         .time_fld_ip, .text_fld_ip{
             flex: 1;
             border: none;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #ebebeb;
         }
         .colon {
-            font-size: 20px;
+            font-size: 1rem;
             text-align: center;
+            font-weight: bold;
         }
         .location_fld_ip {
             display: inline-block;
-            padding: 5px 20px;
             border: 1px solid #3498db;
             border-radius: 5px;
             background-color: white;
@@ -212,6 +210,9 @@
             cursor: pointer;
             user-select: none;
             transition: 0.5s;
+            text-align: center;
+            padding: 2px 10px;
+            text-decoration: none;
         }
         input[type="radio"]:checked + .location_fld_ip {
             background-color: #3498db;
@@ -257,7 +258,13 @@
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             margin: auto;
         }
-
+        h2{
+          margin: 0;
+          font-size: 1rem;
+          display: flex;
+          font-weight: bold;
+          color: #333;
+        }
         @media (max-width: 1024px){
             .body{
                 margin: 30px;
@@ -328,7 +335,6 @@
 
         <div ui-view class="app-body" style="justify-content: center;" id="view">
     <!-- ############ PAGE START-->
-<div class="container">
     <section class="meeting_minutes_container">
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
@@ -339,14 +345,14 @@
     <div class="div1">
       <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
       {% if meeting %}
-        <button type="button" class="modal_btn">Delete</button>
+        <button type="button" class="modal_btn">Delete <i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
       {% endif %}
     </div>
 
             <div class="div2">
                 <div class="label-container">
                     <div class="location_fld"><!--location-->
-                        <h2 style="font-size: 20px; margin: 0px; display: flex;">Location<div style="color: #e74c3c;">*</div></h2>
+                        <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
 
                         <div id="location-buttons">
@@ -361,58 +367,56 @@
           </div>
         </div>
 
-        <div class="space"></div>
-
         <div class="time_fld">
-          <h2 style="font-size: 20px; display: flex;">Meeting Date<div style="color: #e74c3c;">*</div></h2>
+          <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|default_if_none:'' }}">
         </div>
 
         <!-- Time Fields -->
         <div class="time_fld">
-          <h2 style="font-size: 20px; display: flex;">Start time<div style="color: #e74c3c;">*</div></h2>
+          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
         </div>
 
         <div class="time_fld">
-          <h2 style="font-size: 20px; display: flex;">End time<div style="color: #e74c3c;">*</div></h2>
+          <h2>End time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
           <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
         </div>
 
         <!-- Venue -->
-        <div class="text_fld">
-          <h2 style="font-size: 20px; display: flex;">Venue</h2>
+        <div class="time_fld">
+          <h2>Venue</h2>
           <div class="colon">:</div>
-          <input type="text" name="venue" class="text_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+          <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
         </div>
 
         <!-- Total Attendee -->
-        <div class="text_fld">
-          <h2 style="font-size: 20px; display: flex;">Total Attendee<div style="color: #e74c3c;">*</div></h2>
+        <div class="time_fld">
+          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="number" name="total_attendees" class="text_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+          <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
         </div>
 
         <!-- IEEE & Non-IEEE -->
-        <div class="text_fld">
-          <h2 style="font-size: 20px; display: flex;">IEEE Attendee</h2>
+        <div class="time_fld">
+          <h2>IEEE Attendee</h2>
           <div class="colon">:</div>
-          <input type="number" name="ieee_attendee" class="text_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+          <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
         </div>
 
-        <div class="text_fld">
-          <h2 style="font-size: 20px; display: flex;">Non-IEEE Attendee</h2>
+        <div class="time_fld">
+          <h2>Non-IEEE Attendee</h2>
           <div class="colon">:</div>
-          <input type="number" name="non_ieee_attendee" class="text_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+          <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
         </div>
       </div>
 
       <!-- Agenda Controls -->
       <div class="agenda" id="agenda-controls">
-        <h2 style="font-size: 20px; display: flex;">Agenda<div style="color: #e74c3c;">*</div></h2>
+        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
         <div>
           <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
           <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
@@ -424,13 +428,13 @@
         {% if meeting.agendas %}
           {% for item in meeting.agendas %}
             <div class="agenda_fld">
-              <h2 style="font-size: 20px;">{{ forloop.counter }}.</h2>
+              <h2>{{ forloop.counter }}.</h2>
               <input type="text" class="agenda_fld_ip" name="agenda" required value="{{ item }}">
             </div>
           {% endfor %}
         {% else %}
           <div class="agenda_fld">
-            <h2 style="font-size: 20px;">1.</h2>
+            <h2>1.</h2>
             <input type="text" class="agenda_fld_ip" name="agenda[]" required>
           </div>
         {% endif %}
@@ -438,13 +442,13 @@
 
       <!-- Discussion -->
       <div>
-        <h2 style="font-size: 20px; margin-top: 40px; display: flex;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
         <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
       </div>
 
         <div class="label-container" style="margin-top: 40px;">
             <div class="text_fld"><!--host-->   
-            <h2 style="font-size: 20px; margin:0px;">Host</h2>
+            <h2>Host</h2>
             <div class="colon">:</div>
             <input type="text"  name="host" class="text_fld_ip"  value="{{ meeting.host|default_if_none:'' }}">
         </div>
@@ -452,7 +456,7 @@
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2 style="font-size: 20px; margin:0px;">Co-host</h2>
+          <h2>Co-host</h2>
           <div class="colon">:</div>
           <input type="text" name="co_host" class="text_fld_ip" value="{{ meeting.co_host|default_if_none:'' }}">
         </div>
@@ -460,7 +464,7 @@
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2 style="font-size: 20px; margin:0px;">Guest</h2>
+          <h2>Guest</h2>
           <div class="colon">:</div>
           <input type="text" name="guest" class="text_fld_ip" value="{{ meeting.guest|default_if_none:'' }}">
         </div>
@@ -468,7 +472,7 @@
         <div class="space"></div>
 
         <div class="text_fld">
-          <h2 style="font-size: 20px; margin:0px;">Written by<span style="color: #e74c3c;">*</span></h2>
+          <h2>Written by<span style="color: #e74c3c;">*</span></h2>
           <div class="colon">:</div>
           <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
         </div>
@@ -496,7 +500,6 @@
                           </div>
                       </div>
                 {% endif %}
-            </div>
      </section>
 
 
