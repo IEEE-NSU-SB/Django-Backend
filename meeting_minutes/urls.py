@@ -6,8 +6,6 @@ app_name = 'meeting_minutes'
 ##defining the urls to work with
 
 urlpatterns = [
-    #meeting_minutes_homepage
-    path('',views.meeting_minutes_homepage, name='meeting_minutes_homepage'),
 
     # #team_meeting_minutes
     # path('',views.team_meeting_minutes, name='team_meeting_minutes'),
@@ -19,11 +17,13 @@ urlpatterns = [
     # #branch_meeting_minutes_list
     # path('branch_meeting_minutes_list',views.branch_meeting_minutes_list,name='branch_meeting_minutes_list'),
     
+    #meeting_minutes_homepage
+    path('',views.meeting_minutes_homepage, name='meeting_minutes_homepage'),
     # Create a new meeting
-    path('meeting_minutes_create/', views.meeting_minutes_create, name="meeting_minutes_create"),
+    path('create/', views.meeting_minutes_create, name="meeting_minutes_create"),
 
     # Edit an existing meeting
-    path('meeting_minutes_edit/<int:pk>/', views.meeting_minutes_edit, name="meeting_minutes_edit"), # needs pk
+    path('edit/<int:pk>/', views.meeting_minutes_edit, name="meeting_minutes_edit"), # needs pk
     path('meeting-minutes/<int:pk>/pdf/', views.download_meeting_pdf, name='download_meeting_pdf'),
 ]              
     
