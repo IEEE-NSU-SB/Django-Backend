@@ -432,7 +432,7 @@
           {% for item in meeting.agendas %}
             <div class="agenda_fld">
               <h2>{{ forloop.counter }}.</h2>
-              <input type="text" class="agenda_fld_ip" name="agenda" required value="{{ item }}">
+              <input type="text" class="agenda_fld_ip" name="agenda[]" required value="{{ item }}">
             </div>
           {% endfor %}
         {% else %}
