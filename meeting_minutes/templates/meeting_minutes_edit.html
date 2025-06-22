@@ -373,20 +373,20 @@
         <div class="time_fld">
           <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|default_if_none:'' }}">
+          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
         </div>
 
         <!-- Time Fields -->
         <div class="time_fld">
           <h2>Start time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|default_if_none:'' }}">
+          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
         </div>
 
         <div class="time_fld">
           <h2>End time<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|default_if_none:'' }}">
+          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
         </div>
 
         <!-- Venue -->

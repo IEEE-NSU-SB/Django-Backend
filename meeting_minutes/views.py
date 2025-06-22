@@ -76,21 +76,10 @@ def meeting_minutes_homepage(request, primary=None):
 def meeting_minutes_create(request, primary=None):
     if request.method == 'POST':
         location = request.POST.get('location')
-        start_time_raw = request.POST.get('start_time')
-        end_time_raw = request.POST.get('end_time')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
         meeting_date=request.POST.get('meeting_date')
-        if 'T' in start_time_raw:
-            dt_obj = datetime.fromisoformat(start_time_raw)
-            date = dt_obj.date()
-            start_time = dt_obj.time()
-        else:
-            date = datetime.today().date()
-            start_time = datetime.strptime(start_time_raw, '%H:%M').time()
-
-        if 'T' in end_time_raw:
-            end_time = datetime.fromisoformat(end_time_raw).time()
-        else:
-            end_time = datetime.strptime(end_time_raw, '%H:%M').time()
+        
         venue = request.POST.get('venue')
         total_attendee = int(request.POST.get('total_attendees', 0))
         ieee_attendee = request.POST.get('ieee_attendee')
@@ -132,11 +121,10 @@ def meeting_minutes_edit(request, pk):
     if request.method == 'POST':
         if 'save' in request.POST:
             location = request.POST.get('location')
-            start_time_raw = request.POST.get('start_time')
-            end_time_raw = request.POST.get('end_time')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
 
-            start_time = datetime.fromisoformat(start_time_raw).time() if 'T' in start_time_raw else datetime.strptime(start_time_raw, '%H:%M').time()
-            end_time = datetime.fromisoformat(end_time_raw).time() if 'T' in end_time_raw else datetime.strptime(end_time_raw, '%H:%M').time()
+            
             meeting.meeting_date=request.POST.get('meeting_date')
             meeting.meeting_name = request.POST.get('meeting_name')
             meeting.location = location
@@ -211,7 +199,7 @@ def download_meeting_pdf(request, pk):
 
    # Write meeting fields to PDF
     draw_line("Meeting Name", meeting.meeting_name)
-    draw_line("Date", meeting.date.strftime("%Y-%m-%d"))
+    draw_line("Date", meeting.meeting_date.strftime("%Y-%m-%d"))
     draw_line("Time", f"{meeting.start_time.strftime('%H:%M')} - {meeting.end_time.strftime('%H:%M')}")
     draw_line("Location", meeting.location)
     draw_line("Venue", meeting.venue or "N/A")
