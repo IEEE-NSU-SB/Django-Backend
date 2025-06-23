@@ -170,7 +170,7 @@ def download_meeting_pdf(request, pk):
     y = height - 100
     line_height = 30  # Space between lines
     
-    logo_path = os.path.join(settings.BASE_DIR, 'core', 'static', 'images', 'logo.jpg')  
+    logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')  
     if os.path.exists(logo_path):
         p.drawImage(
     ImageReader(logo_path),
