@@ -168,4 +168,6 @@ urlpatterns = [
 
     # Wallet Urls
     path('wallet/', include('wallet.urls'), name='wallet'),
+    #Meeting Minutes Urls
+    path('meeting_minutes/', include("meeting_minutes.urls", namespace="meeting_minutes"))
 ]
