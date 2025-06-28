@@ -62,7 +62,7 @@ logger=logging.getLogger(__name__)
 
 @login_required
 @member_login_permission
-def meeting_minutes_homepage(request, primary=None):
+def meeting_minutes_homepage(request, primary=None, team_primary=None):
 
     try:
         sc_ag=PortData.get_all_sc_ag(request=request)
@@ -76,12 +76,23 @@ def meeting_minutes_homepage(request, primary=None):
         else:
             primary = 1
             meetings = MeetingMinutes.objects.filter(sc_ag__primary=1).order_by('-meeting_date')
+
+        create_url = None
+        edit_url = None
+        if team_primary:
+            team_namespace = get_team_redirect_namespace(team_primary)
+            create_url = f'{team_namespace}:meeting_minutes_create_team'
+            edit_url = f'{team_namespace}:meeting_minutes_edit_team'
+            
         
         context = {
             'all_sc_ag':sc_ag,
             'sc_ag_info':get_sc_ag_info,
             'user_data':user_data,
             'primary': primary,
+            'team_primary':team_primary,
+            'create_url':create_url,
+            'edit_url':edit_url,
             'meetings': meetings,
         }
         return render(request, 'meeting_minutes_homepage.html', context)
@@ -93,7 +104,7 @@ def meeting_minutes_homepage(request, primary=None):
 
 @login_required
 @member_login_permission
-def meeting_minutes_create(request, primary=None):
+def meeting_minutes_create(request, primary=None, team_primary=None):
 
     try:
         if request.method == 'POST':
@@ -153,11 +164,18 @@ def meeting_minutes_create(request, primary=None):
         else:
             primary = 1
 
+        homepage_url = None
+        if team_primary:
+            team_namespace = get_team_redirect_namespace(team_primary)
+            homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
+
         context = {
             'all_sc_ag':sc_ag,
             'sc_ag_info':get_sc_ag_info,
             'user_data':user_data,
             'primary': primary,
+            'team_primary':team_primary,
+            'homepage_url':homepage_url,
             'meeting': None
         }
 
@@ -170,7 +188,7 @@ def meeting_minutes_create(request, primary=None):
 
 @login_required
 @member_login_permission
-def meeting_minutes_edit(request, pk, primary=None):
+def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
     try:
         meeting = MeetingMinutes.objects.get(pk=pk)
@@ -217,11 +235,18 @@ def meeting_minutes_edit(request, pk, primary=None):
         else:
             primary = 1
 
+        homepage_url = None
+        if team_primary:
+            team_namespace = get_team_redirect_namespace(team_primary)
+            homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
+
         context = {
             'all_sc_ag':sc_ag,
             'sc_ag_info':get_sc_ag_info,
             'user_data':user_data,
             'primary': primary,
+            'team_primary':team_primary,
+            'homepage_url':homepage_url,
             'meeting': meeting,
         }
 
@@ -314,3 +339,27 @@ def download_meeting_pdf(request, pk):
 
     # Return the response as a downloadable PDF
     return response
+
+
+def get_team_redirect_namespace(team_primary):
+
+    if team_primary == 2:
+        return 'content_writing_and_publications_team'
+    elif team_primary == 3:
+        return 'events_and_management_team'
+    elif team_primary == 4:
+        return 'logistics_and_operations_team'
+    elif team_primary == 5:
+        return 'promotions_team'
+    elif team_primary == 6 or team_primary == 0:
+        return 'public_relation_team'
+    elif team_primary == 7:
+        return 'membership_development_team'
+    elif team_primary == 8:
+        return 'website_development_team'
+    elif team_primary == 9:
+        return 'media_team'
+    elif team_primary == 10:
+        return 'graphics_team'
+    elif team_primary == 11:
+        return 'finance_and_corporate_team'

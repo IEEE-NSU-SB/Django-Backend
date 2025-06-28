@@ -265,7 +265,11 @@
                 class="create_btn"
                 id="create-account-btn"
                 {% if primary == 1 %}
+                {% if team_primary %}
+                onclick="window.location.href='{% url create_url team_primary %}'">
+                {% else %}
                 onclick="window.location.href='{% url 'central_branch:meeting_minutes:meeting_minutes_create' %}'">
+                {% endif %}
                 {% else %}
                 onclick="window.location.href='{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_create' primary %}'">
                 {% endif %}
@@ -306,7 +310,11 @@
                   <td>{{ forloop.counter }}</td>
                   <td>
                       {% if primary == 1%}
+                      {% if team_primary %}
+                      <a href="{% url edit_url team_primary meeting.pk %}" style="text-decoration: none">
+                      {% else %}
                       <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="text-decoration: none">
+                      {% endif %}
                       {% else %}
                       <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit' primary meeting.pk %}" style="text-decoration: none">
                       {% endif %}

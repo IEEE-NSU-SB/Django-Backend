@@ -346,7 +346,15 @@
             </div>
 
     <div class="div1">
+      {% if primary == 1 %}
+      {% if team_primary %}
+      <a href="{% url homepage_url team_primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% else %}
       <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% endif %}
+      {% else %}
+      <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage' primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% endif %}
       {% if meeting %}
         <button type="button" class="modal_btn">Delete <i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
       {% endif %}
