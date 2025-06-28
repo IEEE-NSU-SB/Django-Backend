@@ -370,6 +370,23 @@
           </div>
         </div>
 
+       <div class="time_fld">
+        <h2>Team <div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+
+        <!-- Dropdown menu -->
+        <select id="teamDropdown" class="time_fld_ip" onchange="updateTeamValue()" required>
+          <option value="" disabled selected>Select a team</option>
+          <option value="website-development-team">Website Development Team</option>
+          <option value="promotions">Promotions</option>
+          <option value="media">Media</option>
+          <option value="graphics">Graphics</option>
+        </select>
+
+        <!-- Hidden input field -->
+        <input type="hidden" name="meeting_date" id="selectedTeam" value="{{ meeting.meeting_date }}">
+      </div>
+
         <div class="time_fld">
           <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
           <div class="colon">:</div>
@@ -557,6 +574,26 @@
         }
     });
     </script>
+    <script>
+      function updateTeamValue() {
+        const dropdown = document.getElementById("teamDropdown");
+        const hiddenInput = document.getElementById("selectedTeam");
+        hiddenInput.value = dropdown.value;
+      }
+
+      // If you want to pre-fill from existing data (e.g., from Django)
+      window.addEventListener('DOMContentLoaded', () => {
+        const selected = "{{ meeting.meeting_date }}"; // Replace with actual team value if needed
+        const dropdown = document.getElementById("teamDropdown");
+        const hiddenInput = document.getElementById("selectedTeam");
+
+        if (selected) {
+          dropdown.value = selected;
+          hiddenInput.value = selected;
+        }
+      });
+    </script>
+
     {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
 
 </body>
