@@ -1,20 +1,27 @@
 from datetime import datetime, time
+import logging
+import traceback
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import os
+from central_branch.views import custom_500
+from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
+from port.models import Chapters_Society_and_Affinity_Groups
+from system_administration.system_error_handling import ErrorHandling
 from users import renderData
 from insb_port import settings
 from meeting_minutes.models import MeetingMinutes
-from django.views.decorators.csrf import csrf_exempt
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from users.renderData import member_login_permission
+from django.contrib.auth.decorators import login_required
 
 from port.renderData import PortData
 # from . import renderData
-# from meeting_minutes.renderData import team_mm_info,branch_mm_info
 
 # Create your views here.
+logger=logging.getLogger(__name__) 
 
 # def team_meeting_minutes(request):
 #     '''
@@ -53,104 +60,179 @@ from port.renderData import PortData
 #     return render(request,'branch_meeting_minutes.html')
 
 
-#     #meeting_minutes_edit
-
-
+@login_required
+@member_login_permission
 def meeting_minutes_homepage(request, primary=None):
-    sc_ag=PortData.get_all_sc_ag(request=request)
-    current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
-    user_data=current_user.getUserData() #getting user data as dictionary file
-    get_sc_ag_info=None
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        get_sc_ag_info=None
         
-    meetings = MeetingMinutes.objects.all().order_by('-meeting_date')
+        if primary:
+            meetings = MeetingMinutes.objects.filter(sc_ag__primary=primary).order_by('-meeting_date')
+            get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
+        else:
+            primary = 1
+            meetings = MeetingMinutes.objects.filter(sc_ag__primary=1).order_by('-meeting_date')
+        
+        context = {
+            'all_sc_ag':sc_ag,
+            'sc_ag_info':get_sc_ag_info,
+            'user_data':user_data,
+            'primary': primary,
+            'meetings': meetings,
+        }
+        return render(request, 'meeting_minutes_homepage.html', context)
     
-    context = {
-        'all_sc_ag':sc_ag,
-        'sc_ag_info':get_sc_ag_info,
-        'user_data':user_data,
-        'primary': primary,
-        'meetings': meetings,
-    }
-    return render(request, 'meeting_minutes_homepage.html', context)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
+@login_required
+@member_login_permission
 def meeting_minutes_create(request, primary=None):
-    if request.method == 'POST':
-        location = request.POST.get('location')
-        start_time = request.POST.get('start_time')
-        end_time = request.POST.get('end_time')
-        meeting_date=request.POST.get('meeting_date')
-        
-        venue = request.POST.get('venue')
-        total_attendee = int(request.POST.get('total_attendees', 0))
-        ieee_attendee = request.POST.get('ieee_attendee')
-        non_ieee_attendee = request.POST.get('non_ieee_attendee')
-        agendas = request.POST.getlist('agenda[]')
-        discussion = request.POST.get('discussion')
-        host = request.POST.get('host')
-        co_host = request.POST.get('co_host')
-        guest = request.POST.get('guest')
-        written_by = request.POST.get('written_by')
-        meeting_name = request.POST.get('meeting_name')
 
-        MeetingMinutes.objects.create(
-            meeting_name=meeting_name,
-            location=location,
-            start_time=start_time,
-            end_time=end_time,
-            meeting_date=meeting_date,
-            venue=venue,
-            total_attendee=total_attendee,
-            ieee_attendee=ieee_attendee,
-            non_ieee_attendee=non_ieee_attendee,
-            agendas=agendas,
-            discussion=discussion,
-            host=host,
-            co_host=co_host,
-            guest=guest,
-            written_by=written_by
-        )
-
-        return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
-
-    return render(request, 'meeting_minutes_edit.html', {'meeting': None})
-
-
-def meeting_minutes_edit(request, pk):
-    meeting = MeetingMinutes.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        if 'save' in request.POST:
+    try:
+        if request.method == 'POST':
             location = request.POST.get('location')
             start_time = request.POST.get('start_time')
             end_time = request.POST.get('end_time')
-
+            meeting_date=request.POST.get('meeting_date')
             
-            meeting.meeting_date=request.POST.get('meeting_date')
-            meeting.meeting_name = request.POST.get('meeting_name')
-            meeting.location = location
-            meeting.start_time = start_time
-            meeting.end_time = end_time
-            meeting.venue = request.POST.get('venue')
-            meeting.total_attendee = int(request.POST.get('total_attendees', 0))
-            meeting.ieee_attendee = request.POST.get('ieee_attendee')
-            meeting.non_ieee_attendee = request.POST.get('non_ieee_attendee')
-            meeting.agendas = request.POST.getlist('agenda[]')
-            meeting.discussion = request.POST.get('discussion')
-            meeting.host = request.POST.get('host')
-            meeting.co_host = request.POST.get('co_host')
-            meeting.guest = request.POST.get('guest')
-            meeting.written_by = request.POST.get('written_by')
+            venue = request.POST.get('venue')
+            total_attendee = int(request.POST.get('total_attendees', 0) or 0)
+            ieee_attendee = int(request.POST.get('ieee_attendee', 0) or 0)
+            non_ieee_attendee = int(request.POST.get('non_ieee_attendee', 0) or 0)
+            agendas = request.POST.getlist('agenda[]')
+            discussion = request.POST.get('discussion')
+            host = request.POST.get('host')
+            co_host = request.POST.get('co_host')
+            guest = request.POST.get('guest')
+            written_by = request.POST.get('written_by')
+            meeting_name = request.POST.get('meeting_name')
 
-            meeting.save()
-            
-        elif 'delete' in request.POST:
-            meeting.delete()
+            if primary:
+                sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
+            else:
+                sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']
 
-        return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
+            MeetingMinutes.objects.create(
+                sc_ag_id=sc_ag,
+                meeting_name=meeting_name,
+                location=location,
+                start_time=start_time,
+                end_time=end_time,
+                meeting_date=meeting_date,
+                venue=venue,
+                total_attendee=total_attendee,
+                ieee_attendee=ieee_attendee,
+                non_ieee_attendee=non_ieee_attendee,
+                agendas=agendas,
+                discussion=discussion,
+                host=host,
+                co_host=co_host,
+                guest=guest,
+                written_by=written_by
+            )
 
-    return render(request, 'meeting_minutes_edit.html', {'meeting': meeting})
+            if primary:
+                return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage', primary)
+            else:
+                return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
+        
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        get_sc_ag_info=None
 
+        if primary:
+            get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
+        else:
+            primary = 1
 
+        context = {
+            'all_sc_ag':sc_ag,
+            'sc_ag_info':get_sc_ag_info,
+            'user_data':user_data,
+            'primary': primary,
+            'meeting': None
+        }
+
+        return render(request, 'meeting_minutes_edit.html', context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
+@member_login_permission
+def meeting_minutes_edit(request, pk, primary=None):
+
+    try:
+        meeting = MeetingMinutes.objects.get(pk=pk)
+
+        if request.method == 'POST':
+            if 'save' in request.POST:
+                location = request.POST.get('location')
+                start_time = request.POST.get('start_time')
+                end_time = request.POST.get('end_time')
+
+                meeting.meeting_date=request.POST.get('meeting_date')
+                meeting.meeting_name = request.POST.get('meeting_name')
+                meeting.location = location
+                meeting.start_time = start_time
+                meeting.end_time = end_time
+                meeting.venue = request.POST.get('venue')
+                meeting.total_attendee = int(request.POST.get('total_attendees', 0))
+                meeting.ieee_attendee = request.POST.get('ieee_attendee')
+                meeting.non_ieee_attendee = request.POST.get('non_ieee_attendee')
+                meeting.agendas = request.POST.getlist('agenda[]')
+                meeting.discussion = request.POST.get('discussion')
+                meeting.host = request.POST.get('host')
+                meeting.co_host = request.POST.get('co_host')
+                meeting.guest = request.POST.get('guest')
+                meeting.written_by = request.POST.get('written_by')
+
+                meeting.save()
+                
+            elif 'delete' in request.POST:
+                meeting.delete()
+
+            if primary:
+                return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit', primary, pk)
+            else:
+                return redirect('central_branch:meeting_minutes:meeting_minutes_edit', pk)
+        
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        get_sc_ag_info=None
+
+        if primary:
+            get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
+        else:
+            primary = 1
+
+        context = {
+            'all_sc_ag':sc_ag,
+            'sc_ag_info':get_sc_ag_info,
+            'user_data':user_data,
+            'primary': primary,
+            'meeting': meeting,
+        }
+
+        return render(request, 'meeting_minutes_edit.html', context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
+
+@login_required
 def download_meeting_pdf(request, pk):
     # Try to fetch the meeting by primary key
     try:

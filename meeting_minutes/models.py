@@ -50,21 +50,23 @@ from port.models import Teams, Chapters_Society_and_Affinity_Groups
 
 
 class MeetingMinutes(models.Model):
-    meeting_name = models.CharField(max_length=255)
-    location = models.CharField(max_length=50)
-    meeting_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.CASCADE)
+    team = models.ForeignKey(Teams, null=True, blank=True, on_delete=models.SET_NULL)
+    meeting_name = models.CharField(max_length=255, blank=False, null=False)
+    location = models.CharField(max_length=50, blank=True, null=True)
+    meeting_date = models.DateField(blank=True, null=True)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
     venue = models.CharField(max_length=255, blank=True, null=True)
-    total_attendee = models.IntegerField()
-    ieee_attendee = models.IntegerField(blank=True, null=True)
-    non_ieee_attendee = models.IntegerField(blank=True, null=True)
+    total_attendee = models.IntegerField(blank=False, null=False, default=0)
+    ieee_attendee = models.IntegerField(blank=False, null=False, default=0)
+    non_ieee_attendee = models.IntegerField(blank=False, null=False, default=0)
     agendas = models.JSONField(default=list)  # ✅ recommended
-    discussion = models.TextField()
+    discussion = models.TextField(blank=True, null=True)
     host = models.CharField(max_length=255, blank=True, null=True)
     co_host = models.CharField(max_length=255, blank=True, null=True)
     guest = models.CharField(max_length=255, blank=True, null=True)
-    written_by = models.CharField(max_length=255)
+    written_by = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.pk)
