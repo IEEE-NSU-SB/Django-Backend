@@ -365,6 +365,9 @@
 
         </div>
     </div>
+    {% block common_js %}
+        {% include "common_js.html" %}
+    {% endblock common_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('searchInput');
