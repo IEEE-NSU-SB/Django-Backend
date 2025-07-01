@@ -332,7 +332,70 @@
   
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
-        {% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
+        {% if primary == 1%}
+            {% if team_primary is None %}
+              {% block navbar %}
+                  {% include 'navbar.html' %}
+              {% endblock navbar %}
+            {% else %}
+              {% if team_namespace == 'content_writing_and_publications_team' %}
+              {% block caw_navbar %}
+                  {% include 'content_navbar.html' %} 
+              {% endblock caw_navbar %}
+    
+              {% elif team_namespace == 'events_and_management_team' %}
+              {% block emt_navbar %}
+                  {% include 'emt_navbar.html' %} 
+              {% endblock emt_navbar %}
+    
+              {% elif team_namespace == 'logistics_and_operations_team' %}
+              {% block lot_navbar %}
+                  {% include 'logistics_navbar.html' %} 
+              {% endblock lot_navbar %}
+    
+              {% elif team_namespace == 'promotions_team' %}
+              {% block promotion_navbar %}
+                  {% include 'promotions_team/promotions_navbar.html' %} 
+              {% endblock promotion_navbar %}
+    
+              {% elif team_namespace == 'public_relation_team' %}
+              {% block prt_navbar %}
+                  {% include 'public_relation_team/public_relation_navbar.html' %} 
+              {% endblock prt_navbar %}
+    
+              {% elif team_namespace == 'membership_development_team' %}
+              {% block mdt_navbar %}
+                  {% include 'mdt_navbar.html' %} 
+              {% endblock mdt_navbar %}
+    
+              {% elif team_namespace == 'media_team' %}
+              {% block media_navbar %}
+                  {% include 'media_navbar.html' %} 
+              {% endblock media_navbar %}
+    
+              {% elif team_namespace == 'graphics_team' %}
+              {% block graphics_navbar %}
+                  {% include 'graphics_navbar.html' %} 
+              {% endblock graphics_navbar %}
+    
+              {% elif team_namespace == 'finance_and_corporate_team' %}
+              {% block finance_navbar %}
+                  {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+              {% endblock finance_navbar %}
+    
+              {% elif team_namespace == 'website_development_team' %}
+              {% block web_navbar %}
+                  {% include 'website_development_team/web_navbar.html' %} 
+              {% endblock web_navbar %}
+    
+              {% endif %}
+            {% endif %}
+        {% else %}
+            {% block sc_ag_navbar %}
+                {% include 'sc_ag_navbar.html' %}
+            {% endblock sc_ag_navbar %}
+
+        {% endif %}
         </div>
         <!--navbar content-->   
 
@@ -347,7 +410,7 @@
 
     <div class="div1">
       {% if primary == 1 %}
-      {% if team_primary %}
+      {% if team_primary is not None %}
       <a href="{% url homepage_url team_primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
       {% else %}
       <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
@@ -378,12 +441,12 @@
           </div>
         </div>
 
-       <div class="time_fld" {% if not team_primary or not meeting %}style="gap:0px"{% endif %}>
+       <div class="time_fld" {% if team_primary is None or not meeting %}style="gap:0px"{% endif %}>
         <h2>Team <div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
 
         <!-- Dropdown menu -->
-        {% if team_primary and meeting %}
+        {% if team_primary is not None and meeting %}
         <div class="time_fld_ip">{{meeting.team.team_name}}</div>
         {% else %}
         <select id="teamDropdown" name="selected_team" class="time_fld_ip" required>

@@ -38,14 +38,14 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
             get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
         else:
             primary = 1
-            if team_primary:
+            if team_primary is not None:
                 meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=team_primary).order_by('-meeting_date')
             else:
                 meetings = MeetingMinutes.objects.filter(sc_ag__primary=1).order_by('-meeting_date')
 
         create_url = None
         edit_url = None
-        if team_primary:
+        if team_primary != None:
             team_namespace = get_team_redirect_namespace(team_primary)
             create_url = f'{team_namespace}:meeting_minutes_create_team'
             edit_url = f'{team_namespace}:meeting_minutes_edit_team'        
@@ -56,6 +56,7 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
             'user_data':user_data,
             'primary': primary,
             'team_primary':team_primary,
+            'team_namespace':team_namespace,
             'create_url':create_url,
             'edit_url':edit_url,
             'meetings': meetings,
@@ -72,8 +73,9 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
 def meeting_minutes_create(request, primary=None, team_primary=None):
 
     try:
+        team_namespace = None
         homepage_url = None
-        if team_primary:
+        if team_primary != None:
             team_namespace = get_team_redirect_namespace(team_primary)
             homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
 
@@ -126,7 +128,7 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
             if primary:
                 return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage', primary)
             else:
-                if team_primary:
+                if team_primary != None:
                     return redirect(homepage_url, team_primary)
                 else:
                     return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
@@ -149,6 +151,7 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
             'user_data':user_data,
             'primary': primary,
             'team_primary':team_primary,
+            'team_namespace':team_namespace,
             'homepage_url':homepage_url,
             'teams':teams,
             'meeting': None
@@ -171,7 +174,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
         if request.method == 'POST':
             if 'save' in request.POST:
                 edit_url = None
-                if team_primary:
+                if team_primary != None:
                     team_namespace = get_team_redirect_namespace(team_primary)
                     edit_url = f'{team_namespace}:meeting_minutes_edit_team'
 
@@ -203,7 +206,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             if primary:
                 return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit', primary, pk)
             else:
-                if team_primary:
+                if team_primary != None:
                     redirect(edit_url, team_primary, pk)
                 else:
                     return redirect('central_branch:meeting_minutes:meeting_minutes_edit', pk)
@@ -220,8 +223,9 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             primary = 1
             teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
 
+        team_namespace = None
         homepage_url = None
-        if team_primary:
+        if team_primary != None:
             team_namespace = get_team_redirect_namespace(team_primary)
             homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
 
@@ -231,6 +235,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             'user_data':user_data,
             'primary': primary,
             'team_primary':team_primary,
+            'team_namespace':team_namespace,
             'homepage_url':homepage_url,
             'teams':teams,
             'meeting': meeting,
