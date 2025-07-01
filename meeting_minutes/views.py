@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 import os
 from central_branch.views import custom_500
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
-from port.models import Chapters_Society_and_Affinity_Groups
+from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.system_error_handling import ErrorHandling
 from users import renderData
 from insb_port import settings
@@ -23,43 +23,6 @@ from port.renderData import PortData
 # Create your views here.
 logger=logging.getLogger(__name__) 
 
-# def team_meeting_minutes(request):
-#     '''
-#     Loads all the teams' exisitng meeting minutes
-#     Gives option to add or delete a meeting minutes
-#     '''
-     
-#     #load teams' meeting minutes from database
-    
-#     teams_mm=renderData.team_meeting_minutes.load_all_team_mm()
-#     team_mm_list=[]
-#     for team in teams_mm:
-#         team_mm_list.append(team)
-#     context={
-#         'team':team_mm_list
-#     }
-
-#     return render(request,'team_meeting_minutes.html')
-
-
-# def branch_meeting_minutes(request):
-#     '''
-#     Loads all the branchs' existing meeting minutes
-#     Gives option to add or delete a meeting minutes
-#     '''
-    
-#     #load branchs' meeting minutes from database
-    
-#     branch_mm=renderData.branch_meeting_minutes.load_all_branch_mm()
-#     branch_mm_list=[]
-#     for branch in branch_mm:
-#         branch_mm_list.append(branch)
-#     context={
-#         'team':branch_mm_list
-#     }
-#     return render(request,'branch_meeting_minutes.html')
-
-
 @login_required
 @member_login_permission
 def meeting_minutes_homepage(request, primary=None, team_primary=None):
@@ -75,15 +38,17 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
             get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
         else:
             primary = 1
-            meetings = MeetingMinutes.objects.filter(sc_ag__primary=1).order_by('-meeting_date')
+            if team_primary:
+                meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=team_primary).order_by('-meeting_date')
+            else:
+                meetings = MeetingMinutes.objects.filter(sc_ag__primary=1).order_by('-meeting_date')
 
         create_url = None
         edit_url = None
         if team_primary:
             team_namespace = get_team_redirect_namespace(team_primary)
             create_url = f'{team_namespace}:meeting_minutes_create_team'
-            edit_url = f'{team_namespace}:meeting_minutes_edit_team'
-            
+            edit_url = f'{team_namespace}:meeting_minutes_edit_team'        
         
         context = {
             'all_sc_ag':sc_ag,
@@ -107,11 +72,17 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
 def meeting_minutes_create(request, primary=None, team_primary=None):
 
     try:
+        homepage_url = None
+        if team_primary:
+            team_namespace = get_team_redirect_namespace(team_primary)
+            homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
+
         if request.method == 'POST':
             location = request.POST.get('location')
             start_time = request.POST.get('start_time')
             end_time = request.POST.get('end_time')
-            meeting_date=request.POST.get('meeting_date')
+            meeting_date = request.POST.get('meeting_date')
+            selected_team = request.POST.get('selected_team')
             
             venue = request.POST.get('venue')
             total_attendee = int(request.POST.get('total_attendees', 0) or 0)
@@ -127,11 +98,14 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
 
             if primary:
                 sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
+                team = Teams.objects.filter(team_of__primary=primary, primary=selected_team).values('id')[0]['id']
             else:
                 sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']
+                team = Teams.objects.filter(team_of__primary=1, primary=selected_team).values('id')[0]['id']
 
             MeetingMinutes.objects.create(
                 sc_ag_id=sc_ag,
+                team_id=team,
                 meeting_name=meeting_name,
                 location=location,
                 start_time=start_time,
@@ -152,7 +126,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
             if primary:
                 return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage', primary)
             else:
-                return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
+                if team_primary:
+                    return redirect(homepage_url, team_primary)
+                else:
+                    return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')
         
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -161,13 +138,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
 
         if primary:
             get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
+            teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
         else:
             primary = 1
-
-        homepage_url = None
-        if team_primary:
-            team_namespace = get_team_redirect_namespace(team_primary)
-            homepage_url = f'{team_namespace}:meeting_minutes_homepage_team'
+            teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
 
         context = {
             'all_sc_ag':sc_ag,
@@ -176,6 +150,7 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
             'primary': primary,
             'team_primary':team_primary,
             'homepage_url':homepage_url,
+            'teams':teams,
             'meeting': None
         }
 
@@ -195,6 +170,11 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
         if request.method == 'POST':
             if 'save' in request.POST:
+                edit_url = None
+                if team_primary:
+                    team_namespace = get_team_redirect_namespace(team_primary)
+                    edit_url = f'{team_namespace}:meeting_minutes_edit_team'
+
                 location = request.POST.get('location')
                 start_time = request.POST.get('start_time')
                 end_time = request.POST.get('end_time')
@@ -223,7 +203,10 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             if primary:
                 return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit', primary, pk)
             else:
-                return redirect('central_branch:meeting_minutes:meeting_minutes_edit', pk)
+                if team_primary:
+                    redirect(edit_url, team_primary, pk)
+                else:
+                    return redirect('central_branch:meeting_minutes:meeting_minutes_edit', pk)
         
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -232,8 +215,10 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
         if primary:
             get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
+            teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
         else:
             primary = 1
+            teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
 
         homepage_url = None
         if team_primary:
@@ -247,6 +232,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             'primary': primary,
             'team_primary':team_primary,
             'homepage_url':homepage_url,
+            'teams':teams,
             'meeting': meeting,
         }
 
@@ -258,6 +244,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
         return custom_500(request)
 
 @login_required
+@member_login_permission
 def download_meeting_pdf(request, pk):
     # Try to fetch the meeting by primary key
     try:

@@ -15,7 +15,7 @@
     {% endblock common_css %}
     
 <script>
-  let agendaCount = 1;
+  let agendaCount = {% if meeting.agendas %}{{meeting.agendas|length}}{% else %}0{% endif %};
 
   function addDiv() {
     if (agendaCount >= 10) {
@@ -378,21 +378,21 @@
           </div>
         </div>
 
-       <div class="time_fld">
+       <div class="time_fld" {% if not team_primary or not meeting %}style="gap:0px"{% endif %}>
         <h2>Team <div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
 
         <!-- Dropdown menu -->
-        <select id="teamDropdown" class="time_fld_ip" onchange="updateTeamValue()" required>
-          <option value="" disabled selected>Select a team</option>
-          <option value="website-development-team">Website Development Team</option>
-          <option value="promotions">Promotions</option>
-          <option value="media">Media</option>
-          <option value="graphics">Graphics</option>
+        {% if team_primary and meeting %}
+        <div class="time_fld_ip">{{meeting.team.team_name}}</div>
+        {% else %}
+        <select id="teamDropdown" name="selected_team" class="time_fld_ip" required>
+          <option value="" disabled {% if not meeting.team %}selected{% endif %}>Select a team</option>
+          {% for team in teams %}
+          <option value="{{team.primary}}" {% if meeting.team.primary == team.primary %}selected{% endif %}>{{team.team_name}}</option>
+          {% endfor %}
         </select>
-
-        <!-- Hidden input field -->
-        <input type="hidden" name="meeting_date" id="selectedTeam" value="{{ meeting.meeting_date }}">
+        {% endif %}
       </div>
 
         <div class="time_fld">
@@ -581,25 +581,6 @@
         alert("Please fill in the description field.");
         }
     });
-    </script>
-    <script>
-      function updateTeamValue() {
-        const dropdown = document.getElementById("teamDropdown");
-        const hiddenInput = document.getElementById("selectedTeam");
-        hiddenInput.value = dropdown.value;
-      }
-
-      // If you want to pre-fill from existing data (e.g., from Django)
-      window.addEventListener('DOMContentLoaded', () => {
-        const selected = "{{ meeting.meeting_date }}"; // Replace with actual team value if needed
-        const dropdown = document.getElementById("teamDropdown");
-        const hiddenInput = document.getElementById("selectedTeam");
-
-        if (selected) {
-          dropdown.value = selected;
-          hiddenInput.value = selected;
-        }
-      });
     </script>
 
     {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}

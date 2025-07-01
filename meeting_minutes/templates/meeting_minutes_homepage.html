@@ -301,7 +301,7 @@
                   <th>SL</th>
                   <th>Meeting Name</th>
                   <th>Date</th>
-                  <th>Download</th>
+                  {% comment %} <th>Download</th> {% endcomment %}
                 </tr>
               </thead>
               <tbody id="tableBody">
@@ -322,7 +322,7 @@
                         </a>
                   </td>
                   <td>{{ meeting.meeting_date }}</td>
-                  <td>
+                  {% comment %} <td>
                     <a
                     {% if primary == 1 %}
                     href="{% url 'central_branch:meeting_minutes:download_meeting_pdf' meeting.pk %}"
@@ -332,7 +332,7 @@
                     >
                       <i class="fa fa-download download-icon"></i>
                     </a>
-                  </td>
+                  </td> {% endcomment %}
                 </tr>
                 {% empty %}
                 <tr>
