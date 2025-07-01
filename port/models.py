@@ -43,7 +43,7 @@ class Teams(models.Model):
 
     '''
     team_name=models.CharField(max_length=40,null=False,blank=False)
-    team_short_description=RichTextField(null=True,blank=True,max_length=500)
+    team_short_description=RichTextField(null=True,blank=True)
     primary=models.IntegerField(null=False,blank=False,default=0)
     team_picture=ResizedImageField(null=True,blank=True,upload_to="Teams/team_images/")
     # team_of attribute means to which SC_AG or Branch The Team is registered to
