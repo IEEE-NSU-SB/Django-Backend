@@ -16,6 +16,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
+from django.utils.html import strip_tags
+
 
 from port.renderData import PortData
 # from . import renderData
@@ -28,6 +30,8 @@ logger=logging.getLogger(__name__)
 def meeting_minutes_homepage(request, primary=None, team_primary=None):
 
     try:
+        team_namespace = None
+        
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
@@ -197,11 +201,25 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                 meeting.co_host = request.POST.get('co_host')
                 meeting.guest = request.POST.get('guest')
                 meeting.written_by = request.POST.get('written_by')
+                
+                
+                
 
                 meeting.save()
                 
+                
             elif 'delete' in request.POST:
                 meeting.delete()
+                if primary:
+                    return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage', primary)
+                else:
+                    if team_primary is not None:
+                        team_namespace = get_team_redirect_namespace(team_primary)
+                        return redirect(f'{team_namespace}:meeting_minutes_homepage_team', team_primary)
+                    else:
+                        return redirect('central_branch:meeting_minutes:meeting_minutes_homepage')   
+                
+                
 
             if primary:
                 return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit', primary, pk)
@@ -251,87 +269,104 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 @login_required
 @member_login_permission
 def download_meeting_pdf(request, pk):
-    # Try to fetch the meeting by primary key
     try:
-        meeting = MeetingMinutes.objects.get(pk=pk)
-    except MeetingMinutes.DoesNotExist:
-        return HttpResponse("Meeting not found.", status=404)
+        # Fetch the meeting object
+        meeting = get_object_or_404(MeetingMinutes, pk=pk)
 
-    # Set up HTTP response headers for PDF download
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename="meeting_{pk}.pdf"'
+        # Set up HTTP response headers for PDF download
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="meeting_{pk}.pdf"'
 
-    # Create a canvas object for drawing the PDF
-    p = canvas.Canvas(response, pagesize=A4)
-    width, height = A4  # Page size
+        # Create the PDF canvas
+        p = canvas.Canvas(response, pagesize=A4)
+        width, height = A4
 
-    # Start position from the top of the page
-    y = height - 100
-    line_height = 30  # Space between lines
-    
-    logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')  
-    if os.path.exists(logo_path):
-        p.drawImage(
-    ImageReader(logo_path),
-    x=500, y=height - 100,  # Position
-    width=80, height=80,   # Size
-    preserveAspectRatio=True,
-    mask='auto'            
-)
-        
-    print("LOGO PATH:", logo_path)
-    print("Exists:", os.path.exists(logo_path))    
+        # Define margins and spacing
+        top_margin = 50
+        left_margin = 50
+        line_height = 20
+        y = height - top_margin
 
-   
-    p.saveState()
-    p.setFont("Helvetica", 40)
-    p.setFillColorRGB(0.7, 0.9, 1.0, alpha=0.5)
-    p.drawCentredString(width / 2, height / 2, "IEEE NSU Student Branch")
-    p.restoreState()
+        # Draw Logo if it exists
+        try:
+            logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
+            if os.path.exists(logo_path):
+                p.drawImage(
+                    ImageReader(logo_path),
+                    x=width - 130,
+                    y=height - 130,
+                    width=80,
+                    height=80,
+                    preserveAspectRatio=True,
+                    mask='auto'
+                )
+        except Exception as e:
+            logger.warning(f"Logo could not be loaded: {e}")
 
-    # Helper function to draw each field in the PDF
-    def draw_line(label, value):
-        nonlocal y
-        p.setFont("Helvetica", 16)
-        p.drawString(50, y, f"{label}: {value}")
+        # Draw Watermark
+        p.saveState()
+        p.setFont("Helvetica-Bold", 40)
+        p.setFillGray(0.9)
+        p.drawCentredString(width / 2, height / 2, "IEEE NSU Student Branch")
+        p.restoreState()
+
+        # Draw Title
+        p.setFont("Helvetica-Bold", 24)
+        p.drawCentredString(width / 2, y, "Meeting Minutes Report")
+        y -= 2 * line_height
+
+        # Helper to draw lines
+        def draw_line(label, value):
+            nonlocal y
+            if y < 50:
+                p.showPage()
+                y = height - top_margin
+            p.setFont("Helvetica", 14)
+            p.drawString(left_margin, y, f"{label}: {value}")
+            y -= line_height
+
+        # Add meeting fields
+        draw_line("Meeting Name", meeting.meeting_name or "N/A")
+        draw_line("Date", meeting.meeting_date.strftime("%Y-%m-%d") if meeting.meeting_date else "N/A")
+        draw_line(
+            "Time",
+            f"{meeting.start_time.strftime('%H:%M')} - {meeting.end_time.strftime('%H:%M')}"
+            if meeting.start_time and meeting.end_time else "N/A"
+        )
+        draw_line("Location", meeting.location or "N/A")
+        draw_line("Venue", meeting.venue or "N/A")
+        draw_line("Total Attendees", str(meeting.total_attendee or 0))
+        draw_line("IEEE Attendees", str(meeting.ieee_attendee or 0))
+        draw_line("Non-IEEE Attendees", str(meeting.non_ieee_attendee or 0))
+        draw_line("Agendas", ", ".join(meeting.agendas) if isinstance(meeting.agendas, list) else (meeting.agendas or "N/A"))
+        draw_line("Host", meeting.host or "N/A")
+        draw_line("Co-host", meeting.co_host or "N/A")
+        draw_line("Guest", meeting.guest or "N/A")
+        draw_line("Written by", meeting.written_by or "N/A")
+
+        # Discussion Section (multi-line)
+        y -= line_height
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(left_margin, y, "Discussion:")
         y -= line_height
 
-   # Write meeting fields to PDF
-    draw_line("Meeting Name", meeting.meeting_name)
-    draw_line("Date", meeting.meeting_date.strftime("%Y-%m-%d"))
-    draw_line("Time", f"{meeting.start_time.strftime('%H:%M')} - {meeting.end_time.strftime('%H:%M')}")
-    draw_line("Location", meeting.location)
-    draw_line("Venue", meeting.venue or "N/A")
-    draw_line("Total Attendees", str(meeting.total_attendee))
-    draw_line("IEEE Attendees", str(meeting.ieee_attendee) if meeting.ieee_attendee is not None else "N/A")
-    draw_line("Non-IEEE Attendees", str(meeting.non_ieee_attendee) if meeting.non_ieee_attendee is not None else "N/A")
-    draw_line("Agendas", meeting.agendas)
-    
-    draw_line("Host", meeting.host or "N/A")
-    draw_line("Co-host", meeting.co_host or "N/A")
-    draw_line("Guest", meeting.guest or "N/A")
-    draw_line("Written by", meeting.written_by)
-    # Add the "Discussion" section
-    p.drawString(50, y, "Discussion:")
-    y -= line_height
+        p.setFont("Helvetica", 12)
+        text_object = p.beginText(left_margin, y)
+        discussion_lines = strip_tags(meeting.discussion or "N/A").splitlines()
+        for line in discussion_lines:
+            text_object.textLine(line)
+        p.drawText(text_object)
 
-    # Begin text block for discussion content (multi-line)
-    text_object = p.beginText(50, y)
-    text_object.setFont("Helvetica", 12)
+        # Finish PDF
+        p.showPage()
+        p.save()
 
-    # Write each line of discussion to the PDF
-    for line in meeting.discussion.splitlines():
-        text_object.textLine(line)
+        return response
 
-    p.drawText(text_object)
-
-    # Finalize and close the PDF document
-    p.showPage()
-    p.save()
-
-    # Return the response as a downloadable PDF
-    return response
-
+    except Exception as e:
+        logger.error(f"Error generating meeting PDF at {datetime.now()}", exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e, error_traceback=traceback.format_exc())
+        return HttpResponse("Internal Server Error while generating PDF.", status=500)
 
 def get_team_redirect_namespace(team_primary):
 
