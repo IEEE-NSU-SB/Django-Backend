@@ -365,6 +365,7 @@
                 <tr>
                   <th>SL</th>
                   <th>Meeting Name</th>
+                  <th>Location</th>
                   <th>Date</th>
                   {% comment %} <th>Download</th> {% endcomment %}
                 </tr>
@@ -386,6 +387,7 @@
                       {{ meeting.meeting_name }}
                         </a>
                   </td>
+                  <td>{{ meeting.location }}</td>
                   <td>{{ meeting.meeting_date }}</td>
                   {% comment %} <td>
                     <a

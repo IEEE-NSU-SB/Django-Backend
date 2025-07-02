@@ -6,7 +6,6 @@ from central_branch.view_access import Branch_View_Access
 from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from chapters_and_affinity_group.models import SC_AG_Members
 from meeting_minutes.models import MeetingMinutesAccess
-from system_administration.models import SC_AG_Data_Access
 from system_administration.system_error_handling import ErrorHandling
 from users.models import Members
 

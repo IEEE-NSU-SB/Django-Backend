@@ -11,10 +11,11 @@ from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.system_error_handling import ErrorHandling
 from users import renderData
 from insb_port import settings
-from meeting_minutes.models import MeetingMinutes
+from meeting_minutes.models import MeetingMinutes, MeetingMinutesAccess
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from users.models import Members
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
@@ -128,7 +129,7 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                     sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']
                     team = Teams.objects.filter(team_of__primary=1, primary=selected_team).values('id')[0]['id']
 
-                MeetingMinutes.objects.create(
+                meeting_minutes = MeetingMinutes.objects.create(
                     sc_ag_id=sc_ag,
                     team_id=team,
                     meeting_name=meeting_name,
@@ -147,6 +148,13 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                     guest=guest,
                     written_by=written_by
                 )
+                
+                try: 
+                    username = request.user.username
+                    member = Members.objects.get(ieee_id=username)
+                    MeetingMinutesAccess.objects.create(meeting_minutes=meeting_minutes, member=member, access_type='Edit')
+                except:
+                    pass
 
                 if primary:
                     return redirect('chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage', primary)
