@@ -600,13 +600,13 @@
       {% else %}
       <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage' primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
       {% endif %}
-      {% if meeting %}
+      {% if meeting and has_access == 'Edit' %}
         <i
           class="fa fa-users user-btn"
           aria-hidden="true"
           data-sid="{{budget_sheet.pk}}"
         ></i>
-        <button type="button" class="modal_btn">Delete {{has_access}}<i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
+        <button type="button" class="modal_btn">Delete<i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
       {% endif %}
     </div>
 
@@ -739,6 +739,7 @@
       {% endif %}
 
       <!-- Agenda Controls -->
+      {% if has_access == 'Edit' %}
       <div class="agenda" id="agenda-controls">
         <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
         <div>
@@ -746,7 +747,6 @@
           <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
         </div>
       </div>
-
       <!-- Agenda Items -->
       <div id="agenda-items">
         {% if meeting.agendas %}
@@ -763,6 +763,28 @@
           </div>
         {% endif %}
       </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div class="agenda" id="agenda-controls">
+        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
+      </div>
+      <!-- Agenda Items -->
+      <div id="agenda-items">
+        {% if meeting.agendas %}
+          {% for item in meeting.agendas %}
+            <div class="agenda_fld">
+              <h2>{{ forloop.counter }}.</h2>
+              <div class="agenda_fld_ip">{{ item }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="agenda_fld">
+            <h2>1.</h2>
+            <div class="agenda_fld_ip"></div>
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      
 
       <!-- Discussion -->
       {% if has_access == 'Edit' %}
