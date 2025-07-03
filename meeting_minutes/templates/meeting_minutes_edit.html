@@ -583,7 +583,11 @@
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
-                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
+              {% if has_access == 'Edit' %}
+              <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
+              {% elif has_access == 'ViewOnly' %}
+              <h1 class="h1" >{{ meeting.meeting_name|default_if_none:'' }}</h1>
+              {% endif %}
             </div>
 
     <div class="div1">
@@ -609,19 +613,23 @@
             <div class="div2">
                 <div class="label-container">
                     <div class="location_fld"><!--location-->
+            {% if has_access == 'Edit' %}
                         <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
-
+          
                         <div id="location-buttons">
-                            <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
-                            <label for="virtual" class="location_fld_ip">Virtual</label>
-
-            <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
-            <label for="hybrid" class="location_fld_ip">Hybrid</label>
-
-            <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
-            <label for="inperson" class="location_fld_ip">In-person</label>
-          </div>
+                          <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
+                          <label for="virtual" class="location_fld_ip">Virtual</label>
+                          
+                          <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
+                          <label for="hybrid" class="location_fld_ip">Hybrid</label>
+                          
+                          <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
+                          <label for="inperson" class="location_fld_ip">In-person</label>
+                        </div>
+            {% elif has_access == 'ViewOnly' %}
+            <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2><div class="colon">: </div><div>{{meeting.venue}}</div>
+            {% endif %}
         </div>
 
        <div class="time_fld" {% if team_primary is None or not meeting %}style="gap:0px"{% endif %}>
@@ -641,52 +649,94 @@
         {% endif %}
       </div>
 
-        <div class="time_fld">
-          <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
-        </div>
-
-        <!-- Time Fields -->
-        <div class="time_fld">
-          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
-        </div>
-
-        <div class="time_fld">
-          <h2>End time<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
-        </div>
-
-        <!-- Venue -->
-        <div class="time_fld">
-          <h2>Venue</h2>
-          <div class="colon">:</div>
-          <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
-        </div>
-
-        <!-- Total Attendee -->
-        <div class="time_fld">
-          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
-        </div>
-
-        <!-- IEEE & Non-IEEE -->
-        <div class="time_fld">
-          <h2>IEEE Attendee</h2>
-          <div class="colon">:</div>
-          <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
-        </div>
-
-        <div class="time_fld">
-          <h2>Non-IEEE Attendee</h2>
-          <div class="colon">:</div>
-          <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
-        </div>
+      {% if has_access == 'Edit' %}
+      <div class="time_fld">
+        <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
       </div>
+
+      <!-- Time Fields -->
+      <div class="time_fld">
+        <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
+      </div>
+
+      <div class="time_fld">
+        <h2>End time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
+      </div>
+
+      <!-- Venue -->
+      <div class="time_fld">
+        <h2>Venue</h2>
+        <div class="colon">:</div>
+        <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+      </div>
+
+      <!-- Total Attendee -->
+      <div class="time_fld">
+        <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+      </div>
+
+      <!-- IEEE & Non-IEEE -->
+      <div class="time_fld">
+        <h2>IEEE Attendee</h2>
+        <div class="colon">:</div>
+        <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+      </div>
+
+      <div class="time_fld">
+        <h2>Non-IEEE Attendee</h2>
+        <div class="colon">:</div>
+        <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+      </div>
+    </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div class="time_fld">
+        <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.meeting_date|date:'Y-m-d' }}</div>
+      </div>
+
+      <!-- Time Fields -->
+      <div class="time_fld">
+        <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.start_time|time:'H:i' }}</div>
+      </div>
+
+      <div class="time_fld">
+        <h2>End time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.end_time|time:'H:i' }}</div>
+      </div>
+
+      <!-- Venue -->
+      <div class="time_fld">
+        <h2>Venue</h2>
+        <div class="colon">:</div><div>{{ meeting.venue|default_if_none:'' }}</div>
+      </div>
+
+      <!-- Total Attendee -->
+      <div class="time_fld">
+        <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.total_attendee|default_if_none:'' }}</div>
+      </div>
+
+      <!-- IEEE & Non-IEEE -->
+      <div class="time_fld">
+        <h2>IEEE Attendee</h2>
+        <div class="colon">:</div><div>{{ meeting.ieee_attendee|default_if_none:'' }}</div>
+      </div>
+
+      <div class="time_fld">
+        <h2>Non-IEEE Attendee</h2>
+        <div class="colon">:</div><div>{{ meeting.non_ieee_attendee|default_if_none:'' }}</div>
+      </div>
+    </div>
+      {% endif %}
 
       <!-- Agenda Controls -->
       <div class="agenda" id="agenda-controls">
@@ -715,6 +765,7 @@
       </div>
 
       <!-- Discussion -->
+      {% if has_access == 'Edit' %}
       <div>
         <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
         <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
@@ -744,18 +795,52 @@
         </div>
 
         <div class="space"></div>
-
+        
         <div class="text_fld">
           <h2>Written by<span style="color: #e74c3c;">*</span></h2>
           <div class="colon">:</div>
           <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
         </div>
       </div>
-
       <!-- Save -->
       <div style="display: flex; justify-content: center; margin-top: 20px;">
         <button type="submit" name="save" class="save_btn">Save</button>
       </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div>
+        <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <div style="min-height: 150px; border: 1px solid #737373; padding: 1em; box-sizing: border-box; background-color: #f9f9f9; width: -webkit-fill-available">{{ meeting.discussion|safe|default_if_none:'' }}</textarea>
+      </div>
+
+        <div class="label-container" style="margin-top: 40px;">
+            <div class="text_fld"><!--host-->   
+            <h2>Host</h2>
+            <div class="colon">:</div><div>{{ meeting.host|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Co-host</h2>
+          <div class="colon">:</div><div>{{ meeting.co_host|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Guest</h2>
+          <div class="colon">:</div><div>{{ meeting.guest|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Written by<span style="color: #e74c3c;">*</span></h2>
+          <div class="colon">:</div><div>{{ meeting.written_by|default_if_none:'' }}</div>
+        </div>
+      </div>
+      {% endif %}
+
     </form>
 
             <!-- modal-->
@@ -806,11 +891,11 @@
                 </thead>
                 <tbody id="budgetTableBody">
                   <!-- Table data will be dynamically loaded -->
-                  {% comment %} {% for team_member in fct_team_member_accesses %} {% endcomment %}
+                  {% for member in members %}
                   <tr>
                     <td>{{forloop.counter}}</td>
-                    <td>{{team_member.member.name}}</td>
-                    <td>{{team_member.member.position}}</td>
+                    <td>{{member.member.name}}</td>
+                    <td>{{member.member.position}}</td>
                     <td>
                       <input type="hidden" name="ieee_id" value={{team_member.member.ieee_id}}>
                       <select
@@ -830,7 +915,7 @@
                       </select>
                     </td>
                   </tr>
-                  {% comment %} {% endfor %} {% endcomment %}
+                  {% endfor %}
                 </tbody>
               </table>
 

@@ -4,6 +4,7 @@ import traceback
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import os
+from central_branch.renderData import Branch
 from central_branch.views import custom_500
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from meeting_minutes.manage_access import MM_Render_Access
@@ -15,7 +16,7 @@ from meeting_minutes.models import MeetingMinutes, MeetingMinutesAccess
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from users.models import Members
+from users.models import Members, Panel_Members
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
@@ -181,7 +182,8 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                 'team_namespace':team_namespace,
                 'homepage_url':homepage_url,
                 'teams':teams,
-                'meeting': None
+                'meeting': None,
+                'has_access':'Edit'
             }
 
             return render(request, 'meeting_minutes_edit.html', context)
@@ -265,9 +267,13 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
                 teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
+                # current_panel = SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary=primary)
+                # members = Panel_Members.objects.filter(tenure=current_panel[0])
             else:
                 primary = 1
                 teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
+                # current_panel = Branch.load_current_panel()
+                # members = Panel_Members.objects.filter(tenure=current_panel)
 
             team_namespace = None
             homepage_url = None
@@ -285,6 +291,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                 'homepage_url':homepage_url,
                 'teams':teams,
                 'meeting': meeting,
+                # 'members':members,
                 'has_access':has_access
             }
 
