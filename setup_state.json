@@ -1,0 +1,11 @@
+{
+  "venv_created": true,
+  "venv_activated": true,
+  "requirements_installed": true,
+  "env_updated": true,
+  "migrated": true,
+  "contenttypes_cleared": true,
+  "data_loaded": false,
+  "superuser_created": false,
+  "server_started": false
+}
