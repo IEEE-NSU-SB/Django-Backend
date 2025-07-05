@@ -257,6 +257,153 @@
         .edit-access-btn svg {
             display: block;
         }
+        
+        /* modal CSS starts here */
+
+        .modal_view_access {
+            display: block;
+            opacity: 0;
+            position: fixed;
+            z-index: -1;
+            padding-top: 20vh;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 120%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-20px);
+        }
+
+        .modal_content {
+            background-color: white;
+            width: 390px;
+            border-radius: 7px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            margin: auto;
+            padding: 20px 30px;
+        }
+        .modal_content h1{
+            font-size: 18px;
+            margin: 0px;
+            font-weight: bold;
+        }
+
+        .x_btn{
+          text-decoration: none;
+          border: none;
+          background-color: white;
+          transition: 0.5s;
+          font-size: 20px;
+          /* border-bottom: solid 1px white; */
+          color: #b3b3b3;
+          position: relative;
+          bottom: 4px;
+          cursor: pointer;
+        }
+        .x_btn:hover{
+          color: black;
+        }
+        .confirm_btn{
+            padding: 5px 30px;
+            color: #fff;
+            background-color: #00843ea4;
+            text-decoration: none;
+            border: 1px solid #00843ea4;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            width: 50%;
+            cursor: pointer;
+        }
+        .confirm_btn:hover{
+            background-color: #fff;
+            color: #00843ea4;
+        }
+        .close_btn{
+            cursor: pointer;
+            padding: 5px 30px;
+            color: #A4A4A4;
+            background-color: #F3F3F3;
+            text-decoration: none;
+            border: 1px solid #A4A4A4;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            width: 50%;
+            
+        }
+        .close_btn:hover{
+            background-color: #F3F3F3 ;
+            border: 1px solid #000;
+            color: #000000;
+        }  
+
+        #checkbox-buttons input[type="checkbox"] {
+          display: none;
+        }
+
+        .access_fld_ip {
+          display: block;
+          padding: 10px 16px;
+          margin: 5px;
+          border-bottom: solid 1px #b3b3b3;
+          cursor: pointer;
+          position: relative;
+          background-color: white;
+          font-family: sans-serif;
+          transition: all 0.2s ease-in-out;
+          color: gray;
+        }
+
+        .access_fld_ip::before {
+          content: "";
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-right: 10px;
+          vertical-align: middle;
+          border: 2px solid #b3b3b3;
+          border-radius: 3px;
+          background-color: white;
+        }
+
+        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip {
+          color: black;
+        }
+
+        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip::before {
+          content: "✔";
+          color: black;
+          font-size: 14px;
+          font-weight: bold;
+          text-align: center;
+          line-height: 16px;
+        }
+        .checkbox_btns{
+            margin-top: 8px;
+            border: 1px solid #b3b3b3;
+            border-radius: 7px;
+            display: block;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 600px){
+            .modal_content {
+            width: 70%;
+            }
+        }
+        @media (max-width: 500px){
+            .modal_content {
+            width: 95%;
+            }
+        }
+        /* modal CSS ends here */
     </style>
 </head>
 
@@ -323,7 +470,7 @@
                                     <td>Branch</td>
                                     <td>Chair</td>
                                     <td>
-                                        <button class="edit-access-btn">
+                                        <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
                                             <span class="material-symbols-outlined" style="font-size: 1.25rem;">
                                                 border_color
                                             </span>
@@ -336,7 +483,7 @@
                                     <td>Events</td>
                                     <td>Coordinator</td>
                                     <td>
-                                        <button class="edit-access-btn">
+                                        <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
                                             <span class="material-symbols-outlined" style="font-size: 1.25rem;">
                                                 border_color
                                             </span>
@@ -349,7 +496,7 @@
                                     <td>Tech Team</td>
                                     <td>Member</td>
                                     <td>
-                                        <button class="edit-access-btn">
+                                        <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
                                             <span class="material-symbols-outlined" style="font-size: 1.25rem;">
                                                 border_color
                                             </span>
@@ -365,6 +512,61 @@
 
         </div>
     </div>
+
+        <div class="modal_view_access" id="view_access_modal">
+        <form method="post" id="form">
+        {% csrf_token %}
+        <div class="modal_content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+            <h1 style="margin-bottom: 10px;">Control what John Doe can access:</h1>
+            <button type="button" class="x_btn"><i class="fa fa-times"></i></button>
+            </div>
+
+
+            <div id="checkbox-buttons" class="checkbox_btns">
+                <input type="checkbox" id="event" value="Event Create Access">
+                <label for="event" class="access_fld_ip">Event Create Access</label>
+
+                <input type="checkbox" id="edit" value="Event Details Edit Permission">
+                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
+
+                <input type="checkbox" id="task" value="Create Individual Task Permission">
+                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+
+                <input type="checkbox" id="panel" value="Create Panel Access">
+                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                <input type="checkbox" id="event" value="Event Create Access">
+                <label for="event" class="access_fld_ip">Event Create Access</label>
+
+                <input type="checkbox" id="edit" value="Event Details Edit Permission">
+                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
+
+                <input type="checkbox" id="task" value="Create Individual Task Permission">
+                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+
+                <input type="checkbox" id="panel" value="Create Panel Access">
+                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                <input type="checkbox" id="event" value="Event Create Access">
+                <label for="event" class="access_fld_ip">Event Create Access</label>
+
+                <input type="checkbox" id="edit" value="Event Details Edit Permission">
+                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
+
+                <input type="checkbox" id="task" value="Create Individual Task Permission">
+                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+
+                <input type="checkbox" id="panel" value="Create Panel Access">
+                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+            </div>
+
+            <div style="display: flex; justify-content: center;">
+                <button type="button" class="close_btn">Cancel</button>
+                <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+            </div>
+        </div>
+        </form>
+    </div>
+
     {% block common_js %}
         {% include "common_js.html" %}
     {% endblock common_js %}
@@ -393,6 +595,47 @@
             });
         });
     </script>
+   <script>
+  // Open modal
+  const openBtns = document.querySelectorAll(".open_modal_btn");
+  openBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modalId = btn.getAttribute("data-target");
+      const modal = document.querySelector(modalId);
+      if (modal) {
+        modal.style.transform = "translateY(0px)";
+        modal.style.zIndex = "103100";
+        modal.style.opacity = "1";
+      }
+    });
+  });
+
+  // Close modal via X or Cancel button
+  const closeBtns = document.querySelectorAll(".x_btn, .close_btn");
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modal = btn.closest("#view_access_modal");
+      if (modal) {
+        modal.style.transform = "translateY(-50px)";
+        modal.style.zIndex = "-100";
+        modal.style.opacity = "0";
+      }
+    });
+  });
+
+  // Close modal when clicking on the background (outside content)
+  const modal = document.querySelector("#view_access_modal");
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      const modalContent = modal.querySelector(".modal_content");
+      if (!modalContent.contains(event.target)) {
+        modal.style.transform = "translateY(-50px)";
+        modal.style.zIndex = "-100";
+        modal.style.opacity = "0";
+      }
+    });
+  }
+</script>
 
 </body>
 
