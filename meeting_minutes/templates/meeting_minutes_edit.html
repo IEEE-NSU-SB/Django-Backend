@@ -216,6 +216,7 @@
             flex: 1;
             border: none;
             border-bottom: 1px solid #ebebeb;
+            width:100%;
         }
         .colon {
             font-size: 1rem;
@@ -339,7 +340,7 @@
       .user-btn {
         border: none;
         padding: 0.7rem 0.7rem 0.5rem 0.7rem;
-        border-radius: 50%;
+        border-radius: 6px;
         cursor: pointer;
         transition: background-color 0.3s ease-in-out;
         display: flex;
@@ -600,14 +601,16 @@
       {% else %}
       <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage' primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
       {% endif %}
-      {% if meeting and has_access == 'Edit' %}
+      <div>
+        {% if meeting and has_access == 'Edit' %}
         <i
-          class="fa fa-users user-btn"
-          aria-hidden="true"
-          data-sid="{{budget_sheet.pk}}"
+        class="fa fa-users user-btn"
+        aria-hidden="true"
+        data-sid="{{budget_sheet.pk}}"
         ></i>
         <button type="button" class="modal_btn">Delete<i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
 
             <div class="div2">
@@ -692,13 +695,13 @@
 
       <!-- IEEE & Non-IEEE -->
       <div class="time_fld">
-        <h2>IEEE Attendee</h2>
+        <h2>IEEE Attendee<div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
         <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
       </div>
 
       <div class="time_fld">
-        <h2>Non-IEEE Attendee</h2>
+        <h2>Non-IEEE Attendee<div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
         <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
       </div>
