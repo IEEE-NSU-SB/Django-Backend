@@ -632,13 +632,20 @@
             {% endif %}
         </div>
 
-       <div class="time_fld" {% if team_primary is None or not meeting %}style="gap:0px"{% endif %}>
+       <div class="time_fld" {% if team_primary is None %}style="gap:0px"{% endif %}>
         <h2>Team <div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
 
         <!-- Dropdown menu -->
         {% if team_primary is not None and meeting %}
         <div class="time_fld_ip">{{meeting.team.team_name}}</div>
+        {% elif team_primary is not None and not meeting %}
+          {% for team in teams %}
+            {% if team.primary == team_primary %}
+            <div class="time_fld_ip">{{team.team_name}}</div>
+            <input type="hidden" name="selected_team" value="{{team.primary}}">
+            {% endif %}
+          {% endfor %}
         {% else %}
         <select id="teamDropdown" name="selected_team" class="time_fld_ip" required>
           <option value="" disabled {% if not meeting.team %}selected{% endif %}>Select a team</option>
