@@ -105,6 +105,42 @@
         margin: auto;
         padding: 10px 20px;
     }
+    
+    .modal_update_content h1{
+        font-size: 18px;
+        margin: 0px;
+    }
+    @media (max-width: 900px) {
+    .img_inner_container {
+        flex: 0 0 calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
+    }
+    }
+    @media (max-width: 600px) {
+        .img_inner_container {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+    @media (max-width: 800px){
+    
+    .modal_update_content{
+            width: 90%;
+        }
+        .text_fld {
+            grid-template-columns: 0.4fr 10px 1fr;
+        }
+    }
+    @media (max-width: 500px){
+    
+    .modal_update_content{
+            width: 95%;
+        }
+        .video-wrapper , .img-wrapper{
+            height: 150px;
+        }
+    }
+
 </style>
 <div id="tab2" class="tab-content">
     <!-- <h2 style="text-align:center;">Middle Banner Picture with Numbers</h2> -->
