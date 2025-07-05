@@ -458,17 +458,18 @@
                                 <tr>
                                     <th style="background-color: #f0f0f0; color: #000000;">SL</th>
                                     <th style="background-color: #f0f0f0; color: #000000;">Name</th>
-                                    <th style="background-color: #f0f0f0; color: #000000;">Team</th>
                                     <th style="background-color: #f0f0f0; color: #000000;">Position</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Team</th>
                                     <th style="background-color: #f0f0f0; color: #000000;">Edit Access</th>
                                 </tr>
                             </thead>
                             <tbody id="accessTableBody">
+                                {% for member in branch_data_access %}
                                 <tr>
                                     <td>1</td>
-                                    <td class="font-medium">John Doe</td>
-                                    <td>Branch</td>
-                                    <td>Chair</td>
+                                    <td class="font-medium">{{ member.ieee_id.name }}</td>
+                                    <td>{{ member.ieee_id.position }}</td>
+                                    <td>{{ member.ieee_id.team }}</td>
                                     <td>
                                         <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
                                             <span class="material-symbols-outlined" style="font-size: 1.25rem;">
@@ -477,33 +478,7 @@
                                         </button>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td class="font-medium">Jane Smith</td>
-                                    <td>Events</td>
-                                    <td>Coordinator</td>
-                                    <td>
-                                        <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
-                                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">
-                                                border_color
-                                            </span>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td class="font-medium">Peter Jones</td>
-                                    <td>Tech Team</td>
-                                    <td>Member</td>
-                                    <td>
-                                        <button class="edit-access-btn open_modal_btn" data-target="#view_access_modal">
-                                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">
-                                                border_color
-                                            </span>
-                                        </button>
-                                    </td>
-                                </tr>
-
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -524,39 +499,98 @@
 
 
             <div id="checkbox-buttons" class="checkbox_btns">
-                <input type="checkbox" id="event" value="Event Create Access">
-                <label for="event" class="access_fld_ip">Event Create Access</label>
+                {% if member.create_event_access %}
+                    <input type="checkbox" checked="True" value="create_event_access" name="create_event_access">
+                    <label for="create_event_access" class="access_fld_ip" style="border: none;">Event Create Access
+                    </label>
+                {% else %}
+                    <input type="checkbox" value="create_event_access" name="create_event_access">
+                    <label for="create_event_access" class="access_fld_ip" style="border: none;">Event Create Access
+                    </label>                                    
+                {% endif %}
 
-                <input type="checkbox" id="edit" value="Event Details Edit Permission">
-                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
 
-                <input type="checkbox" id="task" value="Create Individual Task Permission">
-                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+                {% if member.event_details_page_access %}
+                    <input type="checkbox" checked="True" value="event_details_page_access" name="event_details_page_access">
+                    <label for="event_details_page_access" class="access_fld_ip" style="border: none;">Event Details Edit Permission</label>
+                {% else %}
+                    <input type="checkbox" value="event_details_page_access" name="event_details_page_access">
+                    <label for="event_details_page_access" class="access_fld_ip" style="border: none;">Event Details Edit Permission</label>
+                {% endif %}
 
-                <input type="checkbox" id="panel" value="Create Panel Access">
-                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
-                <input type="checkbox" id="event" value="Event Create Access">
-                <label for="event" class="access_fld_ip">Event Create Access</label>
+                {% if member.create_individual_task_access %}
+                    <input type="checkbox" checked="True" value="create_individual_task_access" name="create_individual_task_access">
+                    <label for="create_individual_task_access" class="access_fld_ip" style="border: none;">Create Individual Task Permission</label>
+                {% else %}
+                    <input type="checkbox" value="create_individual_task_access" name="create_individual_task_access">
+                    <label for="create_individual_task_access" class="access_fld_ip" style="border: none;">Create Individual Task Permission</label>
+                {% endif %}
 
-                <input type="checkbox" id="edit" value="Event Details Edit Permission">
-                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
+                {% comment %} {% if member.create_team_task_access %}
+                    <input type="checkbox" checked="True" value="create_team_task_access" name="create_team_task_access">
+                    <label for="create_team_task_access" class="access_fld_ip" style="border: none;">Create Team Task Permission</label>
+                {% else %}
+                    <input type="checkbox" value="create_team_task_access" name="create_team_task_access">
+                    <label for="create_team_task_access" class="access_fld_ip" style="border: none;">Create Team Task Permission</label>
+                {% endif %} {% endcomment %}
 
-                <input type="checkbox" id="task" value="Create Individual Task Permission">
-                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
 
-                <input type="checkbox" id="panel" value="Create Panel Access">
-                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
-                <input type="checkbox" id="event" value="Event Create Access">
-                <label for="event" class="access_fld_ip">Event Create Access</label>
+                {% if member.create_panels_access %}
+                    <input type="checkbox" checked="True" value="create_panels_access" name="create_panels_access">
+                    <label for="create_panels_access" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                {% else %}
+                    <input type="checkbox" value="create_panels_access" name="create_panels_access">
+                    <label for="create_panels_access" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                {% endif %}
 
-                <input type="checkbox" id="edit" value="Event Details Edit Permission">
-                <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
 
-                <input type="checkbox" id="task" value="Create Individual Task Permission">
-                <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+                {% if member.panel_memeber_add_remove_access %}
+                    <input type="checkbox" checked="True" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
+                    <label for="panel_memeber_add_remove_access" class="access_fld_ip" style="border: none;">Panel Member Add/Remove Access</label>
+                {% else %}
+                    <input type="checkbox" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
+                    <label for="panel_memeber_add_remove_access" class="access_fld_ip" style="border: none;">Panel Member Add/Remove Access</label>
+                {% endif %}
 
-                <input type="checkbox" id="panel" value="Create Panel Access">
-                <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                {% if member.team_details_page %}
+                    <input type="checkbox" checked="True" value="team_details_page" name="team_details_page">
+                    <label for="team_details_page" class="access_fld_ip" style="border: none;">Team Details Page Access</label>
+                {% else %}
+                    <input type="checkbox" value="team_details_page" name="team_details_page">
+                    <label for="team_details_page" class="access_fld_ip" style="border: none;">Team Details Page Access</label>
+                {% endif %}
+
+                {% if member.manage_award_access %}
+                    <input type="checkbox" checked="True" value="manage_award_access" name="manage_award_access">
+                    <label for="manage_award_access" class="access_fld_ip" style="border: none;">Manage Award Access</label>
+                {% else %}
+                    <input type="checkbox" value="manage_award_access" name="manage_award_access">
+                    <label for="manage_award_access" class="access_fld_ip" style="border: none;">Manage Award Access</label>
+                {% endif %}
+
+                {% if member.manage_web_access %}
+                    <input type="checkbox" checked="True" value="manage_web_access" name="manage_web_access">
+                    <label for="manage_web_access" class="access_fld_ip" style="border: none;">Manage Web Access</label>
+                {% else %}
+                    <input type="checkbox" value="manage_web_access" name="manage_web_access">
+                    <label for="manage_web_access" class="access_fld_ip" style="border: none;">Manage Web Access</label>
+                {% endif %}
+
+                {% if member.manage_custom_notification_access %}
+                    <input type="checkbox" checked="True" value="manage_custom_notification_access" name="manage_custom_notification_access">
+                    <label for="manage_custom_notification_access" class="access_fld_ip" style="border: none;">Manage Custom Notification</label>
+                {% else %}
+                    <input type="checkbox" value="manage_custom_notification_access" name="manage_custom_notification_access">
+                    <label for="manage_custom_notification_access" class="access_fld_ip" style="border: none;">Manage Custom Notification</label>
+                {% endif %}
+
+                {% if member.manage_email_access %}
+                    <input type="checkbox" checked="True" value="manage_email_access" name="manage_email_access">
+                    <label for="manage_email_access" class="access_fld_ip" style="border: none;">Manage Email Access</label>
+                {% else %}
+                    <input type="checkbox" value="manage_email_access" name="manage_email_access">
+                    <label for="manage_email_access" class="access_fld_ip" style="border: none;">Manage Email Access</label>
+                {% endif %}
             </div>
 
             <div style="display: flex; justify-content: center;">
