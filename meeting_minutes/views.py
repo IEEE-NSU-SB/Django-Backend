@@ -52,7 +52,7 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
                     meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=team_primary).order_by('-meeting_date')
                     has_meeting_minutes_create_access = MM_Render_Access.has_meeting_minutes_create_access(request, sc_ag_primary=1, team_primary=team_primary)
                 else:
-                    meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=None).order_by('-meeting_date')
+                    meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=1).order_by('-meeting_date')
                     has_meeting_minutes_create_access = MM_Render_Access.has_meeting_minutes_create_access(request, sc_ag_primary=1)
 
             team_namespace = None
@@ -125,7 +125,7 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                 
                 if selected_team == None:
                     selected_team = 1
-                    
+
                 if primary:
                     sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
                     team = Teams.objects.filter(team_of__primary=primary, primary=selected_team).values('id')[0]['id']
