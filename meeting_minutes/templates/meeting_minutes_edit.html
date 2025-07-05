@@ -650,12 +650,16 @@
             {% endif %}
           {% endfor %}
         {% else %}
+        {% if has_access == 'ViewOnly' %}
+        <div class="time_fld_ip">{{meeting.team.team_name}}</div>
+        {% else %}
         <select id="teamDropdown" name="selected_team" class="time_fld_ip" required>
           <option value="" disabled {% if not meeting.team %}selected{% endif %}>Select a team</option>
           {% for team in teams %}
           <option value="{{team.primary}}" {% if meeting.team.primary == team.primary %}selected{% endif %}>{{team.team_name}}</option>
           {% endfor %}
         </select>
+        {% endif %}
         {% endif %}
       </div>
 

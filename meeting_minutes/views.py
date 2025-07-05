@@ -122,7 +122,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                 guest = request.POST.get('guest')
                 written_by = request.POST.get('written_by')
                 meeting_name = request.POST.get('meeting_name')
-
+                
+                if selected_team == None:
+                    selected_team = 1
+                    
                 if primary:
                     sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
                     team = Teams.objects.filter(team_of__primary=primary, primary=selected_team).values('id')[0]['id']

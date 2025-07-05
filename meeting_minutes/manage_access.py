@@ -159,7 +159,8 @@ class MM_Render_Access:
                             return member_data_access[0].access_type
                         elif get_member[0].position.is_officer and get_member[0].team.primary == team_primary:
                             return 'Edit'
-                        elif (get_member[0].position.is_officer and get_member[0].team.primary != team_primary) or get_member[0].team.primary == team_primary:
+                        elif (get_member[0].position.is_officer and get_member[0].team.primary != team_primary) or (get_member[0].team.primary == team_primary) or (team_primary == None and get_member[0].team != None):
+
                             return 'ViewOnly'
                         else:
                             return 'Restricted'
