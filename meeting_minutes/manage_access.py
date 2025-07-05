@@ -31,7 +31,7 @@ class MM_Render_Access:
                     else:
                         if team_primary != None and get_member[0].team.primary == team_primary:
                             return True
-                        elif team_primary == None and get_member[0].team != None:
+                        elif team_primary == None and get_member[0].position.is_officer:
                             return True
                         else:
                             return False
