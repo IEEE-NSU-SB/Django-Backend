@@ -20,7 +20,7 @@ from users.models import Members, Panel_Members
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
-
+from django.db.models import OuterRef, Subquery
 
 from port.renderData import PortData
 # from . import renderData
@@ -213,11 +213,12 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             meeting = MeetingMinutes.objects.get(pk=pk)
 
             if request.method == 'POST':
+                edit_url = None
+                if team_primary != None:
+                    team_namespace = get_team_redirect_namespace(team_primary)
+                    edit_url = f'{team_namespace}:meeting_minutes_edit_team'
+
                 if 'save' in request.POST:
-                    edit_url = None
-                    if team_primary != None:
-                        team_namespace = get_team_redirect_namespace(team_primary)
-                        edit_url = f'{team_namespace}:meeting_minutes_edit_team'
 
                     location = request.POST.get('location')
                     start_time = request.POST.get('start_time')
@@ -241,7 +242,21 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                     
                     meeting.save()
                     
-                    
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+
+                    for i in range(len(ieee_ids)):
+                        access = MeetingMinutesAccess.objects.filter(meeting_minutes_id=pk, member=ieee_ids[i])
+                        if access.exists():
+                            if access_types[i] != '':
+                                access.update(access_type=access_types[i])
+                            else:
+                                access.delete()
+                        else:
+                            if access_types[i] != '':
+                                MeetingMinutesAccess.objects.create(meeting_minutes_id=pk, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
+
                 elif 'delete' in request.POST:
                     meeting.delete()
                     if primary:
@@ -267,13 +282,44 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
                 teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
-                # current_panel = SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary=primary)
-                # members = Panel_Members.objects.filter(tenure=current_panel[0])
+                current_panel = SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary=primary)
+                # Subquery to get the access_type for the matching member
+                access_qs = MeetingMinutesAccess.objects.filter(
+                    member=OuterRef('member'),
+                    meeting_minutes=pk
+                ).values('access_type')[:1]  # get first match only
+
+                # Main query: Panel_Members with access_type annotated
+                members = Panel_Members.objects.filter(tenure=current_panel[0]).annotate(
+                    access_type=Subquery(access_qs)
+                )
             else:
                 primary = 1
                 teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
-                # current_panel = Branch.load_current_panel()
-                # members = Panel_Members.objects.filter(tenure=current_panel)
+                current_panel = Branch.load_current_panel()
+
+                if team_primary != None:
+                    # Subquery to get the access_type for the matching member
+                    access_qs = MeetingMinutesAccess.objects.filter(
+                        member=OuterRef('member'),
+                        meeting_minutes=pk
+                    ).values('access_type')[:1]  # get first match only
+
+                    # Main query: Panel_Members with access_type annotated
+                    members = Panel_Members.objects.filter(tenure=current_panel, team__primary=team_primary).annotate(
+                        access_type=Subquery(access_qs)
+                    )
+                else:
+                    # Subquery to get the access_type for the matching member
+                    access_qs = MeetingMinutesAccess.objects.filter(
+                        member=OuterRef('member'),
+                        meeting_minutes=pk
+                    ).values('access_type')[:1]  # get first match only
+
+                    # Main query: Panel_Members with access_type annotated
+                    members = Panel_Members.objects.filter(tenure=current_panel).annotate(
+                        access_type=Subquery(access_qs)
+                    )
 
             team_namespace = None
             homepage_url = None
@@ -291,7 +337,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                 'homepage_url':homepage_url,
                 'teams':teams,
                 'meeting': meeting,
-                # 'members':members,
+                'members':members,
                 'has_access':has_access
             }
 

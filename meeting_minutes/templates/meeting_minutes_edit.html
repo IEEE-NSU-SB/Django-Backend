@@ -919,7 +919,7 @@
                     <td>{{member.member.name}}</td>
                     <td>{{member.member.position}}</td>
                     <td>
-                      <input type="hidden" name="ieee_id" value={{team_member.member.ieee_id}}>
+                      <input type="hidden" name="ieee_id" value={{member.member.ieee_id}}>
                       <select
                         name="access_type"
                         class="form-select"
@@ -930,10 +930,10 @@
                           text-decoration: none;
                         "
                       >
-                        <option value="" {% if team_member.access_type == None %}selected{% endif %}>Select</option>
-                        <option value="ViewOnly" {% if team_member.access_type == 'ViewOnly' %}selected{% endif %}>ViewOnly</option>
-                        <option value="Edit" {% if team_member.access_type == 'Edit' %}selected{% endif %}>Edit</option>
-                        <option value="Restricted" {% if team_member.access_type == 'Restricted' %}selected{% endif %}>Restricted</option>
+                        <option value="" {% if member.access_type == None %}selected{% endif %}>Select</option>
+                        <option value="ViewOnly" {% if member.access_type == 'ViewOnly' %}selected{% endif %}>ViewOnly</option>
+                        <option value="Edit" {% if member.access_type == 'Edit' %}selected{% endif %}>Edit</option>
+                        <option value="Restricted" {% if member.access_type == 'Restricted' %}selected{% endif %}>Restricted</option>
                       </select>
                     </td>
                   </tr>
