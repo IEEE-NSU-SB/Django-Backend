@@ -15,7 +15,7 @@
     {% endblock common_css %}
     
 <script>
-  let agendaCount = {% if meeting.agendas %}{{meeting.agendas|length}}{% else %}0{% endif %};
+  let agendaCount = {% if meeting.agendas %}{{meeting.agendas|length}}{% else %}1{% endif %};
 
   function addDiv() {
     if (agendaCount >= 10) {
