@@ -178,10 +178,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
 
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
-                teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=primary, is_active=True).values('primary', 'team_name')
             else:
                 primary = 1
-                teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=1, is_active=True).values('primary', 'team_name')
 
             context = {
                 'all_sc_ag':sc_ag,

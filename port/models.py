@@ -53,7 +53,8 @@ class Teams(models.Model):
     
     class Meta:
         verbose_name="Registered Team"
-        ordering=['-is_active','team_name']
+        ordering=['-is_active','-team_of','team_name']
+
     def __str__(self) -> str:
         return self.team_name   
 
