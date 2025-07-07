@@ -675,6 +675,13 @@
         <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
       </div>
 
+      <!-- Venue -->
+      <div class="time_fld">
+        <h2>Venue</h2>
+        <div class="colon">:</div>
+        <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+      </div>
+
       <!-- Time Fields -->
       <div class="time_fld">
         <h2>Start time<div style="color: #e74c3c;">*</div></h2>
@@ -688,13 +695,6 @@
         <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
       </div>
 
-      <!-- Venue -->
-      <div class="time_fld">
-        <h2>Venue</h2>
-        <div class="colon">:</div>
-        <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
-      </div>
-
       <!-- Total Attendee -->
       <div class="time_fld">
         <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
@@ -704,13 +704,13 @@
 
       <!-- IEEE & Non-IEEE -->
       <div class="time_fld">
-        <h2>IEEE Attendee<div style="color: #e74c3c;">*</div></h2>
+        <h2>IEEE Attendee</h2>
         <div class="colon">:</div>
         <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
       </div>
 
       <div class="time_fld">
-        <h2>Non-IEEE Attendee<div style="color: #e74c3c;">*</div></h2>
+        <h2>Non-IEEE Attendee</h2>
         <div class="colon">:</div>
         <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
       </div>
@@ -1013,13 +1013,6 @@
           ['view', ['fullscreen', 'codeview', 'help']]
         ]
       });
-
-        document.getElementById('form').addEventListener('submit',(e)=>{
-        if ($('#summernote').summernote('isEmpty')) {
-        e.preventDefault();
-        alert("Please fill in the description field.");
-        }
-    });
     </script>
 
     <script>
@@ -1056,6 +1049,62 @@
         });
       });
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector("form");
+      const startTimeInput = document.querySelector("input[name='start_time']");
+      const endTimeInput = document.querySelector("input[name='end_time']");
+
+      form.addEventListener("submit", function (e) {
+        const content = $('#summernote').summernote('code');
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = content;
+        const textContent = tempDiv.textContent.trim().replace(/\u200B/g, ''); // remove zero-width space
+
+        if (!textContent) {
+          alert("Discussion is required.");
+          e.preventDefault(); // Stop form from submitting
+          return;
+        }
+      });
+
+
+      form.addEventListener("submit", function (e) {
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
+
+        if (!startTime || !endTime) return; // Skip if one is empty
+
+        if (startTime >= endTime) {
+          e.preventDefault();
+          alert("Start time must be before end time.");
+          endTimeInput.focus();
+        }
+
+        if (endTime <= startTime) {
+          e.preventDefault();
+          alert("End time must be after start time.");
+          endTimeInput.focus();
+        }
+      });
+
+      startTimeInput.addEventListener("change", () => {
+        if (startTimeInput.value && endTimeInput.value && startTimeInput.value >= endTimeInput.value) {
+          alert("Start time must be before end time.");
+          startTimeInput.value = "";
+        }
+      });
+
+      endTimeInput.addEventListener("change", () => {
+        if (startTimeInput.value && endTimeInput.value && endTimeInput.value <= startTimeInput.value) {
+          alert("End time must be after start time.");
+          endTimeInput.value = "";
+        }
+      });
+      
+    });
+</script>
+
 
     {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
 
