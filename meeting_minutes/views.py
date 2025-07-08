@@ -363,7 +363,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
 @login_required
 @member_login_permission
-def download_meeting_pdf(request, pk):
+def download_meeting_pdf(request, pk, primary=None):
     try:
         # Fetch the meeting object
         meeting = get_object_or_404(MeetingMinutes, pk=pk)
@@ -389,12 +389,39 @@ def download_meeting_pdf(request, pk):
         p.drawCentredString(width / 2, y, "Meeting Minutes")
         y -= 35
 
+        main_logo_path = os.path.join(
+            settings.BASE_DIR,
+            'meeting_minutes', 'static', 'images', 'logos', 'main_branch_logo.jpg'
+        )
+        
         try:
-            logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
-            if os.path.exists(logo_path):
+            # Only draw Branch logo if primary != 1
+            if primary and int(primary) != 1:
+                branch_logo_file = f'branch_logo_{primary}.jpg'
+                branch_logo_path = os.path.join(
+                    settings.BASE_DIR,
+                    'meeting_minutes', 'static', 'images', 'logos', branch_logo_file
+                )
+
+                if os.path.exists(branch_logo_path):
+                    p.drawImage(
+                        ImageReader(branch_logo_path),
+                        x=margin,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
+
+        except Exception as e:
+            logger.warning(f"Branch logo could not be loaded: {e}")
+            
+        try:
+            if os.path.exists(main_logo_path):
                 p.drawImage(
-                    ImageReader(logo_path),
-                    x=width - 90,
+                    ImageReader(main_logo_path),
+                    x=width - margin - 50,
                     y=height - 90,
                     width=50,
                     height=50,
@@ -402,7 +429,22 @@ def download_meeting_pdf(request, pk):
                     mask='auto'
                 )
         except Exception as e:
-            logger.warning(f"Logo could not be loaded: {e}")
+            logger.warning(f"Main Branch logo could not be loaded: {e}")    
+        
+        # try:
+        #     logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
+        #     if os.path.exists(logo_path):
+        #         p.drawImage(
+        #             ImageReader(logo_path),
+        #             x=width - 90,
+        #             y=height - 90,
+        #             width=50,
+        #             height=50,
+        #             preserveAspectRatio=True,
+        #             mask='auto'
+        #         )
+        # except Exception as e:
+        #     logger.warning(f"Logo could not be loaded: {e}")
         y -= 20
         p.setStrokeColor(colors.darkblue)
         p.setLineWidth(3)
