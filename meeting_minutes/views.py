@@ -409,28 +409,37 @@ def download_meeting_pdf(request, pk, primary=None):
                 if os.path.exists(sc_ag_logo_path):
                     p.drawImage(
                         ImageReader(sc_ag_logo_path),
-                        x=margin,
+                        x=width - margin - 50,
                         y=height - 90,
                         width=50,
                         height=50,
                         preserveAspectRatio=True,
                         mask='auto'
-                    )      
+                    )
 
         except Exception as e:
             logger.warning(f"Branch logo could not be loaded: {e}")
             
         try:
             if os.path.exists(branch_logo_path):
-                p.drawImage(
-                    ImageReader(branch_logo_path),
-                    x=width - margin - 50,
-                    y=height - 90,
-                    width=50,
-                    height=50,
-                    preserveAspectRatio=True,
-                    mask='auto'
-                )
+                    p.drawImage(
+                        ImageReader(branch_logo_path),
+                        x=margin,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )                      
+                # p.drawImage(
+                #     ImageReader(branch_logo_path),
+                #     x=width - margin - 50,
+                #     y=height - 90,
+                #     width=50,
+                #     height=50,
+                #     preserveAspectRatio=True,
+                #     mask='auto'
+                # )
         except Exception as e:
             logger.warning(f"Main Branch logo could not be loaded: {e}")    
         
