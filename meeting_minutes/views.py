@@ -383,7 +383,11 @@ def download_meeting_pdf(request, pk, primary=None):
 
         p.setFont("Helvetica-Bold", 20)
         p.setFillColor(colors.darkblue)
-        p.drawCentredString(width / 2, y, "IEEE NSU Student Branch")
+        if primary and int(primary) == 1:
+            p.drawCentredString(width / 2, y, "IEEE NSU Student Branch")
+        else:
+            branch_name = get_branch_name(int(primary))
+            p.drawCentredString(width / 2, y, branch_name)
         y -= 25
         
         p.setFont("Helvetica-Bold", 16)
@@ -599,3 +603,13 @@ def get_sc_ag_header_color(primary):
             return '#008bC2'
         elif primary == 5:
             return '#006699'    
+        
+        
+def get_branch_name(sc_primary):
+    branch_names = {
+        2: "IEEE NSU Power and Energy Society",
+        3: "IEEE NSU Robotics and Automation Society",
+        4: "IEEE NSU Industry Application Society",
+        5: "IEEE NSU Women in Engineering Affinity Group",
+    }
+    return branch_names.get(sc_primary, "Unknown Branch")
