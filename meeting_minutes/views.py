@@ -7,6 +7,8 @@ import os
 from central_branch.renderData import Branch
 from central_branch.views import custom_500
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
+from finance_and_corporate_team.genPDF import BudgetPDF
+from main_website.models import Toolkit
 from meeting_minutes.manage_access import MM_Render_Access
 from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.system_error_handling import ErrorHandling
@@ -388,39 +390,36 @@ def download_meeting_pdf(request, pk, primary=None):
         p.setFillColor(colors.black)
         p.drawCentredString(width / 2, y, "Meeting Minutes")
         y -= 35
-
-        main_logo_path = os.path.join(
-            settings.BASE_DIR,
-            'meeting_minutes', 'static', 'images', 'logos', 'main_branch_logo.jpg'
-        )
+        
+        branch_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(1)).picture
+        branch_logo_path = settings.MEDIA_ROOT+str(branch_logo)
+        sc_ag_logo_path = None
         
         try:
             # Only draw Branch logo if primary != 1
             if primary and int(primary) != 1:
-                branch_logo_file = f'branch_logo_{primary}.jpg'
-                branch_logo_path = os.path.join(
-                    settings.BASE_DIR,
-                    'meeting_minutes', 'static', 'images', 'logos', branch_logo_file
-                )
+                sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(3)).picture
+                sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
+                print("Test:",primary)
 
-                if os.path.exists(branch_logo_path):
+                if os.path.exists(sc_ag_logo_path):
                     p.drawImage(
-                        ImageReader(branch_logo_path),
+                        ImageReader(sc_ag_logo_path),
                         x=margin,
                         y=height - 90,
                         width=50,
                         height=50,
                         preserveAspectRatio=True,
                         mask='auto'
-                    )
+                    )      
 
         except Exception as e:
             logger.warning(f"Branch logo could not be loaded: {e}")
             
         try:
-            if os.path.exists(main_logo_path):
+            if os.path.exists(branch_logo_path):
                 p.drawImage(
-                    ImageReader(main_logo_path),
+                    ImageReader(branch_logo_path),
                     x=width - margin - 50,
                     y=height - 90,
                     width=50,
@@ -431,20 +430,7 @@ def download_meeting_pdf(request, pk, primary=None):
         except Exception as e:
             logger.warning(f"Main Branch logo could not be loaded: {e}")    
         
-        # try:
-        #     logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
-        #     if os.path.exists(logo_path):
-        #         p.drawImage(
-        #             ImageReader(logo_path),
-        #             x=width - 90,
-        #             y=height - 90,
-        #             width=50,
-        #             height=50,
-        #             preserveAspectRatio=True,
-        #             mask='auto'
-        #         )
-        # except Exception as e:
-        #     logger.warning(f"Logo could not be loaded: {e}")
+        
         y -= 20
         p.setStrokeColor(colors.darkblue)
         p.setLineWidth(3)
@@ -589,3 +575,27 @@ def get_team_redirect_namespace(team_primary):
         return 'graphics_team'
     elif team_primary == 11:
         return 'finance_and_corporate_team'
+    
+def get_sc_ag_logo_name(sc_primary):
+        if sc_primary == 1:
+            return 'IEEE NSU SB Logo'
+        elif sc_primary == 2:
+            return 'IEEE NSU PES SBC Logo'
+        elif sc_primary == 3:
+            return 'IEEE NSU RAS SBC Logo'
+        elif sc_primary == 4:
+            return 'IEEE NSU IAS SBC Logo'
+        elif sc_primary == 5:
+            return 'IEEE NSU SB WIE AG Logo'
+        
+def get_sc_ag_header_color(primary):
+        if primary == 1:
+            return '#137AAC'
+        elif primary == 2:
+            return '#659941'
+        elif primary == 3:
+            return '#602569'
+        elif primary == 4:
+            return '#008bC2'
+        elif primary == 5:
+            return '#006699'    
