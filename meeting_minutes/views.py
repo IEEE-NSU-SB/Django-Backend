@@ -402,7 +402,7 @@ def download_meeting_pdf(request, pk, primary=None):
         try:
             # Only draw Branch logo if primary != 1
             if primary and int(primary) != 1:
-                sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(3)).picture
+                sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(int(primary))).picture
                 sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
                 print("Test:",primary)
 
@@ -582,7 +582,7 @@ def get_team_redirect_namespace(team_primary):
     
 def get_sc_ag_logo_name(sc_primary):
         if sc_primary == 1:
-            return 'IEEE NSU SB Logo'
+            return 'IEEE NSU SB Logo (Rectangular)'
         elif sc_primary == 2:
             return 'IEEE NSU PES SBC Logo'
         elif sc_primary == 3:
