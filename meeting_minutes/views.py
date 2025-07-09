@@ -582,7 +582,7 @@ def get_team_redirect_namespace(team_primary):
     
 def get_sc_ag_logo_name(sc_primary):
         if sc_primary == 1:
-            return 'IEEE NSU SB Logo (Rectangular)'
+            return 'IEEE NSU SB Logo'
         elif sc_primary == 2:
             return 'IEEE NSU PES SBC Logo'
         elif sc_primary == 3:
