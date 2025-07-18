@@ -274,8 +274,7 @@
           {% endif %}
           {% if has_access_to_create_event %}
           {% if is_branch %}
-          <a href="{% url 'central_branch:event_creation_form1' %}" class="btn" style="margin-bottom:15px" ;>Create a
-            New Event</a>
+          <a href="{% url 'central_branch:event_creation_form1' %}" class="btn" style="margin-bottom:15px" ;>Create a New Event</a>
           {% else %}
           <a href="{% url 'chapters_and_affinity_group:event_creation_form1' sc_ag_info.primary %}" class="btn"
             style="margin-bottom:15px" ;>Create a New Event</a>
@@ -285,12 +284,12 @@
           {% endif %}
           {% if is_branch %}
           {% if common_access %}
-          <form method="POST" style="margin-bottom: 15px;">
+          <div style="display: flex; flex-direction: row; justify-content: center;">
+          <form method="POST" style="margin-bottom: 10px;">
             {% csrf_token %}
             <input type="submit" name="authorise" class="btn" value="Authorize Google">
           </form>
-          <div>
-            <button class="btn  dropdown-toggle" data-toggle="dropdown">Generate an
+            <button class="btn dropdown-toggle" data-toggle="dropdown">Generate an
               Excel Sheet for Yearly Events</button>
             <div class="dropdown-menu dropdown-menu-scale info pull-right" style="right: 50%; left: 50%;">
               {% for year in all_event_years %}
