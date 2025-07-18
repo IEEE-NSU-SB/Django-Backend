@@ -273,6 +273,13 @@
             justify-content: space-between;
             margin-top: 18px;
         }
+        #recruitment-link{
+          text-decoration: none;
+          border: 1px solid transparent;
+          border-bottom: 1px solid #ddd;
+          /* border-radius: 8px; */
+          padding: 8px 16px;
+        }
   </style>
 </head>
 <body>
@@ -313,6 +320,20 @@
                       <span>Home</span>
                     </a>
                     <div ui-include="'../views/blocks/dropdown.new.html'"></div>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link" href="{% url 'membership_development_team:task_home_team' 7 %}">
+                  <i class="fa fa-tasks" aria-hidden="true"></i>
+                  <span>Tasks</span>
+                  </a>
+                  <div ui-include="'../views/blocks/dropdown.new.html'"></div>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link" href="#">
+                  <i class="fa fa-comments"></i>
+                  <span>Meeting Minutes</span>
+                  </a>
+                  <div ui-include="'../views/blocks/dropdown.new.html'"></div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="{% url 'membership_development_team:members_list' %}">
@@ -410,10 +431,14 @@
             <div style="text-align: right;">
                 <span class="close_1">&times;</span>
             </div>
-            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; align-items: center; padding: 8px;" class="">
-                          <label for="recruitment_date" style="font-style: 16px; margin: 0;font-weight: bold;">Set Recruitment Deadline:</label>
-                          <input type="datetime-local" style="border: none;" name="recruitment_end_datetime" {% if session.session.session_end_date_time %}value="{{session.session.session_end_date_time|date:'Y-m-d\\TH:i'}}"{% endif %}>
-                          <div class="toggle">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; padding: 8px;" class="">
+              <label for="recruitment_date" style="font-style: 16px; margin: 0;font-weight: bold;">Set Recruitment Deadline:</label>
+              <input type="datetime-local" style="border: none;" name="recruitment_end_datetime" {% if session.session.session_end_date_time %}value="{{session.session.session_end_date_time|date:'Y-m-d\\TH:i'}}"{% endif %}>
+              <div>
+                <label for="recruitment-link" style="font-style: 16px; margin: 0;font-weight: bold;">Recruitment Event Link:</label>
+                <input type="text" name="recruitment_event_link" id="recruitment-link" placeholder="Event Link" {% if session.session.recruitment_event_link %}value="{{session.session.recruitment_event_link}}"{% endif %}>
+              </div>
+              <div class="toggle">
                         <div style="display: flex; margin: 0 10px;">
                             <p class="on_text" style="color: #000000a2;">Is Active?</p>
                             <!-- <p class="on_text" style="color: #000000a2;">OFF</p> -->

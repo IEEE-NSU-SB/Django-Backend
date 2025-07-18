@@ -89,9 +89,10 @@ def recruitee(request, pk):
             if request.method == 'POST':
                 if 'save_details' in request.POST:
                     recruitment_end_datetime = request.POST.get('recruitment_end_datetime')
+                    recruitment_event_link = request.POST.get('recruitment_event_link')
                     is_active = request.POST.get('is_active')
 
-                    if renderData.Recruitment.update_session_details(pk, recruitment_end_datetime, is_active):
+                    if renderData.Recruitment.update_session_details(pk, recruitment_end_datetime, recruitment_event_link, is_active):
                         messages.success(request, 'Session details updated successfully!')
                     else:
                         messages.warning(request, 'Something went wrong!')
