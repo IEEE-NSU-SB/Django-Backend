@@ -21,6 +21,10 @@
         justify-content: center;
         }
 
+        body.modal-open {
+          overflow: hidden;
+        }
+
         .row {
         display: flex;
         justify-content: center;
@@ -77,18 +81,73 @@
               left: 0;
           }
 
-          /* Style for the close button */
-          .close-btn {
-              position: absolute;
-              top: 20px;
-              right: 20px;
-              color: white;
-              font-size: 24px;
-              cursor: pointer;
-          }
-        /* .tab.active{
-          background-color: #FFC72C;
-        } */
+        .x_btn{
+            text-decoration: none;
+            border: none;
+            background-color: white;
+            transition: 0.5s;
+            font-size: 20px;
+            border-bottom: solid 1px white;
+            color: #b3b3b3;
+            position: relative;
+            bottom: -5px;
+            cursor: pointer;
+        }
+        .x_btn:hover{
+            color: black;
+        }
+        .confirm_btn{
+            padding: 5px 30px;
+            color: #fff;
+            background-color: #00843ea4;
+            text-decoration: none;
+            border: 1px solid #00843ea4;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            width: 50%;
+            cursor: pointer;
+        }
+        .confirm_btn:hover{
+            background-color: #fff;
+            color: #00843ea4;
+        }
+        .close_btn{
+            cursor: pointer;
+            padding: 5px 30px;
+            color: #A4A4A4;
+            background-color: transparent;
+            text-decoration: none;
+            border: 1px solid #A4A4A4;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            width: 50%;
+            
+        }
+        .close_btn:hover{
+            background-color: #F3F3F3 ;
+            border: 1px solid #000;
+            color: #000000;
+        }  
+        .delete_btn{
+            padding: 5px 12px;
+            color: #fadbd8;
+            background-color: #FF5959;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            
+        }
+        .delete_btn:hover{
+            background-color: #fadbd8;
+            color: #FF5959;
+        }
     </style>
 </head>
 <body>
@@ -134,9 +193,8 @@
             <!--Tab view-->
             {% block web_home_tab %}
               {% include "Manage Website/Homepage/web_homepage_tab.html" %}
-            {% endblock web_home_tab %}
-            
-        </div>
+            {% endblock web_home_tab %} 
+          </div>
         <!--PAGE END-->
 
         <!--Theme Switcher-->
@@ -145,9 +203,8 @@
             {% include "theme_switcher.html" %}
         {% endblock theme_switcher %}
     
-    </div>
+        </div>
     <!-- app end-->
-
     {% block common_js %}
         {% include "common_js.html" %}
     {% endblock common_js %}
