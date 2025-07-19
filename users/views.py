@@ -5,12 +5,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from central_events.google_calendar_handler import CalendarHandler
 from insb_port import settings
+from port.models import Chapters_Society_and_Affinity_Groups
 from system_administration.models import SystemErrors, adminUsers
 from task_assignation.models import Member_Task_Point
 from users import registerUser
 from django.db import connection
 from django.db.utils import IntegrityError
 from recruitment.models import recruited_members
+from wallet.models import Wallet
+from wallet.renderData import WalletManager
 from . models import Members,ResetPasswordTokenTable,UserSignupTokenTable
 import csv,datetime
 from django.utils.timezone import now
@@ -213,6 +216,7 @@ def dashboard(request):
         hit_count_over_5_years = renderData.getHitCountOver5Years()
         #getting monthly members with highest task completion points
         monthly_top_members = renderData.getMonthlyTopMembers()
+
                 
         # Get the SC & AGS
         sc_ag=PortData.get_all_sc_ag(request=request)
@@ -222,6 +226,19 @@ def dashboard(request):
         user_data=current_user.getUserData() #getting user data as dictionary file
         performers = get_top_5_performers(request)
         top_teams = get_top_5_teams(request)
+
+
+        if is_eb_or_admin:
+            wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
+            wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary=1)
+            wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary=1)
+            wallet_entry_stats_for_current_month = WalletManager.get_wallet_entry_stats_for_current_month(primary=1)
+        else:
+            wallet_balance = None
+            wallet_entry_stats_whole_tenure = None
+            wallet_entry_stats_whole_tenure_by_month = None
+            wallet_entry_stats_for_current_month = None
+
         if(user_data==False):
 
             if request.method == "POST":
@@ -256,6 +273,11 @@ def dashboard(request):
             'media_url':settings.MEDIA_URL,
             'performers':performers,
             'top_teams':top_teams,
+            'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
+            'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
+            'wallet_entry_stats_for_current_month':wallet_entry_stats_for_current_month,
+            'wallet_balance': wallet_balance,
+            'now': datetime.now(),
         }
 
         

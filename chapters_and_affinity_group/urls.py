@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 app_name="chapters_and_affinity_group"
@@ -62,5 +62,10 @@ urlpatterns = [
     #Add Events to Mega Event
     path('<str:primary>/events/mega_event_add_event/<int:mega_event_id>/',views.mega_event_add_event,name="mega_event_add_event"), 
     #excel generation
-    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag")
+    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag"),
+
+    # Wallet Urls
+    path('<str:primary>/wallet/', include('wallet.urls'), name='wallet'),
+    # Meeting Minutes Urls
+    path('<str:primary>/meeting_minutes/', include('meeting_minutes.urls'), name='meeting_minutes'),
 ]

@@ -1,6 +1,7 @@
 from django.urls import path,include
 from . import views
 from central_branch.views import task_edit,add_task,create_task,upload_task,task_home,forward_to_incharges
+from meeting_minutes.views import meeting_minutes_homepage, meeting_minutes_create, meeting_minutes_edit
 
 app_name="finance_and_corporate_team"
 
@@ -26,5 +27,13 @@ urlpatterns = [
     path('budget/event_budget/<int:event_id>/',views.create_budget,name="edit_event_budget"),
     path('budget/edit/<int:sheet_id>/',views.edit_budget,name="edit_budget"),
     path('budget/download/', views.download_budget, name='download_budget_sheet'),
-    path('budget/load_budget_sheet_access/', views.GetBudgetSheetAcessDataAjax.as_view(), name='load_budget_sheet_access')
+    path('budget/load_budget_sheet_access/', views.GetBudgetSheetAcessDataAjax.as_view(), name='load_budget_sheet_access'),
+
+    # Meeting Minutes Hompage
+    path('meeting_minutes/<int:team_primary>/', meeting_minutes_homepage, name='meeting_minutes_homepage_team'),
+    # Create a new meeting
+    path('meeting_minutes/<int:team_primary>/create/', meeting_minutes_create, name="meeting_minutes_create_team"),
+    # Edit an existing meeting
+    path('meeting_minutes/<int:team_primary>/edit/<int:pk>/', meeting_minutes_edit, name="meeting_minutes_edit_team"),
+
 ]

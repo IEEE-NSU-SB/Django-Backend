@@ -3,6 +3,7 @@ from django.urls import path,include
 from . import views
 from .views import GetTaskCategoryPointsAjax, SaveMemberTaskPointsAjax, UpdatePositionAjax,UpdateAwardAjax
 from .views import UpdatePositionAjax,UpdateRestrictionAjax,AwardRanking
+from wallet import views as walletViews
 
 app_name='central_branch'
 
@@ -62,6 +63,7 @@ urlpatterns = [
     path('manage_website/about/ieee_bangladesh_section/',views.ieee_bangladesh_section,name = "ieee_bangladesh_section"),
     path('manage_website/about/ieee_nsu_student_branch/',views.ieee_nsu_student_branch,name = "ieee_nsu_student_branch"),
     path('manage_website/about/faq/',views.faq,name = "faq"),
+    path('manage_website/about/contact/',views.contact,name = "contact"),
     path('manage_website/toolkit',views.manage_toolkit,name="manage_toolkit"),
     path('manage_website/toolkit/update/<int:pk>',views.update_toolkit,name="update_toolkit"),
     path('manage_website/feedbacks',views.feedbacks,name="feedbacks"),
@@ -163,4 +165,9 @@ urlpatterns = [
     path('mail/request_update_schedule/',views.UpdateScheduledEmailOptionsAjax.as_view(),name='request_update_email_schedule'),
     path('navigate/', views.PaginationAjax.as_view(),name='navigate'),
     path('mail/view/attachments/<str:message_id>/<str:attachment_id>/', views.get_attachment, name='get_attachment'),
+
+    # Wallet Urls
+    path('wallet/', include('wallet.urls'), name='wallet'),
+    #Meeting Minutes Urls
+    path('meeting_minutes/', include("meeting_minutes.urls", namespace="meeting_minutes"))
 ]

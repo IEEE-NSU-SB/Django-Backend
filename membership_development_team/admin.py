@@ -6,7 +6,14 @@ class Renewal_Sessions(admin.ModelAdmin):
     list_display=['id','session_name','session_time']
 @admin.register(Renewal_requests)
 class Renewal_Requests(admin.ModelAdmin):
-    list_display=['id','session_id_id','name']
+    list_display = ['id', 'session_id_id', 'name']
+    readonly_fields = ('view_encrypted_password',)
+    exclude = ('_ieee_account_password',)
+
+    def view_encrypted_password(self, obj):
+        return "Hidden for security"
+
+    view_encrypted_password.short_description = 'IEEE Account Password'
 @admin.register(Portal_Joining_Requests)
 class Joining_Requests(admin.ModelAdmin):
     list_display=['ieee_id','name','position','team']

@@ -463,3 +463,4 @@ class GetBudgetSheetAcessDataAjax(View):
             return JsonResponse({'data':fct_team_member_accesses})
         else:
             return JsonResponse({'message':'error'})
+        
