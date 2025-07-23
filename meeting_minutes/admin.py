@@ -5,3 +5,5 @@ from .models import *
 # Register your models here.
 
 admin.site.register(MeetingMinutes)
+
+admin.site.register(MeetingMinutesAccess)

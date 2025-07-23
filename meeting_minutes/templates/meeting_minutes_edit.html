@@ -15,7 +15,7 @@
     {% endblock common_css %}
     
 <script>
-  let agendaCount = 1;
+  let agendaCount = {% if meeting.agendas %}{{meeting.agendas|length}}{% else %}1{% endif %};
 
   function addDiv() {
     if (agendaCount >= 10) {
@@ -56,6 +56,24 @@
 </script>
 
     <style>
+        :root {
+          --primary-color: #00629b;
+          --secondary-color: #107a57;
+          --background-color: #f3f4f6;
+          --text-color: #1f2937;
+          --border-color: #e5e7eb;
+          --ieee-blue: #0f77b3;
+          --ieee-light-blue: #0083ca;
+          --ieee-teal: #00843d;
+          --ieee-light-gray: #e4e4e4;
+          --ieee-medium-gray: #d9d9d9;
+          --ieee-dark-gray: #666666;
+          --ieee-black: #000000;
+          --white: #f0f0f0;
+          --red: #ef4444;
+          --green: #059669;
+        }
+
         .meeting_minutes_container{
             margin: 50px auto;
             padding: 50px;
@@ -96,7 +114,7 @@
             background-color: white;
         }
         .modal_btn{
-            padding: 0px 14px;
+            padding: 2px 14px;
             color: #e74c3c;
             background-color: #fadbd8;
             text-decoration: none;
@@ -198,6 +216,7 @@
             flex: 1;
             border: none;
             border-bottom: 1px solid #ebebeb;
+            width:100%;
         }
         .colon {
             font-size: 1rem;
@@ -268,48 +287,213 @@
           font-weight: bold;
           color: #333;
         }
-        @media (max-width: 1024px){
-            .body{
-                margin: 30px;
-                padding: 30px;
-            }
-            .modal_content {
-            width: 40%;
-            }
-        }
-        @media (max-width: 600px){
-            .body{
-                margin: 20px;
-                padding: 20px;
-            }
-            .space{
-                display: none;
-            }
-            .label-container {
-                grid-template-columns: 1fr;
-            }
-            .location_fld_ip{
-                margin-bottom: 5px;
-            }
-            .h1{
-            padding: 0px 10px 5px 10px;
-            }
-            .modal_content {
-            width: 70%;
-            }
+        
+        .user-btn {
+          border: none;
+          padding: 4px 6px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: #fefefe;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+      }
 
-        }
+      .user-btn:hover {
+        color: white;
+        background-color: var(--primary-color);
+      }
+      
+      .modal-2-content::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .modal-2-content::-webkit-scrollbar-thumb {
+        background-color: #e7eeef;
+        transition: all 0.4s ease-in-out;
+        border-radius: 4px;
+      }
+    .modal-2-content::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(169, 170, 170);
+    }
+    .modal-2-content {
+      background-color: #fefefe;
+      margin: auto 35%;
+      padding: 20px;
+      border: 1px solid rgb(136, 136, 136);
+      width: 40%;
+      border-radius: 6px;
+      max-height: 500px;
+      overflow: auto;
+    }
+    
+    .modal-2-content input {
+      width: auto;
+    }
+    
+    .manage_access_modal {
+      opacity: 0;
+      position: fixed;
+      z-index: -1;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 120%;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease-in-out;
+      transform: translateY(-20px);
+      overflow: auto;
+    }
+    
+    .close_2 {
+      color: #000;
+      font-size: 28px;
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+      bottom: 3px;
+    }
+    
+    .close_2:hover,
+    .close_2:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .cancel_btn {
+      padding: 4px 26px;
+      color: var(--red);
+      background: white;
+      border-radius: 4px;
+      border: 1px solid var(--red);
+      transition: all ease-in-out 0.3s;
+    }
+    .cancel_btn:hover {
+      color: white;
+      background: var(--red);
+      border-color: transparent;
+    }
+    
+    .submit {
+      padding: 2px 26px;
+      border-radius: 4px;
+      border: 1px solid var(--green);
+      transition: all ease-in-out 0.3s;
+      background: white;
+      color: var(--green);
+    }
+    .submit:hover {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: #fefefe;
+      /* font-weight: 600; */
+      /* text-transform: uppercase; */
+      font-size: 0.875rem;
+      padding: 1rem;
+      text-align: left;
+    }
+    
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      background-color: white;
+    }
+    
+    td input {
+      text-align: center;
+      text-decoration: none;
+      border: none;
+    }
+    
+    /* input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      transition: border-color 0.3s ease-in-out;
+      } */
+      
+      input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
 
-        @media (max-width: 425px){
-            .location_fld_ip{
-                margin-bottom: 5px;
-            }
-            .modal_content {
-            width: 70%;
-            }
-        }
-
-    </style>
+      @media (max-width: 1024px){
+          .body{
+              margin: 30px;
+              padding: 30px;
+          }
+          .modal_content {
+          width: 40%;
+          }
+      
+          .modal-2-content {
+            left: 0px;
+            margin: auto;
+          }
+      }
+      @media (max-width: 600px){
+          .body{
+              margin: 20px;
+              padding: 20px;
+          }
+          .space{
+              display: none;
+          }
+          .label-container {
+              grid-template-columns: 1fr;
+          }
+          .location_fld_ip{
+              margin-bottom: 5px;
+          }
+          .h1{
+          padding: 0px 10px 5px 10px;
+          }
+          .modal_content {
+          width: 70%;
+          }
+      
+          .modal-2-content {
+            width: auto;
+          }
+          .meeting_minutes_container{
+            padding: 12px;
+          }
+      
+      }
+      
+      @media (max-width: 425px){
+          .location_fld_ip{
+              margin-bottom: 5px;
+          }
+          .modal_content {
+          width: 70%;
+          }
+      }
+      </style>
 </head>
 {% block preloader %}
     {% include 'preloader.html' %}
@@ -332,7 +516,70 @@
   
         <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
-        {% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
+        {% if primary == 1%}
+            {% if team_primary is None %}
+              {% block navbar %}
+                  {% include 'navbar.html' %}
+              {% endblock navbar %}
+            {% else %}
+              {% if team_namespace == 'content_writing_and_publications_team' %}
+              {% block caw_navbar %}
+                  {% include 'content_navbar.html' %} 
+              {% endblock caw_navbar %}
+    
+              {% elif team_namespace == 'events_and_management_team' %}
+              {% block emt_navbar %}
+                  {% include 'emt_navbar.html' %} 
+              {% endblock emt_navbar %}
+    
+              {% elif team_namespace == 'logistics_and_operations_team' %}
+              {% block lot_navbar %}
+                  {% include 'logistics_navbar.html' %} 
+              {% endblock lot_navbar %}
+    
+              {% elif team_namespace == 'promotions_team' %}
+              {% block promotion_navbar %}
+                  {% include 'promotions_team/promotions_navbar.html' %} 
+              {% endblock promotion_navbar %}
+    
+              {% elif team_namespace == 'public_relation_team' %}
+              {% block prt_navbar %}
+                  {% include 'public_relation_team/public_relation_navbar.html' %} 
+              {% endblock prt_navbar %}
+    
+              {% elif team_namespace == 'membership_development_team' %}
+              {% block mdt_navbar %}
+                  {% include 'mdt_navbar.html' %} 
+              {% endblock mdt_navbar %}
+    
+              {% elif team_namespace == 'media_team' %}
+              {% block media_navbar %}
+                  {% include 'media_navbar.html' %} 
+              {% endblock media_navbar %}
+    
+              {% elif team_namespace == 'graphics_team' %}
+              {% block graphics_navbar %}
+                  {% include 'graphics_navbar.html' %} 
+              {% endblock graphics_navbar %}
+    
+              {% elif team_namespace == 'finance_and_corporate_team' %}
+              {% block finance_navbar %}
+                  {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+              {% endblock finance_navbar %}
+    
+              {% elif team_namespace == 'website_development_team' %}
+              {% block web_navbar %}
+                  {% include 'website_development_team/web_navbar.html' %} 
+              {% endblock web_navbar %}
+    
+              {% endif %}
+            {% endif %}
+        {% else %}
+            {% block sc_ag_navbar %}
+                {% include 'sc_ag_navbar.html' %}
+            {% endblock sc_ag_navbar %}
+
+        {% endif %}
         </div>
         <!--navbar content-->   
 
@@ -342,99 +589,176 @@
         <form method="post" id="form"> <!--form starts-->
             {% csrf_token %}
             <div class="div0"> <!--title-->
-                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
+              {% if has_access == 'Edit' %}
+              <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
+              {% elif has_access == 'ViewOnly' %}
+              <h1 class="h1" >{{ meeting.meeting_name|default_if_none:'' }}</h1>
+              {% endif %}
             </div>
 
     <div class="div1">
+      {% if primary == 1 %}
+      {% if team_primary is not None %}
+      <a href="{% url homepage_url team_primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% else %}
       <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
-      {% if meeting %}
-        <button type="button" class="modal_btn">Delete <i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
       {% endif %}
+      {% else %}
+      <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_homepage' primary %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% endif %}
+      <div style="display: flex; align-items: center; gap: 4px;">
+        {% if meeting and has_access == 'Edit' %}
+        <i
+        class="fa fa-users user-btn"
+        aria-hidden="true"
+        data-sid="{{budget_sheet.pk}}"
+        ></i>
+        <button type="button" class="modal_btn">Delete<i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
+        {% endif %}
+      </div>
     </div>
 
             <div class="div2">
                 <div class="label-container">
                     <div class="location_fld"><!--location-->
+            {% if has_access == 'Edit' %}
                         <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2>
                         <div class="colon">:</div>
-
+          
                         <div id="location-buttons">
-                            <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
-                            <label for="virtual" class="location_fld_ip">Virtual</label>
-
-            <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
-            <label for="hybrid" class="location_fld_ip">Hybrid</label>
-
-            <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
-            <label for="inperson" class="location_fld_ip">In-person</label>
-          </div>
+                          <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
+                          <label for="virtual" class="location_fld_ip">Virtual</label>
+                          
+                          <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
+                          <label for="hybrid" class="location_fld_ip">Hybrid</label>
+                          
+                          <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
+                          <label for="inperson" class="location_fld_ip">In-person</label>
+                        </div>
+            {% elif has_access == 'ViewOnly' %}
+            <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2><div class="colon">: </div><div>{{meeting.venue}}</div>
+            {% endif %}
         </div>
 
-       <div class="time_fld">
+       <div class="time_fld" {% if team_primary is None %}style="gap:0px"{% endif %}>
         <h2>Team <div style="color: #e74c3c;">*</div></h2>
         <div class="colon">:</div>
 
         <!-- Dropdown menu -->
-        <select id="teamDropdown" class="time_fld_ip" onchange="updateTeamValue()" required>
-          <option value="" disabled selected>Select a team</option>
-          <option value="website-development-team">Website Development Team</option>
-          <option value="promotions">Promotions</option>
-          <option value="media">Media</option>
-          <option value="graphics">Graphics</option>
+        {% if team_primary is not None and meeting %}
+        <div class="time_fld_ip">{{meeting.team.team_name}}</div>
+        {% elif team_primary is not None and not meeting %}
+          {% for team in teams %}
+            {% if team.primary == team_primary %}
+            <div class="time_fld_ip">{{team.team_name}}</div>
+            <input type="hidden" name="selected_team" value="{{team.primary}}">
+            {% endif %}
+          {% endfor %}
+        {% else %}
+        {% if has_access == 'ViewOnly' %}
+        <div class="time_fld_ip">{{meeting.team.team_name}}</div>
+        {% else %}
+        <select id="teamDropdown" name="selected_team" class="time_fld_ip" required>
+          <option value="" disabled {% if not meeting.team %}selected{% endif %}>Select a team</option>
+          {% for team in teams %}
+          <option value="{{team.primary}}" {% if meeting.team.primary == team.primary %}selected{% endif %}>{{team.team_name}}</option>
+          {% endfor %}
         </select>
-
-        <!-- Hidden input field -->
-        <input type="hidden" name="meeting_date" id="selectedTeam" value="{{ meeting.meeting_date }}">
+        {% endif %}
+        {% endif %}
       </div>
 
-        <div class="time_fld">
-          <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
-        </div>
-
-        <!-- Time Fields -->
-        <div class="time_fld">
-          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
-        </div>
-
-        <div class="time_fld">
-          <h2>End time<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
-        </div>
-
-        <!-- Venue -->
-        <div class="time_fld">
-          <h2>Venue</h2>
-          <div class="colon">:</div>
-          <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
-        </div>
-
-        <!-- Total Attendee -->
-        <div class="time_fld">
-          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
-          <div class="colon">:</div>
-          <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
-        </div>
-
-        <!-- IEEE & Non-IEEE -->
-        <div class="time_fld">
-          <h2>IEEE Attendee</h2>
-          <div class="colon">:</div>
-          <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
-        </div>
-
-        <div class="time_fld">
-          <h2>Non-IEEE Attendee</h2>
-          <div class="colon">:</div>
-          <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
-        </div>
+      {% if has_access == 'Edit' %}
+      <div class="time_fld">
+        <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
       </div>
+
+      <!-- Venue -->
+      <div class="time_fld">
+        <h2>Venue</h2>
+        <div class="colon">:</div>
+        <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+      </div>
+
+      <!-- Time Fields -->
+      <div class="time_fld">
+        <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
+      </div>
+
+      <div class="time_fld">
+        <h2>End time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
+      </div>
+
+      <!-- Total Attendee -->
+      <div class="time_fld">
+        <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div>
+        <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+      </div>
+
+      <!-- IEEE & Non-IEEE -->
+      <div class="time_fld">
+        <h2>IEEE Attendee</h2>
+        <div class="colon">:</div>
+        <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+      </div>
+
+      <div class="time_fld">
+        <h2>Non-IEEE Attendee</h2>
+        <div class="colon">:</div>
+        <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+      </div>
+    </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div class="time_fld">
+        <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.meeting_date|date:'Y-m-d' }}</div>
+      </div>
+
+      <!-- Time Fields -->
+      <div class="time_fld">
+        <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.start_time|time:'H:i' }}</div>
+      </div>
+
+      <div class="time_fld">
+        <h2>End time<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.end_time|time:'H:i' }}</div>
+      </div>
+
+      <!-- Venue -->
+      <div class="time_fld">
+        <h2>Venue</h2>
+        <div class="colon">:</div><div>{{ meeting.venue|default_if_none:'' }}</div>
+      </div>
+
+      <!-- Total Attendee -->
+      <div class="time_fld">
+        <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+        <div class="colon">:</div><div>{{ meeting.total_attendee|default_if_none:'' }}</div>
+      </div>
+
+      <!-- IEEE & Non-IEEE -->
+      <div class="time_fld">
+        <h2>IEEE Attendee</h2>
+        <div class="colon">:</div><div>{{ meeting.ieee_attendee|default_if_none:'' }}</div>
+      </div>
+
+      <div class="time_fld">
+        <h2>Non-IEEE Attendee</h2>
+        <div class="colon">:</div><div>{{ meeting.non_ieee_attendee|default_if_none:'' }}</div>
+      </div>
+    </div>
+      {% endif %}
 
       <!-- Agenda Controls -->
+      {% if has_access == 'Edit' %}
       <div class="agenda" id="agenda-controls">
         <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
         <div>
@@ -442,7 +766,6 @@
           <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
         </div>
       </div>
-
       <!-- Agenda Items -->
       <div id="agenda-items">
         {% if meeting.agendas %}
@@ -459,8 +782,31 @@
           </div>
         {% endif %}
       </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div class="agenda" id="agenda-controls">
+        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
+      </div>
+      <!-- Agenda Items -->
+      <div id="agenda-items">
+        {% if meeting.agendas %}
+          {% for item in meeting.agendas %}
+            <div class="agenda_fld">
+              <h2>{{ forloop.counter }}.</h2>
+              <div class="agenda_fld_ip">{{ item }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="agenda_fld">
+            <h2>1.</h2>
+            <div class="agenda_fld_ip"></div>
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      
 
       <!-- Discussion -->
+      {% if has_access == 'Edit' %}
       <div>
         <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
         <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
@@ -490,44 +836,145 @@
         </div>
 
         <div class="space"></div>
-
+        
         <div class="text_fld">
           <h2>Written by<span style="color: #e74c3c;">*</span></h2>
           <div class="colon">:</div>
           <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
         </div>
       </div>
-
       <!-- Save -->
       <div style="display: flex; justify-content: center; margin-top: 20px;">
         <button type="submit" name="save" class="save_btn">Save</button>
       </div>
+      {% elif has_access == 'ViewOnly' %}
+      <div>
+        <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <div style="min-height: 150px; border: 1px solid #737373; padding: 1em; box-sizing: border-box; background-color: #f9f9f9; width: -webkit-fill-available">{{ meeting.discussion|safe|default_if_none:'' }}</textarea>
+      </div>
+
+        <div class="label-container" style="margin-top: 40px;">
+            <div class="text_fld"><!--host-->   
+            <h2>Host</h2>
+            <div class="colon">:</div><div>{{ meeting.host|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Co-host</h2>
+          <div class="colon">:</div><div>{{ meeting.co_host|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Guest</h2>
+          <div class="colon">:</div><div>{{ meeting.guest|default_if_none:'' }}</div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Written by<span style="color: #e74c3c;">*</span></h2>
+          <div class="colon">:</div><div>{{ meeting.written_by|default_if_none:'' }}</div>
+        </div>
+      </div>
+      {% endif %}
+
     </form>
 
-                    <!-- modal-->
-                    {% if meeting %}
-                    <div id="myModal" class="delete_modal">
-                      <div class="modal_content">
-                                <form method="POST">
-                                  {% csrf_token %}
-                                  <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
-                                  <div style="display: flex; justify-content: center;">        
-                                      <!-- delete btn -->
-                                      <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
-                                      <span><button type="button" class="close_btn">No</button></span>
-                                    </div>
-                                </form>
-                          </div>
-                      </div>
-                {% endif %}
-     </section>
+            <!-- modal-->
+            {% if meeting %}
+            <div id="myModal" class="delete_modal">
+              <div class="modal_content">
+                        <form method="POST">
+                          {% csrf_token %}
+                          <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
+                          <div style="display: flex; justify-content: center;">        
+                              <!-- delete btn -->
+                              <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
+                              <span><button type="button" class="cancel_btn">No</button></span>
+                            </div>
+                        </form>
+                  </div>
+              </div>
+        {% endif %}
+
+        <!-- User Modal -->
+        <div id="modal_2" class="manage_access_modal">
+          <div class="modal-2-content">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                align-items: center;
+              "
+            >
+              <h5>Manage Access</h5>
+              <span class="close_2">&times;</span>
+            </div>
+            <form method="POST">
+              {% csrf_token %}
+              <div class="table-responsive" style="border-radius: 4px 4px 0 0">
+                <table class="table table-striped table-class">
+                  <thead>
+                    <tr>
+                      <th>SL</th>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Action</th>
+                      <!-- Updated header title -->
+                    </tr>
+                  </thead>
+                  <tbody id="budgetTableBody">
+                    <!-- Table data will be dynamically loaded -->
+                    {% for member in members %}
+                    <tr>
+                      <td>{{forloop.counter}}</td>
+                      <td>{{member.member.name}}</td>
+                      <td>{{member.member.position}}</td>
+                      <td>
+                        <input type="hidden" name="ieee_id" value={{member.member.ieee_id}}>
+                        <select
+                          name="access_type"
+                          class="form-select"
+                          style="
+                            padding: 6px 12px;
+                            border-radius: 6px;
+                            border: none;
+                            text-decoration: none;
+                          "
+                        >
+                          <option value="" {% if member.access_type == None %}selected{% endif %}>Select</option>
+                          <option value="ViewOnly" {% if member.access_type == 'ViewOnly' %}selected{% endif %}>ViewOnly</option>
+                          <option value="Edit" {% if member.access_type == 'Edit' %}selected{% endif %}>Edit</option>
+                          <option value="Restricted" {% if member.access_type == 'Restricted' %}selected{% endif %}>Restricted</option>
+                        </select>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+  
+                <div style="display: flex; justify-content: right; gap: 6px">
+                  <a href="#" class="cancel_btn">Cancel</a>
+                  <button name="save_access" type="submit" class="submit">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+      
 
 
      <script>
         const modal = document.getElementById("myModal");
         // const deleteForm = document.querySelector("#myModal form");
         const deleteBtns = document.querySelectorAll(".modal_btn");
-        const closeBtn = document.querySelector(".close_btn");
+        const closeBtn = document.querySelector(".cancel_btn");
 
         deleteBtns.forEach(button => {
             button.addEventListener("click", () => {
@@ -566,33 +1013,98 @@
           ['view', ['fullscreen', 'codeview', 'help']]
         ]
       });
-
-        document.getElementById('form').addEventListener('submit',(e)=>{
-        if ($('#summernote').summernote('isEmpty')) {
-        e.preventDefault();
-        alert("Please fill in the description field.");
-        }
-    });
     </script>
+
     <script>
-      function updateTeamValue() {
-        const dropdown = document.getElementById("teamDropdown");
-        const hiddenInput = document.getElementById("selectedTeam");
-        hiddenInput.value = dropdown.value;
-      }
+      var userBtn = document.querySelectorAll(".user-btn");
+      var modal_2 = document.getElementById("modal_2");
+      var closeUser = modal_2.getElementsByClassName("close_2")[0];
+      var cancelUser = modal_2.getElementsByClassName("cancel_btn")[0];
 
-      // If you want to pre-fill from existing data (e.g., from Django)
-      window.addEventListener('DOMContentLoaded', () => {
-        const selected = "{{ meeting.meeting_date }}"; // Replace with actual team value if needed
-        const dropdown = document.getElementById("teamDropdown");
-        const hiddenInput = document.getElementById("selectedTeam");
+      userBtn.forEach(function (btn) {
+        btn.onclick = function () {
+          modal_2.style.transform = "translateY(0px)";
+          modal_2.style.zIndex = "103100";
+          modal_2.style.opacity = "1";
+        };
 
-        if (selected) {
-          dropdown.value = selected;
-          hiddenInput.value = selected;
-        }
+        closeUser.onclick = function () {
+          modal_2.style.transform = "translateY(-50px)";
+          modal_2.style.zIndex = "-100";
+          modal_2.style.opacity = "0";
+        };
+
+        cancelUser.onclick = function () {
+          modal_2.style.transform = "translateY(-50px)";
+          modal_2.style.zIndex = "-100";
+          modal_2.style.opacity = "0";
+        };
+
+        window.addEventListener("click", function (event) {
+          if (event.target === modal_2) {
+            modal_2.style.transform = "translateY(-50px)";
+            modal_2.style.zIndex = "-100";
+            modal_2.style.opacity = "0";
+          }
+        });
       });
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector("form");
+      const startTimeInput = document.querySelector("input[name='start_time']");
+      const endTimeInput = document.querySelector("input[name='end_time']");
+
+      form.addEventListener("submit", function (e) {
+        const content = $('#summernote').summernote('code');
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = content;
+        const textContent = tempDiv.textContent.trim().replace(/\u200B/g, ''); // remove zero-width space
+
+        if (!textContent) {
+          alert("Discussion is required.");
+          e.preventDefault(); // Stop form from submitting
+          return;
+        }
+      });
+
+
+      form.addEventListener("submit", function (e) {
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
+
+        if (!startTime || !endTime) return; // Skip if one is empty
+
+        if (startTime >= endTime) {
+          e.preventDefault();
+          alert("Start time must be before end time.");
+          endTimeInput.focus();
+        }
+
+        if (endTime <= startTime) {
+          e.preventDefault();
+          alert("End time must be after start time.");
+          endTimeInput.focus();
+        }
+      });
+
+      startTimeInput.addEventListener("change", () => {
+        if (startTimeInput.value && endTimeInput.value && startTimeInput.value >= endTimeInput.value) {
+          alert("Start time must be before end time.");
+          startTimeInput.value = "";
+        }
+      });
+
+      endTimeInput.addEventListener("change", () => {
+        if (startTimeInput.value && endTimeInput.value && endTimeInput.value <= startTimeInput.value) {
+          alert("End time must be after start time.");
+          endTimeInput.value = "";
+        }
+      });
+      
+    });
+</script>
+
 
     {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
 
