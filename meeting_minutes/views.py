@@ -7,6 +7,8 @@ import os
 from central_branch.renderData import Branch
 from central_branch.views import custom_500
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
+from finance_and_corporate_team.genPDF import BudgetPDF
+from main_website.models import Toolkit
 from meeting_minutes.manage_access import MM_Render_Access
 from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.system_error_handling import ErrorHandling
@@ -26,7 +28,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Paragraph
-from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
 
 from port.renderData import PortData
@@ -178,10 +180,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
 
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
-                teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=primary, is_active=True).values('primary', 'team_name')
             else:
                 primary = 1
-                teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=1, is_active=True).values('primary', 'team_name')
 
             context = {
                 'all_sc_ag':sc_ag,
@@ -363,7 +365,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
 @login_required
 @member_login_permission
-def download_meeting_pdf(request, pk):
+def download_meeting_pdf(request, pk, primary=None):
     try:
         # Fetch the meeting object
         meeting = get_object_or_404(MeetingMinutes, pk=pk)
@@ -381,28 +383,71 @@ def download_meeting_pdf(request, pk):
 
         p.setFont("Helvetica-Bold", 20)
         p.setFillColor(colors.darkblue)
-        p.drawCentredString(width / 2, y, "IEEE NSU Student Branch")
-        y -= 25
+
+        sc_ag_name = Chapters_Society_and_Affinity_Groups.objects.filter(primary=(primary if primary else 1)).values('group_name').first()['group_name']
+        style = getSampleStyleSheet()["Normal"]
+        style = ParagraphStyle(style, leading=17, fontName='Helvetica-Bold', fontSize=16, alignment=1, textColor=get_sc_ag_header_color(primary=(int(primary) if primary else 1)))
+
+        # Create a Paragraph with the given text
+        para = Paragraph(sc_ag_name, style)
+
+        # Wrap the text to fit within max_width
+        text_width = min(300, width - 20)  # Limit width
+        wrapped_width, wrapped_height = para.wrap(text_width, 0)  # Get required height
+
+        # Adjust Y so the first line stays in place
+        adjusted_y_position = height - 50 - wrapped_height  # Shift down
+
+        # Center X calculation
+        x_position = (width - wrapped_width) / 2
+
+        # Draw the wrapped text
+        para.drawOn(p, x_position, adjusted_y_position)
+        # p.drawCentredString(width / 2, y, sc_ag_name)
+        y = adjusted_y_position
         
         p.setFont("Helvetica-Bold", 16)
         p.setFillColor(colors.black)
-        p.drawCentredString(width / 2, y, "Meeting Minutes")
+        p.drawCentredString(width / 2, y-30, "Meeting Minutes")
         y -= 35
+        
+        branch_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(1)).picture
+        branch_logo_path = settings.MEDIA_ROOT+str(branch_logo)
+        sc_ag_logo_path = None
 
         try:
-            logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
-            if os.path.exists(logo_path):
-                p.drawImage(
-                    ImageReader(logo_path),
-                    x=width - 90,
-                    y=height - 90,
-                    width=50,
-                    height=50,
-                    preserveAspectRatio=True,
-                    mask='auto'
-                )
+            if os.path.exists(branch_logo_path):
+                    p.drawImage(
+                        ImageReader(branch_logo_path),
+                        x=margin,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
         except Exception as e:
-            logger.warning(f"Logo could not be loaded: {e}")
+            logger.warning(f"Main Branch logo could not be loaded: {e}")    
+        
+        try:
+            if primary:
+                sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(int(primary))).picture
+                sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
+
+                if os.path.exists(sc_ag_logo_path):
+                    p.drawImage(
+                        ImageReader(sc_ag_logo_path),
+                        x=width - margin - 50,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
+
+        except Exception as e:
+            logger.warning(f"Sc_AG logo could not be loaded: {e}")
+              
         y -= 20
         p.setStrokeColor(colors.darkblue)
         p.setLineWidth(3)
@@ -547,3 +592,27 @@ def get_team_redirect_namespace(team_primary):
         return 'graphics_team'
     elif team_primary == 11:
         return 'finance_and_corporate_team'
+    
+def get_sc_ag_logo_name(sc_primary):
+        if sc_primary == 1:
+            return 'IEEE NSU SB Logo'
+        elif sc_primary == 2:
+            return 'IEEE NSU PES SBC Logo'
+        elif sc_primary == 3:
+            return 'IEEE NSU RAS SBC Logo'
+        elif sc_primary == 4:
+            return 'IEEE NSU IAS SBC Logo'
+        elif sc_primary == 5:
+            return 'IEEE NSU SB WIE AG Logo'
+        
+def get_sc_ag_header_color(primary):
+        if primary == 1:
+            return '#137AAC'
+        elif primary == 2:
+            return '#659941'
+        elif primary == 3:
+            return '#602569'
+        elif primary == 4:
+            return '#008bC2'
+        elif primary == 5:
+            return '#006699'    

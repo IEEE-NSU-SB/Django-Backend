@@ -6,8 +6,8 @@ from django_json_widget.widgets import JSONEditorWidget
 # Register your models here.
 @admin.register(Task_Category)
 class Task_Category(admin.ModelAdmin):
-    list_display = ['name', 'points', 'enabled']
-    search_fields = ['name']
+    list_display = ['name', 'points', 'team', 'enabled']
+    search_fields = ['name', 'team__team_name']
 
 @admin.register(Task)
 class Task(admin.ModelAdmin):

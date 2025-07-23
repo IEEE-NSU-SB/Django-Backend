@@ -1,8 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django_resized import ResizedImageField
+from .encryption import encrypt_string, decrypt_string
 from port.models import Teams, Roles_and_Position
-
 # Create your models here.
 
 #Table for renewal Sessions, primary key is id
@@ -27,7 +27,7 @@ class Renewal_requests(models.Model):
     contact_no=models.CharField(null=False,blank=False,max_length=30,default="null")
     email_associated=models.EmailField(null=False,blank=False)
     email_ieee=models.EmailField(null=True,blank=True)
-    ieee_account_password=models.CharField(null=False,blank=False,max_length=500)
+    _ieee_account_password = models.CharField(db_column='ieee_account_password', null=False, blank=False, max_length=500)
     
     #this *_check fields refers to the subscriptions the user is selecting on the forms.
     ieee_renewal_check=models.BooleanField(null=False,blank=False,default=False)
@@ -44,6 +44,20 @@ class Renewal_requests(models.Model):
     view_status=models.BooleanField(null=False,blank=False,default=False)
     
     official_comment=models.CharField(null=True,blank=True,max_length=150) #the comment that team member leaves while renewal time
+
+
+    def set_ieee_account_password(self, raw_password):
+        self._ieee_account_password = encrypt_string(raw_password)
+
+    def get_decrypted_ieee_account_password(self):
+        try:
+            return decrypt_string(self._ieee_account_password)
+        except Exception:
+            return "[Decryption Error]"
+
+    # You can use this to mask password in most contexts
+    def masked_password():
+        return "********"
     
     # Warning! Don't register This Table in Admin! Security Issue #
     class Meta:
