@@ -11,8 +11,8 @@
       flex-direction: row;
     }
       .magazine_section .magazine_container .card .cover{
-        width: 100%;
-        height: 100%;
+        width: 500px;
+        height: 500px;
         object-fit: cover;
         transition: all 0.5s;
       }
@@ -52,21 +52,22 @@
     
       /* Some styles added to button */
       .magazine_section .magazine_container .card .container .button {
-        background-color: white; 
-        color: black; 
+        background-color: #002855; 
+        color: white; 
         transition: 0.5s;
         border: 2px solid #008CBA;
         border-radius: 5px;
         font-size: 16px;
-        width: 200px;
+        width: 400px;
+        text-align: center;
         padding: 10px;
         cursor: pointer;
       }
       
       /* Button hover effect added */
       .magazine_section .magazine_container .card .container .button:hover {
-        background-color: #008CBA;
-        color: white;
+        background-color: white;
+        color: #002855;
       }
     
       .magazines .slide-up-fade-in{
@@ -145,8 +146,8 @@
         
         /* Button hover effect added */
         .magazine_section .magazine_container .card .container .button:hover {
-          background-color: #008CBA;
-          color: white;
+          background-color: white;
+          color: #002855;
         }
         .magazine_section .magazine_container .card .magaine_image_content{
           height: 250px;
@@ -168,15 +169,15 @@
   <div class="magazine_container" style="max-width: 1140px;">
     {% for i in all_magazines %}
     <div class="card , slide-up-fade-in">
-        <div class="magaine_image_content" style="max-width: 680px;
-        width: 100%; overflow: hidden;">
+        <div class="magaine_image_content" style="max-width: 500px;
+        width: 65%; overflow: hidden;">
         <a target="blank" href="/media_files/{{i.magazine_file}}"><img class="cover" src="/media_files/{{i.magazine_picture}}" alt="magazine_cover"> </a>
         </div>
         <div class="container" style="padding: 10px;">
             <h1 class="card-title">{{i.magazine_title}}</h1>
-            <hr class="hr-dots">
-            <hr class="hr-dash">
-            <p style="font-weight: bolder;">A Publication of <br>
+            <br>
+            
+            <p>A Publication of 
             {{i.published_by}} <br>
             {{i.publish_date}}</p>
             <p class="">{{i.magazine_short_description | safe}}</p>
