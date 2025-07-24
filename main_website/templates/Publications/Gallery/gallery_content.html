@@ -91,6 +91,7 @@
         max-width: 1140px;
         padding: 25px;
     }
+    /* shohan */
     #videoGallery .row{
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -137,11 +138,11 @@
     .centering .button .photo-btn:hover{
         border: 1px solid brown;
     }
+    
     .gallery-buttons {
         display: flex;
         margin: 20px 0;
       }
-
       .gallery-button {
         padding: 10px;
         cursor: pointer;
@@ -301,6 +302,38 @@
   .video img:hover, .video img:active, .video img:focus {
     opacity: 0.75;
   }
+
+  .content_container{
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .Single_content{
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid hsla(0, 0%, 83%, 1);
+    padding: 25px;
+  }
+
+.img_div img{
+   width: 100%;
+}
+.content_div h2{
+     font-weight: bold;
+     font-size: 30px;
+}
+.content_div p{
+    font-weight: 400;
+    color: hsla(0, 0%, 20%, 1);
+    font-style: 13px;
+}
+@media screen and (max-width:576px) {
+  .Single_content{
+    flex-direction: column;
+  }
+}
+
 </style>
 <section class="centering">
   <div class="gallery-buttons">
@@ -364,7 +397,44 @@
     <img class="modal-content" id="modalImage" />
   </div>
   <div class="gallery-content" id="videoGallery">
-    <div class="row">
+
+  
+    <div class="content_container">
+      <div class="Single_content">
+        <div class="img_div">
+          <img src="https://images.unsplash.com/photo-1682687218608-5e2522b04673?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
+        </div>
+        <div class="content_div">
+          <h2>Chronicons</h2>
+          <p>Dec. 17, 2018</p>
+          <p>Chronicons is the first edition of IEEE NSU Student Branch’s magazine. Chronicons is not just a magazine, it is an assortment of research papers, technical articles and interviews that will spur the mind of everyone who has a reach to this spectacular piece of brochure</p>
+        </div>
+      </div>
+      <div class="Single_content">
+        <div class="img_div">
+          <img src="https://images.unsplash.com/photo-1682687218608-5e2522b04673?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
+        </div>
+        <div class="content_div">
+          <h2>Chronicons</h2>
+          <p>Dec. 17, 2018</p>
+          <p>Chronicons is the first edition of IEEE NSU Student Branch’s magazine. Chronicons is not just a magazine, it is an assortment of research papers, technical articles and interviews that will spur the mind of everyone who has a reach to this spectacular piece of brochure</p>
+        </div>
+      </div>
+      <div class="Single_content">
+        <div class="img_div">
+          <img src="https://images.unsplash.com/photo-1682687218608-5e2522b04673?q=80&w=1075&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
+        </div>
+        <div class="content_div">
+          <h2>Chronicons</h2>
+          <p>Dec. 17, 2018</p>
+          <p>Chronicons is the first edition of IEEE NSU Student Branch’s magazine. Chronicons is not just a magazine, it is an assortment of research papers, technical articles and interviews that will spur the mind of everyone who has a reach to this spectacular piece of brochure</p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- <div class="row">
       {% for i in all_videos %}
       <article class="video">
         <figure>
@@ -377,8 +447,7 @@
       {% endfor %}
       
       
-    </div>
-
+    </div> -->
     <!-- <div class="video_container">
             <div class="main-video">
                 <div class="video">
