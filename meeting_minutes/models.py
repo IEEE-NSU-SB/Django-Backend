@@ -16,7 +16,7 @@ class MeetingMinutes(models.Model):
     total_attendee = models.IntegerField(blank=False, null=False, default=0)
     ieee_attendee = models.IntegerField(blank=False, null=False, default=0)
     non_ieee_attendee = models.IntegerField(blank=False, null=False, default=0)
-    agendas = models.JSONField(default=list)  # ✅ recommended
+    agendas = models.JSONField(default=list)  
     discussion = models.TextField(blank=True, null=True)
     host = models.CharField(max_length=255, blank=True, null=True)
     co_host = models.CharField(max_length=255, blank=True, null=True)

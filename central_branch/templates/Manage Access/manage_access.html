@@ -344,47 +344,28 @@
         }  
 
         #checkbox-buttons input[type="checkbox"] {
-          display: none;
+          display: block;
         }
 
         .access_fld_ip {
-          display: block;
-          padding: 10px 16px;
-          margin: 5px;
-          border-bottom: solid 1px #b3b3b3;
-          cursor: pointer;
-          position: relative;
-          background-color: white;
-          font-family: sans-serif;
-          transition: all 0.2s ease-in-out;
-          color: gray;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            margin: 5px;
+            border-bottom: solid 1px #b3b3b3;
+            cursor: pointer;
+            background-color: white;
+            font-family: sans-serif;
+            transition: all 0.2s ease-in-out;
+            color: gray;
         }
 
-        .access_fld_ip::before {
-          content: "";
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          margin-right: 10px;
-          vertical-align: middle;
-          border: 2px solid #b3b3b3;
-          border-radius: 3px;
-          background-color: white;
-        }
-
-        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip {
+        .access_fld_ip:has(input:checked) {
           color: black;
         }
 
-        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip::before {
-          content: "✔";
-          color: black;
-          font-size: 14px;
-          font-weight: bold;
-          text-align: center;
-          line-height: 16px;
-        }
-        .checkbox_btns{
+        .checkbox_btns {
             margin-top: 8px;
             border: 1px solid #b3b3b3;
             border-radius: 7px;
@@ -392,6 +373,7 @@
             max-height: 200px;
             overflow-y: auto;
         }
+
 
         @media (max-width: 600px){
             .modal_content {
@@ -499,99 +481,62 @@
 
 
             <div id="checkbox-buttons" class="checkbox_btns">
-                {% if member.create_event_access %}
-                    <input type="checkbox" checked="True" value="create_event_access" name="create_event_access">
-                    <label for="create_event_access" class="access_fld_ip" style="border: none;">Event Create Access
-                    </label>
-                {% else %}
-                    <input type="checkbox" value="create_event_access" name="create_event_access">
-                    <label for="create_event_access" class="access_fld_ip" style="border: none;">Event Create Access
-                    </label>                                    
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="create_event_access" value="create_event_access" {% if member.create_event_access %}checked{% endif %}>
+                    <span>Event Create Access</span>
+                </label>
 
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="event_details_page_access" value="event_details_page_access" {% if member.event_details_page_access %}checked{% endif %}>
+                    <span>Event Details Edit Permission</span>
+                </label>
 
-                {% if member.event_details_page_access %}
-                    <input type="checkbox" checked="True" value="event_details_page_access" name="event_details_page_access">
-                    <label for="event_details_page_access" class="access_fld_ip" style="border: none;">Event Details Edit Permission</label>
-                {% else %}
-                    <input type="checkbox" value="event_details_page_access" name="event_details_page_access">
-                    <label for="event_details_page_access" class="access_fld_ip" style="border: none;">Event Details Edit Permission</label>
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="create_individual_task_access" value="create_individual_task_access" {% if member.create_individual_task_access %}checked{% endif %}>
+                    <span>Create Individual Task Permission</span>
+                </label>
 
-                {% if member.create_individual_task_access %}
-                    <input type="checkbox" checked="True" value="create_individual_task_access" name="create_individual_task_access">
-                    <label for="create_individual_task_access" class="access_fld_ip" style="border: none;">Create Individual Task Permission</label>
-                {% else %}
-                    <input type="checkbox" value="create_individual_task_access" name="create_individual_task_access">
-                    <label for="create_individual_task_access" class="access_fld_ip" style="border: none;">Create Individual Task Permission</label>
-                {% endif %}
+                {% comment %} <label class="access_fld_ip">
+                    <input type="checkbox" name="create_team_task_access" value="create_team_task_access" {% if member.create_team_task_access %}checked{% endif %}>
+                    <span>Create Team Task Permission</span>
+                </label> {% endcomment %}
 
-                {% comment %} {% if member.create_team_task_access %}
-                    <input type="checkbox" checked="True" value="create_team_task_access" name="create_team_task_access">
-                    <label for="create_team_task_access" class="access_fld_ip" style="border: none;">Create Team Task Permission</label>
-                {% else %}
-                    <input type="checkbox" value="create_team_task_access" name="create_team_task_access">
-                    <label for="create_team_task_access" class="access_fld_ip" style="border: none;">Create Team Task Permission</label>
-                {% endif %} {% endcomment %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="create_panels_access" value="create_panels_access" {% if member.create_panels_access %}checked{% endif %}>
+                    <span>Create Panel Access</span>
+                </label>
 
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="panel_memeber_add_remove_access" value="panel_memeber_add_remove_access" {% if member.panel_memeber_add_remove_access %}checked{% endif %}>
+                    <span>Panel Member Add/Remove Access</span>
+                </label>
 
-                {% if member.create_panels_access %}
-                    <input type="checkbox" checked="True" value="create_panels_access" name="create_panels_access">
-                    <label for="create_panels_access" class="access_fld_ip" style="border: none;">Create Panel Access</label>
-                {% else %}
-                    <input type="checkbox" value="create_panels_access" name="create_panels_access">
-                    <label for="create_panels_access" class="access_fld_ip" style="border: none;">Create Panel Access</label>
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="team_details_page" value="team_details_page" {% if member.team_details_page %}checked{% endif %}>
+                    <span>Team Details Page Access</span>
+                </label>
 
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="manage_award_access" value="manage_award_access" {% if member.manage_award_access %}checked{% endif %}>
+                    <span>Manage Award Access</span>
+                </label>
 
-                {% if member.panel_memeber_add_remove_access %}
-                    <input type="checkbox" checked="True" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
-                    <label for="panel_memeber_add_remove_access" class="access_fld_ip" style="border: none;">Panel Member Add/Remove Access</label>
-                {% else %}
-                    <input type="checkbox" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
-                    <label for="panel_memeber_add_remove_access" class="access_fld_ip" style="border: none;">Panel Member Add/Remove Access</label>
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="manage_web_access" value="manage_web_access" {% if member.manage_web_access %}checked{% endif %}>
+                    <span>Manage Web Access</span>
+                </label>
 
-                {% if member.team_details_page %}
-                    <input type="checkbox" checked="True" value="team_details_page" name="team_details_page">
-                    <label for="team_details_page" class="access_fld_ip" style="border: none;">Team Details Page Access</label>
-                {% else %}
-                    <input type="checkbox" value="team_details_page" name="team_details_page">
-                    <label for="team_details_page" class="access_fld_ip" style="border: none;">Team Details Page Access</label>
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="manage_custom_notification_access" value="manage_custom_notification_access" {% if member.manage_custom_notification_access %}checked{% endif %}>
+                    <span>Manage Custom Notification</span>
+                </label>
 
-                {% if member.manage_award_access %}
-                    <input type="checkbox" checked="True" value="manage_award_access" name="manage_award_access">
-                    <label for="manage_award_access" class="access_fld_ip" style="border: none;">Manage Award Access</label>
-                {% else %}
-                    <input type="checkbox" value="manage_award_access" name="manage_award_access">
-                    <label for="manage_award_access" class="access_fld_ip" style="border: none;">Manage Award Access</label>
-                {% endif %}
-
-                {% if member.manage_web_access %}
-                    <input type="checkbox" checked="True" value="manage_web_access" name="manage_web_access">
-                    <label for="manage_web_access" class="access_fld_ip" style="border: none;">Manage Web Access</label>
-                {% else %}
-                    <input type="checkbox" value="manage_web_access" name="manage_web_access">
-                    <label for="manage_web_access" class="access_fld_ip" style="border: none;">Manage Web Access</label>
-                {% endif %}
-
-                {% if member.manage_custom_notification_access %}
-                    <input type="checkbox" checked="True" value="manage_custom_notification_access" name="manage_custom_notification_access">
-                    <label for="manage_custom_notification_access" class="access_fld_ip" style="border: none;">Manage Custom Notification</label>
-                {% else %}
-                    <input type="checkbox" value="manage_custom_notification_access" name="manage_custom_notification_access">
-                    <label for="manage_custom_notification_access" class="access_fld_ip" style="border: none;">Manage Custom Notification</label>
-                {% endif %}
-
-                {% if member.manage_email_access %}
-                    <input type="checkbox" checked="True" value="manage_email_access" name="manage_email_access">
-                    <label for="manage_email_access" class="access_fld_ip" style="border: none;">Manage Email Access</label>
-                {% else %}
-                    <input type="checkbox" value="manage_email_access" name="manage_email_access">
-                    <label for="manage_email_access" class="access_fld_ip" style="border: none;">Manage Email Access</label>
-                {% endif %}
+                <label class="access_fld_ip">
+                    <input type="checkbox" name="manage_email_access" value="manage_email_access" {% if member.manage_email_access %}checked{% endif %}>
+                    <span>Manage Email Access</span>
+                </label>
             </div>
+
 
             <div style="display: flex; justify-content: center;">
                 <button type="button" class="close_btn">Cancel</button>
