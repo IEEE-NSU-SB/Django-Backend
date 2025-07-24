@@ -236,8 +236,9 @@
         </div>
     </div> -->
             <div id="update_banner_modal" class="modal_update">
-                <form method="post" id="form">
+                <form method="post" enctype="multipart/form-data" id="form">
                     {% csrf_token %}
+                    
                     <div class="modal_update_content">
                       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h1>Update Banner</h1>
@@ -255,18 +256,18 @@
                         <div class="text_fld" style="grid-template-columns: 0.25fr 10px 1fr;">  
                             <h2 style="font-size: 15px; margin:0px;">Banner image</h2>
                             <div class="colon">:</div>
-                            <input type="file" class="text_fld_ip" id="hero-image" accept="image/*">
+                            <input type="file" name="banner_picture_with_stat" class="text_fld_ip" id="hero-image" accept="image/*">
                         </div>
 
                         <div style="display: flex; justify-content: end;">
                             <div style="display: flex;">
                                 <button type="button" class="close_btn">Cancel</button>
-                                <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                                <input type="submit" name="update_banner" class="confirm_btn" style="margin-left: 10px;" value="Confirm">
                             </div>
                         </div>
                       </div>
                 </div>
-            </form>
+                </form>
         </div>
 </div>
 

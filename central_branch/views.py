@@ -1180,6 +1180,7 @@ def manage_website_homepage(request):
                         messages.success(request,"Banner Picture With Statistics was successfully updated")
                         return redirect('central_branch:manage_website_home')    
                     except Exception as e:
+                        print("Exception while updating banner:", e)
                         messages.error(request,"Something went wrong! Please try again.")
                         return redirect('central_branch:manage_website_home')  
 
@@ -1201,19 +1202,19 @@ def manage_website_homepage(request):
                     return redirect('central_branch:manage_website_home')
                 
                 #when user edits saved thoughts
-                if request.POST.get('update'):
+                # if request.POST.get('update'):
 
-                    author_edit = request.POST.get('author_edit')
-                    thoughts_edit = request.POST.get('your_thoughts_edit')
-                    thoughts_id = request.POST.get('thought_id')
-                    #passing them to function to update changes made
-                    if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
-                        messages.success(request,"Thoughts updated successfully!")
-                    else:
-                        messages.error(request,"Error Occured. Please try again later!")
-                    return redirect('central_branch:manage_website_home')
+                #     author_edit = request.POST.get('author_edit')
+                #     thoughts_edit = request.POST.get('your_thoughts_edit')
+                #     thoughts_id = request.POST.get('thought_id')
+                #     #passing them to function to update changes made
+                #     if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
+                #         messages.success(request,"Thoughts updated successfully!")
+                #     else:
+                #         messages.error(request,"Error Occured. Please try again later!")
+                #     return redirect('central_branch:manage_website_home')
                 
-                #when user wants to delete a thought
+                # when user wants to delete a thought
                 if request.POST.get('thought_delete'):
                     
                     id = request.POST.get('delete_thought')

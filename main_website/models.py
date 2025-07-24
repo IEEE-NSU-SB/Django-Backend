@@ -20,8 +20,17 @@ class HomePageTopBanner(models.Model):
     third_layer_text=models.TextField(null=False,blank=False,max_length=300)
     button_text=models.CharField(null=False,blank=False,max_length=50,default="About INSB")
     button_url=models.CharField(null=False,blank=False,default="#",max_length=200)
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
+    
+    video_url = models.URLField(blank=True, null=True)
+       
     class Meta:
-        verbose_name='Homepage Banner Picture With Texts'
+        verbose_name='Homepage Banner Picture or video With Texts'
     def __str__(self) -> str:
         return str(self.pk)
 

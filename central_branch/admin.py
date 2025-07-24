@@ -11,3 +11,6 @@ from .models import Email_Draft
 @admin.register(Email_Draft)
 class Email_Draft(admin.ModelAdmin):
     list_display = ['email_unique_id', 'subject', 'timestamp']
+    
+    
+    

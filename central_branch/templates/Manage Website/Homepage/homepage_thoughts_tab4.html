@@ -1,205 +1,284 @@
-{% block homepage_thoughts_tab %}
-{% load static %}
+{% block homepage_thoughts_tab %} {% load static %}
 <style>
-    .thought_outer_container{
-        border-radius: 11px;
-        background: #00629b0e;
-        width: 372px;
-        padding: 12px;
-        margin-top: 12px;
-        break-inside: avoid; /* Prevents item from splitting between columns */
-    }
-    .thought_outer_container p{
-        background: #00629b3f;
-        padding: 7px;
-        border-radius: 5px;
-        margin: 0;
-    }
-    .thought_container{
-        column-count: 3;
-        column-gap: 12px;
-        width: 100%;
-    }
-    .add_thought_btn {
-        border-radius: 4px;
-        border: 1px solid transparent;
-        color: #002855d8;
-        background-color: #00629b32;
-        padding: 3px 16px;
-        transition: all .3s ease-in-out;
-        cursor: pointer;
-        text-align: right;
-    }
+  .thought_outer_container {
+    border-radius: 11px;
+    background: #00629b0e;
+    width: 372px;
+    padding: 12px;
+    margin-top: 12px;
+    break-inside: avoid; /* Prevents item from splitting between columns */
+  }
+  .thought_outer_container p {
+    background: #00629b3f;
+    padding: 7px;
+    border-radius: 5px;
+    margin: 0;
+  }
+  .thought_container {
+    column-count: 3;
+    column-gap: 12px;
+    width: 100%;
+  }
+  .add_thought_btn {
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: #002855d8;
+    background-color: #00629b32;
+    padding: 3px 16px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    text-align: right;
+  }
 
-    .add_thought_btn:hover {
-        background-color: #002855d8;
-        color: white;
-    }
-    .delete_thought_btn{
-        color: black;
-        background: #FF5959;
-        padding: 5px;
-        border-radius: 6px;
-        border: 1px solid #000;
-        position: relative;
-        bottom: 4px;
-        cursor: pointer;
-        transition: all .3s ease-in-out;
-    }
-    .delete_thought_btn:hover{
-        background: #f64040;
-    }
-    .modal_thought {
-        display: block;
-        opacity: 0;
-        position: fixed;
-        z-index: -1;
-        padding-top: 5vh;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 120%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-        align-items: center;
-        transition: all 0.3s ease-in-out;
-        transform: translateY(-20px);
-    }
+  .add_thought_btn:hover {
+    background-color: #002855d8;
+    color: white;
+  }
+  .delete_thought_btn {
+    color: black;
+    background: #ff5959;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #000;
+    position: relative;
+    bottom: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  .delete_thought_btn:hover {
+    background: #f64040;
+  }
+  .modal_thought {
+    display: block;
+    opacity: 0;
+    position: fixed;
+    z-index: -1;
+    padding-top: 5vh;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 120%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-20px);
+  }
 
-    .modal_thought_content {
-        background-color: white;
-        width: 40%;
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 7px;
-        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-        margin: auto;
-        padding: 10px 20px;
-    }
-    .modal_delete_thought {
-        display: block;
-        opacity: 0;
-        position: fixed;
-        z-index: -1;
-        padding-top: 5vh;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 120%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-        align-items: center;
-        transition: all 0.3s ease-in-out;
-        transform: translateY(-20px);
-    }
+  .modal_thought_content {
+    background-color: white;
+    width: 40%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 7px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: auto;
+    padding: 10px 20px;
+  }
+  .modal_delete_thought {
+    display: block;
+    opacity: 0;
+    position: fixed;
+    z-index: -1;
+    padding-top: 5vh;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 120%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-20px);
+  }
 
-    .modal_delete_thought_content {
-        background-color: white;
-        width: 40%;
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 7px;
-        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-        margin: auto;
-        padding: 10px 20px;
-    }
-    .modal_thought_content h1,
-    .modal_delete_thought_content h1{
-        font-size: 18px;
-        margin: 0px;
-    }
-    @media (max-width: 900px) {
+  .modal_delete_thought_content {
+    background-color: white;
+    width: 40%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 7px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: auto;
+    padding: 10px 20px;
+  }
+  .modal_thought_content h1,
+  .modal_delete_thought_content h1 {
+    font-size: 18px;
+    margin: 0px;
+  }
+  @media (max-width: 900px) {
     .img_inner_container {
-        flex: 0 0 calc((100% - 12px) / 2);
-        max-width: calc((100% - 12px) / 2);
+      flex: 0 0 calc((100% - 12px) / 2);
+      max-width: calc((100% - 12px) / 2);
     }
+  }
+  @media (max-width: 600px) {
+    .img_inner_container {
+      flex: 0 0 100%;
+      max-width: 100%;
     }
-    @media (max-width: 600px) {
-        .img_inner_container {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
-    @media (max-width: 800px){
+  }
+  @media (max-width: 800px) {
     .modal_thought_content,
-    .modal_delete_thought_content{
-            width: 90%;
-        }
-        .text_fld {
-            grid-template-columns: 0.4fr 10px 1fr;
-        }
+    .modal_delete_thought_content {
+      width: 90%;
     }
-    @media (max-width: 500px){
+    .text_fld {
+      grid-template-columns: 0.4fr 10px 1fr;
+    }
+  }
+  @media (max-width: 500px) {
     .modal_thought_content,
-    .modal_delete_thought_content{
-            width: 95%;
-        }
-        .video-wrapper , .img-wrapper{
-            height: 150px;
-        }
+    .modal_delete_thought_content {
+      width: 95%;
     }
-    /* Medium screens: 2 columns */
-    @media (max-width: 1400px) {
+    .video-wrapper,
+    .img-wrapper {
+      height: 150px;
+    }
+  }
+  /* Medium screens: 2 columns */
+  @media (max-width: 1400px) {
     .thought_container {
-        column-count: 2;
+      column-count: 2;
     }
-    .thought_outer_container{
-        width: 100%;
+    .thought_outer_container {
+      width: 100%;
     }
-}
+  }
 
-/* Small screens: 1 column */
-@media (max-width: 480px) {
+  /* Small screens: 1 column */
+  @media (max-width: 480px) {
     .thought_container {
-        column-count: 1;
+      column-count: 1;
     }
-    .thought_outer_container{
-        width: 100%;
+    .thought_outer_container {
+      width: 100%;
     }
-    }
+  }
 </style>
 
 <div id="tab4" class="tab-content">
-    <!-- <h2 style="text-align:center;">HomePage Thoughts</h2> -->
-    <!-- <br> -->
-    <div ui-view class="app-body" id="view">
-        <div class="container">
-            <div class="add_btn_container">
-                <button type="button" class="open_modal_btn add_thought_btn" data-target="#add_thought_modal"> Add thought</button>
-            </div>
-            <div class="thought_container">
-                <div class="thought_outer_container">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h6 style="font-weight: bold;">John Doe</h6>
-                        <i class="fas fa-trash delete_thought_btn open_modal_btn" data-target="#delete_thought_modal" title="Delete"></i>
-                    </div>
-                    <p>A good Branch</p>
-                </div>
-                <div class="thought_outer_container">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h6>John Doe</h6>
-                        <i class="fas fa-trash delete_thought_btn open_modal_btn" data-target="#delete_thought_modal" title="Delete"></i>
-                    </div>
-                    <p>A good Branch Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vitae architecto magni in quos molestias animi. Quam illo illum non fuga temporibus officia tenetur voluptatum modi.</p>
-                </div>
-                <div class="thought_outer_container">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h6>John Doe</h6>
-                        <i class="fas fa-trash delete_thought_btn open_modal_btn" data-target="#delete_thought_modal" title="Delete"></i>
-                    </div>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum maxime ab minus obcaecati nam ducimus.</p>
-                </div>
-                <div class="thought_outer_container">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h6>John Doe</h6>
-                        <i class="fas fa-trash delete_thought_btn open_modal_btn" data-target="#delete_thought_modal" title="Delete"></i>
-                    </div>
-                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
-                </div>
-            </div>
-            </div>
+  <!-- <h2 style="text-align:center;">HomePage Thoughts</h2> -->
+  <!-- <br> -->
+  <div ui-view class="app-body" id="view">
+    <div class="container">
+      <div class="add_btn_container">
+        <button
+          type="button"
+          class="open_modal_btn add_thought_btn"
+          data-target="#add_thought_modal"
+        >
+          Add thought
+        </button>
+      </div>
 
-                    <!-- <div class="box-body">
+      <div class="thought_container">
+        {% for thought in all_thoughts %}
+        <div class="thought_outer_container" data-thought-id="{{ thought.id }}">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h6 style="font-weight: bold">{{ thought.author }}</h6>
+            <i
+              class="fas fa-trash delete_thought_btn open_modal_btn"
+              data-target="#delete_thought_modal"
+              onclick="delete_thoughts({{thought.id}})"
+              title="Delete"
+            ></i>
+          </div>
+          <p>{{ thought.quote }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% comment %}
+      <div class="thought_container">
+        <div class="thought_outer_container" data-thought-id="{{ thought.id }}">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h6 style="font-weight: bold">John Doe</h6>
+            <i
+              class="fas fa-trash delete_thought_btn open_modal_btn"
+              data-target="#delete_thought_modal"
+              title="Delete"
+            ></i>
+          </div>
+          <p>A good Branch</p>
+        </div>
+        <div class="thought_outer_container" data-thought-id="{{ thought.id }}">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h6>John Doe</h6>
+            <i
+              class="fas fa-trash delete_thought_btn open_modal_btn"
+              data-target="#delete_thought_modal"
+              title="Delete"
+            ></i>
+          </div>
+          <p>
+            A good Branch Lorem ipsum dolor sit, amet consectetur adipisicing
+            elit. Vitae architecto magni in quos molestias animi. Quam illo
+            illum non fuga temporibus officia tenetur voluptatum modi.
+          </p>
+        </div>
+        <div class="thought_outer_container" data-thought-id="{{ thought.id }}">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h6>John Doe</h6>
+            <i
+              class="fas fa-trash delete_thought_btn open_modal_btn"
+              data-target="#delete_thought_modal"
+              title="Delete"
+            ></i>
+          </div>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum
+            maxime ab minus obcaecati nam ducimus.
+          </p>
+        </div>
+        <div class="thought_outer_container" data-thought-id="{{ thought.id }}">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <h6>John Doe</h6>
+            <i
+              class="fas fa-trash delete_thought_btn open_modal_btn"
+              data-target="#delete_thought_modal"
+              title="Delete"
+            ></i>
+          </div>
+          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+        </div>
+      </div>
+    </div>
+    {% endcomment %}
+
+    <!-- <div class="box-body">
                 
                         <div class="form-group row">
                             <label for="captions" class="col-sm-3 form-control-label">Add Thoughts:</label>
@@ -230,7 +309,7 @@
                         </div>
                     </div> -->
 
-            <!-- <div class="modal fade" id="AddThoughtsModal" tabindex="-1" role="dialog" aria-labelledby="AddCategoryModalLabel" aria-hidden="true">
+    <!-- <div class="modal fade" id="AddThoughtsModal" tabindex="-1" role="dialog" aria-labelledby="AddCategoryModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -278,7 +357,7 @@
                     </div>
                 </div>
             </div> -->
-        <!-- {% for thought in all_thoughts %}
+    <!-- {% for thought in all_thoughts %}
             <div class="modal fade" id="EditCaptionModal{{thought.pk}}" tabindex="-1" role="dialog" aria-labelledby="EditCaptionModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content">
@@ -333,7 +412,7 @@
             </div>
         {% endfor %} -->
 
-        <!-- <div class="modal fade" id="ConfirmDeleteModalForThoughts" tabindex="-1" role="dialog" aria-labelledby="ConfirmDeleteModalLabel" aria-hidden="true">
+    <!-- <div class="modal fade" id="ConfirmDeleteModalForThoughts" tabindex="-1" role="dialog" aria-labelledby="ConfirmDeleteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-top" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -359,68 +438,116 @@
             </div>
         </div> -->
 
-        <div id="add_thought_modal" class="modal_thought">
-            <form method="post" id="form">
-                {% csrf_token %}
-            <div class="modal_thought_content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h1>Add Thought</h1>
-                <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+    <div id="add_thought_modal" class="modal_thought">
+      <form method="post" id="form">
+        {% csrf_token %}
+        <input id="delete_thought" name="delete_thought" type="hidden">
 
-                <div class="container" style="margin-top: 40px;">
-                <div class="text_fld" style="grid-template-columns: 0.5fr 10px 1fr;">  
-                <h2 style="font-size: 15px; margin:0px;">Author Name & Position</h2>
-                <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
-                </div>
+        <div class="modal_thought_content">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+            "
+          >
+            <h1>Add Thought</h1>
+            <button type="button" class="x_btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
 
-                <div>
-                    <h2 style="font-size: 15px;">Your Thoughts:</h2>
-                    <textarea style="width: 100%;border: 1px solid #ccc;min-height: 100px;padding: 6px;" name="discussion" class="desc_fld"></textarea>
-                </div>
-
-                <div style="display: flex; justify-content: end;">
-                <div style="display: flex;">
-                <button type="button" class="close_btn">Cancel</button>
-                <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
-                </div>
-                </div>
-
+          <div class="container" style="margin-top: 40px">
+            <div class="text_fld" style="grid-template-columns: 0.5fr 10px 1fr">
+              <h2 style="font-size: 15px; margin: 0px">
+                Author Name & Position
+              </h2>
+              <div class="colon">:</div>
+              <input type="text" class="text_fld_ip" name="author" required />
             </div>
-        </div>
-        </form>
-        </div>
 
-        <div id="delete_thought_modal" class="modal_delete_thought">
-            <form method="post" id="form">
-                {% csrf_token %}
-            <div class="modal_delete_thought_content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h1>Delete Thought</h1>
-                <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-
-                <h2 style="font-size: 20px; margin-top: 20px;">Are you sure you want to delete this thought?</h2>
-
-
-                <div style="display: flex; justify-content: end; padding-top: 20px;">
-                <div style="display: flex;">
-                <button type="button" class="close_btn">Cancel</button>
-                <button type="submit" class="delete_btn" style="margin-left: 10px;">Yes, delete</button>
-                </div>
-                </div>
+            <div>
+              <h2 style="font-size: 15px">Your Thoughts:</h2>
+              <textarea
+                style="
+                  width: 100%;
+                  border: 1px solid #ccc;
+                  min-height: 100px;
+                  padding: 6px;
+                "
+                name="your_thoughts"
+                class="desc_fld"
+                required
+              ></textarea>
             </div>
-            </form>
+
+            <div style="display: flex; justify-content: end">
+              <div style="display: flex">
+                <button type="button" class="close_btn">Cancel</button>
+                <input
+                  type="submit"
+                  name="save"
+                  class="confirm_btn"
+                  style="margin-left: 10px"
+                  value="Save"
+                >
+                  
+                
+              </div>
+            </div>
+          </div>
         </div>
+      </form>
     </div>
 
+    <div id="delete_thought_modal"  class="modal_delete_thought">
+      <form method="post" id="form">
+        {% csrf_token %}
+        <input type="hidden" name="delete_thought" id="delete_thought_id">
+        <div class="modal_delete_thought_content">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+            "
+          >
+            <h1>Delete Thought</h1>
+            <button type="button" class="x_btn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
 
+          <h2 style="font-size: 20px; margin-top: 20px">
+           
+            Are you sure you want to delete this thought?
+          </h2>
+
+          <div style="display: flex; justify-content: end; padding-top: 20px">
+            <div style="display: flex">
+              <button type="button" class="close_btn">Cancel</button>
+              <input
+                type="submit"
+                name="thought_delete"
+                class="delete_btn"
+                style="margin-left: 10px"
+                value="Yes, delete"
+              >
+                
+              
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 <script>
   // ====== ADD THOUGHT MODAL ======
   const addThoughtBtns = document.querySelectorAll(".add_thought_btn"); // Add your trigger class
-  addThoughtBtns.forEach(btn => {
+  addThoughtBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const modalId = btn.getAttribute("data-target");
       const modal = document.querySelector(modalId);
@@ -433,8 +560,10 @@
     });
   });
 
-  const addThoughtCloseBtns = document.querySelectorAll("#add_thought_modal .x_btn, #add_thought_modal .close_btn");
-  addThoughtCloseBtns.forEach(btn => {
+  const addThoughtCloseBtns = document.querySelectorAll(
+    "#add_thought_modal .x_btn, #add_thought_modal .close_btn"
+  );
+  addThoughtCloseBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const modal = btn.closest(".modal_thought");
@@ -450,7 +579,9 @@
   const addThoughtModal = document.querySelector("#add_thought_modal");
   if (addThoughtModal) {
     addThoughtModal.addEventListener("click", (event) => {
-      const modalContent = addThoughtModal.querySelector(".modal_thought_content");
+      const modalContent = addThoughtModal.querySelector(
+        ".modal_thought_content"
+      );
       if (!modalContent.contains(event.target)) {
         addThoughtModal.style.transform = "translateY(-50px)";
         addThoughtModal.style.zIndex = "-100";
@@ -462,7 +593,7 @@
 
   // ====== DELETE THOUGHT MODAL ======
   const deleteThoughtBtns = document.querySelectorAll(".delete_thought_btn"); // Add your trigger class
-  deleteThoughtBtns.forEach(btn => {
+  deleteThoughtBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const modalId = btn.getAttribute("data-target");
       const modal = document.querySelector(modalId);
@@ -475,8 +606,10 @@
     });
   });
 
-  const deleteThoughtCloseBtns = document.querySelectorAll("#delete_thought_modal .x_btn, #delete_thought_modal .close_btn");
-  deleteThoughtCloseBtns.forEach(btn => {
+  const deleteThoughtCloseBtns = document.querySelectorAll(
+    "#delete_thought_modal .x_btn, #delete_thought_modal .close_btn"
+  );
+  deleteThoughtCloseBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const modal = btn.closest(".modal_delete_thought");
@@ -492,7 +625,9 @@
   const deleteThoughtModal = document.querySelector("#delete_thought_modal");
   if (deleteThoughtModal) {
     deleteThoughtModal.addEventListener("click", (event) => {
-      const modalContent = deleteThoughtModal.querySelector(".modal_delete_thought_content");
+      const modalContent = deleteThoughtModal.querySelector(
+        ".modal_delete_thought_content"
+      );
       if (!modalContent.contains(event.target)) {
         deleteThoughtModal.style.transform = "translateY(-50px)";
         deleteThoughtModal.style.zIndex = "-100";
@@ -502,6 +637,5 @@
     });
   }
 </script>
-
 
 {% endblock homepage_thoughts_tab %}
