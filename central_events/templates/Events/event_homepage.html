@@ -2,121 +2,182 @@
 {% load static %}
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    {% if is_branch %}
+  <meta charset="utf-8" />
+  {% if is_branch %}
     <title>Events | IEEE NSU Student Branch</title>
-    {% else %}
-    <title>Events | {{sc_ag_info.group_name}}</title>
-    {% endif %}
-    <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+  {% else %}
+    <title>Events | {{ sc_ag_info.group_name }}</title>
+  {% endif %}
+  <link rel="icon" href="{% static 'logos/logo.gif' %}" />
 
-    {% block common_css %}
-        {% include "common_css.html" %}
-    {% endblock common_css %}
+  {% block common_css %}
+    {% include "common_css.html" %}
+  {% endblock common_css %}
 
-    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+  <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
 
+  <style>
+    /* Base layout */
+    body, html {
+      margin: 0;
+      align-items: center;
+      justify-content: center;
+    }
 
-    <style>
-        body, html {
-        
-        margin: 0;
-        
-        align-items: center;
-        justify-content: center;
-        }
+    .row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
 
-        .row {
+    .app-body {
+      justify-content: center;
+      margin-left: 15%;
+      margin-right: 15%;
+    }
+
+    @media (max-width: 760px) {
+      .app-body {
+        margin-left: 5%;
+        margin-right: 5%;
+      }
+    }
+
+    /* Buttons */
+    .btn-container {
+      text-align: center;
+    }
+
+    .btn {
+      border-radius: 4px;
+      border: 1px solid transparent;
+      color: #000;
+      background-color: #ececec;
+      padding: 3px 16px;
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .btn:hover {
+      background-color: #95ffa5;
+    }
+
+    @media (max-width: 768px) {
+      .btn {
+        width: 100%;
+      }
+    }
+
+    /* Event name column */
+    .event_name_column_content {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: blue;
+      max-width: 200px;
+    }
+
+    /* Select Row Count Dropdown */
+    .num_rows {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 200px;
+    }
+
+    @media screen and (max-width: 500px) {
+      .header_wrap {
         display: flex;
-        justify-content: center;
+        flex-direction: column-reverse;
         align-items: center;
-        height: 100%;
-        }
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-          }
-          .btn-container {
-            text-align: center;
-          }
-          
-          .btn {
-            max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-          }
-          
-          /* Media query for smaller screens (adjust the breakpoint as needed) */
-          @media (max-width: 768px) {
-            .btn {
-              width: 100%; /* Make the button full width on smaller screens */
-            }
-          }
-        
-          .event_name_column_content {
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: blue;
-            max-width: 200px;
-          }
+        gap: 10px;
+      }
 
-          .app-body{
-            justify-content:center; 
-            margin-left:15%;
-            margin-right:15%;
-          }
-          
-          @media (max-width: 760px) {
-              .app-body {
-                  margin-left: 5%;
-                  margin-right: 5%;
-              }
-          }
-          .num_rows{
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            width: 200px;
-          }
-          @media screen and (max-width: 500px){
-            .header_wrap{
-              display: flex;
-              flex-direction: column-reverse;
-              align-items: center;
-              gap: 10px;
-            }
-            .tb_search{
-              width: 100%;
-            }
-          }
+      .tb_search {
+        width: 100%;
+      }
+    }
 
-          /* Banner styles */
-          .banner {
-              background-color: #b4252b;
-              color: white;
-              padding: 10px;
-              text-align: center;
-          }
-      
-          .banner p {
-              margin: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-          }
-      
-          .lock-icon {
-              margin-right: 10px;
-          }
-    </style>
+    /* Banner */
+    .banner {
+      background-color: #b4252b;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .banner p {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lock-icon {
+      margin-right: 10px;
+    }
+
+    /* Search input */
+    #search_input_all {
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      height: 26px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table container */
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table */
+    #table-id {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 15px;
+    }
+
+    #table-id thead th {
+      background-color: #e4e4e4;
+      color: #000;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 2px solid #dee2e6;
+      white-space: nowrap;
+    }
+
+    #table-id tbody td {
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    #table-id tbody tr:nth-child(odd) {
+      background-color: #f9f9f9;
+    }
+
+    #table-id tbody tr:hover {
+      background-color: #f1f1f1;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    #table-id th:first-child,
+    #table-id td:first-child {
+      width: 50px;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
