@@ -17,7 +17,7 @@
       body, html {
       
         margin: 0;
-        
+        background: #fff;
         align-items: center;
         justify-content: center;
       }
@@ -66,7 +66,11 @@
         margin-left:15%;
         margin-right:15%;
       }
-      
+      .graphics-box{
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        padding: 4px;
+        border-radius: 4px;
+      }
       @media (max-width: 760px) {
           .app-body {
               margin-left: 5%;
@@ -103,7 +107,7 @@
               <br>
               <br>
               <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;">{{event_name}}</b></span></h2>
-              <h6>Note:</h6>
+              <h6 style="font-weight: bold; color: #00629B;">Note:</h6>
               <ol style="justify-content:center;margin-bottom:15px;"><b>
                 <li>Provide the drive link of the folder for this event by clicking on the (+) icon</li>
                 <li>You can add as many links as you want, and you can update or delete them</li>
