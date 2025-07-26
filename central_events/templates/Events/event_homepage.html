@@ -288,7 +288,7 @@
                             {% else %}
                             <td><a class="event_name_column_content" style="color:blue;" href="{% url 'chapters_and_affinity_group:event_edit_form' sc_ag_info.primary key.id %}">{{key.event_name }}</a></td>
                             {% endif %}
-                            <td>{{ key.event_organiser.group_name }}</td>
+                            <td>{{ key.event_organiser.short_form }}</td>
                             <td>
                             {% for types in key.event_type.all %}
                               {% if forloop.last %}
