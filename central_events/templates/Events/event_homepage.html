@@ -59,7 +59,7 @@
           }
         
           .event_name_column_content {
-            display: block;
+            display: inline-grid;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -129,7 +129,7 @@
             overflow: auto;
         }
         table th{
-                color: #000;
+                color: rgb(0, 0, 0, .9);
         }
         table tr:nth-child(even) {
             background-color: white; /* Light gray or any color you prefer */
@@ -384,18 +384,22 @@
                         <tr>
                           <td>{{ forloop.counter }}</td>
                             {% if is_branch %}
-                            <td><a class="event_name_column_content" style="color:#00629B;" href="{% url 'central_branch:event_edit_form' key.id %}">{{key.event_name }}</a></td>
+                            <td><a class="event_name_column_content" style="color:#00629B; font-weight: bold;" href="{% url 'central_branch:event_edit_form' key.id %}">{{key.event_name }}</a></td>
                             {% else %}
-                            <td><a class="event_name_column_content" style="color:#00629B;" href="{% url 'chapters_and_affinity_group:event_edit_form' sc_ag_info.primary key.id %}">{{key.event_name }}</a></td>
+                            <td><a class="event_name_column_content" style="color:#00629B; font-weight: bold;" href="{% url 'chapters_and_affinity_group:event_edit_form' sc_ag_info.primary key.id %}">{{key.event_name }}</a></td>
                             {% endif %}
                             <td>{% if key.event_date and key.start_date == None %}{{ key.event_date }}{% else %}{{ key.start_date|date:"M. d, Y"  }}{% endif %}</td>
                             <td>{{ key.event_organiser.short_form }}</td>
                             <td>
                             {% for types in key.event_type.all %}
                               {% if forloop.last %}
-                              {{ types.event_category }} 
+                              <p style="background-color: rgb(0, 156, 166,.2); border-radius: 4px;font-weight: bold; color: rgb(0, 156, 166,.8);">
+                              {{ types.event_category }}
+                              </p> 
                               {% else %}
+                              <p style="background-color: rgb(0, 156, 166,.2); border-radius: 4px;font-weight: bold; color: rgb(0, 156, 166,.8);">
                               {{ types.event_category }},
+                              </p>
                               {% endif %}
                             {% endfor %}
                             </td>
