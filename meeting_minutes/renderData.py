@@ -23,3 +23,7 @@
 #     def add_mm_to_branch(branch_or_society_id,branch_or_society_meeting_title):
 #         ' ' ' This function adds new meeting minutes of the team' ' '
 #         branch_meeting_minutes.objects.filter(branch_or_society_id=branch_or_society_id).update(branch_or_society_meeting_title)  
+
+#     def add_mm_to_branch(branch_or_society_id,branch_or_society_meeting_title):
+#         ' ' ' This function adds new meeting minutes of the team' ' '
+#         branch_meeting_minutes.objects.filter(branch_or_society_id=branch_or_society_id).update(branch_or_society_meeting_title) 
