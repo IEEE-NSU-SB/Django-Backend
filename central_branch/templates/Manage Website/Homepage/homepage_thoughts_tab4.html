@@ -188,7 +188,7 @@
             <i
               class="fas fa-trash delete_thought_btn open_modal_btn"
               data-target="#delete_thought_modal"
-              onclick="delete_thoughts({{thought.id}})"
+              onclick="deletethoughts({{thought.id}})"
               title="Delete"
             ></i>
           </div>
@@ -636,6 +636,16 @@
       }
     });
   }
+
+
+  function deletethoughts(thoughtId) {
+  // For the modal's hidden input
+  var input = document.getElementById('delete_thought_id');
+  if (input) {
+    input.value = thoughtId;
+  }
+}
+
 </script>
 
 {% endblock homepage_thoughts_tab %}
