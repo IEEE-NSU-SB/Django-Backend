@@ -10,6 +10,10 @@
         flex-direction: row;
         align-items: stretch;
     }
+    .slide-up-fade-in:hover{
+        box-shadow: 5px 5px 10px gray;
+        transition: 0.5s;
+    }
 
     .magazine_section .magazine_container .card .magaine_image_content,
     .magazine_section .magazine_container .card .container {
@@ -39,33 +43,16 @@
         margin-bottom: -10px;
     }
 
-    .magazine_section .magazine_container .card .container .hr-dots {
-        display: inline-block;
-        width: 25px;
-        border-style: dotted none none;
-        border-width: 5px;
-        border-color: #002855;
-        margin-left: 0;
-    }
-
-    .magazine_section .magazine_container .card .container .hr-dash {
-        display: inline-block;
-        width: 50px;
-        border-radius: 5px;
-        border: 2.75px solid #002855;
-        margin-left: 1.5px;
-    }
-
     .magazine_section .magazine_container .card .container p {
         font-size: 14px;
     }
 
     .magazine_section .magazine_container .card .container .button {
         margin-top: auto;
-        background-color: #002855; 
+        background-color: #00629B; 
         color: white; 
         transition: 0.5s;
-        border: 2px solid #002855;
+        border: 2px solid #00629B;
         border-radius: 5px;
         font-size: 16px;
         width: 365px;
@@ -75,11 +62,14 @@
     }
 
     .magazine_section .magazine_container .card .container .button:hover {
+        box-shadow:  5px 5px 10px rgba(0, 0, 0, 2);
+
         background-color: white;
-        color: #002855;
+        color: #00629B;
     }
 
     .magazines .slide-up-fade-in {
+        border-radius: 25px;
         animation: slide-up-fade-in ease 1s;
         animation-iteration-count: 1;
         transform-origin: 50% 50%;
@@ -150,7 +140,7 @@
 
         .magazine_section .magazine_container .card .container .button:hover {
             background-color: white;
-            color: #002855;
+            color: #00629B;
         }
 
         .magazine_section .magazine_container .card .magaine_image_content {
