@@ -76,6 +76,7 @@ from django.views import View
 from task_assignation.models import *
 import re
 from email.utils import getaddresses, parseaddr, parsedate_to_datetime
+from main_website.models import MediaToggle
 
 # Create your views here.
 logger=logging.getLogger(__name__)
@@ -1129,9 +1130,23 @@ def manage_website_homepage(request):
             if(user_data==False):
                 return DatabaseError
             
-            
+            toggle, created = MediaToggle.objects.get_or_create(id=1)
             # Getting Form response
             if request.method=="POST":
+                
+                # --- Handle Media Toggle Switch ---
+                
+
+                # Get or create media toggle instance
+                
+
+                # Handle toggle form POST
+                if request.POST.get('media_type'):
+                    selected_media = request.POST.get('media_type', 'image')
+                    toggle.media_type = selected_media
+                    toggle.save()
+                    messages.success(request, f"Media type changed to {selected_media}")
+                    return redirect('central_branch:manage_website_home')
 
                 # To delete an item
                 if request.POST.get('delete'):
@@ -1258,6 +1273,7 @@ def manage_website_homepage(request):
                 'bannerPictureWithNumbers':existing_banner_picture_with_numbers,
                 'media_url':settings.MEDIA_URL,
                 'all_thoughts':all_thoughts,
+                'selected_type': toggle.media_type,
                 # 'insb_members':get_all_insb_members,
                 # 'volunteer_of_the_month_form':volunteer_of_the_month_form,
                 # 'all_volunteer_of_month':volunteers_of_the_month,

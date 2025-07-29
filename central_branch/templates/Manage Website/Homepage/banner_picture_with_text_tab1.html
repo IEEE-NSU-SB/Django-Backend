@@ -458,25 +458,31 @@
 </style>
 <div id="tab1" class="tab-content container">
         <!-- <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2> -->
-        <div style="margin-top:12px;">  
-            <div class="add_btn_container" style="display: flex; justify-content: space-between; align-items:center;flex-wrap: wrap; gap: 14px;">
-                  <div class="toggle-wrapper">
-                        <label class="toggle-label">Show</label>
-                        <div class="toggle-options">
-                        <input type="radio" id="showImage" name="showOption" checked>
-                        <label class="option image" for="showImage" style="margin-right: 4px;">
-                            <span class="dot"></span>
-                            Image
-                        </label>
-                        <input type="radio" id="showVideo" name="showOption">
-                        <label class="option video" for="showVideo">
-                            <span class="dot"></span>
-                            Video
-                        </label>
-                        </div>
-                    </div>
-                <button class="add-image open_modal_btn" data-target="#add_img_modal">Add Image</button>
-            </div>
+    <div class="add_btn_container" style="display: flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 14px;">
+  
+            <!-- Media Toggle Form -->
+            <form method="POST" id="mediaToggleForm" style="display: flex; align-items: center;">
+                {% csrf_token %}
+                <div class="toggle-wrapper">
+                <label class="toggle-label">Show</label>
+                <div class="toggle-options">
+                    <input type="radio" id="showImage" name="media_type" value="image" {% if selected_type == "image" %}checked{% endif %}>
+                    <label class="option image" for="showImage" style="margin-right: 4px;">
+                    <span class="dot"></span>
+                    Image
+                    </label>
+                    <input type="radio" id="showVideo" name="media_type" value="video" {% if selected_type == "video" %}checked{% endif %}>
+                    <label class="option video" for="showVideo">
+                    <span class="dot"></span>
+                    Video
+                    </label>
+                </div>
+                </div>
+            </form>
+
+            <!-- Add Image Button -->
+            <button class="add-image open_modal_btn" data-target="#add_img_modal">Add Image</button>
+    </div>
             <!-- <div class="btn-container">
             <button class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add New Image and Text in Top Banner</button>
             </div> -->
@@ -1182,6 +1188,15 @@
 
   window.addEventListener('resize', updateCarousel);
   window.addEventListener('load', updateCarousel);
+
+    document.querySelectorAll('input[name="media_type"]').forEach(input => {
+        input.addEventListener('change', () => {
+        document.getElementById('mediaToggleForm').submit();
+        });
+    });
+
+
+
 </script>
 
 {% endblock banner_picture_text_tab %}

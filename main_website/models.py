@@ -34,6 +34,17 @@ class HomePageTopBanner(models.Model):
     def __str__(self) -> str:
         return str(self.pk)
 
+#for select between image and video in homepage    
+class MediaToggle(models.Model):
+    MEDIA_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+    media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES, default='image')
+
+    def __str__(self):
+        return self.media_type    
+
 #Table for Ribbon Picture
 class BannerPictureWithStat(models.Model):
 
