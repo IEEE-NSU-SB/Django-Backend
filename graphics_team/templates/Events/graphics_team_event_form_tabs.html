@@ -1,43 +1,95 @@
 {% load static %}
 {% block graphics_team_event_form_tabs %}
 <style>
-    .tab a.active{
-        color:green;
-        background-color:yellow;
+    .graphics-sub-tabs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        border-radius: 6px;
+        list-style: none;
+        margin: 0;
+        flex-wrap: wrap;
     }
-    .tabs li:hover{
+
+    .graphics-sub-tabs li {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 20px;
+        background-color: transparent;
+        color: #333333b7;
+        cursor: pointer;
         transition: all 0.3s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        width: 100px;
+    }
+
+    .graphics-sub-tabs li a {
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .graphics-sub-tabs li.active_tab {
+        background-color: rgba(0, 40, 85, 0.9);
+        color: white;
+        border-radius: 6px;
+    }
+
+    .graphics-sub-tabs li:hover {
+        background-color: #00629b3b;
+        color: #002855db;
+    }
+
+    @media (max-width: 768px) {
+        .graphics-sub-tabs {
+            width: 100%;
+        }
+
+        .graphics-sub-tabs li {
+            width: 100%;
+        }
     }
 </style>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Get the current page's URL
         const currentPageUrl = window.location.href;
-      
-        // Find the links in the navigation bar
-        const tabs = document.querySelectorAll(".tabs li");
-      
-        // Loop through the tabs and add a "active" class to the matching tab
-        tabs.forEach(function (tab) {
-          const link = tab.querySelector("a");
-          if (link.href === currentPageUrl) {
-            link.classList.add("active");
-          }
-          
-          // Add click event listener to the entire tab
-          tab.addEventListener("click", function() {
-            window.location.href = link.href;
-          });
+        const tabs = document.querySelectorAll(".graphics-sub-tabs li");
+
+        tabs.forEach(tab => {
+            const link = tab.querySelector("a");
+
+            if (link && currentPageUrl.includes(link.getAttribute("href"))) {
+                tabs.forEach(t => t.classList.remove("active_tab"));
+                tab.classList.add("active_tab");
+            }
+
+            tab.addEventListener("click", function (e) {
+                e.preventDefault();
+                tabs.forEach(t => t.classList.remove("active_tab"));
+                tab.classList.add("active_tab");
+                if (link) window.location.href = link.href;
+            });
         });
     });
 </script>
 
-<div class="tabs-container" style="display: flex; flex-direction: column;">
-    <ul class="tabs" style="display: flex; margin-right: 0px; justify-content: center;">
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <ul class="graphics-sub-tabs">
         <li class="tab"><a href="{% url 'graphics_team:event_form' event_id %}">Banner</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'graphics_team:add_link_event_form' event_id %}">Add Links</a></li>
+        <li class="tab"><a href="{% url 'graphics_team:add_link_event_form' event_id %}">Add Links</a></li>
     </ul>
     <br>
 </div>
-
 {% endblock graphics_team_event_form_tabs %}

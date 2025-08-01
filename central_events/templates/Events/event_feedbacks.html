@@ -19,8 +19,6 @@
         {% include "common_css.html" %}
     {% endblock common_css %}
 
-    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
-
     <style>
 
         body, html {
@@ -49,13 +47,74 @@
             font-size: 16px; /* Adjust the font size as needed */
         }
         
-        /* Media query for smaller screens (adjust the breakpoint as needed) */
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%; /* Make the button full width on smaller screens */
-            }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+            /* width: 200px; */
         }
 
+        table{
+            max-height: 50px;
+            overflow: auto;
+        }
+        table th{
+                color: #000;
+        }
+        table tr:nth-child(even) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+        table tr:nth-child(odd) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+        .table-responsive{
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        .table-responsive th{
+            position: sticky;
+            top: -2px;
+        }
+        .table_box{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .feedback-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 6px;
+            margin-bottom: 0;
+        }
+        
+        .feedback-table th, .feedback-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .feedback-table th {
+            background-color: #f0f0f0;
+        }
+        
+        .feedback-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .feedback-search-showRows-box{
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: .5rem;
+        }
         .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
             max-width: 80%; 
             height: 90%; 
@@ -67,16 +126,37 @@
             }
         }
         
-        .app-body{
+        /* .app-body{
             justify-content:center; 
             margin-left:15%;
             margin-right:15%;
-        }
+        } */
         
         @media (max-width: 760px) {
             .app-body {
                 margin-left: 5%;
                 margin-right: 5%;
+            }
+            .btn {
+                width: 100%;
+            }
+            .table-responsive{
+                overflow-x: scroll;
+                width: 500px;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .table-responsive{
+                width: 400px;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            .table-responsive{
+                width: 350px;
+            }
+            .container{
+                margin: auto;
+                width: 100%;
             }
         }
     </style>
@@ -96,7 +176,7 @@
         <!-- aside end -->
   
         <!-- navbar content -->
-        <div id="content" class="app-content box-shadow-z0" role="main">
+        <div id="content" class="app-content box-shadow-z0" style="background-color: white; height: 110vh;" role="main">
             {% if is_branch %}
               {% block navbar %}
                   {% include 'navbar.html' %}
@@ -112,8 +192,7 @@
         <!-- ############ PAGE START-->
         <div ui-view class="app-body" id="view">
                 
-            <div class="container">
-                <br>
+            <!-- <div class="container">
                 <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span
                     style="color:#00629B;">{{event_name}}</b></span></h2><br>
                 
@@ -122,7 +201,7 @@
                     <li>Add NOTE</li>
                 </ol></b>
 
-                <br> {% endcomment %}
+                <br> {% endcomment %} -->
 
                 <!--for error messages-->
                 <div class="container">
@@ -141,8 +220,8 @@
                 </div>
                 <!--for error messages end-->
 
-                <br>
-            </div>
+                <!-- <br>
+            </div> -->
 
 
             <br>  

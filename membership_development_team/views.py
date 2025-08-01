@@ -1,5 +1,7 @@
+import json
 from django.shortcuts import render,redirect
-from django.db import DatabaseError, IntegrityError, InternalError
+from django.db import DatabaseError
+from system_administration.system_logs import System_Logs
 import users
 from users.models import MemberSkillSets, Members
 from port.models import Teams
@@ -15,7 +17,6 @@ from django.http import JsonResponse, HttpResponse,HttpResponseBadRequest,HttpRe
 from datetime import datetime
 import xlwt
 from django.contrib import messages
-from django.urls import reverse
 from port.models import Roles_and_Position,Teams
 from django.conf import settings
 from system_administration.render_access import Access_Render
@@ -68,7 +69,7 @@ def md_team_homepage(request):
 @member_login_permission
 def insb_members_list(request):
 
-    # try:
+    try:
 
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -108,10 +109,10 @@ def insb_members_list(request):
         else:
             return render(request,'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
         
-    # except Exception as e:
-    #     logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-    #     ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
-    #     return cv.custom_500(request)
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
 
 @login_required
 @member_login_permission
@@ -489,8 +490,8 @@ def membership_renewal_form(request,pk):
                     #get_ieee_id=Members.objects.filter(email_personal=email_personal).values_list('ieee_id')
                     
                     try:
-                        #encrypted_pass=renewal_data.encrypt_password(password=password)
-                        renewal_instance=Renewal_requests(timestamp=datetime.now(),session_id=Renewal_Sessions.objects.get(id=pk,session_name=session_name),ieee_id=ieee_id,nsu_id=nsu_id,name=name,contact_no=contact_no,email_associated=email_associated,email_ieee=email_ieee,ieee_account_password=password,ieee_renewal_check=ieee_renewal,pes_renewal_check=pes_renewal,ras_renewal_check=ras_renewal,ias_renewal_check=ias_renewal,wie_renewal_check=wie_renewal,transaction_id=transaction_id,comment=comment,renewal_status=False,view_status=False)
+                        renewal_instance=Renewal_requests(timestamp=datetime.now(),session_id=Renewal_Sessions.objects.get(id=pk,session_name=session_name),ieee_id=ieee_id,nsu_id=nsu_id,name=name,contact_no=contact_no,email_associated=email_associated,email_ieee=email_ieee,ieee_renewal_check=ieee_renewal,pes_renewal_check=pes_renewal,ras_renewal_check=ras_renewal,ias_renewal_check=ias_renewal,wie_renewal_check=wie_renewal,transaction_id=transaction_id,comment=comment,renewal_status=False,view_status=False)
+                        renewal_instance.set_ieee_account_password(password)
                         renewal_instance.save()
                         
                         # Send mail upon form submission to users IEEE Account Associated mail
@@ -728,7 +729,6 @@ def renewal_request_details(request,pk,request_id):
 
     try:
         #check if the user has access to view
-        print(f"here the pk is{pk}")
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
         sc_ag=PortData.get_all_sc_ag(request=request)
@@ -736,13 +736,13 @@ def renewal_request_details(request,pk,request_id):
         user=request.user
         has_access=(renderData.MDT_DATA.renewal_data_access_view_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username))
         
-        renewal_request_details=Renewal_requests.objects.filter(id=request_id).values('timestamp','name','ieee_id','nsu_id','email_associated','email_ieee','ieee_account_password','ieee_renewal_check','pes_renewal_check','ras_renewal_check','ias_renewal_check','wie_renewal_check','transaction_id','renewal_status','contact_no','comment','official_comment')
-        name=renewal_request_details[0]['name']
+        renewal_request_details=Renewal_requests.objects.filter(id=request_id)
+        name=renewal_request_details[0].name
 
         has_comment=False
         for i in range(len(renewal_request_details)):
-            ieee_id=renewal_request_details[i]['ieee_id']
-            if(renewal_request_details[i]['official_comment'] is not None):
+            ieee_id=renewal_request_details[i].ieee_id
+            if(renewal_request_details[i].official_comment is not None):
                 has_comment=True
         #changing the viewing status
         Renewal_requests.objects.filter(id=request_id).update(view_status=True)
@@ -789,6 +789,7 @@ def renewal_request_details(request,pk,request_id):
             'all_sc_ag':sc_ag,
             'id':request_id,
             'details':renewal_request_details,
+            'masked_password':Renewal_requests.masked_password(),
             'has_comment':has_comment,
             'has_next_request':has_next_request,
             'next_request_id':next_request_id,
@@ -926,7 +927,7 @@ def generateExcelSheet_renewal_requestList(request,session_id):
             font_style.font.bold = True
 
             # Defining columns that will stay in the first row
-            columns = ['Name','IEEE ID', 'Associated Email','IEEE Email','Contact No', 'IEEE Account Password', 'IEEE-Renewal', 'PES-Renewal', 'RAS-Renewal','IAS-Renewal','WIE-Renewal','Transaction ID','Any Comments?',
+            columns = ['Name','IEEE ID', 'Associated Email','IEEE Email','Contact No', 'IEEE-Renewal', 'PES-Renewal', 'RAS-Renewal','IAS-Renewal','WIE-Renewal','Transaction ID','Any Comments?',
                     'Renewal Status','MDT Comment']
 
             # Defining first column
@@ -942,7 +943,6 @@ def generateExcelSheet_renewal_requestList(request,session_id):
                                                     'email_associated',
                                                     'email_ieee',
                                                     'contact_no',
-                                                    'ieee_account_password',
                                                     'ieee_renewal_check','pes_renewal_check','ras_renewal_check','ias_renewal_check','wie_renewal_check',
                                                     'transaction_id',
                                                     'comment',
@@ -992,7 +992,7 @@ def generateExcelSheet_membersList(request):
             font_style.font.bold = True
 
             # Defining columns that will stay in the first row
-            columns = ['IEEE ID','NSU ID', 'Name', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
+            columns = ['IEEE ID','NSU ID', 'Name', 'Current Team', 'Current Position', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
                     'Facebook URL']
 
             # Defining first column
@@ -1006,6 +1006,8 @@ def generateExcelSheet_membersList(request):
             rows = Members.objects.all().values_list('ieee_id',
                                                     'nsu_id',
                                                     'name',
+                                                    'team__team_name',
+                                                    'position__role',
                                                     'email_ieee',
                                                     'email_personal',
                                                     'school',
@@ -1015,7 +1017,7 @@ def generateExcelSheet_membersList(request):
                                                     'home_address',
                                                     'date_of_birth',
                                                     'gender',
-                                                    'facebook_url').order_by('position')
+                                                    'facebook_url').order_by('-position')
             for row in rows:
                 row_num += 1
                 for col_num in range(len(row)):
@@ -1495,3 +1497,29 @@ def site_registration_faculty_confirmation(request):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
+
+@login_required
+@member_login_permission
+def request_password(request):
+
+    if request.method == "POST":
+        try:
+            has_access=(renderData.MDT_DATA.renewal_data_access_view_control(request.user.username) or Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username))
+            if has_access:
+                data = json.loads(request.body)
+                request_id = data.get("request_id")
+                request_obj = Renewal_requests.objects.get(id=request_id)
+                
+                decrypted_password = request_obj.get_decrypted_ieee_account_password()
+                
+                System_Logs.save_logs(request_obj, 'request', message=f'{request.user.username} requested for password of reg_id={request_id}')
+
+                return JsonResponse({"success": True, "decrypted_password": decrypted_password})
+            else:
+                return JsonResponse({"success": False, "error": "You do not have authorization to view this resource"})
+        except Renewal_requests.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Request not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    else:
+        return JsonResponse({"success": False, "error": "Invalid request method"}, status=400)

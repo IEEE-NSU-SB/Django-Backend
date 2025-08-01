@@ -5,12 +5,12 @@
 <head>
 
     <title>{{team.team_name}} - IEEE NSU SB</title>
-    <link rel="icon" href="{% static 'upload/logo.gif' %}" />
+    <link rel="icon" href="{% static 'upload/logo.gif' %}"/>
     <meta name="mobile-web-app-capable" content="yes">
 
     <!--Common CSS-->
     {% block common_css %}
-    {% include "common_css_includes.html" %}
+        {% include "common_css_includes.html" %}
     {% endblock common_css %}
 
     <!--Extra CSS-->
@@ -95,14 +95,11 @@
             justify-items: center;
             max-width: 1140px;
         }
-
-        .coordinatorDiv {
-            display: flex;
-            justify-content: center;
-        }
-
         @media screen and (max-width: 800px) {
-            .startingDiv {}
+            .startingDiv{
+                grid-template-columns: 1fr;
+                justify-items: center;
+            } 
         }
     </style>
 </head>
