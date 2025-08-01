@@ -3,21 +3,16 @@
 {% block news_card_container %}
 
 <style>
-
-    {% comment %} .achievement_card{
-        height: 425px;
-    } {% endcomment %}
-
     .card-img-top {
         object-fit: cover;
-        height: 250px; /* Set a fixed height for the image */
+        height: 200px; 
     }
 
     .card-title {
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 2; /* Show 2 lines of text */
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
     }
 
@@ -29,67 +24,124 @@
         -webkit-box-orient: vertical;
     }
 
-    .description-container.collapsed,
-    .card-title.collapsed {
+    .description-container.expanded,
+    .card-title.expanded {
         -webkit-line-clamp: unset;
     }
+
+    .news_card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        height: 360px;
+        transition: height 0.3s ease;
+    }
+
+    .news_card.expanded {
+        height: 1000px; 
+    }
+    
+    .read-more-link {
+        color: rgb(0, 40, 85, .75);
+        transition: all .3s ease-in-out;
+        position: absolute;
+        bottom: 5px;
+    }
+    .read-more-link :hover{
+        color: rgb(0, 40, 85);
+    }
+    #loadMore {
+        color: rgba(0, 40, 85, 0.75);
+        border-color: rgba(0, 40, 85, 0.75);
+    }
+    #loadMore:hover {
+        color: #fff;
+        background-color: rgba(0, 40, 85, 0.75);
+    }
+
+
 </style>
+
 <div class="container">
     <div class="row m-0">
 
-        <!-- Repeat the card -->
         {% for i in all_news %}
         <div class="col-lg-4 col-md-6 col-sm-12 mt-5 content">
-            <div class="card shadow achievement_card">
-                <a href="{% url 'main_website:news_description' i.pk %}"><img class="card-img-top" src="/media_files/{{i.news_picture}}" alt="news_thumbnail"></a>
+            <div class="card shadow news_card">
+                <a href="{% url 'main_website:news_description' i.pk %}">
+                    <img class="card-img-top" src="/media_files/{{i.news_picture}}" alt="news_thumbnail">
+                </a>
 
                 <div class="card-body">
-                    <a href="{% url 'main_website:news_description' i.pk %}"><h5 class="card-title fw-bold mt-2">{{i.news_title}}<br></h5></a>
-                    <div class="description-container">
+                    <a href="{% url 'main_website:news_description' i.pk %}">
+                        <h5 class="card-title fw-bold mt-2 collapsed">{{i.news_title}}<br></h5>
+                    </a>
+                    <div class="description-container collapsed">
                         <p class="card-text">{{i.news_description|safe}}</p>
                     </div>
-                    <a href="#" class="read-more-link" >Read More</a>
-
-                    
+                    <a href="#" class="read-more-link">Read More</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
+
 <br><br>
 <div class="text-center">
-    <div class="btn btn-outline-primary px-5 py-2 mb-5"  id="loadMore">Load more</div>
+    <div class="btn btn-outline-primary px-5 py-2 mb-5" id="loadMore">Load more</div>
 </div>
+
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Accordion + toggle -->
 <script>
-    $(document).ready(function () {
-        $(".read-more-link").click(function (event) {
-            event.preventDefault();
+$(document).ready(function () {
+    $(".read-more-link").click(function (event) {
+        event.preventDefault();
 
-            var cardBody = $(this).closest(".card-body");
-            var cardText = cardBody.find(".description-container");
-            var cardTitle = cardBody.find(".card-title");
-            var card = cardBody.closest(".card");
+        var clickedCard = $(this).closest(".news_card");
+        var cardBody = clickedCard.find(".card-body");
+        var cardText = clickedCard.find(".description-container");
+        var cardTitle = clickedCard.find(".card-title");
+        var isExpanded = clickedCard.hasClass("expanded");
 
-            cardText.toggleClass("collapsed");
-            cardTitle.toggleClass("collapsed");
-
-            // Check if any card text is collapsed
-            var isCollapsed = card.find(".description-container.collapsed").length > 0;
-
-            // Set card height based on collapsed state
-            card.css("height", isCollapsed ? "auto" : "425px");
-
-            // Change the link text based on collapsed state
-            var linkText = isCollapsed ? "Read Less" : "Read More";
-            $(this).text(linkText);
+        // Collapse all cards
+        $(".news_card").each(function () {
+            var card = $(this);
+            card.removeClass("expanded").css("height", "360px");
+            card.find(".description-container").removeClass("expanded").addClass("collapsed");
+            card.find(".card-title").removeClass("expanded").addClass("collapsed");
+            card.find(".read-more-link").text("Read More");
         });
+
+        if (!isExpanded) {
+            cardText.removeClass("collapsed").addClass("expanded");
+            cardTitle.removeClass("collapsed").addClass("expanded");
+            clickedCard.addClass("expanded");
+
+            // Temporarily set height to auto to measure
+            clickedCard.css("height", "auto");
+            var fullHeight = clickedCard[0].scrollHeight;
+
+            // Reset to 360px then animate to full height
+            clickedCard.css("height", "360px");
+            setTimeout(function () {
+                clickedCard.css("height", fullHeight + "px");
+            }, 10);
+
+            $(this).text("Read Less");
+        }
     });
+});
 </script>
-    <!-- News load more script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+
+
+<!-- Load More -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
         var contents = document.getElementsByClassName("content");
         var loadMore = document.getElementById("loadMore");
 
@@ -98,24 +150,22 @@
 
         function showNextItems() {
             for (var i = startIndex; i < startIndex + itemsToShow; i++) {
-            if (contents[i]) {
-                contents[i].classList.add('d-block')
-            }
+                if (contents[i]) {
+                    contents[i].classList.add('d-block');
+                }
             }
             startIndex += itemsToShow;
-            
+
             if (startIndex >= contents.length) {
-            loadMore.textContent = "No Content";
-            loadMore.classList.add("noContent");
-            loadMore.removeEventListener("click", showNextItems);
+                loadMore.textContent = "No Content";
+                // loadMore.classList.add("noContent");
+                loadMore.removeEventListener("click", showNextItems);
             }
         }
 
         loadMore.addEventListener("click", showNextItems);
-
         showNextItems();
-        });
-
-    </script>
+    });
+</script>
 
 {% endblock news_card_container %}

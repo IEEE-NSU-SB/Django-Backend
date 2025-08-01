@@ -1241,7 +1241,7 @@ class Branch:
             for i in events:
                 all_collaborations_for_this_event = InterBranchCollaborations.objects.filter(event_id = i.id)
                 for j in all_collaborations_for_this_event:
-                    collaborations.append(j.collaboration_with.group_name)  
+                    collaborations.append(j.collaboration_with.short_form)  
                 dic.update({i:collaborations})
                 collaborations=[]
                 

@@ -276,6 +276,7 @@ CELERY_TASK_SERIALIZER = 'json'
 # }
 
 NEWS_API_KEY=os.environ.get('NEWS_API_KEY')
+ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY")
 
 if(os.environ.get('SETTINGS')=='prod'):
     GOOGLE_CLOUD_CLIENT_ID=os.environ.get('GOOGLE_CLOUD_CLIENT_ID')

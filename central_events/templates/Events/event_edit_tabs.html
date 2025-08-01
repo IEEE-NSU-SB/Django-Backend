@@ -1,22 +1,54 @@
 {% load static %}
 {% block event_edit_tab %}
 <style>
-    .tab a.active {
-        color: green;
-        background-color: yellow;
+    /* Unified tab styles with homepage styling */
+    .event-edit-tabs {
+        display: grid;
+        grid-template-columns: repeat(7,1fr);
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        border-radius: 6px;
+        list-style: none;
+        margin: 0;
+        width: 100%;
     }
 
-    .tabs li:hover {
+    .event-edit-tabs li {
+        padding: 5px 0px;
+        border: none;
+        border-radius: 20px;
+        background-color: transparent;
+        color: #333333b7;
+        cursor: pointer;
         transition: all 0.3s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* width: 150px; */
     }
-    @media screen and (max-width: 524px){
-        .tabs{
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
+
+    .event-edit-tabs li a {
+        text-decoration: none;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
     }
-    .google_calendar_btn{
+
+    .event-edit-tabs li.active_tab {
+        background-color: rgb(0, 40, 85, 0.9);
+        color: #ffffff;
+        border-radius: 6px;
+    }
+
+    .event-edit-tabs li:hover {
+        background-color: #00629b3b;
+        color: #002855db;
+        border-radius: 6px;
+    }
+
+    /* .google_calendar_btn {
         margin: 0;
         text-align: center;
         padding: 10px;
@@ -24,81 +56,99 @@
         width: 150px;
         color: #f0f0f0;
         background: #2a9d8f;
-        /* font-weight: bold; */
         border-radius: 3rem;
         border: 1px solid #2a9d8f;
         transition: all .3s ease-in-out;
     }
-    .google_calendar_btn:hover{
+        
+    .google_calendar_btn:hover {
+        color: #2a9d8f;
+        background: #f0f0f0;
+        } */
+        
+    .btn_active {
         color: #2a9d8f;
         background: #f0f0f0;
     }
-    .btn_active{
-        color: #2a9d8f;
-        background: #f0f0f0;
+    
+    @media screen and (max-width: 1024px) {
+        .event-edit-tabs {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media screen and (max-width: 524px) {
+        .event-edit-tabs {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .event-edit-tabs li {
+            width: 100%;
+        }
+
+        .event-edit-tabs {
+            grid-template-columns: repeat(1, 1fr);
+        }
+        /* .google_calendar_btn {
+            width: 100%;
+        } */
     }
 </style>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Get the current page's URL
         const currentPageUrl = window.location.href;
+        const tabs = document.querySelectorAll(".event-edit-tabs li");
+        // const calendarBtn = document.querySelector('.google_calendar_btn');
 
-        // Find the links in the navigation bar
-        const tabs = document.querySelectorAll(".tabs li");
-
-        // Loop through the tabs and add a "active" class to the matching tab
-        tabs.forEach(function (tab) {
+        // Clear all active states and add based on current URL
+        tabs.forEach(tab => {
             const link = tab.querySelector("a");
 
-            // Check if the URL contains "/graphics" or "/graphics/links"
-            if (currentPageUrl.includes("/graphics") || currentPageUrl.includes("/graphics/links")) {
-                // If it does, set the "Graphics" tab as active
-                tabs[2].querySelector("a").classList.add("active");
+            // Check if link matches current URL
+            if (link && currentPageUrl.includes(link.getAttribute("href"))) {
+                tabs.forEach(t => t.classList.remove("active_tab")); // Remove all
+                tab.classList.add("active_tab");
             }
 
-            const buttons = document.querySelectorAll('.google_calendar_btn');
-        
-            buttons.forEach(button => {
-                const link = button.querySelector('a').href;
-                
-                if (currentPageUrl.includes("/google_calendar")) {
-                    button.classList.add('btn_active');
-                } else {
-                    button.classList.remove('btn_active');
-                }
-            });
+            // Add navigation and manual activation on click
+            tab.addEventListener("click", function (e) {
+                e.preventDefault(); // Prevent immediate navigation
 
-            // Add click event listener to the entire tab
-            tab.addEventListener("click", function () {
-                window.location.href = link.href;
+                tabs.forEach(t => t.classList.remove("active_tab")); // Remove all
+                tab.classList.add("active_tab"); // Add to clicked
+                if (link) window.location.href = link.href; // Then navigate
             });
         });
+
+        // Activate Google Calendar button
+        // if (calendarBtn && currentPageUrl.includes("/google_calendar")) {
+        //     calendarBtn.classList.add('btn_active');
+        // }
     });
 </script>
 
-<div class="tabs-container" style="display: flex; flex-direction: column;">
-    <ul class="tabs" style="display: flex; margin-right: 0px; justify-content: center;">
+
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <ul class="event-edit-tabs">
         {% if is_branch %}
-        <li class="tab"><a href="{% url 'central_branch:event_edit_form' event_id %}">Edit</a></li>
-        <li class="tab"><a href="{% url 'central_branch:event_edit_media_form_tab' event_id%}">Media</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_edit_graphics_form_tab' event_id%}">Graphics</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_edit_content_form_tab' event_id%}">Content</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_edit_budget_form_tab' event_id%}">Budget</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:event_feedback' event_id%}">Feedbacks</a></li>
-        <div style="border-left: 10px solid transparent;"></div>
-        <p class="google_calendar_btn"><a href="{% url 'central_branch:google_calendar' event_id %}">Google Calendar</a></p>
+            <li class="tab"><a href="{% url 'central_branch:event_edit_form' event_id %}">Edit</a></li>
+            <li class="tab"><a href="{% url 'central_branch:event_edit_media_form_tab' event_id %}">Media</a></li>
+            <li class="tab"><a href="{% url 'central_branch:event_edit_graphics_form_tab' event_id %}">Graphics</a></li>
+            <li class="tab"><a href="{% url 'central_branch:event_edit_content_form_tab' event_id %}">Content</a></li>
+            <li class="tab"><a href="{% url 'central_branch:event_edit_budget_form_tab' event_id %}">Budget</a></li>
+            <li class="tab"><a href="{% url 'central_branch:event_feedback' event_id %}">Feedbacks</a></li>
+            <li class="tab"><a href="{% url 'central_branch:google_calendar' event_id %}">Google Calendar</a></li>
         {% else %}
-        <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_form' primary event_id %}">Edit</a></li>
-        <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_media_form_tab' primary event_id%}">Media</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'chapters_and_affinity_group:event_edit_graphics_form_tab' primary event_id%}">Graphics</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'chapters_and_affinity_group:event_edit_content_form_tab' primary event_id%}">Content</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'chapters_and_affinity_group:event_edit_budget_form_tab' primary event_id %}">Budget</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'chapters_and_affinity_group:event_feedback' primary event_id%}">Feedbacks</a></li>
-        <div style="border-left: 10px solid transparent;"></div>
-        <p class="google_calendar_btn"><a href="{% url 'chapters_and_affinity_group:google_calendar' primary event_id %}">Google Calendar</a></p>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_form' primary event_id %}">Edit</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_media_form_tab' primary event_id %}">Media</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_graphics_form_tab' primary event_id %}">Graphics</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_content_form_tab' primary event_id %}">Content</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_edit_budget_form_tab' primary event_id %}">Budget</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:event_feedback' primary event_id %}">Feedbacks</a></li>
+            <li class="tab"><a href="{% url 'chapters_and_affinity_group:google_calendar' primary event_id %}">Google Calendar</a></li>
         {% endif %}
     </ul>
     <br>
 </div>
-
 {% endblock event_edit_tab %}

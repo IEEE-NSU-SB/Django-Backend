@@ -7,6 +7,8 @@ import os
 from central_branch.renderData import Branch
 from central_branch.views import custom_500
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
+from finance_and_corporate_team.genPDF import BudgetPDF
+from main_website.models import Toolkit
 from meeting_minutes.manage_access import MM_Render_Access
 from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.system_error_handling import ErrorHandling
@@ -20,7 +22,14 @@ from users.models import Members, Panel_Members
 from users.renderData import member_login_permission
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
-
+from django.db.models import OuterRef, Subquery
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_JUSTIFY
 
 from port.renderData import PortData
 # from . import renderData
@@ -52,7 +61,7 @@ def meeting_minutes_homepage(request, primary=None, team_primary=None):
                     meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=team_primary).order_by('-meeting_date')
                     has_meeting_minutes_create_access = MM_Render_Access.has_meeting_minutes_create_access(request, sc_ag_primary=1, team_primary=team_primary)
                 else:
-                    meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=None).order_by('-meeting_date')
+                    meetings = MeetingMinutes.objects.filter(sc_ag__primary=1, team__primary=1).order_by('-meeting_date')
                     has_meeting_minutes_create_access = MM_Render_Access.has_meeting_minutes_create_access(request, sc_ag_primary=1)
 
             team_namespace = None
@@ -122,6 +131,9 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
                 guest = request.POST.get('guest')
                 written_by = request.POST.get('written_by')
                 meeting_name = request.POST.get('meeting_name')
+                
+                if selected_team == None:
+                    selected_team = 1
 
                 if primary:
                     sc_ag = Chapters_Society_and_Affinity_Groups.objects.filter(primary=primary).values('id')[0]['id']
@@ -168,10 +180,10 @@ def meeting_minutes_create(request, primary=None, team_primary=None):
 
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
-                teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=primary, is_active=True).values('primary', 'team_name')
             else:
                 primary = 1
-                teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
+                teams = Teams.objects.filter(team_of__primary=1, is_active=True).values('primary', 'team_name')
 
             context = {
                 'all_sc_ag':sc_ag,
@@ -213,11 +225,12 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             meeting = MeetingMinutes.objects.get(pk=pk)
 
             if request.method == 'POST':
+                edit_url = None
+                if team_primary != None:
+                    team_namespace = get_team_redirect_namespace(team_primary)
+                    edit_url = f'{team_namespace}:meeting_minutes_edit_team'
+
                 if 'save' in request.POST:
-                    edit_url = None
-                    if team_primary != None:
-                        team_namespace = get_team_redirect_namespace(team_primary)
-                        edit_url = f'{team_namespace}:meeting_minutes_edit_team'
 
                     location = request.POST.get('location')
                     start_time = request.POST.get('start_time')
@@ -241,7 +254,21 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                     
                     meeting.save()
                     
-                    
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+
+                    for i in range(len(ieee_ids)):
+                        access = MeetingMinutesAccess.objects.filter(meeting_minutes_id=pk, member=ieee_ids[i])
+                        if access.exists():
+                            if access_types[i] != '':
+                                access.update(access_type=access_types[i])
+                            else:
+                                access.delete()
+                        else:
+                            if access_types[i] != '':
+                                MeetingMinutesAccess.objects.create(meeting_minutes_id=pk, member=Members.objects.get(ieee_id=ieee_ids[i]), access_type=access_types[i])
+
                 elif 'delete' in request.POST:
                     meeting.delete()
                     if primary:
@@ -267,13 +294,44 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
             if primary:
                 get_sc_ag_info = SC_AG_Info.get_sc_ag_details(request,primary)
                 teams = Teams.objects.filter(team_of__primary=primary).values('primary', 'team_name')
-                # current_panel = SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary=primary)
-                # members = Panel_Members.objects.filter(tenure=current_panel[0])
+                current_panel = SC_AG_Info.get_current_panel_of_sc_ag(request, sc_ag_primary=primary)
+                # Subquery to get the access_type for the matching member
+                access_qs = MeetingMinutesAccess.objects.filter(
+                    member=OuterRef('member'),
+                    meeting_minutes=pk
+                ).values('access_type')[:1]  # get first match only
+
+                # Main query: Panel_Members with access_type annotated
+                members = Panel_Members.objects.filter(tenure=current_panel[0]).annotate(
+                    access_type=Subquery(access_qs)
+                )
             else:
                 primary = 1
                 teams = Teams.objects.filter(team_of__primary=1).values('primary', 'team_name')
-                # current_panel = Branch.load_current_panel()
-                # members = Panel_Members.objects.filter(tenure=current_panel)
+                current_panel = Branch.load_current_panel()
+
+                if team_primary != None:
+                    # Subquery to get the access_type for the matching member
+                    access_qs = MeetingMinutesAccess.objects.filter(
+                        member=OuterRef('member'),
+                        meeting_minutes=pk
+                    ).values('access_type')[:1]  # get first match only
+
+                    # Main query: Panel_Members with access_type annotated
+                    members = Panel_Members.objects.filter(tenure=current_panel, team__primary=team_primary).annotate(
+                        access_type=Subquery(access_qs)
+                    )
+                else:
+                    # Subquery to get the access_type for the matching member
+                    access_qs = MeetingMinutesAccess.objects.filter(
+                        member=OuterRef('member'),
+                        meeting_minutes=pk
+                    ).values('access_type')[:1]  # get first match only
+
+                    # Main query: Panel_Members with access_type annotated
+                    members = Panel_Members.objects.filter(tenure=current_panel).annotate(
+                        access_type=Subquery(access_qs)
+                    )
 
             team_namespace = None
             homepage_url = None
@@ -291,7 +349,7 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
                 'homepage_url':homepage_url,
                 'teams':teams,
                 'meeting': meeting,
-                # 'members':members,
+                'members':members,
                 'has_access':has_access
             }
 
@@ -307,99 +365,204 @@ def meeting_minutes_edit(request, pk, primary=None, team_primary=None):
 
 @login_required
 @member_login_permission
-def download_meeting_pdf(request, pk):
+def download_meeting_pdf(request, pk, primary=None):
     try:
         # Fetch the meeting object
         meeting = get_object_or_404(MeetingMinutes, pk=pk)
 
-        # Set up HTTP response headers for PDF download
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'inline; filename="meeting_{pk}.pdf"'
 
-        # Create the PDF canvas
         p = canvas.Canvas(response, pagesize=A4)
         width, height = A4
 
-        # Define margins and spacing
-        top_margin = 50
-        left_margin = 50
+        margin = 50
         line_height = 20
-        y = height - top_margin
+        y = height - 60
 
-        # Draw Logo if it exists
+
+        p.setFont("Helvetica-Bold", 20)
+        p.setFillColor(colors.darkblue)
+
+        sc_ag_name = Chapters_Society_and_Affinity_Groups.objects.filter(primary=(primary if primary else 1)).values('group_name').first()['group_name']
+        style = getSampleStyleSheet()["Normal"]
+        style = ParagraphStyle(style, leading=17, fontName='Helvetica-Bold', fontSize=16, alignment=1, textColor=get_sc_ag_header_color(primary=(int(primary) if primary else 1)))
+
+        # Create a Paragraph with the given text
+        para = Paragraph(sc_ag_name, style)
+
+        # Wrap the text to fit within max_width
+        text_width = min(300, width - 20)  # Limit width
+        wrapped_width, wrapped_height = para.wrap(text_width, 0)  # Get required height
+
+        # Adjust Y so the first line stays in place
+        adjusted_y_position = height - 50 - wrapped_height  # Shift down
+
+        # Center X calculation
+        x_position = (width - wrapped_width) / 2
+
+        # Draw the wrapped text
+        para.drawOn(p, x_position, adjusted_y_position)
+        # p.drawCentredString(width / 2, y, sc_ag_name)
+        y = adjusted_y_position
+        
+        p.setFont("Helvetica-Bold", 16)
+        p.setFillColor(colors.black)
+        p.drawCentredString(width / 2, y-30, "Meeting Minutes")
+        y -= 35
+        
+        branch_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(1)).picture
+        branch_logo_path = settings.MEDIA_ROOT+str(branch_logo)
+        sc_ag_logo_path = None
+
         try:
-            logo_path = os.path.join(settings.BASE_DIR, 'meeting_minutes', 'static', 'images', 'logo.jpg')
-            if os.path.exists(logo_path):
-                p.drawImage(
-                    ImageReader(logo_path),
-                    x=width - 130,
-                    y=height - 130,
-                    width=80,
-                    height=80,
-                    preserveAspectRatio=True,
-                    mask='auto'
-                )
+            if os.path.exists(branch_logo_path):
+                    p.drawImage(
+                        ImageReader(branch_logo_path),
+                        x=margin,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
         except Exception as e:
-            logger.warning(f"Logo could not be loaded: {e}")
+            logger.warning(f"Main Branch logo could not be loaded: {e}")    
+        
+        try:
+            if primary:
+                sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(int(primary))).picture
+                sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
 
-        # Draw Watermark
-        p.saveState()
-        p.setFont("Helvetica-Bold", 40)
-        p.setFillGray(0.9)
-        p.drawCentredString(width / 2, height / 2, "IEEE NSU Student Branch")
-        p.restoreState()
+                if os.path.exists(sc_ag_logo_path):
+                    p.drawImage(
+                        ImageReader(sc_ag_logo_path),
+                        x=width - margin - 50,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
 
-        # Draw Title
-        p.setFont("Helvetica-Bold", 24)
-        p.drawCentredString(width / 2, y, "Meeting Minutes Report")
-        y -= 2 * line_height
+        except Exception as e:
+            logger.warning(f"Sc_AG logo could not be loaded: {e}")
+              
+        y -= 20
+        p.setStrokeColor(colors.darkblue)
+        p.setLineWidth(3)
+        p.line(margin, y, width - margin, y)
+        y -= 30
 
-        # Helper to draw lines
-        def draw_line(label, value):
+        def draw_field(label, value, is_bold=False):
             nonlocal y
-            if y < 50:
-                p.showPage()
-                y = height - top_margin
-            p.setFont("Helvetica", 14)
-            p.drawString(left_margin, y, f"{label}: {value}")
+            font = "Helvetica-Bold" if is_bold else "Helvetica"
+            p.setFont(font, 11)
+            p.drawString(margin, y, f"{label}:")
+            p.setFont("Helvetica", 11)
+            p.drawString(margin + 120, y, str(value))
             y -= line_height
 
-        # Add meeting fields
-        draw_line("Meeting Name", meeting.meeting_name or "N/A")
-        draw_line("Date", meeting.meeting_date.strftime("%Y-%m-%d") if meeting.meeting_date else "N/A")
-        draw_line(
-            "Time",
-            f"{meeting.start_time.strftime('%H:%M')} - {meeting.end_time.strftime('%H:%M')}"
-            if meeting.start_time and meeting.end_time else "N/A"
+        draw_field("Meeting Name", meeting.meeting_name or "N/A", True)
+        draw_field("Date", meeting.meeting_date.strftime("%B %d, %Y") if meeting.meeting_date else "N/A")
+        draw_field("Time", f"{meeting.start_time.strftime('%I:%M %p')} - {meeting.end_time.strftime('%I:%M %p')}"
+                  if meeting.start_time and meeting.end_time else "N/A")
+        draw_field("Location", meeting.location or "N/A")
+        draw_field("Venue", meeting.venue or "N/A")
+        
+        y -= 10
+        
+        total = meeting.total_attendee or 0
+        ieee = meeting.ieee_attendee or 0
+        non_ieee = meeting.non_ieee_attendee or 0
+        draw_field("Attendance", f"Total: {total} (IEEE: {ieee}, Non-IEEE: {non_ieee})", True)
+        
+        y -= 10
+        
+        draw_field("Host", meeting.host or "N/A")
+        draw_field("Co-host", meeting.co_host or "N/A")
+        draw_field("Guest", meeting.guest or "N/A")
+        draw_field("Written by", meeting.written_by or "N/A")
+        
+        y -= 15
+        
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(margin, y, "Agenda:")
+        y -= line_height
+        p.setFont("Helvetica", 10)
+        agenda_text = ", ".join(meeting.agendas) if isinstance(meeting.agendas, list) else (meeting.agendas or "N/A")
+        
+        words = agenda_text.split()
+        line = ""
+        for word in words:
+            if p.stringWidth(line + word, "Helvetica", 10) < width - 2 * margin:
+                line += word + " "
+            else:
+                p.drawString(margin + 20, y, line.strip())
+                y -= 15
+                line = word + " "
+        if line:
+            p.drawString(margin + 20, y, line.strip())
+            y -= 25
+
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(margin, y, "Discussion:")
+        y -= line_height
+        
+        # Create justified paragraph style
+        justified_style = ParagraphStyle(
+            'Justified',
+            fontName='Helvetica',
+            fontSize=10,
+            leading=14,
+            alignment=TA_JUSTIFY,
+            leftIndent=20,
+            rightIndent=20,
+            spaceAfter=10
         )
-        draw_line("Location", meeting.location or "N/A")
-        draw_line("Venue", meeting.venue or "N/A")
-        draw_line("Total Attendees", str(meeting.total_attendee or 0))
-        draw_line("IEEE Attendees", str(meeting.ieee_attendee or 0))
-        draw_line("Non-IEEE Attendees", str(meeting.non_ieee_attendee or 0))
-        draw_line("Agendas", ", ".join(meeting.agendas) if isinstance(meeting.agendas, list) else (meeting.agendas or "N/A"))
-        draw_line("Host", meeting.host or "N/A")
-        draw_line("Co-host", meeting.co_host or "N/A")
-        draw_line("Guest", meeting.guest or "N/A")
-        draw_line("Written by", meeting.written_by or "N/A")
+        
+        # Discussion text formatted as justified paragraphs
+        discussion_text = strip_tags(meeting.discussion or "No discussion recorded.")
+        
+        # Split into paragraphs
+        paragraphs = [p.strip() for p in discussion_text.replace('\r\n', '\n').split('\n') if p.strip()]
+        
+        def check_new_page(needed_height=50):
+            nonlocal y
+            if y < needed_height:
+                p.showPage()
+                y = height - 60
+                p.setFont("Helvetica-Bold", 12)
+                p.setFillColor(colors.darkblue)
+                p.drawString(margin, y, "Discussion (continued):")
+                y -= line_height + 10
+                p.setFillColor(colors.black)
 
-        # Discussion Section (multi-line)
-        y -= line_height
-        p.setFont("Helvetica-Bold", 16)
-        p.drawString(left_margin, y, "Discussion:")
-        y -= line_height
+        for paragraph_text in paragraphs:
+            para = Paragraph(paragraph_text, justified_style)
+            para_width = width - 2 * margin 
+            para_height = para.wrap(para_width, y)[1]
+            check_new_page(para_height) 
+            para.drawOn(p, margin, y - para_height)
+            y -= para_height + 10
 
-        p.setFont("Helvetica", 12)
-        text_object = p.beginText(left_margin, y)
-        discussion_lines = strip_tags(meeting.discussion or "N/A").splitlines()
-        for line in discussion_lines:
-            text_object.textLine(line)
-        p.drawText(text_object)
+        if y < 80:
+            p.showPage()
+            y = height - 60
 
-        # Finish PDF
-        p.showPage()
+        p.saveState()
+        p.setFont("Helvetica", 50)
+        p.setFillColor(colors.lightgrey)
+        p.setFillAlpha(0.1)
+        p.translate(width/2, height/2)
+        p.rotate(45)
+        p.drawCentredString(0, 0, "IEEE NSU")
+        p.restoreState()
+        p.setFont("Helvetica", 8)
+        p.setFillColor(colors.gray)
+        p.drawCentredString(width / 2, 30, f"Generated on {datetime.now().strftime('%B %d, %Y')}")
+
         p.save()
-
         return response
 
     except Exception as e:
@@ -429,3 +592,27 @@ def get_team_redirect_namespace(team_primary):
         return 'graphics_team'
     elif team_primary == 11:
         return 'finance_and_corporate_team'
+    
+def get_sc_ag_logo_name(sc_primary):
+        if sc_primary == 1:
+            return 'IEEE NSU SB Logo'
+        elif sc_primary == 2:
+            return 'IEEE NSU PES SBC Logo'
+        elif sc_primary == 3:
+            return 'IEEE NSU RAS SBC Logo'
+        elif sc_primary == 4:
+            return 'IEEE NSU IAS SBC Logo'
+        elif sc_primary == 5:
+            return 'IEEE NSU SB WIE AG Logo'
+        
+def get_sc_ag_header_color(primary):
+        if primary == 1:
+            return '#137AAC'
+        elif primary == 2:
+            return '#659941'
+        elif primary == 3:
+            return '#602569'
+        elif primary == 4:
+            return '#008bC2'
+        elif primary == 5:
+            return '#006699'    

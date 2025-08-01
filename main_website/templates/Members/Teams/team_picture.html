@@ -6,17 +6,23 @@
         margin-top: 8rem!important;
         width: 98%;
     }
+    .img-fluid{
+        height: 500px;
+    }
     @media screen and (max-width: 800px) {
         .col-md-12.my-2 {
             margin-top: 1rem!important;
         }
+        .img-fluid{
+            height: 100%;
+        }
     }
 </style>
 <div class="col-md-12 my-2">
-    <div class="border rounded">
-        <img class="img-fluid" src="/media_files/{{team.team_picture}}" alt="">
+    <div>
+        <img style="border-radius: 4px; max-width: 100%; margin: auto; display: flex;" class="img-fluid" src="/media_files/{{team.team_picture}}" alt="">
     </div>
-    <div class="p-3 my-2 border rounded">
+    <div class="p-3 my-2  rounded">
         {{team.team_short_description |safe}}
     </div>
 </div>

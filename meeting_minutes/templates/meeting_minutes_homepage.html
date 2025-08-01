@@ -22,6 +22,7 @@
         font-size: 2em;
         text-align: center;
         margin-bottom: 20px;
+        margin-top: 20px;
         color: #00629b;
       }
 
@@ -73,13 +74,24 @@
         flex-direction: column;
         z-index: 102;
         padding: 16px;
+        width: 200px;
       }
-
+      
       .filter-options label {
         margin-bottom: 5px;
       }
-
+      
       .filter-options input {
+        margin-bottom: 10px;
+        padding:18px 10px;
+        width: 100%;
+      }
+      
+      .filter-options select {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 10px;
         padding: 10px;
         width: 100%;
@@ -163,6 +175,7 @@
         display: flex;
         gap: 10px;
         align-items: center;
+        flex-wrap: wrap;
       }
       .table-responsive {
         overflow-x: hidden;
@@ -344,18 +357,36 @@
                 Filter <i class="fa fa-filter" aria-hidden="true"></i>
               </p>
               <div id="filterOptions" class="filter-options">
-                <label for="tenureInput">By Tenure</label>
-                <input type="text" id="tenureInput" placeholder="e.g., 2025" />
-                <label for="monthInput">By Month</label>
-                <input type="text" id="monthInput" placeholder="e.g., May" />
-                <label for="locationInput">By Location</label>
-                <input
-                  type="text"
-                  id="locationInput"
-                  placeholder="e.g., Dhaka"
-                />
-                <button onclick="applyCustomFilters()">Apply Filters</button>
-              </div>
+              {% comment %} <label for="tenureInput">By Tenure</label>
+              <input type="text" id="tenureInput" placeholder="e.g., 2025" /> {% endcomment %}
+              <label for="monthSelect">By Month</label>
+              <select id="monthSelect">
+                <option value="">All</option>
+                <option value="january">January</option>
+                <option value="february">February</option>
+                <option value="march">March</option>
+                <option value="april">April</option>
+                <option value="may">May</option>
+                <option value="june">June</option>
+                <option value="july">July</option>
+                <option value="august">August</option>
+                <option value="september">September</option>
+                <option value="october">October</option>
+                <option value="november">November</option>
+                <option value="december">December</option>
+              </select>
+
+              <label for="locationSelect">By Location</label>
+              <select id="locationSelect">
+                <option value="">All</option>
+                <option value="in-person">In-person</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="virtual">Virtual</option>
+              </select>
+
+              <button onclick="applyCustomFilters()">Apply Filters</button>
+              <button onclick="clearFilters()" style="margin-top: 8px;">Clear Filters</button>
+            </div>
             </div>
           </div>
           <br />
@@ -367,7 +398,7 @@
                   <th>Meeting Name</th>
                   <th>Location</th>
                   <th>Date</th>
-                  {% comment %} <th>Download</th> {% endcomment %}
+                  <th>Download</th>
                 </tr>
               </thead>
               <tbody id="tableBody">
@@ -377,19 +408,19 @@
                   <td>
                       {% if primary == 1%}
                       {% if team_primary is not None %}
-                      <a href="{% url edit_url team_primary meeting.pk %}" style="text-decoration: none">
+                      <a href="{% url edit_url team_primary meeting.pk %}" style="color:#0050ac; text-decoration: none">
                       {% else %}
-                      <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="text-decoration: none">
+                      <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_edit' meeting.pk %}" style="color:#0050ac; text-decoration: none">
                       {% endif %}
                       {% else %}
-                      <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit' primary meeting.pk %}" style="text-decoration: none">
+                      <a href="{% url 'chapters_and_affinity_group:meeting_minutes:meeting_minutes_edit' primary meeting.pk %}" style="tcolor:#0050ac; ext-decoration: none">
                       {% endif %}
                       {{ meeting.meeting_name }}
                         </a>
                   </td>
                   <td>{{ meeting.location }}</td>
                   <td>{{ meeting.meeting_date }}</td>
-                  {% comment %} <td>
+                  <td>
                     <a
                     {% if primary == 1 %}
                     href="{% url 'central_branch:meeting_minutes:download_meeting_pdf' meeting.pk %}"
@@ -399,7 +430,7 @@
                     >
                       <i class="fa fa-download download-icon"></i>
                     </a>
-                  </td> {% endcomment %}
+                  </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -428,26 +459,64 @@
       });
     }
     
-    function toggleFilterOptions() {
-      const options = document.getElementById("filterOptions");
-      options.style.display =
-        options.style.display === "flex" ? "none" : "flex";
-    }
-
     function applyCustomFilters() {
-      const tenure = document.getElementById("tenureInput").value.trim();
-      const month = document.getElementById("monthInput").value.trim();
-      const location = document.getElementById("locationInput").value.trim();
+      const selectedMonth = document.getElementById("monthSelect").value;
+      const selectedLocation = document.getElementById("locationSelect").value;
 
-      const filtered = dummyData.filter((item) => {
-        return (
-          (!tenure || item.tenure.toLowerCase() === tenure.toLowerCase()) &&
-          (!month || item.month.toLowerCase() === month.toLowerCase()) &&
-          (!location || item.location.toLowerCase() === location.toLowerCase())
-        );
+      const tableBody = document.getElementById("tableBody");
+      const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+      rows.forEach((row) => {
+        const dateCell = row.children[3];
+        const locationCell = row.children[2];
+
+        if (!dateCell || !locationCell) return;
+
+        const fullDate = dateCell.getAttribute("data-full-date") || dateCell.textContent.trim();
+        const monthFromDate = fullDate.split(" ")[0].toLowerCase();
+        const locationText = locationCell.textContent.trim().toLowerCase();
+
+        const monthMatches = !selectedMonth || monthFromDate === selectedMonth;
+        const locationMatches = !selectedLocation || locationText === selectedLocation;
+
+        row.style.display = (monthMatches && locationMatches) ? "" : "none";
       });
 
       toggleFilterOptions();
     }
+
+    function clearFilters() {
+      document.getElementById("monthSelect").value = "";
+      document.getElementById("locationSelect").value = "";
+
+      const tableBody = document.getElementById("tableBody");
+      const rows = Array.from(tableBody.querySelectorAll("tr"));
+      rows.forEach(row => {
+        row.style.display = "";
+      });
+    }
+
+    function toggleFilterOptions() {
+      const options = document.getElementById("filterOptions");
+      options.style.display = options.style.display === "flex" ? "none" : "flex";
+    }
+
+    // Optional: Run on page load to shorten month names
+    document.addEventListener("DOMContentLoaded", () => {
+      const rows = document.querySelectorAll("#tableBody tr");
+      rows.forEach(row => {
+        const dateCell = row.children[3];
+        if (dateCell) {
+          const fullDate = dateCell.textContent.trim();
+          const parts = fullDate.split(" ");
+          if (parts.length >= 3 && parts[0].length > 4) {
+            const shortMonth = parts[0].substring(0, 3) + ".";
+            const shortDate = [shortMonth, parts[1], parts[2]].join(" ");
+            dateCell.setAttribute("data-full-date", fullDate); // store original
+            dateCell.textContent = shortDate;
+          }
+        }
+      });
+    });
   </script>
 </html>

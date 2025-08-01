@@ -31,7 +31,7 @@ class MM_Render_Access:
                     else:
                         if team_primary != None and get_member[0].team.primary == team_primary:
                             return True
-                        elif team_primary == None and get_member[0].team != None:
+                        elif team_primary == None and get_member[0].position.is_officer:
                             return True
                         else:
                             return False
@@ -45,7 +45,7 @@ class MM_Render_Access:
                 if(get_member.exists()):
                     sc_ag_member = SC_AG_Members.objects.filter(sc_ag__primary=sc_ag_primary, member=get_member[0])
                     if sc_ag_member.exists():
-                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                             return True
                         else:
                             if sc_ag_member[0].team != None:
@@ -55,7 +55,7 @@ class MM_Render_Access:
                     else:
                         return False
                 else:
-                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                         return True
                     else:
                         return False
@@ -69,7 +69,7 @@ class MM_Render_Access:
                     ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
                     return False
             else:
-                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                     return True
                 else:
                     MM_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
@@ -107,7 +107,7 @@ class MM_Render_Access:
                 if(get_member.exists()):
                     sc_ag_member = SC_AG_Members.objects.filter(sc_ag__primary=sc_ag_primary, member=get_member[0])
                     if sc_ag_member.exists():
-                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                             return True
                         else:
                             if sc_ag_member[0].team != None:
@@ -117,7 +117,7 @@ class MM_Render_Access:
                     else:
                         return False
                 else:
-                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                         return True
                     else:
                         return False
@@ -131,7 +131,8 @@ class MM_Render_Access:
                     ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
                     return False
             else:
-                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
+                    print('gnbdfvdcsx')
                     return True
                 else:
                     MM_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
@@ -159,7 +160,8 @@ class MM_Render_Access:
                             return member_data_access[0].access_type
                         elif get_member[0].position.is_officer and get_member[0].team.primary == team_primary:
                             return 'Edit'
-                        elif (get_member[0].position.is_officer and get_member[0].team.primary != team_primary) or get_member[0].team.primary == team_primary:
+                        elif (get_member[0].position.is_officer and get_member[0].team.primary != team_primary) or (get_member[0].team.primary == team_primary) or (team_primary == None and get_member[0].team != None):
+
                             return 'ViewOnly'
                         else:
                             return 'Restricted'
@@ -173,7 +175,7 @@ class MM_Render_Access:
                 if(get_member.exists()):
                     sc_ag_member = SC_AG_Members.objects.filter(sc_ag__primary=sc_ag_primary, member=get_member[0])
                     if sc_ag_member.exists():
-                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                        if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                             return 'Edit'
                         else:
                             if member_data_access.exists():
@@ -187,7 +189,7 @@ class MM_Render_Access:
                     else:
                         return 'Restricted'
                 else:
-                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                    if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                         return 'Edit'
                     else:
                         return 'Restricted'
@@ -201,7 +203,7 @@ class MM_Render_Access:
                     ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
                     return 'Restricted'
             else:
-                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(username, sc_ag_primary)):
+                if(SC_Ag_Render_Access.get_sc_ag_common_access_non_branch(request, sc_ag_primary)):
                     return 'Edit'
                 else:
                     MM_Render_Access.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)

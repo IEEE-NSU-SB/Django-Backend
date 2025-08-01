@@ -181,7 +181,11 @@
                                 <p class="items"><span><b>Email (Associated with IEEE Account): </b></span>{{details.email_associated}} </p>
                                 <p class="items"><span><b>IEEE Email: </b></span>{{details.email_ieee}} </p>
                                 <p class="items"><span><b>Contact No: </b></span>{{details.contact_no}} </p>
-                                <p class="items"><span><b>Account Password: </b></span>{{details.ieee_account_password}} </p>
+                                <p class="items">
+                                    <span><b>Account Password:</b></span>
+                                    <span id="masked-password">{{ masked_password }}</span>
+                                    <button id="show-password-btn" class="btn btn-outline b-primary text-primary" data-request-id="{{ details.pk }}">Show</button>
+                                </p>
                                 <p class="items"><span><b>Applicant Comment: </b></span>{{details.comment}} </p>
                             
                             {% endfor %}    
@@ -401,6 +405,35 @@
     {% block common_js %}
         {% include "common_js.html" %}
     {% endblock common_js %}
+
+    <script>
+        document.getElementById("show-password-btn").addEventListener("click", function () {
+        const btn = this;
+        const requestId = btn.getAttribute("data-request-id");
+
+        fetch("{% url 'membership_development_team:request_password' %}", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",  // CSRF protection
+            },
+            body: JSON.stringify({ request_id: requestId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("masked-password").textContent = data.decrypted_password;
+                btn.remove(); 
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("AJAX error:", error);
+            alert("Something went wrong.");
+        });
+        });
+    </script>
 
 </body>
 </html>
