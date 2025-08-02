@@ -32,6 +32,7 @@
         height: 190px;
         border-radius: 8px;
         overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     }
 
     .img_inner_container img {
@@ -122,7 +123,7 @@
     }
     .video_container{
         width: 100%;
-        height: 290px;
+        height: 330px;
         object-fit: cover;
         border-radius: 8px;
         overflow: hidden;
@@ -256,6 +257,12 @@
         border-radius: 7px;
         width: 100%;
     }
+    .middle-banner-wrapper{
+        height: 130px;
+        overflow: hidden;
+        border-radius: 4px;
+        width: 100%;
+    }
     /* modal CSS ends here */
     /* Image Upload  */
     input[type="file"] {
@@ -305,7 +312,7 @@
         display: flex;
         gap: 12px; 
         transition: transform 0.4s ease-in-out;
-        padding: 0 6px;
+        padding: 15px 6px;
         box-sizing: border-box;
     }
     
@@ -344,41 +351,6 @@
     .delete_modal_content h1{
         font-size: 18px;
         margin: 0px;
-    }
-    @media (max-width: 900px) {
-    .img_inner_container {
-        flex: 0 0 calc((100% - 12px) / 2);
-        max-width: calc((100% - 12px) / 2);
-    }
-    }
-    @media (max-width: 600px) {
-        .img_inner_container {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
-    @media (max-width: 800px){
-    .modal_content,
-    .modal_img_update_content,
-    .delete_modal_content{
-            width: 90%;
-        }
-        .text_fld {
-            grid-template-columns: 0.4fr 10px 1fr;
-        }
-    }
-    @media (max-width: 500px){
-    .modal_content,
-    .modal_img_update_content,
-    .delete_modal_content{
-            width: 95%;
-        }
-        .video-wrapper , .img-wrapper{
-            height: 150px;
-        }
-    .add-image , .add-video{
-        width: 100%;
-    }
     }
     .toggle-wrapper {
       display: flex;
@@ -455,10 +427,52 @@
       background: #002b5c;
       color: white;
     }
+        @media (max-width: 900px) {
+    .img_inner_container {
+        flex: 0 0 calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
+    }
+    }
+    @media (max-width: 800px){
+    .modal_content,
+    .modal_img_update_content,
+    .delete_modal_content{
+            width: 90%;
+        }
+        .text_fld{
+            grid-template-columns: 1fr;
+        }
+        .colon{
+            display: none;
+        }
+    }
+    @media (max-width: 600px) {
+        .img_inner_container {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .video_container{
+            height: 180px;
+        }
+
+    }
+    @media (max-width: 500px){
+    .modal_content,
+    .modal_img_update_content,
+    .delete_modal_content{
+            width: 95%;
+        }
+        .video-wrapper , .img-wrapper{
+            height: 150px;
+        }
+    .add-image , .add-video{
+        width: 100%;
+    }
+    }
 </style>
-<div id="tab1" class="tab-content container">
+<div id="tab1" class="tab-content container" style="border: none; margin: auto; margin-top: 40px;">
         <!-- <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2> -->
-    <div class="add_btn_container" style="display: flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 14px;">
+    <div class="add_btn_container" style="display: flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 14px; margin-left: 6px;margin-right: 6px;">
   
             <!-- Media Toggle Form -->
             <form method="POST" id="mediaToggleForm" style="display: flex; align-items: center;">
@@ -491,108 +505,20 @@
 
                 <div class="carousel_track_wrapper">
                     <div class="carousel_track">
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
+                        {% for i in topBannerItems %}
+                        <div class="img_inner_container">
+                            <!-- <input type="checkbox" class="img_checkbox" /> -->
+                            <img src="{{media_url}}{{i.banner_picture}}" alt="Banner Image" />
+                            <div class="img_overlay"></div>
+                            <div class="img_icons">
+                                <form method="POST">
+                                {% csrf_token %}
+                                <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
+                                <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- Repeat .img_inner_container for other images -->
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
-
-                    <div class="img_inner_container">
-                        <input type="checkbox" class="img_checkbox" />
-                        <img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg" />
-                        <div class="img_overlay"></div>
-                        <div class="img_icons">
-                        <i class="fas fa-edit" title="Update"></i>
-                        <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                        </div>
-                    </div>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -606,9 +532,10 @@
             </div>
 
             <div class="video_container">
-                <video controls="" autoplay="">
-                    <source src="https://www.youtube.com/shorts/TlCcJlfWDzc?feature=share">
-                </video>
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <!-- <video controls="" autoplay="">
+                    <source src="https://youtu.be/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx">
+                </video> -->
             </div>
         </div>
         <br>
@@ -748,7 +675,6 @@
         </div>
     </div> -->
 </div>
-</div>
         <!-- <div class="header_wrap" style="padding: 0px;">
             <div class="num_rows">
         
@@ -850,56 +776,56 @@
                 <div class="container" style="margin-top: 40px;">
                     <!-- Banner Image Upload -->
                     <div class="text_fld">  
-                        <h2 style="font-size: 15px; margin:0px;">Hero Image</h2>
+                        <h2 style="font-size: 15px; margin:0px;">Hero Image (1600 x 750)</h2>
                         <div class="colon">:</div>
-                        <input type="file" class="text_fld_ip" id="hero-image" accept="image/*" name="banner_picture">
+                        <input type="file" class="text_fld_ip" id="hero-image" accept="image/*" name="banner_picture" required>
                     </div>
 
                     <!-- First Text -->
                     <div class="text_fld">
                         <h2 style="font-size: 15px; margin:0px;">First text</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" name="first_layer_text">
+                        <input type="text" class="text_fld_ip" name="first_layer_text" required>
                     </div>
 
                     <!-- Second Text (colored) -->
                     <div class="text_fld">
                         <h2 style="font-size: 15px; margin:0px;">Second text</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" name="first_layer_text_colored">
+                        <input type="text" class="text_fld_ip" name="first_layer_text_colored" required>
                     </div>
 
                     <!-- Third Text (paragraph) -->
                     <div class="text_fld">
                         <h2 style="font-size: 15px; margin:0px;">Third text</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" name="third_layer_text">
+                        <input type="text" class="text_fld_ip" name="third_layer_text" required>
                     </div>
 
                     <!-- Button Text -->
                     <div class="text_fld">
                         <h2 style="font-size: 15px; margin:0px;">Button text</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" name="button_text">
+                        <input type="text" class="text_fld_ip" name="button_text" required>
                     </div>
 
                     <!-- Button Link -->
                     <div class="text_fld">
                         <h2 style="font-size: 15px; margin:0px;">Button link</h2>
                         <div class="colon">:</div>
-                        <input type="text" class="text_fld_ip" name="button_url">
+                        <input type="text" class="text_fld_ip" name="button_url" required>
                     </div>
-                </div>
 
                 <!-- Modal Footer Buttons -->
                 <div style="display: flex; justify-content: end; padding-top: 20px;">
                     <div style="display: flex;">
                         <button type="button" class="close_btn">Cancel</button>
-                        <input type="submit" class="confirm_btn" style="margin-left: 10px;" value="Confirm">
+                        <input type="submit" class="confirm_btn" style="margin-left: 10px;" name="add_banner" value="Confirm">
                     </div>
                 </div>
             </div>
         </form>
+    </div>
     </div>
 
     <div id="update_img_modal" class="modal_add_img_video">

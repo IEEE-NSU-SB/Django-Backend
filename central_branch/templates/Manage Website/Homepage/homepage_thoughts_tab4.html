@@ -124,9 +124,6 @@
     .modal_delete_thought_content {
       width: 90%;
     }
-    .text_fld {
-      grid-template-columns: 0.4fr 10px 1fr;
-    }
   }
   @media (max-width: 500px) {
     .modal_thought_content,
@@ -159,11 +156,11 @@
   }
 </style>
 
-<div id="tab4" class="tab-content">
+<div id="tab4" class="tab-content" style="border: none;">
   <!-- <h2 style="text-align:center;">HomePage Thoughts</h2> -->
   <!-- <br> -->
   <div ui-view class="app-body" id="view">
-    <div class="container">
+    <div class="container" style="margin: auto;">
       <div class="add_btn_container">
         <button
           type="button"
@@ -459,11 +456,10 @@
           </div>
 
           <div class="container" style="margin-top: 40px">
-            <div class="text_fld" style="grid-template-columns: 0.5fr 10px 1fr">
+            <div class="text_fld" style="grid-template-columns:1fr">
               <h2 style="font-size: 15px; margin: 0px">
                 Author Name & Position
               </h2>
-              <div class="colon">:</div>
               <input type="text" class="text_fld_ip" name="author" required />
             </div>
 

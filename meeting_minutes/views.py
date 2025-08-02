@@ -28,7 +28,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Paragraph
-from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
 
 from port.renderData import PortData
@@ -383,28 +383,56 @@ def download_meeting_pdf(request, pk, primary=None):
 
         p.setFont("Helvetica-Bold", 20)
         p.setFillColor(colors.darkblue)
-        if primary and int(primary) == 1:
-            p.drawCentredString(width / 2, y, "IEEE NSU Student Branch")
-        else:
-            branch_name = get_branch_name(int(primary))
-            p.drawCentredString(width / 2, y, branch_name)
-        y -= 25
+
+        sc_ag_name = Chapters_Society_and_Affinity_Groups.objects.filter(primary=(primary if primary else 1)).values('group_name').first()['group_name']
+        style = getSampleStyleSheet()["Normal"]
+        style = ParagraphStyle(style, leading=17, fontName='Helvetica-Bold', fontSize=16, alignment=1, textColor=get_sc_ag_header_color(primary=(int(primary) if primary else 1)))
+
+        # Create a Paragraph with the given text
+        para = Paragraph(sc_ag_name, style)
+
+        # Wrap the text to fit within max_width
+        text_width = min(300, width - 20)  # Limit width
+        wrapped_width, wrapped_height = para.wrap(text_width, 0)  # Get required height
+
+        # Adjust Y so the first line stays in place
+        adjusted_y_position = height - 50 - wrapped_height  # Shift down
+
+        # Center X calculation
+        x_position = (width - wrapped_width) / 2
+
+        # Draw the wrapped text
+        para.drawOn(p, x_position, adjusted_y_position)
+        # p.drawCentredString(width / 2, y, sc_ag_name)
+        y = adjusted_y_position
         
         p.setFont("Helvetica-Bold", 16)
         p.setFillColor(colors.black)
-        p.drawCentredString(width / 2, y, "Meeting Minutes")
+        p.drawCentredString(width / 2, y-30, "Meeting Minutes")
         y -= 35
         
         branch_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(1)).picture
         branch_logo_path = settings.MEDIA_ROOT+str(branch_logo)
         sc_ag_logo_path = None
+
+        try:
+            if os.path.exists(branch_logo_path):
+                    p.drawImage(
+                        ImageReader(branch_logo_path),
+                        x=margin,
+                        y=height - 90,
+                        width=50,
+                        height=50,
+                        preserveAspectRatio=True,
+                        mask='auto'
+                    )
+        except Exception as e:
+            logger.warning(f"Main Branch logo could not be loaded: {e}")    
         
         try:
-            # Only draw Branch logo if primary != 1
-            if primary and int(primary) != 1:
+            if primary:
                 sc_ag_logo = Toolkit.objects.get(title=get_sc_ag_logo_name(int(primary))).picture
                 sc_ag_logo_path = settings.MEDIA_ROOT+str(sc_ag_logo)
-                print("Test:",primary)
 
                 if os.path.exists(sc_ag_logo_path):
                     p.drawImage(
@@ -418,32 +446,8 @@ def download_meeting_pdf(request, pk, primary=None):
                     )
 
         except Exception as e:
-            logger.warning(f"Branch logo could not be loaded: {e}")
-            
-        try:
-            if os.path.exists(branch_logo_path):
-                    p.drawImage(
-                        ImageReader(branch_logo_path),
-                        x=margin,
-                        y=height - 90,
-                        width=50,
-                        height=50,
-                        preserveAspectRatio=True,
-                        mask='auto'
-                    )                      
-                # p.drawImage(
-                #     ImageReader(branch_logo_path),
-                #     x=width - margin - 50,
-                #     y=height - 90,
-                #     width=50,
-                #     height=50,
-                #     preserveAspectRatio=True,
-                #     mask='auto'
-                # )
-        except Exception as e:
-            logger.warning(f"Main Branch logo could not be loaded: {e}")    
-        
-        
+            logger.warning(f"Sc_AG logo could not be loaded: {e}")
+              
         y -= 20
         p.setStrokeColor(colors.darkblue)
         p.setLineWidth(3)
@@ -612,13 +616,3 @@ def get_sc_ag_header_color(primary):
             return '#008bC2'
         elif primary == 5:
             return '#006699'    
-        
-        
-def get_branch_name(sc_primary):
-    branch_names = {
-        2: "IEEE NSU Power and Energy Society",
-        3: "IEEE NSU Robotics and Automation Society",
-        4: "IEEE NSU Industry Application Society",
-        5: "IEEE NSU Women in Engineering Affinity Group",
-    }
-    return branch_names.get(sc_primary, "Unknown Branch")

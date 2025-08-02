@@ -1167,8 +1167,9 @@ def manage_website_homepage(request):
                         newBanner.save()
                         messages.success(request,"New Banner Picture added in Homepage successfully!")
                         return redirect('central_branch:manage_website_home')
-                    except:
-                        print("GG")
+                    except Exception as e:
+                        print(f"Exception while adding banner: {e}")
+                        traceback.print_exc()
 
 
             '''For banner picture with Texts'''   
