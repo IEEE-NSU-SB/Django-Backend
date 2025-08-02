@@ -49,3 +49,8 @@ class Email_Draft(models.Model):
 
 #     def __str__(self):
 #         return str(self.pk)
+
+
+
+    
+   
