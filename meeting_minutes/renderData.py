@@ -2,7 +2,7 @@
 
 # class team_mm_info:
 
-#     def load_all_tam_mm():
+#     def load_all_team_mm():
 #         ' ' ' This function loads all the meeting minutes of the team' ' '
 
 #         team_mm_list=team_meeting_minutes.objects.all().values('team_mm_id','team_mm_names')
