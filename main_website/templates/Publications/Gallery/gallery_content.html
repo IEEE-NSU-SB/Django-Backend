@@ -1,233 +1,274 @@
 {% load static %} {% block gallery_content %}
 <style>
-    .centering{
-        display: flex;
-        margin: 15px 0px;
-        align-items: center;
-        flex-direction: column;
+  .centering {
+    display: flex;
+    margin: 15px 0px;
+    align-items: center;
+    flex-direction: column;
+  }
+
+    {
+    % comment %
+  }
+
+  .gallery {
+    max-width: 1440px;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    column-gap: 20px;
+  }
+
+  .pic_container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    max-width: 1000px;
+  }
+
+  .pic-box {
+    padding: 5px;
+  }
+
+  .pic_container img {
+    border-radius: 4px;
+    box-shadow: 5px 5px 5px black;
+  }
+
+  .vertical-line {
+    border-left: 2px solid wheat;
+    height: 500px;
+  }
+
+  .video-box {
+    background-color: white;
+    padding: 2px 5px 5px 5px;
+  }
+
+  .video_container {
+    box-shadow: 0px 0px 5px white;
+    border-radius: 6px;
+  }
+
+  /*media queries*/
+  @media (max-width: 1440px) {
+    .gallery {
+      max-width: 85%;
     }
-    {% comment %} .gallery{
-        max-width: 1440px;
-        padding-left: 20px;
-        padding-right: 20px;
-        display: flex;
-        flex-wrap: nowrap;
-        column-gap: 20px;
+
+    .pic_container {
+      max-width: 800px;
     }
-    .pic_container{
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        max-width: 1000px;
+  }
+
+  @media (max-width: 1024px) {
+    .gallery {
+      max-width: 892px;
     }
-    .pic-box{
-        padding: 5px;
+
+    .pic_container {
+      max-width: 550px;
     }
-    .pic_container img{
-        border-radius: 4px;
-        box-shadow: 5px 5px 5px black;
+  }
+
+  @media (max-width: 992px) {
+    .gallery {
+      max-width: 960px;
     }
-    .vertical-line{
-        border-left: 2px solid wheat;
-        height: 500px;
+
+    .pic_container {
+      max-width: 600px;
     }
-    .video-box{
-        background-color: white;
-        padding: 2px 5px 5px 5px;
+  }
+
+  @media (max-width: 768px) {
+    .gallery {
+      max-width: 720px;
     }
-    .video_container{
-        box-shadow: 0px 0px 5px white;
-        border-radius: 6px;
+
+    .pic_container {
+      max-width: 400px;
+      grid-template-columns: 1fr 1fr;
     }
-    /*media queries*/
-    @media (max-width: 1440px){
-        .gallery{
-            max-width: 85%;
-        }
-        .pic_container{
-            max-width: 800px;
-        }
-    }
-    @media (max-width: 1024px){
-        .gallery{
-            max-width: 892px;
-        }
-        .pic_container{
-            max-width: 550px;
-        }
-    }
-    @media (max-width: 992px){
-        .gallery{
-            max-width: 960px;
-        }
-        .pic_container{
-            max-width: 600px;
-        }
-    }
-    @media (max-width: 768px){
-        .gallery{
-            max-width: 720px;
-        }
-        .pic_container{
-            max-width: 400px;
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-    @media (max-width: 576px){
-        .gallery{
-            max-width: 100%;
-            grid-template-columns: 1fr;
-            flex-wrap: wrap;
-        }
-        .vertical-line{
-            display: none;
-        }
-        .pic_container{
-            grid-template-columns: 1fr;
-        }
-    } {% endcomment %}
-    .row{
-        display: flex;
-        flex-wrap: wrap;
-        max-width: 1140px;
-        padding: 25px;
-    }
-    #videoGallery .row{
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media (max-width: 576px) {
+    .gallery {
+      max-width: 100%;
+      grid-template-columns: 1fr;
       flex-wrap: wrap;
-      max-width: 1140px;
-      padding: 25px;
-      gap: 10px;
-    }
-    .column{
-        flex: 25%;
-        max-width: 25%;
-    }
-    .img-hover-zoom{
-        height: auto;
-        overflow: hidden;
-        border: 5px solid #ffff;
-    }
-    .img-hover-zoom img{
-        vertical-align: middle;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        transition:  transform .5s ease;
-    }
-    .img-hover-zoom:hover img{
-        transform: scale(1.5);
     }
 
-    @media screen and (max-width: 800px) {
-        .column{
-            flex: 100%;
-            max-width: 100%;
-        }
+    .vertical-line {
+      display: none;
     }
 
-    .centering .button .photo-btn{
-        background-color: aliceblue;
-        border: 1px solid black;
-        font-family: 'Poppins', sans-serif;
-        height: 3rem;
-        width: 10rem;
-        color: aqua;
+    .pic_container {
+      grid-template-columns: 1fr;
     }
-    .centering .button .photo-btn:hover{
-        border: 1px solid brown;
+  }
+
+    {
+    % endcomment %
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1140px;
+    padding: 25px;
+  }
+
+  /* shohan */
+  #videoGallery .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    flex-wrap: wrap;
+    max-width: 1140px;
+    padding: 25px;
+    gap: 10px;
+  }
+
+  .column {
+    flex: 25%;
+    max-width: 25%;
+  }
+
+  .img-hover-zoom {
+    height: auto;
+    overflow: hidden;
+    border: 5px solid #ffff;
+  }
+
+  .img-hover-zoom img {
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    transition: transform .5s ease;
+  }
+
+  .img-hover-zoom:hover img {
+    transform: scale(1.5);
+  }
+
+  @media screen and (max-width: 800px) {
+    .column {
+      flex: 100%;
+      max-width: 100%;
     }
-    .gallery-buttons {
-        display: flex;
-        margin: 20px 0;
-      }
+  }
 
-      .gallery-button {
-        padding: 10px;
-        cursor: pointer;
-        background-color: 	#FFC72C;
-        color: #fff;
-        border: 2px solid #FFC72C;
-        border-radius: 5px;
-        font-family: 'Poppins', sans-serif;
-        margin-right: 10px;
-        transition: all 0.3s;
-      }
-      .gallery-button:hover{
-        background-color: 	#ffc72c1c;
-        color: #002855;
-        border: 2px solid #002855;
-      }
+  .centering .button .photo-btn {
+    background-color: aliceblue;
+    border: 1px solid black;
+    font-family: 'Poppins', sans-serif;
+    height: 3rem;
+    width: 10rem;
+    color: aqua;
+  }
 
-      .active-btn {
-        background-color: #002855;
-        border: 2px solid #002855;
-        transition: all 0.3s;
-      }
-      .active-btn:hover{
-        background-color: 	#002855;
-        color: #ffffff;
-      }
+  .centering .button .photo-btn:hover {
+    border: 1px solid brown;
+  }
 
-      .gallery-content {
-        display: none;
-      }
+  .gallery-buttons {
+    display: flex;
+    margin: 20px 0;
+  }
 
-      .gallery-content.active {
-        display: block;
-      }
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background-color: rgba(0, 0, 0, 0.9);
-    }
+  .gallery-button {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #FFC72C;
+    color: #fff;
+    border: 2px solid #FFC72C;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    margin-right: 10px;
+    transition: all 0.3s;
+  }
 
-    .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+  .gallery-button:hover {
+    background-color: #ffc72c1c;
+    color: #002855;
+    border: 2px solid #002855;
+  }
 
-    .modal-content img {
-        width: 100%;
-        height: auto;
-    }
+  .active-btn {
+    background-color: #002855;
+    border: 2px solid #002855;
+    transition: all 0.3s;
+  }
 
-    .close {
-        color: #fff;
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        font-size: 30px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .video {
+  .active-btn:hover {
+    background-color: #002855;
+    color: #ffffff;
+  }
+
+  .gallery-content {
+    display: none;
+  }
+
+  .gallery-content.active {
+    display: block;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+
+  .modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .modal-content img {
+    width: 100%;
+    height: auto;
+  }
+
+  .close {
+    color: #fff;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .video {
     background: #fff;
     padding: 5px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-    width: 23%; /* Thumbnails 4 across */
+    width: 23%;
+    /* Thumbnails 4 across */
     margin: 1%;
     float: left;
     border-radius: 5px;
     overflow: hidden;
   }
-    #videoGallery .row .video{
-      width: 100%;
-    }
 
-   /*
+  #videoGallery .row .video {
+    width: 100%;
+  }
+
+  /*
    These keep the height of each video thumbnail consistent between YouTube and Vimeo.
    Each can have thumbnail sizes that vary by 1px and are likely break your layout.
    */
@@ -245,36 +286,41 @@
       line-height: 0;
     }
   }
-  .videoTitle{
+
+  .videoTitle {
     font-family: 'Poppins', sans-serif;
     width: 180px;
-     white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Media Queries - This is the responsive grid. */
 
   @media (max-width: 1024px) {
     .video {
-      width: 31.333%; /* Thumbnails 3 across */
+      width: 31.333%;
+      /* Thumbnails 3 across */
     }
   }
 
   @media (max-width: 900px) {
-    #videoGallery .row{
+    #videoGallery .row {
       grid-template-columns: 1fr 1fr;
     }
   }
 
   @media (max-width: 600px) {
     .video {
-      width: 48%; /* Thumbnails 2 across */
+      width: 48%;
+      /* Thumbnails 2 across */
     }
-    .videoTitle{
-        width: 150px;
+
+    .videoTitle {
+      width: 150px;
     }
-    #videoGallery .row{
+
+    #videoGallery .row {
       grid-template-columns: 1fr;
     }
   }
@@ -282,12 +328,15 @@
   @media (max-width: 360px) {
     .video {
       display: block;
-      width: 96%; /* Single column view. */
-      margin: 2%; /* The smaller the screen, the smaller the percentage actually is. */
+      width: 96%;
+      /* Single column view. */
+      margin: 2%;
+      /* The smaller the screen, the smaller the percentage actually is. */
       float: none;
     }
-    .videoTitle{
-        width: 250px;
+
+    .videoTitle {
+      width: 250px;
     }
   }
 
@@ -298,8 +347,62 @@
     opacity: 1;
   }
 
-  .video img:hover, .video img:active, .video img:focus {
+  .video img:hover,
+  .video img:active,
+  .video img:focus {
     opacity: 0.75;
+  }
+
+  .content_container {
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+
+  .single_content {
+    display: flex;
+    gap: 20px;
+    /* border-bottom: 1px solid hsla(0, 0%, 83%, 1); */
+    padding: 25px;
+    align-items: flex-start;
+  }
+
+  .video_title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    min-height: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+
+  #video_description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-align: justify;
+
+  }
+
+  @media screen and (max-width:576px) {
+    .single_content {
+      flex-direction: column;
+    }
+
+    .vid_frame {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .vid_frame iframe {
+      width: 100%;
+      max-width: 450px;
+    }
   }
 </style>
 <section class="centering">
@@ -316,44 +419,28 @@
       <div class="column">
         {% for i in first_column_images %}
         <div class="img-hover-zoom">
-          <img
-            src="/media_files/{{i.image}}"
-            style="width: 100%"
-            alt=""
-          />
+          <img src="/media_files/{{i.image}}" style="width: 100%" alt="" />
         </div>
         {% endfor %}
       </div>
       <div class="column">
         {% for i in second_column_images %}
         <div class="img-hover-zoom">
-          <img
-            src="/media_files/{{i.image}}"
-            style="width: 100%"
-            alt=""
-          />
+          <img src="/media_files/{{i.image}}" style="width: 100%" alt="" />
         </div>
         {% endfor %}
       </div>
       <div class="column">
         {% for i in third_column_images %}
         <div class="img-hover-zoom">
-          <img
-            src="/media_files/{{i.image}}"
-            style="width: 100%"
-            alt=""
-          />
+          <img src="/media_files/{{i.image}}" style="width: 100%" alt="" />
         </div>
         {% endfor %}
       </div>
       <div class="column">
         {% for i in fourth_column_images %}
         <div class="img-hover-zoom">
-          <img
-            src="/media_files/{{i.image}}"
-            style="width: 100%"
-            alt=""
-          />
+          <img src="/media_files/{{i.image}}" style="width: 100%" alt="" />
         </div>
         {% endfor %}
       </div>
@@ -364,21 +451,50 @@
     <img class="modal-content" id="modalImage" />
   </div>
   <div class="gallery-content" id="videoGallery">
-    <div class="row">
+
+
+
+    <div class="container">
       {% for i in all_videos %}
+      <div class="single_content">
+        <figure class="vid_frame">
+          <iframe style="border-radius: 5px;" src="{{i.video_link}}" frameborder="0" allowfullscreen></iframe>
+        </figure>
+        <div class="title_div">
+          <h2 class="video_title">{{i.video_title}} </h2>
+          <p style="margin-bottom: 32px; margin-top: 0; font-weight: bold; color:rgba(0, 0, 0, 0.326);">Dec. 17, 2018</p>
+          <p id="video_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quas enim officia,
+            nisi est non accusamus quod necessitatibus illo dignissimos vero amet perspiciatis, deleniti iure temporibus
+            optio minus inventore quae veniam expedita blanditiis cupiditate dolor. Ducimus ratione quam harum. Eveniet
+            ipsum aliquid, ad placeat illo vero illum deserunt, maiores, in facere qui nemo voluptatem provident culpa
+            doloribus tenetur consequuntur itaque.</p>
+        </div>
+      </div>
+      <hr style="margin-top: 0;
+    width: 96%;
+    margin-left: auto;
+    margin-right: auto;">
+      {% endfor %}
+    </div>
+
+
+
+
+
+    <!-- <div class="row">
+     
       <article class="video">
         <figure>
           <iframe src="{{i.video_link}}" frameborder="0" allowfullscreen></iframe>
         </figure>
         <p class="videoTitle">
-          {{i.video_title}}
+          {{i.video_title}} 
         </p>
       </article>
-      {% endfor %}
+    
       
       
-    </div>
-
+    </div> -->
     <!-- <div class="video_container">
             <div class="main-video">
                 <div class="video">
@@ -420,11 +536,8 @@
         </div> -->
   </div>
 </section>
-<script
-  src="http://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"
-></script>
+<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
 
 <script src="js/jquery.fancybox.min.js"></script>
 
