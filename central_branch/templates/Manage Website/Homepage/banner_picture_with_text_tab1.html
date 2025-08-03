@@ -514,7 +514,11 @@
                                         <form method="POST">
                                             {% csrf_token %}
                                             <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
-                                            <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
+                                            <i class="fas fa-trash delete_modal_btn"
+                                                data-id="{{ i.id }}"
+                                                data-target="#delete_image_modal"
+                                                title="Delete"></i>
+
                                         </form>
                                     </div>
                                 </div>
@@ -961,6 +965,8 @@
     <div id="delete_image_modal" class="modal_delete">
         <form method="post" id="form">
             {% csrf_token %}
+            <input type="hidden" name="delete" value="1">
+            <input type="hidden" name="get_item" id="delete_item_id">
         <div class="delete_modal_content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h1>Delete Image</h1>
@@ -1146,6 +1152,30 @@
         document.getElementById('mediaToggleForm').submit();
         });
     });
+
+
+    document.querySelectorAll('.delete_modal_btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const modalId = this.dataset.target; // "#delete_image_modal"
+        const bannerId = this.dataset.id;
+
+        // Show modal
+        const modal = document.querySelector(modalId);
+        modal.style.display = 'block';
+
+        // Set the hidden input value
+        document.getElementById('delete_item_id').value = bannerId;
+    });
+    });
+
+    // Close modal on 'x' or cancel button
+    document.querySelectorAll('.x_btn, .close_btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('delete_image_modal').style.display = 'none';
+    });
+    });
+
 
 
 
