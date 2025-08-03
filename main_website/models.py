@@ -28,6 +28,8 @@ class HomePageTopBanner(models.Model):
     media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
     
     video_url = models.URLField(blank=True, null=True)
+    
+    video_caption = models.CharField(null=True, blank=True, max_length=200)
        
     class Meta:
         verbose_name='Homepage Banner Picture or video With Texts'

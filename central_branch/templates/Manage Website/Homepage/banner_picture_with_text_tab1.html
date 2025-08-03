@@ -503,27 +503,37 @@
              <div class="carousel_container">
                 <button class="carousel_btn left_btn">&#10094;</button>
 
-                <div class="carousel_track_wrapper">
-                    <div class="carousel_track">
-                        {% for i in topBannerItems %}
-                        <div class="img_inner_container">
-                            <!-- <input type="checkbox" class="img_checkbox" /> -->
-                            <img src="{{media_url}}{{i.banner_picture}}" alt="Banner Image" />
-                            <div class="img_overlay"></div>
-                            <div class="img_icons">
-                                <form method="POST">
-                                {% csrf_token %}
-                                <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
-                                <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                                </form>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                <div class="carousel_container">
+                    <button class="carousel_btn left_btn">&#10094;</button>
 
-                <button class="carousel_btn right_btn">&#10095;</button>
-            </div>
+                    <div class="carousel_track_wrapper">
+                        <div class="carousel_track">
+                            {% for i in topBannerItems %}
+                                <div class="img_inner_container">
+                                    <img src="{{ media_url }}{{ i.banner_picture }}" alt="Banner Image" />
+                                    <div class="img_overlay"></div>
+                                    <div class="img_icons">
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <i class="fas fa-edit open_modal_btn"
+                                                data-id="{{ i.id }}"
+                                                data-image="{{ media_url }}{{ i.banner_picture }}"
+                                                data-text1="{{ i.text1 }}"
+                                                data-text2="{{ i.text2 }}"
+                                                data-text3="{{ i.text3 }}"
+                                                data-btn-text="{{ i.button_text }}"
+                                                data-btn-link="{{ i.button_link }}"
+                                                title="Update"></i>
+                                            <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button class="carousel_btn right_btn">&#10095;</button>
+                </div>
 
 
         <div style="margin-top: 40px;">  
@@ -531,12 +541,27 @@
                 <button class="add-video open_modal_btn" data-target="#add_video_modal">Update Video</button>
             </div>
 
+        {% if video_banner %}
             <div class="video_container">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <!-- <video controls="" autoplay="">
-                    <source src="https://youtu.be/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx">
-                </video> -->
+                {% with video_id=video_banner.video_url|cut:"https://www.youtube.com/watch?v=" %}
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/{{ video_id }}" 
+                    title="YouTube video player" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+                {% endwith %}
+
+                {% if video_banner.video_caption %}
+                <p class="video_caption" style="text-align: center; margin-top: 10px;">
+                    {{ video_banner.video_caption }}
+                </p>
+                {% endif %}
             </div>
+        {% endif %}
         </div>
         <br>
         <br>
@@ -831,6 +856,9 @@
     <div id="update_img_modal" class="modal_add_img_video">
         <form method="post" id="form">
             {% csrf_token %}
+            <input type="hidden" name="update_banner_image_modal" value="1">
+            <input type="hidden" name="banner_id" id="modal_banner_id">
+
         <div class="modal_content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h1>Update image</h1>
@@ -920,19 +948,19 @@
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Video link</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" class="text_fld_ip" name="video_url" required>
             </div>
 
             <div class="text_fld">
             <h2 style="font-size: 15px; margin:0px;">Text for video</h2>
             <div class="colon">:</div>
-            <input type="text" class="text_fld_ip">
+            <input type="text" class="text_fld_ip" name="video_caption" required>
             </div>
 
             <div style="display: flex; justify-content: end; padding-top: 20px;">
             <div style="display: flex;">
             <button type="button" class="close_btn">Cancel</button>
-            <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+            <input type="submit" class="confirm_btn" style="margin-left: 10px;" name="update_video" value="Confirm">
             </div>
             </div>
 

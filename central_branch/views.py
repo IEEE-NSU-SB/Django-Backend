@@ -1131,6 +1131,9 @@ def manage_website_homepage(request):
                 return DatabaseError
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
+            video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
+            image_banners = HomePageTopBanner.objects.filter(media_type='image')
+            
             # Getting Form response
             if request.method=="POST":
                 
@@ -1153,10 +1156,15 @@ def manage_website_homepage(request):
                     # Delelte the item. Getting the id of the item from the hidden input value.
                     HomePageTopBanner.objects.filter(id=request.POST.get('get_item')).delete()
                     return redirect('central_branch:manage_website_home')
+                
+                
+                
                 # To add a new Banner Item
+
                 if request.POST.get('add_banner'):
                     try:
                         newBanner=HomePageTopBanner.objects.create(
+                            media_type='image',
                             banner_picture=request.FILES['banner_picture'],
                             first_layer_text=request.POST['first_layer_text'],
                             first_layer_text_colored=request.POST['first_layer_text_colored'],
@@ -1170,6 +1178,36 @@ def manage_website_homepage(request):
                     except Exception as e:
                         print(f"Exception while adding banner: {e}")
                         traceback.print_exc()
+                elif request.POST.get('update_video'):
+                    try:
+                        # Try to find an existing video banner
+                        
+
+                        if video_banner:
+                            # Update existing video banner
+                            video_banner.video_url = request.POST['video_url']
+                            video_banner.video_caption = request.POST['video_caption']
+                            video_banner.save()
+                            messages.success(request, "Video banner updated successfully!")
+                        else:
+                            # Create new video banner if none exists
+                            HomePageTopBanner.objects.create(
+                                media_type='video',
+                                video_url=request.POST['video_url'],
+                                video_caption=request.POST['video_caption'],
+                                first_layer_text="FOCUSING LIMELIGHT ON",  # Optional defaults
+                                first_layer_text_colored="MASTERMINDS",
+                                third_layer_text="",
+                                button_text="About INSB",
+                                button_url="#"
+                            )
+                            messages.success(request, "Video banner created successfully!")
+
+                        return redirect('central_branch:manage_website_home')   
+                    except Exception as e:
+                        print(f"Error handling video banner update: {e}")
+                        traceback.print_exc()
+                        messages.error(request, "Failed to update video banner.")     
 
 
             '''For banner picture with Texts'''   
@@ -1275,6 +1313,9 @@ def manage_website_homepage(request):
                 'media_url':settings.MEDIA_URL,
                 'all_thoughts':all_thoughts,
                 'selected_type': toggle.media_type,
+                'video_banner': video_banner,
+                'topBannerItems': image_banners,
+
                 # 'insb_members':get_all_insb_members,
                 # 'volunteer_of_the_month_form':volunteer_of_the_month_form,
                 # 'all_volunteer_of_month':volunteers_of_the_month,
