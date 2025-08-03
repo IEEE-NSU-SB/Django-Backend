@@ -503,8 +503,6 @@
              <div class="carousel_container">
                 <button class="carousel_btn left_btn">&#10094;</button>
 
-                <div class="carousel_container">
-                    <button class="carousel_btn left_btn">&#10094;</button>
 
                     <div class="carousel_track_wrapper">
                         <div class="carousel_track">
@@ -515,15 +513,7 @@
                                     <div class="img_icons">
                                         <form method="POST">
                                             {% csrf_token %}
-                                            <i class="fas fa-edit open_modal_btn"
-                                                data-id="{{ i.id }}"
-                                                data-image="{{ media_url }}{{ i.banner_picture }}"
-                                                data-text1="{{ i.text1 }}"
-                                                data-text2="{{ i.text2 }}"
-                                                data-text3="{{ i.text3 }}"
-                                                data-btn-text="{{ i.button_text }}"
-                                                data-btn-link="{{ i.button_link }}"
-                                                title="Update"></i>
+                                            <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
                                             <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
                                         </form>
                                     </div>
@@ -856,8 +846,7 @@
     <div id="update_img_modal" class="modal_add_img_video">
         <form method="post" id="form">
             {% csrf_token %}
-            <input type="hidden" name="update_banner_image_modal" value="1">
-            <input type="hidden" name="banner_id" id="modal_banner_id">
+
 
         <div class="modal_content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
