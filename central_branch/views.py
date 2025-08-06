@@ -2546,12 +2546,11 @@ def manage_view_access(request):
         has_access = Branch_View_Access.common_access(request.user.username)
         if has_access:
             # get access of the page first
-            all_insb_members=port_render.get_all_registered_members(request)
-            branch_data_access=Branch.get_branch_data_access(request)
+            current_panel_members=Branch.load_current_panel_members()
 
             if request.method=="POST":
-                if(request.POST.get('update_access')):
-                    ieee_id=request.POST['remove_member_data_access']
+                if('update_access' in request.POST):
+                    ieee_id=request.POST['ieee_id']
                     
                     # Setting Data Access Fields to false initially
                     create_event_access=False
@@ -2605,24 +2604,11 @@ def manage_view_access(request):
                                                             'manage_custom_notification_access':manage_custom_notification_access,
                                                             'manage_email_access':manage_email_access})):
                         return redirect('central_branch:manage_access')
-                    
-                if(request.POST.get('add_member_to_access')):
-                    selected_members=request.POST.getlist('member_select')
-                    if(Branch.add_member_to_branch_view_access(request=request,selected_members=selected_members)):
-                        return redirect('central_branch:manage_access')
                 
-                if(request.POST.get('remove_member')):
-                    ieee_id=request.POST['remove_member_data_access']
-                    if(Branch.remover_member_from_branch_access(request=request,ieee_id=ieee_id)):
-                        return redirect('central_branch:manage_access')
-
-                
-
             context={
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
-                'insb_members':all_insb_members,
-                'branch_data_access':branch_data_access,
+                'current_panel_members':current_panel_members,
             }
 
             return render(request,'Manage Access/manage_access.html',context)
@@ -2634,7 +2620,36 @@ def manage_view_access(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
+class GetAccessDataAjax(View):
 
+    # @login_required
+    def get(self, request):
+        if request.GET.get('ieee_id'):
+            ieee_id = request.GET.get('ieee_id')
+            data = Branch.get_branch_data_access_for_member(request, ieee_id)
+            if data:
+                access_data = {
+                    "message":"success",
+                    "ieee_id":ieee_id,
+                    "name":data.ieee_id.name,
+                    "create_event_access":data.create_event_access,
+                    "event_details_page_access":data.event_details_page_access,
+                    "create_individual_task_access":data.create_individual_task_access,
+                    "create_team_task_access":data.create_team_task_access,
+                    "create_panels_access":data.create_panels_access,
+                    "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
+                    "team_details_page":data.team_details_page,
+                    "manage_award_access":data.manage_award_access,
+                    "manage_web_access":data.manage_web_access,
+                    "manage_custom_notification_access":data.manage_custom_notification_access,
+                    "manage_email_access":data.manage_email_access
+                }
+                return JsonResponse(access_data)
+            else:
+                name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
+                return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
+        else:
+            return JsonResponse({'message': "Invalid Response"})
 
 # Create your views here.
 

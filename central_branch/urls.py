@@ -64,10 +64,11 @@ urlpatterns = [
     path('manage_website/about/ieee_nsu_student_branch/',views.ieee_nsu_student_branch,name = "ieee_nsu_student_branch"),
     path('manage_website/about/faq/',views.faq,name = "faq"),
     path('manage_website/about/contact/',views.contact,name = "contact"),
-    path('manage_website/toolkit',views.manage_toolkit,name="manage_toolkit"),
+    path('manage_website/toolkit/',views.manage_toolkit,name="manage_toolkit"),
     path('manage_website/toolkit/update/<int:pk>',views.update_toolkit,name="update_toolkit"),
-    path('manage_website/feedbacks',views.feedbacks,name="feedbacks"),
-    path('manage_access',views.manage_view_access,name="manage_access"),
+    path('manage_website/feedbacks/',views.feedbacks,name="feedbacks"),
+    path('manage_access/',views.manage_view_access,name="manage_access"),
+    path('manage_access/get_access_data/', views.GetAccessDataAjax.as_view(), name="get_access_data"),
     
     #About Page preview urls
     path('manage_website/about/ieee/preview/',views.manage_about_preview,name = "manage_about_preview"),
