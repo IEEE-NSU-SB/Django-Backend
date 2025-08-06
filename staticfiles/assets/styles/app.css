@@ -1693,7 +1693,6 @@ body {
   .app-footer,
   .switcher {
     display: none; } }
-
 /* fix ie9 */
 .ie9 .app-aside {
   position: static !important; }
