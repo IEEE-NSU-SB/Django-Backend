@@ -171,7 +171,7 @@ class Event_Feedback(models.Model):
     event_id = models.ForeignKey(Events,null=False,blank=False,on_delete=models.CASCADE)
     name = models.CharField(null=False,blank=False,max_length=100)
     email = models.EmailField(null=False,blank=False)
-    satisfaction = models.CharField(null=False,blank=False,max_length=50)
+    satisfaction = models.CharField(null=False,blank=False,max_length=50,choices=[("very_satisfied", "Very Satisfied"), ("satisfied", "Satisfied"),("not_satisfied", "Not Satisfied")])
     comment = models.TextField(null=False,blank=False,max_length=400)
 
     class Meta:

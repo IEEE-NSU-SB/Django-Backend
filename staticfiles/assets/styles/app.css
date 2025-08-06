@@ -1393,7 +1393,8 @@ a.list-group-item {
 .box-color {
   background-color: #fff;
   position: relative;
-  margin-bottom: 1.5rem; }
+  margin-bottom: 1.5rem; 
+}
 
 .box-header {
   position: relative;

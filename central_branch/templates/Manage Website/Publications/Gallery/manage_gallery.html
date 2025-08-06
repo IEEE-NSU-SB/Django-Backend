@@ -64,9 +64,8 @@
         cursor: pointer;
     }
 </style>
-<body>
-    <div class="app" id="app">
-        <div ui-view class="app-body" style="justify-content:center; margin-left:27%; margin-right:15%;" id="view">
+        <div ui-view class="app-body" style="margin-left: 12%;" id="view">
+            <div class="container">
 
             <h4 style="justify-content:center;text-align:center;margin-bottom:15px;"><b>Gallery Section</b></h4>
             
@@ -96,7 +95,7 @@
                     <label style="margin-left:5px;">Search:</label>
                     <input class="form-control w-75" type="text" id="searchInput" placeholder="Search..." onkeyup="searchTable()">
                 </div>
-                <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
                 <table class="table table-bordered m-0" style="text-align:center;">
                     <thead>
                     <tr>
@@ -158,13 +157,14 @@
                     <label style="margin-left:5px;">Search:</label>
                     <input class="form-control w-75" type="text" id="searchInput2" placeholder="Search..." onkeyup="searchTable2()">
                 </div>
-                <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
                 <table class="table table-bordered m-0" id="table2" style="text-align:center;">
                     <thead>
                     <tr>
-                        <th style="text-align:center;">Video ID</th>
-                        <th style="text-align:center;">Video Title</th>
-                        <th style="text-align:center;">Video Link</th>
+                        <th style="text-align:center;">ID</th>
+                        <th style="text-align:center;">Title</th>
+                        <th style="text-align:center;">Description</th>
+                        <th style="text-align:center;">Link</th>
                         <th style="text-align:center;">Upload Date</th>
                         <th style="text-align:center;">Action</th>
                     </tr>
@@ -175,6 +175,7 @@
                         <tr>
                             <td><a style="text-decoration:none;color:#00629B;" href="{% url 'central_branch:update_video' i.pk %}">{{i.pk}}</a></td>
                             <td>{{ i.video_title }}</td>
+                            <td>Here dynamic Description will be added leter....</td>
                             <td>{{ i.video_link }}</td>
                             <td>{{i.upload_date}}</td>
                             
@@ -294,10 +295,8 @@
             </div>
             
         </div>
-        
     </div>
     
-</body>
 <script>
     var modal = document.getElementById("myModal");
     var modalImage = document.getElementById("modalImage");
