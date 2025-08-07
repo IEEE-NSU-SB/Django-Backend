@@ -204,6 +204,19 @@
       border: 1px solid #D9D9D9;
     }
 
+    .pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+         }
+
+       .pagination li.disabled {
+  pointer-events: none; /* Prevents click */
+  color: #aaa;
+  cursor: not-allowed;
+}
+  
+
     @media (max-width: 1600px) {
       .event_name_column_content {
         max-width: 500px;
@@ -330,13 +343,13 @@
             </table>
           </div>
           <!--		Start Pagination -->
-          <div class='pagination-container'>
+       <div class='pagination-container'>
             <nav>
-              <ul class="pagination">
+              <ul class="pagination"> 
                 <!--	Here the JS Function Will Add the Rows -->
-              </ul>
+               </ul>
             </nav>
-          </div>
+          </div> 
           <div class="rows_count">Showing 11 to 20 of 91 entries</div>
 
         </div>
@@ -364,73 +377,99 @@
   {% block common_js %}
   {% include "common_js.html" %}
   {% endblock common_js %}
+  <script src="{% static 'script/jquery.js' %}"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    getPagination('#table-id');
-    $('#maxRows').trigger('change');
-    function getPagination(table) {
+   $(document).ready(function () {
+  function paginateTable(table, maxRows) {
+    const totalRows = $(table + ' tbody tr').length;
+    const totalPages = Math.ceil(totalRows / maxRows);
+    const pagination = $('.pagination');
+    const rowsCountBox = $('.rows_count');
 
-      $('#maxRows').on('change', function () {
-        $('.pagination').html('');						// reset pagination div
-        var trnum = 0;									// reset tr counter 
-        var maxRows = parseInt($(this).val());			// get Max Rows from select option
+    function showPage(page) {
+      const start = (page - 1) * maxRows;
+      const end = start + maxRows;
 
-        var totalRows = $(table + ' tbody tr').length;		// numbers of rows 
-        $(table + ' tr:gt(0)').each(function () {			// each TR in  table and not the header
-          trnum++;									// Start Counter 
-          if (trnum > maxRows) {						// if tr number gt maxRows
+      $(table + ' tbody tr').hide().slice(start, end).show();
 
-            $(this).hide();							// fade it out 
-          } if (trnum <= maxRows) { $(this).show(); }// else fade in Important in case if it ..
-        });											//  was fade out to fade it in 
-        if (totalRows > maxRows) {						// if tr total rows gt max rows option
-          var pagenum = Math.ceil(totalRows / maxRows);	// ceil total(rows/maxrows) to get ..  
-          //	numbers of pages 
-          for (var i = 1; i <= pagenum;) {			// for each page append pagination li 
-            $('.pagination').append('<li data-page="' + i + '">\
-                          <span>'+ i++ + '<span class="sr-only">(current)</span></span>\
-                        </li>').show();
-          }											// end for i 
-
-
-        } 												// end if row count > max rows
-        $('.pagination li:first-child').addClass('active'); // add active class to the first li 
-
-
-        //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
-        showig_rows_count(maxRows, 1, totalRows);
-        //SHOWING ROWS NUMBER OUT OF TOTAL DEFAULT
-
-        $('.pagination li').on('click', function (e) {		// on click each page
-          e.preventDefault();
-          var pageNum = $(this).attr('data-page');	// get it's number
-          var trIndex = 0;							// reset tr counter
-          $('.pagination li').removeClass('active');	// remove active class from all li 
-          $(this).addClass('active');					// add active class to the clicked 
-
-
-          //SHOWING ROWS NUMBER OUT OF TOTAL
-          showig_rows_count(maxRows, pageNum, totalRows);
-          //SHOWING ROWS NUMBER OUT OF TOTAL
-
-
-
-          $(table + ' tr:gt(0)').each(function () {		// each tr in table not the header
-            trIndex++;								// tr index counter 
-            // if tr index gt maxRows*pageNum or lt maxRows*pageNum-maxRows fade if out
-            if (trIndex > (maxRows * pageNum) || trIndex <= ((maxRows * pageNum) - maxRows)) {
-              $(this).hide();
-            } else { $(this).show(); } 				//else fade in 
-          }); 										// end of for each tr in table
-        });										// end of on click pagination list
-      });
-      // end of on select change 
-
-      // END OF PAGINATION 
-
+      rowsCountBox.text(`Showing ${start + 1} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+      renderPagination(page);
     }
+
+    function renderPagination(currentPage) {
+      let pageHTML = '';
+
+      if (maxRows >= totalRows) {
+        // Hide pagination completely
+        pagination.html('');
+        rowsCountBox.text(`Showing 1 to ${totalRows} of ${totalRows} entries`);
+        return;
+      }
+
+      // Prev Button
+      pageHTML += `<li data-page="prev" class="${currentPage === 1 ? 'disabled' : ''}">« Prev</li>`;
+
+      // Always show page 1
+      if (currentPage > 2) {
+        pageHTML += `<li data-page="1">1</li>`;
+      }
+
+      // Left dots
+      if (currentPage > 3) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Page before current
+      if (currentPage - 1 > 1) {
+        pageHTML += `<li data-page="${currentPage - 1}">${currentPage - 1}</li>`;
+      }
+
+      // Current page
+      pageHTML += `<li class="active" data-page="${currentPage}">${currentPage}</li>`;
+
+      // Page after current
+      if (currentPage + 1 < totalPages) {
+        pageHTML += `<li data-page="${currentPage + 1}">${currentPage + 1}</li>`;
+      }
+
+      // Right dots
+      if (currentPage < totalPages - 2) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Last page
+      if (currentPage < totalPages - 1) {
+        pageHTML += `<li data-page="${totalPages}">${totalPages}</li>`;
+      }
+
+      // Next Button
+      pageHTML += `<li data-page="next" class="${currentPage === totalPages ? 'disabled' : ''}">Next »</li>`;
+
+      pagination.html(pageHTML);
+
+      // Pagination click
+      pagination.find('li').off('click').on('click', function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('active')) return;
+
+        let selected = $(this).data('page');
+        if (selected === 'prev') selected = currentPage - 1;
+        if (selected === 'next') selected = currentPage + 1;
+
+        showPage(parseInt(selected));
+      });
+    }
+
+    showPage(1);
+  }
+
+  $('#maxRows').on('change', function () {
+    paginateTable('#table-id', parseInt($(this).val()));
+  }).trigger('change');
+});
+// pagination end
 
     // SI SETTING
     /**$(function(){
