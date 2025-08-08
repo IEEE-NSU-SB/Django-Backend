@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
 
     {% block common_css %}
         {% include "common_css.html" %}
@@ -25,10 +26,11 @@
 
         body, html {
             margin: 0;
+            background-color: white;
             align-items: center;
             justify-content: center;
         }
-
+        
         .row {
             display: flex;
             justify-content: center;
@@ -39,6 +41,7 @@
         .btn-container {
             text-align: center;
         }
+        
         
         .btn {
             max-width: 100%;
@@ -189,7 +192,7 @@
             content: '+';
         }
         .spinner {
-            border: 16px solid #f3f3f3; /* Light grey */
+            border: 16px solid #ffffff; /* Light grey */
             border-top: 16px solid #3498db; /* Blue */
             border-radius: 50%;
             width: 50px;
@@ -201,6 +204,14 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        .box{
+            box-shadow: 4px 5px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        #addAttendee:hover {
+            background-color: #d5fdbd;
+            color: #4cab5c;
         }
     </style>
 </head>
@@ -242,7 +253,7 @@
                     style="color:#00629B;">{{event_details.event_name}}</b></span></h2>
                 
             
-                <h6 style="color: #861F41; font-weight: 700;">Note:</h6>
+                <h6 style="color: #00629B; font-weight: 700;">Note:</h6>
                 <ol style="justify-content:center;margin-bottom:15px;"><b>
                     <li>To publish the event on Google Calendar click the toogle button along with "Publish Event to Google Calendar:" and then scroll down to click on "Update Changes".</li>
                     <li>If you made any changes such as create Attendee, delete Attendee or add the attachment and so on, then scroll down to click on "Update Changes".</li>
@@ -298,12 +309,12 @@
             <!--Tab view end-->
             <br>
             
-            <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+            <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 
 <style>
     .publish-switch {
         display: flex;
-        justify-content: flex-end; /* Align to the right end */
+         /* Align to the right end */
         align-items: center;
         position: relative;
     }
@@ -437,6 +448,9 @@
     .modal-title{
         font-weight: bold;
     }
+    .modal-content{
+        border-radius: 25px;
+    }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     
@@ -475,18 +489,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Event Name: {{event.event_name}}</label>                       
+                    <label><b>Event Name: </b>{{event.event_name}}</label>                       
                 </div>
 
                 <div class="form-group">
                     {{form.media}}
                     {{form.as_p}}
                 </div>
+                <textarea name="description" id="description">{{ form.description.value }}</textarea>
 
                 <br>
 
                 <div class="form-group">
-                    <label>Select Attendee List:</label>
+                    <label><b>Select Attendee List:</b></label>
                       <select multiple class="form-control" name="attendeeList">
                         {% comment %}<option {% if "general_members" in selected_attendee_list %}selected{% endif %} value="general_members">All Registered Active Members of IEEE NSU SB</option>{% endcomment %}
                         {% comment %}<option {% if "all_officers" in selected_attendee_list %}selected{% endif %} value="all_officers">All Officers of IEEE NSU SB</option>{% endcomment %}
@@ -501,7 +516,7 @@
                   </div>
 
                   <div class="form-group row align-items-center">
-                    <label for="captions" class="col-sm-3 form-control-label" style="display: flex;">Add Attendee: &nbsp;
+                    <label for="captions" class="col-sm-3 form-control-label" style="display: flex;"><b>Add Attendee:</b> &nbsp;
                         <span>
                             <div class="item">
                                 <div class="tooltip">If you'd like to include an attendee who isn't on the Select Attendee List, please enter their email address here.</div>
@@ -538,7 +553,7 @@
                 {% if not is_event_published_gc %}
                     <!--upload doc-->
                     <div class="form-group">
-                        <label for="documents" style="display: flex;">Upload Attachments (if any):  &nbsp;
+                        <label for="documents" style="display: flex;"><b>Upload Attachments (if any): </b> &nbsp;
                             <span>
                                 <div class="item">
                                     <div class="tooltip">If you have any attachments, please upload them here. Be sure to click the "Publish Event to Google Calendar" button, and then click "Update Changes" to send the email with the attachments.</div>
@@ -611,7 +626,7 @@
             <div class="modal-body">  
                 <form id="AddCaptionModalForm">               
                     <div class="form-group">
-                        <label>Name:</label> 
+                        <label><b>Name:</b></label> 
                             <input
                                 placeholder="Attendee"
                                 class="form-control"
@@ -624,7 +639,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Email:</label> 
+                        <label><b>Email:</b></label> 
                             <input
                                 placeholder="Email"
                                 class="form-control"
@@ -782,33 +797,230 @@
     </script>       
     <script>
     // Function to update the selected documents container
-    function updateSelectedDocuments() {
-        var selectedDocumentsContainer = document.getElementById('content-selected-docs-container');
-        var selectedDocumentsInput = document.getElementById('content-selected-documents');
-        var inputFiles = document.getElementById('content-doc-input').files;
-  
-        // Clear the container
-        selectedDocumentsContainer.innerHTML = '';
-  
-        // Update the container with selected document links
-        for (var i = 0; i < inputFiles.length; i++) {
-            var documentLink = document.createElement('a');
-            //documentLink.href = '#'; // Set the link href accordingly
-            documentLink.className = 'btn btn-link btn-block';
-            documentLink.textContent = inputFiles[i].name;
-            selectedDocumentsContainer.appendChild(documentLink);
-  
-            // Add a line break after each link
-            selectedDocumentsContainer.appendChild(document.createElement('br'));
-  
-            // Update the hidden input with selected document names
-            selectedDocumentsInput.value += inputFiles[i].name + ',';
-        }
+    // Function to update the selected documents container
+function updateSelectedDocuments() {
+    var selectedDocumentsContainer = document.getElementById('content-selected-docs-container');
+    var selectedDocumentsInput = document.getElementById('content-selected-documents');
+    var inputFiles = document.getElementById('content-doc-input').files;
+
+    // Clear the container
+    selectedDocumentsContainer.innerHTML = '';
+
+    // Store selected file names in an array
+    var selectedFileNames = [];
+
+    for (var i = 0; i < inputFiles.length; i++) {
+        var fileName = inputFiles[i].name;
+        selectedFileNames.push(fileName);
+
+        // Create a visible label for each file
+        var fileLabel = document.createElement('p');
+        fileLabel.textContent = fileName;
+        fileLabel.className = 'mb-1 text-muted';
+        selectedDocumentsContainer.appendChild(fileLabel);
     }
+
+    // Join the file names into a comma-separated string for the hidden field
+    selectedDocumentsInput.value = selectedFileNames.join(',');
+}
+
+// Bind the function to the file input's change event
+document.getElementById('content-doc-input').addEventListener('change', updateSelectedDocuments);
+
   
     // Attach the updateSelectedDocuments function to the file input change event
     document.getElementById('content-doc-input').addEventListener('change', updateSelectedDocuments);
   </script>
+  <script>
+    $('#summernote').summernote({
+        placeholder: 'Describe the task...',
+        tabsize: 2,
+        height: 250,
+        toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'clear']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'video']],
+        ['view', ['fullscreen', 'codeview', 'help']]
+        ]
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const customSelects = document.querySelectorAll('.custom_select');
+
+        //updates the selected members
+        function updateSelectedOptions(customSelect) {
+            const selectedOptions = Array.from(customSelect.querySelectorAll(".option.active")).filter(option => option !== customSelect.querySelector(".option.all_tags")).map(function(option) {
+                return {
+                    value: option.getAttribute("data-value"),
+                    text: option.querySelector(".name").textContent.trim()
+                };
+            });
+
+            const selectedValues = selectedOptions.map(function(option){
+                return option.value;
+            });
+
+            customSelect.querySelector(".tags_input").value = selectedValues.join(", ");
+
+            let tagsHTML = "";
+            // console.log(selectedOptions.length)
+            if (selectedOptions.length === 0) {
+                tagsHTML = '<span class="placeholder">Select people to notify</span>';
+            } else {
+                const maxTagsToShow = 1000;
+
+                selectedOptions.forEach(function(option,index){
+                    if(index < maxTagsToShow){
+                        tagsHTML += '<span class="tag">' + option.text + '<span class="remove_tag" onclick="removeMember(this)" data-value="' + option.value+'">&times;</span></span>';
+                    }
+                })
+            }
+            	
+            customSelect.querySelector(".selected_options").innerHTML = tagsHTML;
+
+        }
+
+        customSelects.forEach(function(customSelect) {
+            const searchInput = customSelect.querySelector(".search_tags");
+            const optionsContainer = customSelect.querySelector(".options");
+            const noResultMessage = customSelect.querySelector(".no-result-message");
+            const options = customSelect.querySelectorAll(".option");
+            const allTagsOption = customSelect.querySelector(".option.all_tags");
+            const clearButton = customSelect.querySelector(".clear");
+
+            //if select all is clicked
+            allTagsOption.addEventListener("click", function () {
+                const isActive = allTagsOption.classList.contains("active");
+                options.forEach(function(option) {
+                    if (option !== allTagsOption && option !== noResultMessage) {
+                        option.classList.toggle("active", !isActive);
+                        // console.log(option)
+                    }
+                });
+
+                updateSelectedOptions(customSelect);
+            });
+
+            //clears the search bar
+            clearButton.addEventListener("click", function() {
+                searchInput.value = "";
+                options.forEach(function (option) {
+                    option.style.display = 'grid';
+                });
+                noResultMessage.style.display = 'none';
+            });
+
+            //filters the members
+            searchInput.addEventListener("input", function () {
+                const searchTerm = searchInput.value.toLowerCase();
+
+                options.forEach(function(option) {
+                    const optionText = option.textContent.trim().toLowerCase();
+                    const shouldShow = optionText.includes(searchTerm);
+                    option.style.display = shouldShow ? "grid" : "none";
+                });
+
+                const anyOptionsMatch = Array.from(options).some(option => option.style.display === "grid");
+                noResultMessage.style.display = anyOptionsMatch ? "none" : "block";
+
+                if (searchTerm) {
+                    optionsContainer.classList.add("option-search-active");
+                } else {
+                    optionsContainer.classList.remove("option-search-active");
+                }
+            });
+
+        });
+
+        //function for when a member is clicked
+        customSelects.forEach(function (customSelect) {
+            const options = customSelect.querySelectorAll(".option");
+            options.forEach(function (option) {
+                option.addEventListener("click", function () {
+                    option.classList.toggle("active");
+                    updateSelectedOptions(customSelect);
+                });
+            });
+        });
+
+        //function to remove tag
+        document.addEventListener("click", function (event) {
+            const removeTag = event.target.closest(".remove_tag");
+            if (removeTag) {
+                const customSelect = removeTag.closest(".custom_select");
+                const valueToRemove = removeTag.getAttribute("data-value");
+                const optionToRemove = customSelect.querySelector(".option[data-value='" + valueToRemove + "']");
+                optionToRemove.classList.remove("active");
+                const otherSelectedOptions = customSelect.querySelectorAll(".option.active:not(.all_tags)");
+                const allTagsOption = customSelect.querySelector(".option.all_tags");
+                if (otherSelectedOptions.length === 0) {
+                    allTagsOption.classList.remove("active");
+                }
+                updateSelectedOptions(customSelect);
+            }
+        });
+
+        //function for dropdown
+        const selectBoxes = document.querySelectorAll('.select_box');
+        selectBoxes.forEach(function(selectBox){
+            selectBox.addEventListener("click",function(event){
+                if(!event.target.closest(".tag")){
+                    selectBox.parentNode.classList.toggle('open');
+                }
+            });
+        });
+        document.addEventListener("click",function(event){
+            if(!event.target.closest(".custom_select") && !event.target.classList.contains("remove_tag")){
+                customSelects.forEach(function(customSelect){
+                    customSelect.classList.remove("open");
+                })
+            }
+
+        // function resetCustomSelects(){
+        //     customSelects.forEach(function(customSelect){
+        //         customSelect.querySelectorAll(".option.active").forEach(function(option){
+        //             option.classList.remove("active");
+        //         });
+        //         customSelect.querySelector(".option.all_tags").classList.remove("active");
+        //         updateSelectedOptions(customSelect);
+        //         });
+        //         updateSelectedOptions(customSelect[0]);
+        // }
+
+        //function for submitting without selecting any members
+        const submitButton = document.querySelector(".submit_btn");
+        submitButton.addEventListener("click",function(){
+            let valid = true;
+
+            customSelects.forEach(function(customSelect){
+                const selectedOptions = customSelect.querySelectorAll(".option.active");
+                if(selectedOptions.length === 0){
+                    const tagErrorMsg = customSelect.querySelector(".tag_error_msg");
+                    tagErrorMsg.textContent = "This field is required";
+                    tagErrorMsg.style.display = "block";
+                    valid = false;
+                }else{
+                    const tagErrorMsg = customSelect.querySelector(".tag_error_msg");
+                    tagErrorMsg.textContent = "";
+                    tagErrorMsg.style.display = "none";
+                }
+            });
+
+            // if(valid){
+            //     let tags = document.querySelector(".tags_input").value;
+            //     resetCustomSelects();
+            //     return;
+            // }
+        })
+    });
+    });
+
+</script>
   <script>
     const google_calendar_toggle_button = document.getElementById('google_calendar_toggle_button');
     google_calendar_toggle_button.addEventListener('click',()=>{
@@ -956,6 +1168,15 @@
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
+<!-- jQuery (needed for Summernote) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js & Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Summernote JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
 
 
     
