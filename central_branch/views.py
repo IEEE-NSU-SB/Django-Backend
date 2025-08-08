@@ -1144,6 +1144,29 @@ def manage_website_homepage(request):
                 
 
                 # Handle toggle form POST
+                
+                if "update_top_banner" in request.POST:
+                    image_id = request.POST.get('image_id')
+                
+                    print(request.FILES.get('banner_picture'))
+                    banner_image = None
+                    if request.FILES.get('banner_picture'):
+                        banner_image = request.FILES['banner_picture']
+
+                    first_layer_text = request.POST['first_layer_text']
+                    first_layer_text_colored = request.POST['first_layer_text_colored']
+                    third_layer_text = request.POST['third_layer_text']
+                    button_text = request.POST['button_text']
+                    button_url = request.POST['button_url']
+
+                    if(Branch.update_website_homepage_top_banner(image_id, banner_image, first_layer_text, first_layer_text_colored, third_layer_text, button_text, button_url)):
+                        messages.success(request, 'Updated Successfully!')
+                    else:
+                        messages.warning(request, 'Something went wrong!')
+
+                    return redirect('central_branch:manage_website_home')
+
+                
                 if request.POST.get('media_type'):
                     selected_media = request.POST.get('media_type', 'image')
                     toggle.media_type = selected_media
