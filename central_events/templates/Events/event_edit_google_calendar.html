@@ -255,8 +255,8 @@
             
                 <h6 style="color: #00629B; font-weight: 700;">Note:</h6>
                 <ol style="justify-content:center;margin-bottom:15px;"><b>
-                    <li>To publish the event on Google Calendar click the toogle button along with "Publish Event to Google Calendar:" and then scroll down to click on "Update Changes".</li>
-                    <li>If you made any changes such as create Attendee, delete Attendee or add the attachment and so on, then scroll down to click on "Update Changes".</li>
+                    <li>To publish the event on Google Calendar click the toogle button along with <b style= "color: #00629b">"Publish Event to Google Calendar:"</b> and then scroll down to click on <b style= "color: #00629b">"Update Changes"</b>.</li>
+                    <li>If you made any changes such as create Attendee, delete Attendee or add the attachment and so on, then scroll down to click on<b style= "color: #00629b"> "Update Changes"</b>.</li>
                     <li style="color: red;">If you have any attachments then once you published it in Google Calendar, you won't be able to change it. To change it, you need to unpublish and then you can modify the attachments.</li>
                 </ol></b>
 
@@ -491,13 +491,13 @@
                 <div class="form-group">
                     <label><b>Event Name: </b>{{event.event_name}}</label>                       
                 </div>
+                <label><b>Event Description for Google Calendar:</b></label>
 
                 <div class="form-group">
-                    {{form.media}}
-                    {{form.as_p}}
-                </div>
-                <textarea name="description" id="description">{{ form.description.value }}</textarea>
+                    <textarea name="description" id="summernote">{{ form.description.value }}</textarea>
 
+                </div>
+                
                 <br>
 
                 <div class="form-group">
@@ -831,12 +831,14 @@ document.getElementById('content-doc-input').addEventListener('change', updateSe
     // Attach the updateSelectedDocuments function to the file input change event
     document.getElementById('content-doc-input').addEventListener('change', updateSelectedDocuments);
   </script>
-  <script>
+  <!-- ...existing code... -->
+<script>
+  $(document).ready(function() {
     $('#summernote').summernote({
-        placeholder: 'Describe the task...',
-        tabsize: 2,
-        height: 250,
-        toolbar: [
+      placeholder: 'Describe the event...',
+      tabsize: 2,
+      height: 250,
+      toolbar: [
         ['style', ['style']],
         ['font', ['bold', 'underline', 'clear']],
         ['color', ['color']],
@@ -844,9 +846,11 @@ document.getElementById('content-doc-input').addEventListener('change', updateSe
         ['table', ['table']],
         ['insert', ['link', 'picture', 'video']],
         ['view', ['fullscreen', 'codeview', 'help']]
-        ]
+      ]
     });
+  });
 </script>
+<!-- ...existing code... -->
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
