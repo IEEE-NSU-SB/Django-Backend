@@ -17,6 +17,18 @@
         border-radius: 4px;
     }
 
+    /* NEW STYLES FOR ALIGNMENT */
+    .input-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Creates space between the input and the icon */
+    }
+
+    .input-with-icon .form-control {
+        flex-grow: 1; /* Makes the input field fill the available space */
+        width: auto;  /* Allows flex-grow to control the width */
+    }
+
     #media-selected-images-container {
         max-width: 100%;
     }
@@ -70,11 +82,7 @@
         color: gray;
     }
 
-    .icon_position {
-        position: relative;
-        bottom: 30px;
-        left: 95%;
-    }
+    /* REMOVED .icon_position class as it is no longer needed */
 
     .save-button {
         border-radius: 4px;
@@ -169,7 +177,7 @@
     }
 
     #deleteModal .delete-button {
-        background-color: rgb(213, 251, 219); 
+        background-color: rgb(213, 251, 219);
         color: rgb(76, 171, 92);
     }
     #deleteModal .delete-button:hover {
@@ -199,18 +207,36 @@
 
                 <div class="form-group">
                     <label style="font-weight: bold; font-size: 18px">Folder Drive Link for Event Pictures</label>
-                    <input placeholder="Provide Drive Link for The Event" class="form-control" style="width: 94%; border-radius: 4px;" type="url" autocomplete="off"
-                        id="field1" value="{{media_links.media_link}}" name="drive_link_of_event" />
-                    <a href="{{media_links.media_link}}" class="icon_position"><i class="fa fa-external-link"
-                            aria-hidden="true"></i></i></a>
+                    <div class="input-with-icon">
+                        <input placeholder="Provide Drive Link for The Event" class="form-control" style="border-radius: 4px;" type="url" autocomplete="off"
+                            id="field1" value="{{media_links.media_link}}" name="drive_link_of_event" />
+                        <a href="{{media_links.media_link}}" style="
+                        margin-left: 8px;
+                        background: white;
+                        padding: 6px;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        text-decoration: none;
+                        display: inline-block;"><i class="fa fa-external-link"
+                                aria-hidden="true"></i></a>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label style="font-weight: bold; font-size: 18px;">Folder Drive Link for Pictures with Logos</label>
-                    <input placeholder="Provide Link for the Logo's" class="form-control" style="width: 94%; border-radius: 4px;" type="url" autocomplete="off"
-                        value="{{media_links.logo_link}}" name="logo_drive_link_of_event" />
-                    <a href="{{media_links.logo_link}}" class="icon_position"><i class="fa fa-external-link"
-                            aria-hidden="true"></i></i></a>
+                    <div class="input-with-icon">
+                        <input placeholder="Provide Link for the Logo's" class="form-control" style="border-radius: 4px;" type="url" autocomplete="off"
+                            value="{{media_links.logo_link}}" name="logo_drive_link_of_event" />
+                        <a href="{{media_links.logo_link}}" style="
+                        margin-left: 8px;
+                        background: white;
+                        padding: 6px;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        text-decoration: none;
+                        display: inline-block;"><i class="fa fa-external-link"
+                                aria-hidden="true"></i></a>
+                    </div>
                 </div>
 
                 <div class="form-group">
