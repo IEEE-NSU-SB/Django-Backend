@@ -27,6 +27,7 @@
             margin: 0;
             align-items: center;
             justify-content: center;
+            background-color: white;
         }
 
         .row {
@@ -56,22 +57,20 @@
             }
         }
 
-
         h1{
             text-align:center;
-            font-size:30px;
+            font-size:20px;
             font-weight:bold;
         }
     
         label{
             font-size:20px;
         }
-        
-
         .app-body{
             justify-content:center; 
             margin-left:15%;
             margin-right:15%;
+            background-color:white;
         }
         
         @media (max-width: 760px) {
@@ -80,6 +79,106 @@
                 margin-right: 5%;
             }
         }
+ /*  */
+   h6{
+    color:#00629B;
+   }
+
+
+.captions{
+    padding-left: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .box {
+        padding: 15px;
+    }
+    .box-header h1 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Modal container */
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.5rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+/* Modal header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header .modal-title {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #00629B;
+  margin: 0;
+}
+.modal-body{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 25px;
+    margin: 0px;
+}
+.modal-body p{
+    display: none;
+}
+/* Close button */
+/* .modal-header .close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s ease;
+} */
+
+.modal-header .close:hover {
+  color: #00629B;
+}
+
+/* Modal body form */
+.modal-body form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding:0px;
+}
+
+
+/* Input field */
+.form-control {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #00629B;
+  box-shadow: 0 0 8px rgba(0, 98, 155, 0.4);
+}
+
+.form-control::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+  
     </style>
 </head>
 <body>
@@ -112,24 +211,21 @@
       
       <!-- ############ PAGE START-->
       <div ui-view class="app-body" id="view">
-
-
+        <br>
         <div class="container">
-          <br>
-          <br>
           <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;">{{event_name}}</b></span></h2>
           <h6>Note:</h6>
           <ol style="justify-content:center;margin-bottom:15px;"><b>
-          <li>Provide the captions for the event by clicking on the (+) icon</li>
-          <li>You can add as many captions as you want, and you can update or delete them</li>
-          <li>Make sure to save any changes you make before leaving</li>
+          <li> Provide the captions for the event by clicking on the (+) icon</li>
+          <li> You can add as many captions as you want, and you can update or delete them</li>
+          <li> Make sure to save any changes you make before leaving</li>
           </ol></b>
 
-          <br>
+       
 
             <!--for error messages-->
             <div class="container">
-                <br>
+           
                 {% for message in messages  %}
                     <p>
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -140,7 +236,7 @@
                         </div>
                     </p>
                     {% endfor %}
-                    <br>
+                    
             </div>
             <!--for error messages end-->
 
@@ -166,12 +262,6 @@
         <!--PAGE END-->
 
         
-        
-        
-
-        
-
-    
 
         <!--Theme Switcher-->
 
