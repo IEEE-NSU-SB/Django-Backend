@@ -179,6 +179,20 @@
             margin-bottom: .5rem;
         }
 
+         .pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+         }
+.pagination li {
+    border-radius: 4px !important;
+  }
+       .pagination li.disabled {
+  pointer-events: none; /* Prevents click */
+  color: #aaa;
+  cursor: not-allowed;
+}
+
         @media (max-width: 760px) {
             .app-body {
                 margin-left: 5%;
@@ -477,7 +491,7 @@
     {% block common_js %}
         {% include "common_js.html" %}
     {% endblock common_js %}
-
+    <script src="{% static 'script/jquery.js' %}"></script>
     <script src="{% static 'table_search.js'%}"></script>
     <script>
       document.getElementById('year_to_be_selected').addEventListener('change', function() {
@@ -523,7 +537,95 @@
         }
     }
     
-    
+    // pagination script 
+  $(document).ready(function () {
+  function paginateTable(table, maxRows) {
+    const totalRows = $(table + ' tbody tr').length;
+    const totalPages = Math.ceil(totalRows / maxRows);
+    const pagination = $('.pagination');
+    const rowsCountBox = $('.rows_count');
+
+    function showPage(page) {
+      const start = (page - 1) * maxRows;
+      const end = start + maxRows;
+
+      $(table + ' tbody tr').hide().slice(start, end).show();
+
+      rowsCountBox.text(`Showing ${start + 1} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+      renderPagination(page);
+    }
+
+    function renderPagination(currentPage) {
+      let pageHTML = '';
+
+      if (maxRows >= totalRows) {
+        // Hide pagination completely
+        pagination.html('');
+        rowsCountBox.text(`Showing 1 to ${totalRows} of ${totalRows} entries`);
+        return;
+      }
+
+      // Prev Button
+      pageHTML += `<li data-page="prev" class="${currentPage === 1 ? 'disabled' : ''}">« Prev</li>`;
+
+      // Always show page 1
+      if (currentPage > 2) {
+        pageHTML += `<li data-page="1">1</li>`;
+      }
+
+      // Left dots
+      if (currentPage > 3) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Page before current
+      if (currentPage - 1 > 1) {
+        pageHTML += `<li data-page="${currentPage - 1}">${currentPage - 1}</li>`;
+      }
+
+      // Current page
+      pageHTML += `<li class="active" data-page="${currentPage}">${currentPage}</li>`;
+
+      // Page after current
+      if (currentPage + 1 < totalPages) {
+        pageHTML += `<li data-page="${currentPage + 1}">${currentPage + 1}</li>`;
+      }
+
+      // Right dots
+      if (currentPage < totalPages - 2) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Last page
+      if (currentPage < totalPages - 1) {
+        pageHTML += `<li data-page="${totalPages}">${totalPages}</li>`;
+      }
+
+      // Next Button
+      pageHTML += `<li data-page="next" class="${currentPage === totalPages ? 'disabled' : ''}">Next »</li>`;
+
+      pagination.html(pageHTML);
+
+      // Pagination click
+      pagination.find('li').off('click').on('click', function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('active')) return;
+
+        let selected = $(this).data('page');
+        if (selected === 'prev') selected = currentPage - 1;
+        if (selected === 'next') selected = currentPage + 1;
+
+        showPage(parseInt(selected));
+      });
+    }
+
+    showPage(1);
+  }
+
+  $('#maxRows').on('change', function () {
+    paginateTable('#table-id', parseInt($(this).val()));
+  }).trigger('change');
+});
+// pagination end
     
     
     
