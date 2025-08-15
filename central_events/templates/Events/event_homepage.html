@@ -416,7 +416,7 @@
                         </tr>
                         {% endfor %}
                         
-                      <tbody>
+                      </tbody>
                     </table>
                   </div>
                   <!--		Start Pagination -->
@@ -480,51 +480,93 @@
 
     <script src="{% static 'table_search.js'%}"></script>
     <script>
-      document.getElementById('year_to_be_selected').addEventListener('change', function() {
-          var selectedYear = this.value;
-          var tableRows = document.querySelectorAll('#table-id tbody tr');
-  
-          tableRows.forEach(function(row) {
-              var eventDate = row.querySelector('td:nth-child(6)').textContent.trim(); // Get event date
-              var eventYear = new Date(eventDate).getFullYear(); // Extract year from event date
-  
-              if (selectedYear === 'All' || selectedYear === eventYear.toString()) {
-                  row.style.display = 'table-row';
-              } else {
-                  row.style.display = 'none';
-              }
-          });
-      });
-      function FilterkeyWord_all_table() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search_input_all");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("table-id");
-        tr = table.getElementsByTagName("tr");
-    
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1]; // Change index to 1 for the event name column
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                var eventYear = tr[i].querySelector('td:nth-child(6)').textContent.trim().split(' ')[2]; // Extract year from event date
-    
-                // Check if "Show all years" is selected or if the event year matches the selected year
-                if (document.getElementById('year_to_be_selected').value === 'All' || eventYear === document.getElementById('year_to_be_selected').value) {
-                    // Check if the event name contains the filter text
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = ""; // Show the row
-                    } else {
-                        tr[i].style.display = "none"; // Hide the row
-                    }
-                } else {
-                    tr[i].style.display = "none"; // Hide the row if it doesn't match the selected year
-                }
-            }
+      $(document).ready(function () {
+        function paginateTable(table, maxRows) {
+        const totalRows = $(table + ' tbody tr').length;
+        const totalPages = Math.ceil(totalRows / maxRows);
+        const pagination = $('.pagination');
+        const rowsCountBox = $('.rows_count');
+
+        function showPage(page) {
+          const start = (page - 1) * maxRows;
+          const end = start + maxRows;
+
+          $(table + ' tbody tr').hide().slice(start, end).show();
+
+          rowsCountBox.text(`Showing ${start + 1} to ${Math.min(end, totalRows)} of ${totalRows} entries`);
+          renderPagination(page);
         }
+
+        function renderPagination(currentPage) {
+          let pageHTML = '';
+
+          if (maxRows >= totalRows) {
+        // Hide pagination completely
+            pagination.html('');
+            rowsCountBox.text(`Showing 1 to ${totalRows} of ${totalRows} entries`);
+            return;
+          }
+
+      // Prev Button
+      pageHTML += `<li data-page="prev" class="${currentPage === 1 ? 'disabled' : ''}">« Prev</li>`;
+
+      // Always show page 1
+      if (currentPage > 2) {
+        pageHTML += `<li data-page="1">1</li>`;
+      }
+
+      // Left dots
+      if (currentPage > 3) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Page before current
+      if (currentPage - 1 > 1) {
+        pageHTML += `<li data-page="${currentPage - 1}">${currentPage - 1}</li>`;
+      }
+
+      // Current page
+      pageHTML += `<li class="active" data-page="${currentPage}">${currentPage}</li>`;
+
+      // Page after current
+      if (currentPage + 1 < totalPages) {
+        pageHTML += `<li data-page="${currentPage + 1}">${currentPage + 1}</li>`;
+      }
+
+      // Right dots
+      if (currentPage < totalPages - 2) {
+        pageHTML += `<li class="disabled">...</li>`;
+      }
+
+      // Last page
+      if (currentPage < totalPages - 1) {
+        pageHTML += `<li data-page="${totalPages}">${totalPages}</li>`;
+      }
+
+      // Next Button
+      pageHTML += `<li data-page="next" class="${currentPage === totalPages ? 'disabled' : ''}">Next »</li>`;
+
+      pagination.html(pageHTML);
+
+      // Pagination click
+      pagination.find('li').off('click').on('click', function () {
+        if ($(this).hasClass('disabled') || $(this).hasClass('active')) return;
+
+        let selected = $(this).data('page');
+        if (selected === 'prev') selected = currentPage - 1;
+        if (selected === 'next') selected = currentPage + 1;
+
+        showPage(parseInt(selected));
+      });
     }
-    
-    
-    
+
+    showPage(1);
+  }
+
+  $('#maxRows').on('change', function () {
+    paginateTable('#table-id', parseInt($(this).val()));
+  }).trigger('change');
+});
     
     
   </script>
