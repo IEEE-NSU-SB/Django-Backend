@@ -583,7 +583,7 @@
                             <div class="select_box">
                                 <input type="text" class="tags_input" name="tags" hidden required>
                                 <div class="selected_options">
-                                    <span class="placeholder">Select people to notify</span>
+                                    <span class="placeholder">Select people </span>
                                 </div>
                                 <div class="arrow_icon">
                                     <i class="fa fa-chevron-down"></i>
@@ -990,7 +990,7 @@ document.getElementById('content-doc-input').addEventListener('change', updateSe
             let tagsHTML = "";
             // console.log(selectedOptions.length)
             if (selectedOptions.length === 0) {
-                tagsHTML = '<span class="placeholder">Select people to notify</span>';
+                tagsHTML = '<span class="placeholder">Select people </span>';
             } else {
                 const maxTagsToShow = 1000;
 
