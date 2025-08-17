@@ -10,7 +10,7 @@ from system_administration.system_error_handling import ErrorHandling
 
 class System_Logs:
     
-    def save_logs(instance, action, ip, message=None):
+    def save_logs(instance, action, ip=None, message=None):
         '''This function saves the general log whenever needed'''
         
         try:
