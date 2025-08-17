@@ -11,11 +11,5 @@ def get_renewal_session_id(session_name):
         id=session_id[i]['id']
     return id
 
-def encrypt_password(password):
-    # key=Fernet.generate_key()
-    # fernet=Fernet(key=key)
-    # return fernet.encrypt(password.encode())
-    pass
-
     
     
