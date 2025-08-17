@@ -10,7 +10,7 @@ from system_administration.system_error_handling import ErrorHandling
 
 class System_Logs:
     
-    def save_logs(instance, action):
+    def save_logs(instance, action, ip):
 
         '''This function saves the general log whenever needed'''
         
@@ -21,6 +21,7 @@ class System_Logs:
             log_details = {
                 'action': action,
                 'user': str(user) if user else "Anonymous",
+                'ip': ip
             }
             
             #getting current time
