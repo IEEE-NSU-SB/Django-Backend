@@ -1,9 +1,8 @@
-import imp
 from django.urls import path,include
 from . import views
 from .views import GetTaskCategoryPointsAjax, SaveMemberTaskPointsAjax, UpdatePositionAjax,UpdateAwardAjax
 from .views import UpdatePositionAjax,UpdateRestrictionAjax,AwardRanking
-from wallet import views as walletViews
+from django.contrib.auth.decorators import login_required
 
 app_name='central_branch'
 
@@ -68,7 +67,7 @@ urlpatterns = [
     path('manage_website/toolkit/update/<int:pk>',views.update_toolkit,name="update_toolkit"),
     path('manage_website/feedbacks/',views.feedbacks,name="feedbacks"),
     path('manage_access/',views.manage_view_access,name="manage_access"),
-    path('manage_access/get_access_data/', views.GetAccessDataAjax.as_view(), name="get_access_data"),
+    path('manage_access/get_access_data/', login_required(views.GetAccessDataAjax.as_view()), name="get_access_data"),
     
     #About Page preview urls
     path('manage_website/about/ieee/preview/',views.manage_about_preview,name = "manage_about_preview"),

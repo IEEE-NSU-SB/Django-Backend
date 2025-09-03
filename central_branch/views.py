@@ -2624,32 +2624,37 @@ class GetAccessDataAjax(View):
 
     # @login_required
     def get(self, request):
-        if request.GET.get('ieee_id'):
-            ieee_id = request.GET.get('ieee_id')
-            data = Branch.get_branch_data_access_for_member(request, ieee_id)
-            if data:
-                access_data = {
-                    "message":"success",
-                    "ieee_id":ieee_id,
-                    "name":data.ieee_id.name,
-                    "create_event_access":data.create_event_access,
-                    "event_details_page_access":data.event_details_page_access,
-                    "create_individual_task_access":data.create_individual_task_access,
-                    "create_team_task_access":data.create_team_task_access,
-                    "create_panels_access":data.create_panels_access,
-                    "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
-                    "team_details_page":data.team_details_page,
-                    "manage_award_access":data.manage_award_access,
-                    "manage_web_access":data.manage_web_access,
-                    "manage_custom_notification_access":data.manage_custom_notification_access,
-                    "manage_email_access":data.manage_email_access
-                }
-                return JsonResponse(access_data)
+        has_access = Branch_View_Access.common_access(request.user.username)
+
+        if has_access:
+            if request.GET.get('ieee_id'):
+                ieee_id = request.GET.get('ieee_id')
+                data = Branch.get_branch_data_access_for_member(request, ieee_id)
+                if data:
+                    access_data = {
+                        "message":"success",
+                        "ieee_id":ieee_id,
+                        "name":data.ieee_id.name,
+                        "create_event_access":data.create_event_access,
+                        "event_details_page_access":data.event_details_page_access,
+                        "create_individual_task_access":data.create_individual_task_access,
+                        "create_team_task_access":data.create_team_task_access,
+                        "create_panels_access":data.create_panels_access,
+                        "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
+                        "team_details_page":data.team_details_page,
+                        "manage_award_access":data.manage_award_access,
+                        "manage_web_access":data.manage_web_access,
+                        "manage_custom_notification_access":data.manage_custom_notification_access,
+                        "manage_email_access":data.manage_email_access
+                    }
+                    return JsonResponse(access_data)
+                else:
+                    name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
+                    return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
             else:
-                name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
-                return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
+                return JsonResponse({'message': "Invalid Response"})
         else:
-            return JsonResponse({'message': "Invalid Response"})
+            return JsonResponse({'message':'Not Allowed'})
 
 # Create your views here.
 
