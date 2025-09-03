@@ -76,6 +76,7 @@ from django.views import View
 from task_assignation.models import *
 import re
 from email.utils import getaddresses, parseaddr, parsedate_to_datetime
+from main_website.models import MediaToggle
 
 # Create your views here.
 logger=logging.getLogger(__name__)
@@ -1107,7 +1108,7 @@ def publish_blog_request(request,pk):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
-from main_website.models import HomePageTopBanner
+from main_website.models import HomePageTopBanner, MediaToggle
 @login_required
 @member_login_permission
 def manage_website_homepage(request):
@@ -1129,19 +1130,64 @@ def manage_website_homepage(request):
             if(user_data==False):
                 return DatabaseError
             
+            toggle, created = MediaToggle.objects.get_or_create(id=1)
+            video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
+            image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response
             if request.method=="POST":
+                
+                # --- Handle Media Toggle Switch ---
+                
+
+                # Get or create media toggle instance
+                
+
+                # Handle toggle form POST
+                
+                if "update_top_banner" in request.POST:
+                    image_id = request.POST.get('image_id')
+                
+                    print(request.FILES.get('banner_picture'))
+                    banner_image = None
+                    if request.FILES.get('banner_picture'):
+                        banner_image = request.FILES['banner_picture']
+
+                    first_layer_text = request.POST['first_layer_text']
+                    first_layer_text_colored = request.POST['first_layer_text_colored']
+                    third_layer_text = request.POST['third_layer_text']
+                    button_text = request.POST['button_text']
+                    button_url = request.POST['button_url']
+
+                    if(Branch.update_website_homepage_top_banner(image_id, banner_image, first_layer_text, first_layer_text_colored, third_layer_text, button_text, button_url)):
+                        messages.success(request, 'Updated Successfully!')
+                    else:
+                        messages.warning(request, 'Something went wrong!')
+
+                    return redirect('central_branch:manage_website_home')
+
+                
+                if request.POST.get('media_type'):
+                    selected_media = request.POST.get('media_type', 'image')
+                    toggle.media_type = selected_media
+                    toggle.save()
+                    messages.success(request, f"Media type changed to {selected_media}")
+                    return redirect('central_branch:manage_website_home')
 
                 # To delete an item
                 if request.POST.get('delete'):
                     # Delelte the item. Getting the id of the item from the hidden input value.
                     HomePageTopBanner.objects.filter(id=request.POST.get('get_item')).delete()
                     return redirect('central_branch:manage_website_home')
+                
+                
+                
                 # To add a new Banner Item
+
                 if request.POST.get('add_banner'):
                     try:
                         newBanner=HomePageTopBanner.objects.create(
+                            media_type='image',
                             banner_picture=request.FILES['banner_picture'],
                             first_layer_text=request.POST['first_layer_text'],
                             first_layer_text_colored=request.POST['first_layer_text_colored'],
@@ -1152,8 +1198,39 @@ def manage_website_homepage(request):
                         newBanner.save()
                         messages.success(request,"New Banner Picture added in Homepage successfully!")
                         return redirect('central_branch:manage_website_home')
-                    except:
-                        print("GG")
+                    except Exception as e:
+                        print(f"Exception while adding banner: {e}")
+                        traceback.print_exc()
+                elif request.POST.get('update_video'):
+                    try:
+                        # Try to find an existing video banner
+                        
+
+                        if video_banner:
+                            # Update existing video banner
+                            video_banner.video_url = request.POST['video_url']
+                            video_banner.video_caption = request.POST['video_caption']
+                            video_banner.save()
+                            messages.success(request, "Video banner updated successfully!")
+                        else:
+                            # Create new video banner if none exists
+                            HomePageTopBanner.objects.create(
+                                media_type='video',
+                                video_url=request.POST['video_url'],
+                                video_caption=request.POST['video_caption'],
+                                first_layer_text="FOCUSING LIMELIGHT ON",  # Optional defaults
+                                first_layer_text_colored="MASTERMINDS",
+                                third_layer_text="",
+                                button_text="About INSB",
+                                button_url="#"
+                            )
+                            messages.success(request, "Video banner created successfully!")
+
+                        return redirect('central_branch:manage_website_home')   
+                    except Exception as e:
+                        print(f"Error handling video banner update: {e}")
+                        traceback.print_exc()
+                        messages.error(request, "Failed to update video banner.")     
 
 
             '''For banner picture with Texts'''   
@@ -1180,6 +1257,7 @@ def manage_website_homepage(request):
                         messages.success(request,"Banner Picture With Statistics was successfully updated")
                         return redirect('central_branch:manage_website_home')    
                     except Exception as e:
+                        print("Exception while updating banner:", e)
                         messages.error(request,"Something went wrong! Please try again.")
                         return redirect('central_branch:manage_website_home')  
 
@@ -1201,19 +1279,19 @@ def manage_website_homepage(request):
                     return redirect('central_branch:manage_website_home')
                 
                 #when user edits saved thoughts
-                if request.POST.get('update'):
+                # if request.POST.get('update'):
 
-                    author_edit = request.POST.get('author_edit')
-                    thoughts_edit = request.POST.get('your_thoughts_edit')
-                    thoughts_id = request.POST.get('thought_id')
-                    #passing them to function to update changes made
-                    if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
-                        messages.success(request,"Thoughts updated successfully!")
-                    else:
-                        messages.error(request,"Error Occured. Please try again later!")
-                    return redirect('central_branch:manage_website_home')
+                #     author_edit = request.POST.get('author_edit')
+                #     thoughts_edit = request.POST.get('your_thoughts_edit')
+                #     thoughts_id = request.POST.get('thought_id')
+                #     #passing them to function to update changes made
+                #     if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
+                #         messages.success(request,"Thoughts updated successfully!")
+                #     else:
+                #         messages.error(request,"Error Occured. Please try again later!")
+                #     return redirect('central_branch:manage_website_home')
                 
-                #when user wants to delete a thought
+                # when user wants to delete a thought
                 if request.POST.get('thought_delete'):
                     
                     id = request.POST.get('delete_thought')
@@ -1257,6 +1335,10 @@ def manage_website_homepage(request):
                 'bannerPictureWithNumbers':existing_banner_picture_with_numbers,
                 'media_url':settings.MEDIA_URL,
                 'all_thoughts':all_thoughts,
+                'selected_type': toggle.media_type,
+                'video_banner': video_banner,
+                'topBannerItems': image_banners,
+
                 # 'insb_members':get_all_insb_members,
                 # 'volunteer_of_the_month_form':volunteer_of_the_month_form,
                 # 'all_volunteer_of_month':volunteers_of_the_month,
