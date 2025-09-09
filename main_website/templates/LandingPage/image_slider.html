@@ -376,9 +376,6 @@
           <div class="slider-indicators" id="slider-indicators"></div>
       </div>
     {% if video_embed_url %}
-    <video preload="none" role="presentation" tabindex="-1" loop="" playsinline="" muted="" autoplay="">
-        <source src="{{ video_embed_url }}" type="video/mp4">
-    </video>
       <iframe class="background_video" src="{{ video_embed_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     {% elif video_banner and video_banner.video_url %}
       <!-- Fallback: try to play direct video url if provided -->
