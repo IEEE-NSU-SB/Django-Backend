@@ -137,11 +137,6 @@
           font-weight: bold;
         }
         /* design by shohan */
-        .container {
-      width: 850px !important;
-      margin: 0 auto;
-      display: block;
-    }
            .search_bar {
       text-decoration: none;
       border-radius: 6px;
@@ -198,7 +193,17 @@
   color: #aaa;
   cursor: not-allowed;
 }
-
+   .container {
+        width: 80%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+        @media screen and (max-width: 450px) {
+          .container{
+              margin: auto;
+              width: 100%;
+          }
+        }
         @media (max-width: 1600px) {
           .event_name_column_content {
             max-width: 500px;

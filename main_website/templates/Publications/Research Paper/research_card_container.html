@@ -3,10 +3,7 @@
 {% block research_card_container %}
 
 <style>
-    .card{
-        height:100%;
-        transition: height 0.3s ease;
-    }
+
     .row{
         justify-content: center;
     }
@@ -39,40 +36,27 @@
     .description-container.collapsed,
     .card-title.collapsed {
         -webkit-line-clamp: unset;
-        transition: max-height 0.3s ease;
     }
-    .full-width-card .card{
-        min-height: 500px;
-    }
-    .full-width-card .card-img-top {
-    object-fit: cover;
-    height: 400px;         
-}
 </style>
 <div class="container">
     <div class="row m-0">
 
         <!-- Repeat the card -->
         {% for i in all_research_papers %}
-        <div class="col-12 mt-5 d-flex collapsed full-width-card">
-            <div class="card shadow achievement_card w-100 d-flex flex-column">
-            <a href="{{i.publication_link}}"><img class="card-img-top" src="/media_files/{{i.research_banner_picture}}" alt=""></a>
+        <div class="col-lg-4 col-md-6 col-sm-12 mt-5">
+            <div class="card shadow achievement_card">
+                <a href="{{i.publication_link}}"><img class="card-img-top" src="/media_files/{{i.research_banner_picture}}" alt=""></a>
 
-            {% comment %} <div class="position-absolute">
+                {% comment %} <div class="position-absolute">
                     <span style="background-color: {{i.primary_color_code}};" class=" text-white px-3 py-2 rounded h6">{{i.category}}</span>
-        </div> {% endcomment %}
+                </div> {% endcomment %}
 
-        <div class="card-body d-flex flex-column collapsed">
-                    <a href="{{i.publication_link}}">
-                        <h5 class="card-title fw-bold mt-2 ">{{i.title}}</h5>
-                    </a> <span style="font-style: italic;">{{i.author_names | safe}}</span> 
-                    <div class="description-container ">
+                <div class="card-body">
+                    <a href="{{i.publication_link}}"><h5 class="card-title fw-bold mt-2">{{i.title}}</h5></a> <span style="font-style: italic;">{{i.author_names | safe}}</span> 
+                    <div class="description-container">
                         <p class="card-text">{{i.short_description | safe}}</p>
                     </div>
-
-                    <div class="mt-auto">
-                        <a href="#" class="read-more-link" >Read More</a>
-                    </div>
+                    <a href="#" class="read-more-link" >Read More</a>
 
                     
                 </div>
@@ -84,8 +68,7 @@
 <br><br>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
- 
-     $(document).ready(function () {
+    $(document).ready(function () {
         $(".read-more-link").click(function (event) {
             event.preventDefault();
 
@@ -96,19 +79,18 @@
 
             cardText.toggleClass("collapsed");
             cardTitle.toggleClass("collapsed");
-          
 
+            // Check if any card text is collapsed
             var isCollapsed = card.find(".description-container.collapsed").length > 0;
 
-            
-            cardBody.css("height", isCollapsed ? "auto" : "100%");
+            // Set card height based on collapsed state
+            card.css("height", isCollapsed ? "auto" : "100%");
 
-       
+            // Change the link text based on collapsed state
             var linkText = isCollapsed ? "Read Less" : "Read More";
             $(this).text(linkText);
         });
     });
- 
 </script>
 
 {% endblock research_card_container %}
