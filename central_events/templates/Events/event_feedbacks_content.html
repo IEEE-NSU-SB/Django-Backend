@@ -1,5 +1,5 @@
 {% block event_feedbacks %}
-<!--Events Table-->
+<!--Feedback Table-->
 <div style="text-align:center; margin-top:12px;">
   <form method="POST" id="form-submit">
     {% csrf_token %}  
@@ -47,7 +47,7 @@
                 <td>{{feedback.name}}</td>
                 <!-- <td>{{feedback.email}}</td> -->
                 <td>{{feedback.comment}}</td>
-                <td>{{feedback.satisfaction}}</td>
+                <td>{{feedback.get_satisfaction_display}}</td>
             </tr>
             {% endfor %}
           </form>

@@ -11,10 +11,33 @@
         height: 100%;
         object-fit: cover;
     }
+    .gdlr-blog-title{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .gdlr-blog-title a{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .news-read-more{
+        color: rgb(0, 40, 85, .75);
+        transition: all .3s ease-in-out;
+        position: absolute;
+        bottom: 15px;
+    }
+    .news-read-more:hover{
+        color: rgb(0, 40, 85);
+    }
 </style>
 <section id="content-section-10">
     <div class="gdlr-color-wrapper  gdlr-show-all no-skin"
-    style="background-color: #f7f7f7; padding-top: 70px; padding-bottom: 10px; ">
+    style="background-color: #fff; padding-top: 70px; padding-bottom: 10px; ">
     <div class="container">
             <h3 style="color:#00629B;text-align:center;">Online News</h3>
             <div
@@ -39,7 +62,7 @@
                                 <li class="gdlr-item gdlr-blog-grid gdlr-skin-box">
                                     <article id="{{i.article_id}}"
                                         class="post-2255 post type-post status-publish format-standard has-post-thumbnail hentry category-post-slider tag-blog tag-life-style">
-                                        <div class="gdlr-standard-style">
+                                        <div class="gdlr-standard-style shadow" style="height: 460px;">
                                             <div class="gdlr-blog-thumbnail">
                                                 <a href="{{i.article_link}}"> <img
                                                         src="{{i.article_picture}}"
@@ -69,13 +92,13 @@
                                                 overflow: hidden;
                                                 -webkit-box-orient: vertical;
                                                 text-overflow: ellipsis;
-                                                -webkit-line-clamp: 2;">{{i.article_description}}</div>
+                                                -webkit-line-clamp: 3;">{{i.article_description}}</div>
 
                                                     <div class="clear">
 
                                                     </div>
                                                     <a href="{{i.article_link}}"
-                                                        class="excerpt-read-more">Read More</a>
+                                                        class="news-read-more">Read More</a>
                                             </div>
                                         </div>
                                     </article>

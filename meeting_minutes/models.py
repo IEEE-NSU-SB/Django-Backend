@@ -3,6 +3,11 @@ from django.urls import reverse
 from port.models import Teams, Chapters_Society_and_Affinity_Groups
 from users.models import Members
 # Create your models here.
+from django.db import models
+from django.urls import reverse
+from port.models import Teams, Chapters_Society_and_Affinity_Groups
+from users.models import Members
+# Create your models here.
 
 class MeetingMinutes(models.Model):
     sc_ag = models.ForeignKey(Chapters_Society_and_Affinity_Groups, null=False, blank=False, on_delete=models.CASCADE)

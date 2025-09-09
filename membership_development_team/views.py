@@ -927,7 +927,7 @@ def generateExcelSheet_renewal_requestList(request,session_id):
             font_style.font.bold = True
 
             # Defining columns that will stay in the first row
-            columns = ['Name','IEEE ID', 'Associated Email','IEEE Email','Contact No', 'IEEE Account Password', 'IEEE-Renewal', 'PES-Renewal', 'RAS-Renewal','IAS-Renewal','WIE-Renewal','Transaction ID','Any Comments?',
+            columns = ['Name','IEEE ID', 'Associated Email','IEEE Email','Contact No', 'IEEE-Renewal', 'PES-Renewal', 'RAS-Renewal','IAS-Renewal','WIE-Renewal','Transaction ID','Any Comments?',
                     'Renewal Status','MDT Comment']
 
             # Defining first column
@@ -943,7 +943,6 @@ def generateExcelSheet_renewal_requestList(request,session_id):
                                                     'email_associated',
                                                     'email_ieee',
                                                     'contact_no',
-                                                    'ieee_account_password',
                                                     'ieee_renewal_check','pes_renewal_check','ras_renewal_check','ias_renewal_check','wie_renewal_check',
                                                     'transaction_id',
                                                     'comment',

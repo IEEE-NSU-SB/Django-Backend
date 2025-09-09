@@ -3,6 +3,7 @@ from django.urls import path,include
 from . import views
 from central_branch.views import task_edit,add_task,create_task,upload_task,task_home,forward_to_incharges
 from meeting_minutes.views import meeting_minutes_homepage, meeting_minutes_create, meeting_minutes_edit
+from meeting_minutes.views import meeting_minutes_homepage, meeting_minutes_create, meeting_minutes_edit
 
 app_name='membership_development_team'
 
