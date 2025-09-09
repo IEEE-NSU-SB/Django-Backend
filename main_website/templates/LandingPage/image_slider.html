@@ -376,7 +376,7 @@
           <div class="slider-indicators" id="slider-indicators"></div>
       </div>
     {% if video_embed_url %}
-      <iframe class="background_video" src="{{ video_embed_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <iframe class="background_video" src="{{ video_embed_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen playsinline></iframe>
     {% elif video_banner and video_banner.video_url %}
       <!-- Fallback: try to play direct video url if provided -->
       <video autoplay muted loop playsinline class="background_video">

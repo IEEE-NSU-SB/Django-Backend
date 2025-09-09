@@ -62,8 +62,8 @@ def homepage(request):
                     elif 'youtu.be/' in url:
                         embed_id = url.split('youtu.be/')[1].split('?')[0]
                     if embed_id:
-                        # loop requires playlist param to loop the single video
-                        video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&controls=0&rel=0&modestbranding=0"
+                        # loop requires playlist param to loop the single video                        
+                        video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&playlist={embed_id}&controls=0&modestbranding=1&rel=0&fs=0&disablekb=1"
             except Exception:
                 video_banner = None
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
