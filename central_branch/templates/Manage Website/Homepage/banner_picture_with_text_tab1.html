@@ -513,7 +513,7 @@
                                     <div class="img_overlay"></div>
                                     <div class="img_icons">
                                         
-                                            <i class="fas fa-edit open_modal_btn" data-id="{{ i.id }}" data-target="#update_img_modal" title="Update"></i>
+                                            <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update" onclick="setFormValuesImageModal('{{i.id}}','{{i.banner_picture}}','{{i.first_layer_text}}','{{i.first_layer_text_colored}}','{{i.third_layer_text}}','{{i.button_text}}','{{i.button_url}}')"></i>
                                             <i class="fas fa-trash delete_modal_btn"
                                                 data-id="{{ i.id }}"
                                                 data-target="#delete_image_modal"
@@ -956,23 +956,33 @@
     </div>
 
 <script>
-  // Open modal
-  const btns_modal_add_img_video = document.querySelectorAll(".open_modal_btn");
-  btns_modal_add_img_video.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const modalId = btn.getAttribute("data-target");
-      const Id = btn.getAttribute("data-id");
-      const modal = document.querySelector(modalId);
-      if (modal) {
+
+
+  function setFormValuesImageModal(id, heroImage, firstText, secondText, thirdText, buttonText, buttonUrl) {
+    const modal = document.querySelector("#update_img_modal");
+    {% comment %} // Image preview (if needed)
+    if (heroImage) {
+        let fileInput = document.getElementById("hero-image");
+        fileInput.setAttribute("data-existing", heroImage); 
+        // You can use this attribute later to show preview from server
+    } {% endcomment %}
+
+    // Set text values
+    modal.querySelector('[name="first_layer_text"]').value = firstText;
+    modal.querySelector('[name="first_layer_text_colored"]').value = secondText;
+    modal.querySelector('[name="third_layer_text"]').value = thirdText;
+    modal.querySelector('[name="button_text"]').value = buttonText;
+    modal.querySelector('[name="button_url"]').value = buttonUrl;
+
+    if (modal) {
         modal.style.transform = "translateY(0px)";
         modal.style.zIndex = "103100";
         modal.style.opacity = "1";
         document.body.classList.add("modal-open"); // prevent scroll
 
-        document.getElementById("image_id").value = Id; // Set the image ID for update modal
-      }
-    });
-  });
+        document.getElementById("image_id").value = id; // Set the image ID for update modal
+      }  
+  }
 
   // Close modal via X or Cancel button
   const closeBtns_modal_add_img_video = document.querySelectorAll(".x_btn, .close_btn");
