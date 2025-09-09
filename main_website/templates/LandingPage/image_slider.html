@@ -386,6 +386,27 @@
         <source src="{{ video_banner.video_url }}" type="video/mp4">
       </video>
     {% endif %}
+    <div id="slider-container">
+        <button id="prev-btn" class="slider-btn" onclick="prevSlide()">❮</button>
+        <button id="next-btn" class="slider-btn" onclick="nextSlide()">❯</button>
+        <div id="image-slider">
+        {% for i in banner_item %}
+            {% if i.media_type == 'image' %}
+            <div class="slide">
+                <div class="overlay"></div>
+            <div class="slider-content">
+                <div class="title">{{i.first_layer_text}} <span>{{i.first_layer_text_colored}}</span></div>
+                <div class="paragraph">{{i.third_layer_text}}</div>
+                {% if i.button_text %}
+                <a href="{{i.button_url}}" class="links">{{i.button_text}} <span><ion-icon name="arrow-forward-outline"></ion-icon></span></a>
+                {% endif %}
+            </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div class="slider-indicators" id="slider-indicators"></div>
+    </div>
     {% comment %} <div id="image-slider">
       <div class="slide_video">
         <div class="overlay"></div>
