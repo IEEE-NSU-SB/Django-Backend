@@ -56,15 +56,14 @@ def homepage(request):
                 # Build an embeddable YouTube URL if the saved URL is a YouTube link
                 if video_banner and video_banner.video_url:
                     url = video_banner.video_url
-                    video_embed_url = url
-                    # embed_id = None
-                    # if 'youtube.com/watch' in url and 'v=' in url:
-                    #     embed_id = url.split('v=')[1].split('&')[0]
-                    # elif 'youtu.be/' in url:
-                    #     embed_id = url.split('youtu.be/')[1].split('?')[0]
-                    # if embed_id:
-                    #     # loop requires playlist param to loop the single video
-                    #     video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&playlist={embed_id}&controls=0&rel=0&modestbranding=1"
+                    embed_id = None
+                    if 'youtube.com/watch' in url and 'v=' in url:
+                        embed_id = url.split('v=')[1].split('&')[0]
+                    elif 'youtu.be/' in url:
+                        embed_id = url.split('youtu.be/')[1].split('?')[0]
+                    if embed_id:
+                        # loop requires playlist param to loop the single video
+                        video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&controls=0&rel=0&modestbranding=0"
             except Exception:
                 video_banner = None
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
