@@ -10,8 +10,7 @@ from system_administration.system_error_handling import ErrorHandling
 
 class System_Logs:
     
-    def save_logs(instance, action, message=None):
-
+    def save_logs(instance, action, ip=None, message=None):
         '''This function saves the general log whenever needed'''
         
         try:
@@ -21,6 +20,7 @@ class System_Logs:
             log_details = {
                 'action': action,
                 'user': str(user) if user else "Anonymous",
+                'ip': ip,
                 'message': message
             }
             

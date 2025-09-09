@@ -897,21 +897,46 @@ class Branch:
         ****Remember that the passed keys in the keyword arguments must match with the models attributes.
         '''
         try:
-            # first get member
-            get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
-            
-            # iterate through the fields of the member
-            for field in get_member._meta.fields:
-                # if field name matches with passed kwargs
-                if field.name in kwargs['kwargs']:
-                    # set attribute of the member with the value from keyword argument
-                    setattr(get_member,field.attname,kwargs['kwargs'][field.name])
-                    # save the member
+            # Determine if all access values are False
+            all_false = all(value is False for value in kwargs['kwargs'].values())
+
+            try:
+                get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
+                
+                if all_false:
+                    get_member.delete()
+                    messages.success(request,f"Removed all view permissions for {ieee_id}")
+                    return True
+                else:
+                    # iterate through the fields of the member
+                    for field in get_member._meta.fields:
+                        # if field name matches with passed kwargs
+                        if field.name in kwargs['kwargs']:
+                            # set attribute of the member with the value from keyword argument
+                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
                     get_member.save()
-            messages.success(request,f"View Permission was updated for {ieee_id}")
-            return True
+                    messages.success(request,f"View Permission was updated for {ieee_id}")
+                    return True
+            except:
+                if not all_false:
+                    member = Members.objects.get(ieee_id=ieee_id)
+                    get_member = Branch_Data_Access.objects.create(ieee_id=member)
+                    # iterate through the fields of the member
+                    for field in get_member._meta.fields:
+                        # if field name matches with passed kwargs
+                        if field.name in kwargs['kwargs']:
+                            # set attribute of the member with the value from keyword argument
+                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
+                    get_member.save()
+                    messages.success(request,f"View Permission was updated for {ieee_id}")
+                    return True
+                else:
+                    #Do nothing
+                    return True
+
         except:
-            messages.error(request,"View Permission can not be updated!")
+            messages.warning(request,"View Permission can not be updated!")
+            return False
         
 
     def remover_member_from_branch_access(request,ieee_id):
@@ -927,10 +952,18 @@ class Branch:
         try:
             return Branch_Data_Access.objects.all()
         except:
-            messages.error("Something went wrong while loading Data Access for Branch")
+            messages.error(request, "Something went wrong while loading Data Access for Branch")
             return False
         
-    
+    def get_branch_data_access_for_member(request, ieee_id):
+        try:
+            return Branch_Data_Access.objects.get(ieee_id=ieee_id)
+        except Branch_Data_Access.DoesNotExist:
+            # messages.error(request, "The data access does not exist")
+            return False
+        except:
+            # messages.error(request, "Something went wrong while loading Data Access")
+            return False
     
     def load_branch_eb_panel():
         '''This function loads all the EB panel members from the branch.

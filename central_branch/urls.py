@@ -1,9 +1,8 @@
-import imp
 from django.urls import path,include
 from . import views
 from .views import GetTaskCategoryPointsAjax, SaveMemberTaskPointsAjax, UpdatePositionAjax,UpdateAwardAjax
 from .views import UpdatePositionAjax,UpdateRestrictionAjax,AwardRanking
-from wallet import views as walletViews
+from django.contrib.auth.decorators import login_required
 
 app_name='central_branch'
 
@@ -37,7 +36,6 @@ urlpatterns = [
     
     #WEBSITE Management URL Path
     path('manage_website/homepage',views.manage_website_homepage,name="manage_website_home"),
-    path('manage_website/homepage/update/<int:pk>',views.manage_website_homepage_top_banner_update,name="manage_website_home_top_banner_update"),
     # path('manage_website/homepage/volunteer_of_the_month/<int:pk>',views.update_volunteer_of_month,name="update_vom"),
     path('manage_website/achievements',views.manage_achievements,name="manage_achievements"),
     path('manage_website/achievements/update/<int:pk>',views.update_achievements,name="achievements_update"),
@@ -64,10 +62,11 @@ urlpatterns = [
     path('manage_website/about/ieee_nsu_student_branch/',views.ieee_nsu_student_branch,name = "ieee_nsu_student_branch"),
     path('manage_website/about/faq/',views.faq,name = "faq"),
     path('manage_website/about/contact/',views.contact,name = "contact"),
-    path('manage_website/toolkit',views.manage_toolkit,name="manage_toolkit"),
+    path('manage_website/toolkit/',views.manage_toolkit,name="manage_toolkit"),
     path('manage_website/toolkit/update/<int:pk>',views.update_toolkit,name="update_toolkit"),
-    path('manage_website/feedbacks',views.feedbacks,name="feedbacks"),
-    path('manage_access',views.manage_view_access,name="manage_access"),
+    path('manage_website/feedbacks/',views.feedbacks,name="feedbacks"),
+    path('manage_access/',views.manage_view_access,name="manage_access"),
+    path('manage_access/get_access_data/', login_required(views.GetAccessDataAjax.as_view()), name="get_access_data"),
     
     #About Page preview urls
     path('manage_website/about/ieee/preview/',views.manage_about_preview,name = "manage_about_preview"),

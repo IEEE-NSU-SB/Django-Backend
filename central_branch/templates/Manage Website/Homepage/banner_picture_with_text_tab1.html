@@ -503,27 +503,31 @@
              <div class="carousel_container">
                 <button class="carousel_btn left_btn">&#10094;</button>
 
-                <div class="carousel_track_wrapper">
-                    <div class="carousel_track">
-                        {% for i in topBannerItems %}
-                        <div class="img_inner_container">
-                            <!-- <input type="checkbox" class="img_checkbox" /> -->
-                            <img src="{{media_url}}{{i.banner_picture}}" alt="Banner Image" />
-                            <div class="img_overlay"></div>
-                            <div class="img_icons">
-                                <form method="POST">
-                                {% csrf_token %}
-                                <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update"></i>
-                                <i class="fas fa-trash delete_modal_btn" data-target="#delete_image_modal" title="Delete"></i>
-                                </form>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
 
-                <button class="carousel_btn right_btn">&#10095;</button>
-            </div>
+                    <div class="carousel_track_wrapper">
+                        <div class="carousel_track">
+                            {% for i in topBannerItems %}
+                                <div class="img_inner_container">
+                                    
+                                    <img src="{{ media_url }}{{ i.banner_picture }}" alt="Banner Image" />
+                                    <div class="img_overlay"></div>
+                                    <div class="img_icons">
+                                        
+                                            <i class="fas fa-edit open_modal_btn" data-id="{{ i.id }}" data-target="#update_img_modal" title="Update"></i>
+                                            <i class="fas fa-trash delete_modal_btn"
+                                                data-id="{{ i.id }}"
+                                                data-target="#delete_image_modal"
+                                                title="Delete"></i>
+
+                                       
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button class="carousel_btn right_btn">&#10095;</button>
+                </div>
 
 
         <div style="margin-top: 40px;">  
@@ -531,12 +535,27 @@
                 <button class="add-video open_modal_btn" data-target="#add_video_modal">Update Video</button>
             </div>
 
+        {% if video_banner %}
             <div class="video_container">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <!-- <video controls="" autoplay="">
-                    <source src="https://youtu.be/VGKFgYvYjGs?si=AtQXTi7KWi8lOYPx">
-                </video> -->
+                {% with video_id=video_banner.video_url|cut:"https://www.youtube.com/watch?v=" %}
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/{{ video_id }}" 
+                    title="YouTube video player" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+                {% endwith %}
+
+                {% if video_banner.video_caption %}
+                <p class="video_caption" style="text-align: center; margin-top: 10px;">
+                    {{ video_banner.video_caption }}
+                </p>
+                {% endif %}
             </div>
+        {% endif %}
         </div>
         <br>
         <br>
@@ -706,40 +725,7 @@
 
                 </tr>
             </thead>
-            <tbody>
-                {% for i in topBannerItems %}
-                    <tr>
-                    <td><a href="{% url 'central_branch:manage_website_home_top_banner_update' i.pk %}" ><span style="color:blue;">{{i.button_text}}</span></a></td>
-                    <td style="width: 250px; height: 150px;">
-                        <img src="{{media_url}}{{i.banner_picture}}" alt="Your Image" style="width: 100%; height: 100%;">
-                    </td>
-                    <td>
-                        
-                        <div style="text-align:center;">
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="btn-container">
-                                    <a class="btn btn-outline b-warn text-warn" href="{% url 'central_branch:manage_website_home_top_banner_update' i.pk %}">Update</a>
-                                  <input type="submit" name="delete" class="btn btn-outline b-danger text-danger" value="Delete"></input>
-                                  <input type="hidden" name="get_item" value="{{i.id}}"></input>
-                                </div>
-                            </form>
-                                
-
-                                    Lightbox overlay (hidden by default)
-                                    <div id="lightbox" class="overlay">
-                                        <span class="close-btn" onclick="closeLightbox()">&times;</span>
-                                        <img id="lightbox-img">
-                                    </div>
-                                </div>
-                        </div>
-                        
-                    </td>
-                    </tr>
-    
-                {% endfor %}
-                
-            <tbody>
+            
             </table>
         </div> -->
         <!--		Start Pagination -->
@@ -828,9 +814,11 @@
     </div>
     </div>
 
-    <div id="update_img_modal" class="modal_add_img_video">
-        <form method="post" id="form">
+    <div id="update_img_modal" class="modal_add_img_video" >
+        <form method="post" id="form" enctype="multipart/form-data">
             {% csrf_token %}
+
+
         <div class="modal_content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h1>Update image</h1>
@@ -842,50 +830,51 @@
             </div>
 
             <!-- Hidden file input -->
-            <input type="file" class="image-input" accept="image/*">
+            
+            <input type="hidden" name="image_id" id="image_id">
 
             <div class="container" style="margin-top: 40px;">
             <div class="text_fld">  
             <h2 style="font-size: 15px; margin:0px;">Hero Image</h2>
             <div class="colon">:</div>
-            <input type="file" class="text_fld_ip" id="hero-image" accept="image/*">
+            <input type="file" class="text_fld_ip" name="banner_picture" id="hero-image" accept="image/*">
             </div>
 
             <div class="text_fld">
             <h2 style="font-size: 15px; margin:0px;">First text</h2>
             <div class="colon">:</div>
-            <input type="text" class="text_fld_ip">
+            <input type="text" name="first_layer_text" class="text_fld_ip">
             </div>
 
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Second text</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" name="first_layer_text_colored" class="text_fld_ip">
             </div>
 
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Third text</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" name="third_layer_text" class="text_fld_ip">
             </div>
 
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Button text</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" name="button_text" class="text_fld_ip">
             </div>
 
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Button link</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" name="button_url" class="text_fld_ip">
             </div>
             </div>
 
             <div style="display: flex; justify-content: end; padding-top: 20px;">
             <div style="display: flex;">
             <button type="button" class="close_btn">Cancel</button>
-            <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+            <button type="submit" class="confirm_btn" style="margin-left: 10px;" name="update_top_banner">Confirm</button>
             </div>
             </div>
 
@@ -920,19 +909,19 @@
             <div class="text_fld">
                 <h2 style="font-size: 15px; margin:0px;">Video link</h2>
                 <div class="colon">:</div>
-                <input type="text" class="text_fld_ip">
+                <input type="text" class="text_fld_ip" name="video_url" required>
             </div>
 
             <div class="text_fld">
             <h2 style="font-size: 15px; margin:0px;">Text for video</h2>
             <div class="colon">:</div>
-            <input type="text" class="text_fld_ip">
+            <input type="text" class="text_fld_ip" name="video_caption" required>
             </div>
 
             <div style="display: flex; justify-content: end; padding-top: 20px;">
             <div style="display: flex;">
             <button type="button" class="close_btn">Cancel</button>
-            <button type="submit" class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+            <input type="submit" class="confirm_btn" style="margin-left: 10px;" name="update_video" value="Confirm">
             </div>
             </div>
 
@@ -944,6 +933,8 @@
     <div id="delete_image_modal" class="modal_delete">
         <form method="post" id="form">
             {% csrf_token %}
+            <input type="hidden" name="delete" value="1">
+            <input type="hidden" name="get_item" id="delete_item_id">
         <div class="delete_modal_content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h1>Delete Image</h1>
@@ -970,12 +961,15 @@
   btns_modal_add_img_video.forEach(btn => {
     btn.addEventListener("click", () => {
       const modalId = btn.getAttribute("data-target");
+      const Id = btn.getAttribute("data-id");
       const modal = document.querySelector(modalId);
       if (modal) {
         modal.style.transform = "translateY(0px)";
         modal.style.zIndex = "103100";
         modal.style.opacity = "1";
         document.body.classList.add("modal-open"); // prevent scroll
+
+        document.getElementById("image_id").value = Id; // Set the image ID for update modal
       }
     });
   });
@@ -1129,6 +1123,31 @@
         document.getElementById('mediaToggleForm').submit();
         });
     });
+
+
+    document.querySelectorAll('.delete_modal_btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const modalId = this.dataset.target; // "#delete_image_modal"
+        const bannerId = this.dataset.id;
+
+        // Show modal
+        const modal = document.querySelector(modalId);
+        modal.style.display = 'block';
+
+        // Set the hidden input value
+        document.getElementById('delete_item_id').value = bannerId;
+    });
+    });
+
+    // Close modal on 'x' or cancel button
+    document.querySelectorAll('.x_btn, .close_btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('delete_image_modal').style.display = 'none';
+    });
+    });
+    
+
 
 
 
