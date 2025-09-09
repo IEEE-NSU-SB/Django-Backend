@@ -317,7 +317,7 @@
                             <a class="event_name_column_content" href="{% url 'finance_and_corporate_team:edit_event_budget' event.id %}"> {{event.event_name}}</a><br>
                           </td>
                           <td>{{ event.event_organiser.group_name }}</td>
-                          <td>{{ event.start_date | date:"M. d, Y" }}</td>
+                          <td>{% if event.event_date and event.start_date == None %}{{ event.event_date }}{% else %}{{ event.start_date|date:"M. d, Y"  }}{% endif %}</td>
                           
                       </tr>
                       {% endfor %}

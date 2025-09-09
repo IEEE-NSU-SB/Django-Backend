@@ -1204,12 +1204,9 @@ def manage_website_homepage(request):
                 elif request.POST.get('update_video'):
                     try:
                         # Try to find an existing video banner
-                        
-
                         if video_banner:
                             # Update existing video banner
                             video_banner.video_url = request.POST['video_url']
-                            video_banner.video_caption = request.POST['video_caption']
                             video_banner.save()
                             messages.success(request, "Video banner updated successfully!")
                         else:
@@ -1217,12 +1214,6 @@ def manage_website_homepage(request):
                             HomePageTopBanner.objects.create(
                                 media_type='video',
                                 video_url=request.POST['video_url'],
-                                video_caption=request.POST['video_caption'],
-                                first_layer_text="FOCUSING LIMELIGHT ON",  # Optional defaults
-                                first_layer_text_colored="MASTERMINDS",
-                                third_layer_text="",
-                                button_text="About INSB",
-                                button_url="#"
                             )
                             messages.success(request, "Video banner created successfully!")
 
