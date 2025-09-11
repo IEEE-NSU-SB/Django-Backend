@@ -354,27 +354,6 @@
 {% if selected_media == 'video' %}
   <!-- Video background hero -->
   <div class="video_slide">
-      <div id="slider-container">
-          <button id="prev-btn" class="slider-btn" onclick="prevSlide()">❮</button>
-          <button id="next-btn" class="slider-btn" onclick="nextSlide()">❯</button>
-          <div id="image-slider">
-          {% for i in banner_item %}
-              {% if i.media_type == 'image' %}
-              <div class="slide">
-                  <div class="overlay"></div>
-              <div class="slider-content">
-                  <div class="title">{{i.first_layer_text}} <span>{{i.first_layer_text_colored}}</span></div>
-                  <div class="paragraph">{{i.third_layer_text}}</div>
-                  {% if i.button_text %}
-                  <a href="{{i.button_url}}" class="links">{{i.button_text}} <span><ion-icon name="arrow-forward-outline"></ion-icon></span></a>
-                  {% endif %}
-              </div>
-              </div>
-              {% endif %}
-          {% endfor %}
-          </div>
-          <div class="slider-indicators" id="slider-indicators"></div>
-      </div>
     {% if video_embed_url %}
       <iframe class="background_video" src="{{ video_embed_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen playsinline></iframe>
     {% elif video_banner and video_banner.video_url %}
@@ -404,18 +383,7 @@
         </div>
         <div class="slider-indicators" id="slider-indicators"></div>
     </div>
-    {% comment %} <div id="image-slider">
-      <div class="slide_video">
-        <div class="overlay"></div>
-        <div class="slider-content_video">
-          <div class="title">
-            {{ video_banner.first_layer_text|default:"" }} <span class="typewriter-text" data-texts='["{{ video_banner.video_caption|default:"" }}"]'></span>
-          </div>
-        </div>
-      </div>
     </div>
-    <div class="slider-indicators" id="slider-indicators" style="display: none;"></div>
-  </div> {% endcomment %}
 {% else %}
   <!-- Image slider -->
   <div id="slider-container">
