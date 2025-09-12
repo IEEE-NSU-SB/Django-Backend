@@ -559,185 +559,7 @@
         </div>
         <br>
         <br>
-            <!--Modal form-->
-    <!-- <div id="m-s-a" class="modal fade animate" data-backdrop="true">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="modal-dialog modal-lg" id="animate">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title">Add a New Top Banner Picture & Texts</h5>
-                    </div>
-                    <div class="modal-body text-left p-lg">
-                        
-                        <p>View the Image given below to understand about the fields and fill the Form according to it.</p>
-                        
-                        <div style="text-align:center;">
-                            <img src="{% static 'images/homepage_banner_tutorial.png'%}" alt="Thumbnail" width="250" height="150" onclick="openLightbox('{% static 'images/homepage_banner_tutorial.png' %}')">
-                        </div>
-
-
-                        <div class="container">
-                            <div class="padding">
-                                <div class="row" >
-                                    <div class="col-sm-10">
-                                        <div class="box">
-                                            <div class="box-header">
-                                                <h1 style="text-align:center;">Provide Details</h1>
-                                            </div>
-                                            
-                                            <form method="POST">
-                                                {% csrf_token %}
-                                                <div class="box-body">
-                                                        <div class="form-group row">
-                                                            <label class="col-sm-10 form-control-label">Banner Picture (1600 x 750) <span style="color:red;">*</span></label>
-                                                            <div class="col-sm-10">
-                                                            <input type="file" required id="myFile" name="banner_picture" class="form-control">
-                                    
-                                                            </div>
-                                                        </div>
-                                                        <br>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>First Layer Text <span style="color:red">*<span></label>
-                                                                    <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="First Layer Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="first_layer_text"/>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>First Layer Text (colored) <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Colored Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="first_layer_text_colored"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="form-group">
-                                                            <label>Third Layer Paragraph <span style="color:red">*<span></label>
-                                                                <div class="col-sm-10">
-                                                                <input
-                                                                    placeholder="Third Layer Text"
-                                                                    class="form-control"
-                                                                    type="text"
-                                                                    autocomplete="off"
-                                                                    required
-                                                                    name="third_layer_text"/>
-                                                                </div>
-                                                        </div>
-                                                        <br>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Button Text <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Place the Button Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="button_text"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Button Link <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Read above Instructions before adding the URL"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="button_url"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                            
-                    </div>
-
-                    <div class="modal-footer">
-                    <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">No</button>
-                    <input type="submit" name="add_banner" class="btn btn-success p-x-md" value="Add">               
-                    </div>
-                </div>.modal-content
-            </div>
-        </form>
-        <div id="lightbox" class="overlay">
-            <span class="close-btn" onclick="closeLightbox()">&times;</span>
-            <img id="lightbox-img">
-        </div>
-    </div> -->
 </div>
-        <!-- <div class="header_wrap" style="padding: 0px;">
-            <div class="num_rows">
-        
-            <div class="form-group">
-                Show Numbers Of Row
-                <select class="form-control" name="state" id="maxRows">
-        
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="5000">Show ALL Rows</option>
-                </select>
-        
-            </div>
-            </div>
-            <div class="tb_search">
-            <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
-            </div>
-        </div> -->
-        <!-- <div class="table-responsive">
-            <table class="table table-striped table-class" id="table-id">
-        
-            <thead>
-                <tr>
-                    <th>Button Text</th>
-                    <th>Image</th>
-                    <th>Update/Delete</th>
-
-                </tr>
-            </thead>
-            
-            </table>
-        </div> -->
-        <!--		Start Pagination -->
-        <!-- <div class='pagination-container'>
-            <nav>
-            <ul class="pagination">
-            </ul>
-            </nav>
-        </div> -->
-        <!-- <div class="rows_count">Showing 11 to 20 of 91 entries</div>    
-                
-        </div> -->
 
 <!--Thumbnail Image Script-->
     <div id="add_img_modal" class="modal_add_img_video">
@@ -906,12 +728,6 @@
                 <input type="text" class="text_fld_ip" name="video_url" required>
             </div>
 
-            <div class="text_fld">
-            <h2 style="font-size: 15px; margin:0px;">Text for video</h2>
-            <div class="colon">:</div>
-            <input type="text" class="text_fld_ip" name="video_caption" required>
-            </div>
-
             <div style="display: flex; justify-content: end; padding-top: 20px;">
             <div style="display: flex;">
             <button type="button" class="close_btn">Cancel</button>
@@ -1002,11 +818,10 @@
       }  
   }
 
-  function openVideoModal(video_url, video_caption) {
+  function openVideoModal(video_url) {
     const modal = document.querySelector("#add_video_modal");
 
     modal.querySelector('[name="video_url"]').value = video_url;
-    modal.querySelector('[name="video_caption"]').value = video_caption;
 
     if (modal) {
         modal.style.transform = "translateY(0px)";
@@ -1031,7 +846,7 @@
 
 
 
-  // Video preview
+  {% comment %} // Video preview
   const preview = document.querySelector(".preview-video-upload");
   const videoInput = document.querySelector("#video-upload");
   videoInput.addEventListener('change', function () {
@@ -1043,7 +858,7 @@
       preview.src = "";
       preview.style.display = 'none';
     }
-  });
+  }); {% endcomment %}
 </script>
 <script>
   // Open delete modal
