@@ -548,12 +548,6 @@
                     allowfullscreen>
                 </iframe>
                 {% endwith %}
-
-                {% if video_banner.video_caption %}
-                <p class="video_caption" style="text-align: center; margin-top: 10px;">
-                    {{ video_banner.video_caption }}
-                </p>
-                {% endif %}
             </div>
         {% endif %}
         </div>
@@ -660,6 +654,9 @@
             <h2 style="font-size: 15px; margin:0px;">Hero Image</h2>
             <div class="colon">:</div>
             <input type="file" class="text_fld_ip" name="banner_picture" id="hero-image" accept="image/*">
+            <h2 style="font-size: 15px; margin:0px;">Currently</h2>
+            <div class="colon">:</div>
+            <a style="text-decoration: underline;" target="_blank" name="banner_picture_current" href="#">#</a>
             </div>
 
             <div class="text_fld">
@@ -783,6 +780,8 @@
     modal.querySelector('[name="third_layer_text"]').value = thirdText;
     modal.querySelector('[name="button_text"]').value = buttonText;
     modal.querySelector('[name="button_url"]').value = buttonUrl;
+    modal.querySelector('[name="banner_picture_current"]').href = heroImage;
+    modal.querySelector('[name="banner_picture_current"]').innerHTML = heroImage;
 
     if (modal) {
         modal.style.transform = "translateY(0px)";
