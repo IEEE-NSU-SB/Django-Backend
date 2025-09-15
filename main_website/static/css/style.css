@@ -863,6 +863,7 @@ img.gdlr-full-boxed-background {
 	-moz-box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.1);
 	-webkit-box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.1);
 	box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.1);
+	background-color: #002855;
 }
 
 .gdlr-fixed-header .gdlr-navigation-wrapper .gdlr-main-menu>li>a {
