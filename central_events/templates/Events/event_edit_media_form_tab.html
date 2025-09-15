@@ -27,6 +27,7 @@
             margin: 0;
             align-items: center;
             justify-content: center;
+            background-color: rgb(255, 255, 255);
         }
 
         .row {
@@ -139,13 +140,13 @@
       <br>
       <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span
           style="color:#00629B;">{{event_name}}</b></span></h2><br>
-      <h6>Note:</h6>
+      <h6 style="color:#00629B; font-weight: bold;">Note:</h6>
       <ol style="justify-content:center;margin-bottom:15px;"><b>
           <li>Provide the links to the folder for both event pictures and pictures with logos</li>
           <li>A maximum of six pictures can be uploaded. You can delete pictures and add new ones</li>
           <li>To change any picture, delete it and add a new one</li>
           <li>Before saving images, if you wish to change the selected images, just click 'upload' again and re-select all again</li>
-          <li>Don't forget to save the changes made by clicking the save button</li>
+          <li>Don't forget to save the changes made by clicking the <span style="color: #00629B;">'Save'</span> button</li>
       </ol></b>
 
             {% if show_restriction_banner %}
