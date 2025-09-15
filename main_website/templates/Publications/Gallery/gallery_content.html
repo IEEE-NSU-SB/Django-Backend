@@ -360,10 +360,11 @@
 
   .single_content {
     display: flex;
+    flex-direction: column;
     gap: 20px;
     /* border-bottom: 1px solid hsla(0, 0%, 83%, 1); */
     padding: 25px;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .video_title {
@@ -463,17 +464,17 @@
         <div class="title_div">
           <h2 class="video_title">{{i.video_title}} </h2>
           <p style="margin-bottom: 32px; margin-top: 0; font-weight: bold; color:rgba(0, 0, 0, 0.326);">Dec. 17, 2018</p>
-          <p id="video_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quas enim officia,
+          <!-- <p id="video_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quas enim officia,
             nisi est non accusamus quod necessitatibus illo dignissimos vero amet perspiciatis, deleniti iure temporibus
             optio minus inventore quae veniam expedita blanditiis cupiditate dolor. Ducimus ratione quam harum. Eveniet
             ipsum aliquid, ad placeat illo vero illum deserunt, maiores, in facere qui nemo voluptatem provident culpa
-            doloribus tenetur consequuntur itaque.</p>
+            doloribus tenetur consequuntur itaque.</p> -->
         </div>
       </div>
-      <hr style="margin-top: 0;
+      <!-- <hr style="margin-top: 0;
     width: 96%;
     margin-left: auto;
-    margin-right: auto;">
+    margin-right: auto;"> -->
       {% endfor %}
     </div>
 
