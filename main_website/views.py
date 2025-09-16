@@ -40,7 +40,6 @@ def homepage(request):
         bannerItems=HomepageItems.getHomepageBannerItems()
         # Determine which media to show (image or video)
         selected_media = 'image'
-        video_banner = None
         try:
             toggle = MediaToggle.objects.first()
             if toggle:
@@ -49,6 +48,7 @@ def homepage(request):
             selected_media = 'image'
 
         # Prepare video banner data if video is selected
+        video_banner = None
         if selected_media == 'video':
             try:
                 vid = HomePageTopBanner.objects.filter(media_type='video')
