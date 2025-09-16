@@ -80,7 +80,7 @@
 
         .search-add-container {
             display: flex;
-            flex-direction: column;
+            /* flex-direction: column; */
             padding-top: 2%;
             padding-bottom: 2%;
             gap: 15px;
@@ -426,7 +426,7 @@
                     <div class="search-container">
                         <input type="text" placeholder="Search..." class="search-input" id="searchInput">
                     </div>
-                    <!-- <button class="btn">Add members to provide access</button> -->
+                    <!-- <button type="submit" class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add Members</button> -->
                 </div>
 
 
@@ -491,7 +491,69 @@
             </div>
         </div>
         </form>
+
     </div>
+    <!--Modal-->
+    <div id="m-s-a" class="modal" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+        <div class="modal-header">
+            <h5 class="modal-title">Add member to Central Branch View Access!</h5>
+        </div>
+
+        <div class="modal-body p-lg">
+            <p>This will update the Members in the Data Access Table and you can give access to them for different pages.</p>
+            
+            <!-- Search bar -->
+            <div class="search-container" style="margin-bottom: 15px;">
+            <input type="text" placeholder="Search..." class="search-input" id="searchInput2" onkeyup="searchTable2()">
+            </div>
+
+            <!-- Table -->
+            <div class="content-card" style="height: 450px; overflow-y: auto;">
+            <div class="table-wrapper">
+                <table class="access-table" id="data2">
+                <thead>
+                    <tr>
+                    <th style="background-color: #f0f0f0; color: #000000;">SL</th>
+                    <th style="background-color: #f0f0f0; color: #000000;">Name</th>
+                    <th style="background-color: #f0f0f0; color: #000000;">IEEE ID</th>
+                    <th style="background-color: #f0f0f0; color: #000000;">Current Position</th>
+                    <th style="background-color: #f0f0f0; color: #000000;">Email</th>
+                    <th style="background-color: #f0f0f0; color: #000000;">Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for panel_member in current_panel_members %}
+                    <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="font-medium">{{ panel_member.member.name }}</td>
+                    <td>{{ panel_member.member.ieee_id }}</td>
+                    <td>{{ panel_member.member.position }}</td>
+                    <td>{{ panel_member.member.email_ieee }}</td>
+                    <td>
+                        <input type="checkbox" name="member_select" value="{{panel_member.member.ieee_id}}">
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">Cancel</button>
+            <input type="submit" class="btn btn-outline b-primary text-primary" name="add_member_to_access" value="Add Member"></input>
+        </div>
+        
+        </div><!-- /.modal-content -->
+    </div>
+    </div>
+    <!--Modal Ends-->
+
 
     {% block common_js %}
         {% include "common_js.html" %}
