@@ -1132,10 +1132,14 @@ def manage_website_homepage(request):
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
             video_banner = HomePageTopBanner.objects.filter(media_type='video')
-            if video_banner[0].video:
-                video_banner = video_banner[0]
-            else:
-                video_banner = False
+            try:
+                if len(video_banner) > 0:
+                    if video_banner[0].video:
+                        video_banner = video_banner[0]
+                else:
+                    video_banner = None
+            except:
+                video_banner = None
             image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response

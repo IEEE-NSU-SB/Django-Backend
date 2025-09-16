@@ -51,8 +51,13 @@ def homepage(request):
         # Prepare video banner data if video is selected
         if selected_media == 'video':
             try:
-                video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
-            except Exception:
+                video_banner = HomePageTopBanner.objects.filter(media_type='video')
+                if len(video_banner) > 0:
+                    if video_banner[0].video:
+                        video_banner = video_banner[0]
+                else:
+                    video_banner = None
+            except:
                 video_banner = None
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
         HomepageItems.get_ip_address(request)
