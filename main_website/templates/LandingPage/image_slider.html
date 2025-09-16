@@ -14,7 +14,7 @@
         height: 100vh;
         width: 100%; /* Ensure the slider takes the full width */
     }
-
+    
     .slide {
         width: 100%;
         height: 100%;
@@ -25,7 +25,7 @@
         align-items: flex-start;
         justify-content: center;
         text-align: center;
-        transition: opacity 0.5s ease-in-out;
+        transition: opacity 2s ease-in-out;
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
@@ -50,13 +50,14 @@
         height: 100%;
         z-index: 1;
         background: rgba(0, 0, 0, 0.5);
+        scale: 1;
     }
 
     .slider-content {
         margin: 0 12vw;
         color: white;
         text-align: left;
-        z-index: 1;
+        z-index: 2;
     }
     .paragraph {
         margin-bottom: 10px;
@@ -370,7 +371,7 @@
             {% if i.media_type == 'image' %}
             <div class="slide">
                 <div class="overlay"></div>
-            <div class="slider-content">
+                <div class="slider-content">
                 <div class="title">{{i.first_layer_text}} <span>{{i.first_layer_text_colored}}</span></div>
                 <div class="paragraph">{{i.third_layer_text}}</div>
                 {% if i.button_text %}
@@ -431,7 +432,7 @@
     let autoSwipeInterval;
 
     function showSlide() {
-        imageSlider.style.transition = 'transform 0.7s ease'; // Adjust the duration (1s) and easing as needed
+        imageSlider.style.transition = 'transform 0.5s ease-in-out'; // Adjust the duration (1s) and easing as needed
         imageSlider.style.transform = `translateX(${-currentSlide * 100}%)`;
         fadeInCurrentSlide();
         updateIndicators();
@@ -441,13 +442,13 @@
     function fadeInCurrentSlide() {
         const slides = document.querySelectorAll('.slide');
         slides.forEach((slide, index) => {
-            if (index === currentSlide) {
-                slide.style.opacity = 1;
-                // slide.classList.add('active');
-            } else {
-                slide.style.opacity = 0;
-                // slide.classList.remove('active');
-            }
+            // if (index === currentSlide) {
+            //     slide.style.opacity = 1;
+            //     // slide.classList.add('active');
+            // } else {
+            //     slide.style.opacity = 0;
+            //     // slide.classList.remove('active');
+            // }
         });
     }
 
