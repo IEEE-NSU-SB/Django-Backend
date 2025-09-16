@@ -1131,7 +1131,7 @@ def manage_website_homepage(request):
                 return DatabaseError
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
-            video_banner = HomePageTopBanner.objects.get_or_create(media_type='video').first()
+            video_banner, created = HomePageTopBanner.objects.get_or_create(media_type='video').first()
             image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response
