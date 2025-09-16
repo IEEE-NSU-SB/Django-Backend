@@ -1131,6 +1131,7 @@ def manage_website_homepage(request):
                 return DatabaseError
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
+            video_banner = None
             try:
                 # Get the first video banner if it exists
                 vid = HomePageTopBanner.objects.filter(media_type='video').first()
@@ -1139,7 +1140,7 @@ def manage_website_homepage(request):
                     video_banner = vid
             except Exception as e:
                 video_banner = None
-                
+
             image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response
