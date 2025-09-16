@@ -51,14 +51,14 @@ def homepage(request):
         video_banner = None
         if selected_media == 'video':
             try:
-                vid = HomePageTopBanner.objects.filter(media_type='video')
-                if len(vid) > 0:
-                    if vid[0].video:
-                        video_banner = vid[0]
-                else:
-                    video_banner = None
-            except:
+                # Get the first video banner if it exists
+                vid = HomePageTopBanner.objects.filter(media_type='video').first()
+                
+                if vid and vid.video:  # Check if a banner exists and has a video
+                    video_banner = vid
+            except Exception as e:
                 video_banner = None
+                
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
         HomepageItems.get_ip_address(request)
         #getting all the thoughts
