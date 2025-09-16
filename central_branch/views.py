@@ -1203,19 +1203,31 @@ def manage_website_homepage(request):
                         traceback.print_exc()
                 elif request.POST.get('update_video'):
                     try:
-                        # Try to find an existing video banner
-                        if video_banner:
-                            # Update existing video banner
-                            video_banner.video_url = request.POST['video_url']
-                            video_banner.save()
-                            messages.success(request, "Video banner updated successfully!")
+                        uploaded_file = request.FILES.get('video_file')  # get the uploaded file
+                        print(request.FILES.get('video_file'))
+
+                        if not uploaded_file:
+                            messages.error(request, "No video file uploaded!")
                         else:
-                            # Create new video banner if none exists
-                            HomePageTopBanner.objects.create(
-                                media_type='video',
-                                video_url=request.POST['video_url'],
-                            )
-                            messages.success(request, "Video banner created successfully!")
+                            try:
+                                if video_banner:
+                                    # Delete old file if exists
+                                    if video_banner.video and os.path.isfile(video_banner.video.path):
+                                        os.remove(video_banner.video.path)
+
+                                    # Update existing video banner
+                                    video_banner.video = uploaded_file
+                                    video_banner.save()
+                                    messages.success(request, "Video banner updated successfully!")
+                                else:
+                                    # Create new video banner
+                                    HomePageTopBanner.objects.create(
+                                        media_type='video',
+                                        video=uploaded_file
+                                    )
+                                    messages.success(request, "Video banner created successfully!")
+                            except Exception as e:
+                                messages.error(request, f"Error updating video banner: {e}")
 
                         return redirect('central_branch:manage_website_home')   
                     except Exception as e:

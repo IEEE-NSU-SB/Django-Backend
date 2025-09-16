@@ -14,7 +14,7 @@ from django.forms import ValidationError
     
 # Tables for Homepage
 class HomePageTopBanner(models.Model):
-    banner_picture=ResizedImageField(null=False,blank=False,upload_to='main_website_files/homepage/banner_pictures')
+    banner_picture=ResizedImageField(null=True,blank=True,upload_to='main_website_files/homepage/banner_pictures')
     first_layer_text=models.CharField(null=False,blank=True,default="",max_length=50)
     first_layer_text_colored=models.CharField(null=False,blank=True,default="",max_length=20)
     third_layer_text=models.TextField(null=False,blank=True,default="",max_length=300)
@@ -26,7 +26,7 @@ class HomePageTopBanner(models.Model):
     ]
 
     media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
-    video_url = models.URLField(blank=True, null=True)
+    video = models.FileField(blank=True, null=True, upload_to='main_website_files/homepage/landing_video')
            
     class Meta:
         verbose_name='Homepage Banner Picture or video With Texts'
