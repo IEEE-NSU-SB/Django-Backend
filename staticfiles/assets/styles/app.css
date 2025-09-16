@@ -1393,7 +1393,8 @@ a.list-group-item {
 .box-color {
   background-color: #fff;
   position: relative;
-  margin-bottom: 1.5rem; }
+  margin-bottom: 1.5rem; 
+}
 
 .box-header {
   position: relative;
@@ -1692,7 +1693,6 @@ body {
   .app-footer,
   .switcher {
     display: none; } }
-
 /* fix ie9 */
 .ie9 .app-aside {
   position: static !important; }

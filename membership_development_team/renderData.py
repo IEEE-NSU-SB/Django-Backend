@@ -11,6 +11,7 @@ from django_celery_beat.models import ClockedSchedule,PeriodicTask
 import json
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+
 class MDT_DATA:
     
     def get_member_data(ieee_id):

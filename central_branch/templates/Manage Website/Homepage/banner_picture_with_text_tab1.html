@@ -1,255 +1,999 @@
 {% block banner_picture_text_tab %}
 {% load static %}
+<style>
+    .add-image, .add-video{
+        border-radius: 4px;
+        border: 1px solid transparent;
+        color: #002855d8;
+        background-color: #00629b32;
+        padding: 3px 16px;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+        margin: 0;
+    }
+    .add-image:hover, .add-video:hover{
+        background-color: #002855d8;
+        color: white;
+    }
+    .add_btn_container{
+        text-align: right;
+        margin-bottom: 12px;
+    }
+    .img_container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
 
+    .img_inner_container {
+        position: relative;
+        width: 370px;
+        height: 190px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
 
-<div id="tab1" class="tab-content" style="margin-right: 0px;">
-    <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2>
-    <br>
-    <div style="text-align:center;">  
-        <div class="btn-container">
-          <button class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add New Image and Text in Top Banner</button>
-        </div>
-    </div>
-    <!--Modal form-->
-    <div id="m-s-a" class="modal fade animate" data-backdrop="true">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="modal-dialog modal-lg" id="animate">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title">Add a New Top Banner Picture & Texts</h5>
-                    </div>
-                    
-                    <div class="modal-body text-left p-lg">
-                        
-                        <p>View the Image given below to understand about the fields and fill the Form according to it.</p>
-                        
-                        <!-- Thumbnail image (clickable) -->
-                        <!--If you wish to change photo, make changes in both of the places-->
-                        <div style="text-align:center;">
-                            <img src="{% static 'images/homepage_banner_tutorial.png'%}" alt="Thumbnail" width="250" height="150" onclick="openLightbox('{% static 'images/homepage_banner_tutorial.png' %}')">
-                        </div>
+    .img_inner_container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: 0.3s ease;
+    }
 
-                        <!--Form start-->
+    .img_checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: white;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.2s ease;
+    }
 
-                        <div class="container">
-                            <div class="padding">
-                                <div class="row" >
-                                    <div class="col-sm-10">
-                                        <div class="box">
-                                            <div class="box-header">
-                                                <h1 style="text-align:center;">Provide Details</h1>
-                                            </div>
-                                            
-                                            <form method="POST">
-                                                {% csrf_token %}
-                                                <div class="box-body">
-                                                        <div class="form-group row">
-                                                            <label class="col-sm-10 form-control-label">Banner Picture (1600 x 750) <span style="color:red;">*</span></label>
-                                                            <div class="col-sm-10">
-                                                            <input type="file" required id="myFile" name="banner_picture" class="form-control">
-                                    
-                                                            </div>
-                                                        </div>
-                                                        <br>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>First Layer Text <span style="color:red">*<span></label>
-                                                                    <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="First Layer Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="first_layer_text"/>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>First Layer Text (colored) <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Colored Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="first_layer_text_colored"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="form-group">
-                                                            <label>Third Layer Paragraph <span style="color:red">*<span></label>
-                                                                <div class="col-sm-10">
-                                                                <input
-                                                                    placeholder="Third Layer Text"
-                                                                    class="form-control"
-                                                                    type="text"
-                                                                    autocomplete="off"
-                                                                    required
-                                                                    name="third_layer_text"/>
-                                                                </div>
-                                                        </div>
-                                                        <br>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Button Text <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Place the Button Text"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="button_text"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label>Button Link <span style="color:red">*<span></label>
-                                                                        <div class="col-sm-10">
-                                                                        <input
-                                                                            placeholder="Read above Instructions before adding the URL"
-                                                                            class="form-control"
-                                                                            type="text"
-                                                                            autocomplete="off"
-                                                                            required
-                                                                            name="button_url"/>
-                                                                        </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                            
-                    </div>
+    .img_checkbox:checked {
+    background-color: white;
+    border-color: #aaa;
+    }
 
-                    <div class="modal-footer">
-                    <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">No</button>
-                    <input type="submit" name="add_banner" class="btn btn-success p-x-md" value="Add"></input>               
-                    </div>
-                </div><!-- /.modal-content -->
-            </div>
-        </form>
-        <!-- Lightbox overlay (hidden by default) -->
-        <div id="lightbox" class="overlay">
-            <span class="close-btn" onclick="closeLightbox()">&times;</span>
-            <img id="lightbox-img">
-        </div>
-    </div>
-    <br>
+    .img_checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    width: 6px;
+    height: 12px;
+    border: solid #333;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    }
 
-    <!--Data Table-->
-    <div style="text-align:center; margin-top:30px;">  
-        <div class="container" style="justify-content:center;">
-        <div class="header_wrap" style="padding: 0px;">
-            <div class="num_rows">
-        
-            <div class="form-group">
-                <!--		Show Numbers Of Rows 		-->
-                <select class="form-control" name="state" id="maxRows">
-        
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="5000">Show ALL Rows</option>
-                </select>
-        
-            </div>
-            </div>
-            <div class="tb_search">
-            <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-class" id="table-id">
-        
-            <thead>
-                <tr>
-                    <th>Button Text</th>
-                    <th>Image</th>
-                    <th>Update/Delete</th>
+    .img_overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        transition: background-color 0.3s ease;
+        z-index: 1;
+    }
 
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in topBannerItems %}
-                    <tr>
-                    <td><a href="{% url 'central_branch:manage_website_home_top_banner_update' i.pk %}" ><span style="color:blue;">{{i.button_text}}</span></a></td>
-                    <td style="width: 250px; height: 150px;">
-                        <img src="{{media_url}}{{i.banner_picture}}" alt="Your Image" style="width: 100%; height: 100%;">
-                    </td>
-                    <td>
-                        
-                        <div style="text-align:center;">
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="btn-container">
-                                    <a class="btn btn-outline b-warn text-warn" href="{% url 'central_branch:manage_website_home_top_banner_update' i.pk %}">Update</a>
-                                  <input type="submit" name="delete" class="btn btn-outline b-danger text-danger" value="Delete"></input>
-                                  <input type="hidden" name="get_item" value="{{i.id}}"></input>
-                                </div>
-                            </form>
-                                
+    .img_icons {
+        position: relative;
+        bottom: 110px;
+        /* right: 10px; */
+        display: flex;
+        gap: 14px;
+        opacity: 0;
+        z-index: 2;
+        transition: opacity 0.3s ease;
+        align-items: center;
+        justify-content: center;
+    }
 
-                                    <!-- Lightbox overlay (hidden by default) -->
-                                    <div id="lightbox" class="overlay">
-                                        <span class="close-btn" onclick="closeLightbox()">&times;</span>
-                                        <img id="lightbox-img">
-                                    </div>
-                                </div>
-                        </div>
-                        
-                    </td>
-                    </tr>
+    .img_icons i {
+        color: white;
+        font-size: 22px;
+        padding: 8px;
+        /* background: rgba(0, 0, 0, 0.6); */
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .img_icons i:hover {
+        background: rgba(3, 3, 3, 0.2);
+    }
+
+    .img_inner_container:hover .img_overlay {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .img_inner_container:hover .img_icons {
+        opacity: 1;
+    }
+    .video_container{
+        width: 100%;
+        height: 330px;
+        object-fit: cover;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .video_container > video{
+        width: 100%;
+        height: 100%;
+    }
+    /* modal CSS starts here */
+
+    .modal_add_img_video {
+        display: block;
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 2vh;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        align-items: center;
+        transition: all 0.3s ease-in-out;
+        transform: translateY(-20px);
+    }
+
+    .modal_update_img {
+        display: block;
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 2vh;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        align-items: center;
+        transition: all 0.3s ease-in-out;
+        transform: translateY(-20px);
+    }
+
+    .modal_content {
+        background-color: white;
+        width: 40%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 7px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        margin: auto;
+        padding: 10px 20px;
+    }
     
-                {% endfor %}
-                
-            <tbody>
-            </table>
-        </div>
-        <!--		Start Pagination -->
-        <div class='pagination-container'>
-            <nav>
-            <ul class="pagination">
-                <!--	Here the JS Function Will Add the Rows -->
-            </ul>
-            </nav>
-        </div>
-        <div class="rows_count">Showing 11 to 20 of 91 entries</div>    
-                
-        </div>
-    </div>
+    .modal_delete {
+        display: block;
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 5vh;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        align-items: center;
+        transition: all 0.3s ease-in-out;
+        transform: translateY(-20px);
+    }
 
+    .delete_modal_content {
+        background-color: white;
+        width: 40%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 7px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        margin: auto;
+        padding: 10px 20px;
+    }
+    .modal_content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal_content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modal_content::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 4px;
+    }
+    
+    .container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .text_fld {
+        display: grid;
+        grid-template-columns: 0.2fr 10px 1fr;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+    }
+    .text_fld_ip{
+        flex: 1;
+        border: none;
+        border-bottom: 1px solid #ccc;
+    }
+    .colon {
+        font-size: 20px;
+        text-align: center;
+    }
+    
+    
+    .image-input {
+        display: none;
+    }
+    #video-input {
+        display: none;
+    }
+    .video-wrapper , .img-wrapper {
+        height: 260px;
+        overflow: hidden;
+        border-radius: 7px;
+        width: 100%;
+    }
+    .middle-banner-wrapper{
+        height: 130px;
+        overflow: hidden;
+        border-radius: 4px;
+        width: 100%;
+    }
+    /* modal CSS ends here */
+    /* Image Upload  */
+    input[type="file"] {
+        font-family: inherit;
+        font-size: 14px;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        padding: 5px;
+        transition: all .3s ease-in-out;
+        width: 100%;
+    }
+    
+    /* Style the actual file button */
+    input[type="file"]::file-selector-button {
+        display: none;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.3s ease;
+    }
+    
+    input[type="file"]:hover {
+        background-color: #00629b32;
+        color: #002855d8;
+    }
+    
+    .carousel_container {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: auto;
+        overflow: hidden;
+    }
+    
+    .carousel_track_wrapper {
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .carousel_track {
+        display: flex;
+        gap: 12px; 
+        transition: transform 0.4s ease-in-out;
+        padding: 15px 6px;
+        box-sizing: border-box;
+    }
+    
+    .img_inner_container {
+        flex: 0 0 calc((100% - 24px) / 3); /* 3 items with 12px gap between (2 gaps = 24px) */
+        max-width: calc((100% - 24px) / 3);
+        height: 190px;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .carousel_btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.471);
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 8px 12px;
+        z-index: 10;
+        border-radius: 50%;
+    }
+    
+    .left_btn {
+        left: 10px;
+    }
+    
+    .right_btn {
+        right: 10px;
+    }
+    
+    
+    .modal_content h1,
+    .delete_modal_content h1{
+        font-size: 18px;
+        margin: 0px;
+    }
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 7px;
+      padding: 3px 3px 3px 20px;
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      max-width: fit-content;
+    }
+
+    .toggle-label {
+      margin-right: 12px;
+      font-weight: bold;
+      margin-bottom: 0;
+    }
+
+    .toggle-options {
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-options input[type="radio"] {
+      display: none;
+    }
+
+    .toggle-options label.option {
+      display: flex;
+      align-items: center;
+      padding: 4px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #777;
+      transition: all 0.3s ease;
+      margin: 0;
+    }
+
+    .toggle-options .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 6px;
+      border: 2px solid #ccc;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-options label.option:hover {
+      background: rgba(0, 43, 92, 0.1);
+      color: #333;
+    }
+
+    input#showImage:checked + label.image {
+      background: #002b5c;
+      color: white;
+    }
+    input#showImage:checked + label.image .dot {
+      background: #ffcc00;
+      border-color: #ffcc00;
+    }
+
+    input#showVideo:checked + label.video {
+      background: #002b5c;
+      color: white;
+    }
+    input#showVideo:checked + label.video .dot {
+      background: #ffcc00;
+      border-color: #ffcc00;
+    }
+
+    input#showImage:checked + label.image:hover,
+    input#showVideo:checked + label.video:hover {
+      background: #002b5c;
+      color: white;
+    }
+        @media (max-width: 900px) {
+    .img_inner_container {
+        flex: 0 0 calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
+    }
+    }
+    @media (max-width: 800px){
+    .modal_content,
+    .modal_img_update_content,
+    .delete_modal_content{
+            width: 90%;
+        }
+        .text_fld{
+            grid-template-columns: 1fr;
+        }
+        .colon{
+            display: none;
+        }
+    }
+    @media (max-width: 600px) {
+        .img_inner_container {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .video_container{
+            height: 180px;
+        }
+
+    }
+    @media (max-width: 500px){
+    .modal_content,
+    .modal_img_update_content,
+    .delete_modal_content{
+            width: 95%;
+        }
+        .video-wrapper , .img-wrapper{
+            height: 150px;
+        }
+    .add-image , .add-video{
+        width: 100%;
+    }
+    }
+</style>
+<div id="tab1" class="tab-content container" style="border: none; margin: auto; margin-top: 40px;">
+        <!-- <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2> -->
+    <div class="add_btn_container" style="display: flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 14px; margin-left: 6px;margin-right: 6px;">
+  
+            <!-- Media Toggle Form -->
+            <form method="POST" id="mediaToggleForm" style="display: flex; align-items: center;">
+                {% csrf_token %}
+                <div class="toggle-wrapper">
+                <label class="toggle-label">Show</label>
+                <div class="toggle-options">
+                    <input type="radio" id="showImage" name="media_type" value="image" {% if selected_type == "image" %}checked{% endif %}>
+                    <label class="option image" for="showImage" style="margin-right: 4px;">
+                    <span class="dot"></span>
+                    Image
+                    </label>
+                    <input type="radio" id="showVideo" name="media_type" value="video" {% if selected_type == "video" %}checked{% endif %}>
+                    <label class="option video" for="showVideo">
+                    <span class="dot"></span>
+                    Video
+                    </label>
+                </div>
+                </div>
+            </form>
+
+            <!-- Add Image Button -->
+            <button class="add-image open_modal_btn" data-target="#add_img_modal" onclick="openImageModal()">Add Image</button>
+    </div>
+            <!-- <div class="btn-container">
+            <button class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add New Image and Text in Top Banner</button>
+            </div> -->
+             <div class="carousel_container">
+                <button class="carousel_btn left_btn">&#10094;</button>
+
+
+                    <div class="carousel_track_wrapper">
+                        <div class="carousel_track">
+                            {% for i in topBannerItems %}
+                                <div class="img_inner_container">
+                                    
+                                    <img src="{{ media_url }}{{ i.banner_picture }}" alt="Banner Image" />
+                                    <div class="img_overlay"></div>
+                                    <div class="img_icons">
+                                        
+                                            <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update" onclick="setFormValuesImageModal('{{i.id}}','{{i.banner_picture}}','{{i.first_layer_text}}','{{i.first_layer_text_colored}}','{{i.third_layer_text}}','{{i.button_text}}','{{i.button_url}}')"></i>
+                                            <i class="fas fa-trash delete_modal_btn"
+                                                data-id="{{ i.id }}"
+                                                data-target="#delete_image_modal"
+                                                title="Delete"></i>
+
+                                       
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button class="carousel_btn right_btn">&#10095;</button>
+                </div>
+
+
+        <div style="margin-top: 40px;">  
+            <div class="add_btn_container">  
+                <button class="add-video open_modal_btn" data-target="#add_video_modal" onclick="openVideoModal('{{video_banner.video_url}}', '{{video_banner.video_caption}}')">Update Video</button>
+            </div>
+
+        {% if video_banner %}
+            <div class="video_container">
+                {% with video_id=video_banner.video_url|cut:"https://www.youtube.com/watch?v=" %}
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/{{ video_id }}" 
+                    title="YouTube video player" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+                {% endwith %}
+            </div>
+        {% endif %}
+        </div>
+        <br>
+        <br>
 </div>
 
 <!--Thumbnail Image Script-->
+    <div id="add_img_modal" class="modal_add_img_video">
+        <form method="post" id="form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal_content">
+                <!-- Modal Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h1>Add image</h1>
+                    <button type="button" class="x_btn"><i class="fa fa-times"></i></button>
+                </div>
+
+                <!-- Tutorial Image -->
+                <div class="img-wrapper">
+                    <img src="{% static 'images/homepage_banner_tutorial.png' %}" style="width: 100%; height:100%; object-fit: cover;">
+                </div>
+
+                <!-- Optional preview input (if used) -->
+                <input type="file" class="image-input" accept="image/*" name="image_input">
+
+                <!-- Form Body -->
+                <div class="container" style="margin-top: 40px;">
+                    <!-- Banner Image Upload -->
+                    <div class="text_fld">  
+                        <h2 style="font-size: 15px; margin:0px;">Hero Image (1600 x 750)</h2>
+                        <div class="colon">:</div>
+                        <input type="file" class="text_fld_ip" id="hero-image" accept="image/*" name="banner_picture" required>
+                    </div>
+
+                    <!-- First Text -->
+                    <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">First text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip" name="first_layer_text" required>
+                    </div>
+
+                    <!-- Second Text (colored) -->
+                    <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">Second text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip" name="first_layer_text_colored" required>
+                    </div>
+
+                    <!-- Third Text (paragraph) -->
+                    <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">Third text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip" name="third_layer_text" required>
+                    </div>
+
+                    <!-- Button Text -->
+                    <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">Button text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip" name="button_text" required>
+                    </div>
+
+                    <!-- Button Link -->
+                    <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">Button link</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip" name="button_url" required>
+                    </div>
+
+                <!-- Modal Footer Buttons -->
+                <div style="display: flex; justify-content: end; padding-top: 20px;">
+                    <div style="display: flex;">
+                        <button type="button" class="close_btn">Cancel</button>
+                        <input type="submit" class="confirm_btn" style="margin-left: 10px;" name="add_banner" value="Confirm">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+
+    <div id="update_img_modal" class="modal_add_img_video" >
+        <form method="post" id="form" enctype="multipart/form-data">
+            {% csrf_token %}
+
+
+        <div class="modal_content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h1>Update image</h1>
+            <button type="button" class="x_btn"><i class="fa fa-times"></i></button>
+            </div>
+
+            <div class="img-wrapper">
+            <img src="{% static 'images/homepage_banner_tutorial.png'%}" style="width: 100%; height:100% ;object-fit: cover;">
+            </div>
+
+            <!-- Hidden file input -->
+            
+            <input type="hidden" name="image_id" id="image_id">
+
+            <div class="container" style="margin-top: 40px;">
+            <div class="text_fld">  
+            <h2 style="font-size: 15px; margin:0px;">Hero Image</h2>
+            <div class="colon">:</div>
+            <input type="file" class="text_fld_ip" name="banner_picture" id="hero-image" accept="image/*">
+            <h2 style="font-size: 15px; margin:0px;">Currently</h2>
+            <div class="colon">:</div>
+            <a style="text-decoration: underline;" target="_blank" name="banner_picture_current" href="#">#</a>
+            </div>
+
+            <div class="text_fld">
+            <h2 style="font-size: 15px; margin:0px;">First text</h2>
+            <div class="colon">:</div>
+            <input type="text" name="first_layer_text" class="text_fld_ip">
+            </div>
+
+            <div class="text_fld">
+                <h2 style="font-size: 15px; margin:0px;">Second text</h2>
+                <div class="colon">:</div>
+                <input type="text" name="first_layer_text_colored" class="text_fld_ip">
+            </div>
+
+            <div class="text_fld">
+                <h2 style="font-size: 15px; margin:0px;">Third text</h2>
+                <div class="colon">:</div>
+                <input type="text" name="third_layer_text" class="text_fld_ip">
+            </div>
+
+            <div class="text_fld">
+                <h2 style="font-size: 15px; margin:0px;">Button text</h2>
+                <div class="colon">:</div>
+                <input type="text" name="button_text" class="text_fld_ip">
+            </div>
+
+            <div class="text_fld">
+                <h2 style="font-size: 15px; margin:0px;">Button link</h2>
+                <div class="colon">:</div>
+                <input type="text" name="button_url" class="text_fld_ip">
+            </div>
+            </div>
+
+            <div style="display: flex; justify-content: end; padding-top: 20px;">
+            <div style="display: flex;">
+            <button type="button" class="close_btn">Cancel</button>
+            <button type="submit" class="confirm_btn" style="margin-left: 10px;" name="update_top_banner">Confirm</button>
+            </div>
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+    <div id="add_video_modal" class="modal_add_img_video">
+        <form method="post" id="form">
+            {% csrf_token %}
+        <div class="modal_content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h1>Update video</h1>
+            <button type="button" class="x_btn"><i class="fa fa-times"></i></button>
+            </div>
+
+            <!-- Hidden file input -->
+            <input type="file" id="video-input" accept="video/*">
+
+            <div class="container" style="margin-top: 40px;">
+            <!-- <div class="text_fld">  
+            <h2 style="font-size: 15px; margin:0px;">Hero Video</h2>
+            <div class="colon">:</div>
+                <input type="file" class="text_fld_ip" id="video-upload"  name="video-file" accept="video/*">
+            </div> -->
+            <div class="text_fld">
+                <h2 style="font-size: 15px; margin:0px;">Video link</h2>
+                <div class="colon">:</div>
+                <input type="text" class="text_fld_ip" name="video_url" required>
+            </div>
+
+            <div style="display: flex; justify-content: end; padding-top: 20px;">
+            <div style="display: flex;">
+            <button type="button" class="close_btn">Cancel</button>
+            <input type="submit" class="confirm_btn" style="margin-left: 10px;" name="update_video" value="Confirm">
+            </div>
+            </div>
+
+        </div>
+    </div>
+    </form>
+    </div>
+
+    <div id="delete_image_modal" class="modal_delete">
+        <form method="post" id="form">
+            {% csrf_token %}
+            <input type="hidden" name="delete" value="1">
+            <input type="hidden" name="get_item" id="delete_item_id">
+        <div class="delete_modal_content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h1>Delete Image</h1>
+            <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <h2 style="font-size: 20px; margin-top: 20px;">Are you sure you want to delete this image?</h2>
+
+
+            <div style="display: flex; justify-content: end; padding-top: 20px;">
+            <div style="display: flex;">
+            <button class="close_btn">Cancel</button>
+            <button type="submit" class="delete_btn" style="margin-left: 10px;">Yes, delete</button>
+            </div>
+            </div>
+
+        </div>
+        </form>
+    </div>
+
 <script>
-    function openLightbox(imageSrc) {
-        var lightbox = document.getElementById('lightbox');
-        var lightboxImg = document.getElementById('lightbox-img');
 
-        lightbox.style.display = 'block';
-        lightboxImg.src = imageSrc;
-    }
 
-    function closeLightbox() {
-        var lightbox = document.getElementById('lightbox');
-        lightbox.style.display = 'none';
+  function setFormValuesImageModal(id, heroImage, firstText, secondText, thirdText, buttonText, buttonUrl) {
+    const modal = document.querySelector("#update_img_modal");
+    {% comment %} // Image preview (if needed)
+    if (heroImage) {
+        let fileInput = document.getElementById("hero-image");
+        fileInput.setAttribute("data-existing", heroImage); 
+        // You can use this attribute later to show preview from server
+    } {% endcomment %}
+
+    // Set text values
+    modal.querySelector('[name="first_layer_text"]').value = firstText;
+    modal.querySelector('[name="first_layer_text_colored"]').value = secondText;
+    modal.querySelector('[name="third_layer_text"]').value = thirdText;
+    modal.querySelector('[name="button_text"]').value = buttonText;
+    modal.querySelector('[name="button_url"]').value = buttonUrl;
+    modal.querySelector('[name="banner_picture_current"]').href = heroImage;
+    modal.querySelector('[name="banner_picture_current"]').innerHTML = heroImage;
+
+    if (modal) {
+        modal.style.transform = "translateY(0px)";
+        modal.style.zIndex = "103100";
+        modal.style.opacity = "1";
+        document.body.classList.add("modal-open"); // prevent scroll
+
+        document.getElementById("image_id").value = id; // Set the image ID for update modal
+      }  
+  }
+
+  // Close modal via X or Cancel button
+  const closeBtns_modal_add_img_video = document.querySelectorAll(".x_btn, .close_btn");
+  closeBtns_modal_add_img_video.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modal = btn.closest(".modal_add_img_video");
+      if (modal) {
+        modal.style.transform = "translateY(-50px)";
+        modal.style.zIndex = "-100";
+        modal.style.opacity = "0";
+        document.body.classList.remove("modal-open");
+      }
+    });
+  });
+
+  function openImageModal() {
+    const modal = document.querySelector("#add_img_modal");
+    if (modal) {
+        modal.style.transform = "translateY(0px)";
+        modal.style.zIndex = "103100";
+        modal.style.opacity = "1";
+        document.body.classList.add("modal-open"); // prevent scroll
+      }  
+  }
+
+  function openVideoModal(video_url) {
+    const modal = document.querySelector("#add_video_modal");
+
+    modal.querySelector('[name="video_url"]').value = video_url;
+
+    if (modal) {
+        modal.style.transform = "translateY(0px)";
+        modal.style.zIndex = "103100";
+        modal.style.opacity = "1";
+        document.body.classList.add("modal-open"); // prevent scroll
+      }
+  }
+
+  // Close modal when clicking outside content
+  document.querySelectorAll(".modal_add_img_video").forEach(modal => {
+    modal.addEventListener("click", (event) => {
+      const modalContent = modal.querySelector(".modal_content");
+      if (!modalContent.contains(event.target)) {
+        modal.style.transform = "translateY(-50px)";
+        modal.style.zIndex = "-100";
+        modal.style.opacity = "0";
+        document.body.classList.remove("modal-open");
+      }
+    });
+  });
+
+
+
+  {% comment %} // Video preview
+  const preview = document.querySelector(".preview-video-upload");
+  const videoInput = document.querySelector("#video-upload");
+  videoInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+      const fileURL = URL.createObjectURL(this.files[0]);
+      preview.src = fileURL;
+      preview.style.display = 'block';
+    } else {
+      preview.src = "";
+      preview.style.display = 'none';
     }
+  }); {% endcomment %}
+</script>
+<script>
+  // Open delete modal
+  const deleteBtns = document.querySelectorAll(".delete_modal_btn");
+  deleteBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modalId = btn.getAttribute("data-target");
+      const modal = document.querySelector(modalId);
+      if (modal) {
+        modal.style.transform = "translateY(0px)";
+        modal.style.zIndex = "103100";
+        modal.style.opacity = "1";
+        document.body.classList.add("modal-open");
+      }
+    });
+  });
+
+  // Close delete modal via X or Cancel button
+  const deleteCloseBtns = document.querySelectorAll("#delete_image_modal .x_btn, #delete_image_modal .close_btn");
+  deleteCloseBtns.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modal = btn.closest(".modal_delete");
+      if (modal) {
+        modal.style.transform = "translateY(-50px)";
+        modal.style.zIndex = "-100";
+        modal.style.opacity = "0";
+        document.body.classList.remove("modal-open");
+      }
+    });
+  });
+
+  // Close delete modal when clicking outside content
+  const deleteModal = document.querySelector("#delete_image_modal");
+  if (deleteModal) {
+    deleteModal.addEventListener("click", (event) => {
+      const modalContent = deleteModal.querySelector(".delete_modal_content");
+      if (!modalContent.contains(event.target)) {
+        deleteModal.style.transform = "translateY(-50px)";
+        deleteModal.style.zIndex = "-100";
+        deleteModal.style.opacity = "0";
+        document.body.classList.remove("modal-open");
+      }
+    });
+  }
+</script>
+
+<script>
+  // Reload on checkbox change
+  document.querySelectorAll('.img_checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      location.reload();
+    });
+  });
+
+  // Reload on radio button change
+  document.querySelectorAll('input[name="showOption"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      location.reload();
+    });
+  });
+</script>
+<script>
+  const track = document.querySelector('.carousel_track');
+  const slides = document.querySelectorAll('.img_inner_container');
+  const prevBtn = document.querySelector('.left_btn');
+  const nextBtn = document.querySelector('.right_btn');
+
+  let currentIndex = 0;
+
+  function getSlideWidth() {
+    return slides[0].getBoundingClientRect().width + 12; // includes the gap
+  }
+
+  function getVisibleCount() {
+    const containerWidth = document.querySelector('.carousel_track_wrapper').offsetWidth;
+    const cardWidth = slides[0].getBoundingClientRect().width;
+    return Math.floor(containerWidth / (cardWidth + 12)); // roughly how many can fit
+  }
+
+  function updateCarousel() {
+    const offset = getSlideWidth() * currentIndex;
+    track.style.transform = `translateX(-${offset}px)`;
+  }
+
+  nextBtn.addEventListener('click', () => {
+    const visibleCount = getVisibleCount();
+    if (currentIndex < slides.length - visibleCount) {
+      currentIndex++;
+      updateCarousel();
+    }
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCarousel();
+    }
+  });
+
+  window.addEventListener('resize', updateCarousel);
+  window.addEventListener('load', updateCarousel);
+
+    document.querySelectorAll('input[name="media_type"]').forEach(input => {
+        input.addEventListener('change', () => {
+        document.getElementById('mediaToggleForm').submit();
+        });
+    });
+
+
+    document.querySelectorAll('.delete_modal_btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const modalId = this.dataset.target; // "#delete_image_modal"
+        const bannerId = this.dataset.id;
+
+        // Show modal
+        const modal = document.querySelector(modalId);
+        modal.style.display = 'block';
+
+        // Set the hidden input value
+        document.getElementById('delete_item_id').value = bannerId;
+    });
+    });
+
+    // Close modal on 'x' or cancel button
+    document.querySelectorAll('.x_btn, .close_btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('delete_image_modal').style.display = 'none';
+    });
+    });
+    
+
+
+
+
 </script>
 
 {% endblock banner_picture_text_tab %}

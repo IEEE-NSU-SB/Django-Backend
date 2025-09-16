@@ -10,8 +10,7 @@ from system_administration.system_error_handling import ErrorHandling
 
 class System_Logs:
     
-    def save_logs(instance, action):
-
+    def save_logs(instance, action, ip=None, message=None):
         '''This function saves the general log whenever needed'''
         
         try:
@@ -21,6 +20,8 @@ class System_Logs:
             log_details = {
                 'action': action,
                 'user': str(user) if user else "Anonymous",
+                'ip': ip,
+                'message': message
             }
             
             #getting current time
@@ -33,7 +34,7 @@ class System_Logs:
                     log_of=instance,
                     log_details={current_time+"_0":log_details},
                 )
-            elif action == 'update' or action == 'delete':
+            elif action == 'update' or action == 'delete' or 'request':
                 # Calculate update number (for tracking task updates)
                 content_type = ContentType.objects.get_for_model(instance.__class__)
 

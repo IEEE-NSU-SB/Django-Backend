@@ -5,7 +5,7 @@ from django.urls import reverse
 from central_events.google_calendar_handler import CalendarHandler
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from insb_port import settings
-from main_website.models import About_IEEE, HomePageTopBanner, IEEE_Bangladesh_Section, IEEE_NSU_Student_Branch, IEEE_Region_10, Page_Link,FAQ_Question_Category,FAQ_Questions,HomePage_Thoughts,IEEE_Bangladesh_Section_Gallery
+from main_website.models import About_IEEE, Contact_Info, HomePageTopBanner, IEEE_Bangladesh_Section, IEEE_NSU_Student_Branch, IEEE_Region_10, Page_Link,FAQ_Question_Category,FAQ_Questions,HomePage_Thoughts,IEEE_Bangladesh_Section_Gallery
 from notification.models import NotificationTypes
 from notification.notifications import NotificationHandler
 from port.models import Teams,Roles_and_Position,Chapters_Society_and_Affinity_Groups,Panels
@@ -897,21 +897,46 @@ class Branch:
         ****Remember that the passed keys in the keyword arguments must match with the models attributes.
         '''
         try:
-            # first get member
-            get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
-            
-            # iterate through the fields of the member
-            for field in get_member._meta.fields:
-                # if field name matches with passed kwargs
-                if field.name in kwargs['kwargs']:
-                    # set attribute of the member with the value from keyword argument
-                    setattr(get_member,field.attname,kwargs['kwargs'][field.name])
-                    # save the member
+            # Determine if all access values are False
+            all_false = all(value is False for value in kwargs['kwargs'].values())
+
+            try:
+                get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
+                
+                if all_false:
+                    get_member.delete()
+                    messages.success(request,f"Removed all view permissions for {ieee_id}")
+                    return True
+                else:
+                    # iterate through the fields of the member
+                    for field in get_member._meta.fields:
+                        # if field name matches with passed kwargs
+                        if field.name in kwargs['kwargs']:
+                            # set attribute of the member with the value from keyword argument
+                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
                     get_member.save()
-            messages.success(request,f"View Permission was updated for {ieee_id}")
-            return True
+                    messages.success(request,f"View Permission was updated for {ieee_id}")
+                    return True
+            except:
+                if not all_false:
+                    member = Members.objects.get(ieee_id=ieee_id)
+                    get_member = Branch_Data_Access.objects.create(ieee_id=member)
+                    # iterate through the fields of the member
+                    for field in get_member._meta.fields:
+                        # if field name matches with passed kwargs
+                        if field.name in kwargs['kwargs']:
+                            # set attribute of the member with the value from keyword argument
+                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
+                    get_member.save()
+                    messages.success(request,f"View Permission was updated for {ieee_id}")
+                    return True
+                else:
+                    #Do nothing
+                    return True
+
         except:
-            messages.error(request,"View Permission can not be updated!")
+            messages.warning(request,"View Permission can not be updated!")
+            return False
         
 
     def remover_member_from_branch_access(request,ieee_id):
@@ -927,10 +952,18 @@ class Branch:
         try:
             return Branch_Data_Access.objects.all()
         except:
-            messages.error("Something went wrong while loading Data Access for Branch")
+            messages.error(request, "Something went wrong while loading Data Access for Branch")
             return False
         
-    
+    def get_branch_data_access_for_member(request, ieee_id):
+        try:
+            return Branch_Data_Access.objects.get(ieee_id=ieee_id)
+        except Branch_Data_Access.DoesNotExist:
+            # messages.error(request, "The data access does not exist")
+            return False
+        except:
+            # messages.error(request, "Something went wrong while loading Data Access")
+            return False
     
     def load_branch_eb_panel():
         '''This function loads all the EB panel members from the branch.
@@ -1241,7 +1274,7 @@ class Branch:
             for i in events:
                 all_collaborations_for_this_event = InterBranchCollaborations.objects.filter(event_id = i.id)
                 for j in all_collaborations_for_this_event:
-                    collaborations.append(j.collaboration_with.group_name)  
+                    collaborations.append(j.collaboration_with.short_form)  
                 dic.update({i:collaborations})
                 collaborations=[]
                 
@@ -1919,6 +1952,20 @@ class Branch:
         except Exception as e:
             Branch.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
             ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+            return False
+        
+    def update_contact_info(address, nsu_ieee_email, chair_email, membership_queries_number, corporate_engagement_number):
+        try:
+            contact_info = Contact_Info.objects.get(id=1)
+
+            contact_info.address = address
+            contact_info.nsu_ieee_email = nsu_ieee_email
+            contact_info.chair_email = chair_email
+            contact_info.membership_queries_number = membership_queries_number
+            contact_info.corporate_engagement_number = corporate_engagement_number
+            contact_info.save()
+            return True
+        except:
             return False
         
     def save_homepage_thoughts(author,thought):

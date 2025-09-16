@@ -76,6 +76,7 @@ from django.views import View
 from task_assignation.models import *
 import re
 from email.utils import getaddresses, parseaddr, parsedate_to_datetime
+from main_website.models import MediaToggle
 
 # Create your views here.
 logger=logging.getLogger(__name__)
@@ -1107,7 +1108,7 @@ def publish_blog_request(request,pk):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
-from main_website.models import HomePageTopBanner
+from main_website.models import HomePageTopBanner, MediaToggle
 @login_required
 @member_login_permission
 def manage_website_homepage(request):
@@ -1129,19 +1130,64 @@ def manage_website_homepage(request):
             if(user_data==False):
                 return DatabaseError
             
+            toggle, created = MediaToggle.objects.get_or_create(id=1)
+            video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
+            image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response
             if request.method=="POST":
+                
+                # --- Handle Media Toggle Switch ---
+                
+
+                # Get or create media toggle instance
+                
+
+                # Handle toggle form POST
+                
+                if "update_top_banner" in request.POST:
+                    image_id = request.POST.get('image_id')
+                
+                    print(request.FILES.get('banner_picture'))
+                    banner_image = None
+                    if request.FILES.get('banner_picture'):
+                        banner_image = request.FILES['banner_picture']
+
+                    first_layer_text = request.POST['first_layer_text']
+                    first_layer_text_colored = request.POST['first_layer_text_colored']
+                    third_layer_text = request.POST['third_layer_text']
+                    button_text = request.POST['button_text']
+                    button_url = request.POST['button_url']
+
+                    if(Branch.update_website_homepage_top_banner(image_id, banner_image, first_layer_text, first_layer_text_colored, third_layer_text, button_text, button_url)):
+                        messages.success(request, 'Updated Successfully!')
+                    else:
+                        messages.warning(request, 'Something went wrong!')
+
+                    return redirect('central_branch:manage_website_home')
+
+                
+                if request.POST.get('media_type'):
+                    selected_media = request.POST.get('media_type', 'image')
+                    toggle.media_type = selected_media
+                    toggle.save()
+                    messages.success(request, f"Media type changed to {selected_media}")
+                    return redirect('central_branch:manage_website_home')
 
                 # To delete an item
                 if request.POST.get('delete'):
                     # Delelte the item. Getting the id of the item from the hidden input value.
                     HomePageTopBanner.objects.filter(id=request.POST.get('get_item')).delete()
                     return redirect('central_branch:manage_website_home')
+                
+                
+                
                 # To add a new Banner Item
+
                 if request.POST.get('add_banner'):
                     try:
                         newBanner=HomePageTopBanner.objects.create(
+                            media_type='image',
                             banner_picture=request.FILES['banner_picture'],
                             first_layer_text=request.POST['first_layer_text'],
                             first_layer_text_colored=request.POST['first_layer_text_colored'],
@@ -1152,8 +1198,30 @@ def manage_website_homepage(request):
                         newBanner.save()
                         messages.success(request,"New Banner Picture added in Homepage successfully!")
                         return redirect('central_branch:manage_website_home')
-                    except:
-                        print("GG")
+                    except Exception as e:
+                        print(f"Exception while adding banner: {e}")
+                        traceback.print_exc()
+                elif request.POST.get('update_video'):
+                    try:
+                        # Try to find an existing video banner
+                        if video_banner:
+                            # Update existing video banner
+                            video_banner.video_url = request.POST['video_url']
+                            video_banner.save()
+                            messages.success(request, "Video banner updated successfully!")
+                        else:
+                            # Create new video banner if none exists
+                            HomePageTopBanner.objects.create(
+                                media_type='video',
+                                video_url=request.POST['video_url'],
+                            )
+                            messages.success(request, "Video banner created successfully!")
+
+                        return redirect('central_branch:manage_website_home')   
+                    except Exception as e:
+                        print(f"Error handling video banner update: {e}")
+                        traceback.print_exc()
+                        messages.error(request, "Failed to update video banner.")     
 
 
             '''For banner picture with Texts'''   
@@ -1180,6 +1248,7 @@ def manage_website_homepage(request):
                         messages.success(request,"Banner Picture With Statistics was successfully updated")
                         return redirect('central_branch:manage_website_home')    
                     except Exception as e:
+                        print("Exception while updating banner:", e)
                         messages.error(request,"Something went wrong! Please try again.")
                         return redirect('central_branch:manage_website_home')  
 
@@ -1201,19 +1270,19 @@ def manage_website_homepage(request):
                     return redirect('central_branch:manage_website_home')
                 
                 #when user edits saved thoughts
-                if request.POST.get('update'):
+                # if request.POST.get('update'):
 
-                    author_edit = request.POST.get('author_edit')
-                    thoughts_edit = request.POST.get('your_thoughts_edit')
-                    thoughts_id = request.POST.get('thought_id')
-                    #passing them to function to update changes made
-                    if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
-                        messages.success(request,"Thoughts updated successfully!")
-                    else:
-                        messages.error(request,"Error Occured. Please try again later!")
-                    return redirect('central_branch:manage_website_home')
+                #     author_edit = request.POST.get('author_edit')
+                #     thoughts_edit = request.POST.get('your_thoughts_edit')
+                #     thoughts_id = request.POST.get('thought_id')
+                #     #passing them to function to update changes made
+                #     if Branch.update_saved_thoughts(author_edit,thoughts_edit,thoughts_id):
+                #         messages.success(request,"Thoughts updated successfully!")
+                #     else:
+                #         messages.error(request,"Error Occured. Please try again later!")
+                #     return redirect('central_branch:manage_website_home')
                 
-                #when user wants to delete a thought
+                # when user wants to delete a thought
                 if request.POST.get('thought_delete'):
                     
                     id = request.POST.get('delete_thought')
@@ -1257,6 +1326,10 @@ def manage_website_homepage(request):
                 'bannerPictureWithNumbers':existing_banner_picture_with_numbers,
                 'media_url':settings.MEDIA_URL,
                 'all_thoughts':all_thoughts,
+                'selected_type': toggle.media_type,
+                'video_banner': video_banner,
+                'topBannerItems': image_banners,
+
                 # 'insb_members':get_all_insb_members,
                 # 'volunteer_of_the_month_form':volunteer_of_the_month_form,
                 # 'all_volunteer_of_month':volunteers_of_the_month,
@@ -2011,6 +2084,46 @@ def faq_preview(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
+@login_required
+@member_login_permission  
+def contact(request):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        has_access = Branch_View_Access.get_manage_web_access(request)
+
+        if has_access:
+
+            if request.method == 'POST':
+                if 'save_info' in request.POST:
+                    address = request.POST.get('address')
+                    nsu_ieee_email = request.POST.get('nsu_ieee_email')
+                    chair_email = request.POST.get('chair_email')
+                    membership_queries_number = request.POST.get('membership_queries_number')
+                    corporate_engagement_number = request.POST.get('corporate_engagement_number')
+
+                    if Branch.update_contact_info(address, nsu_ieee_email, chair_email, membership_queries_number, corporate_engagement_number):
+                        messages.success(request, 'Contact info updated successfully!')
+                    else:
+                        messages.error(request, 'Something went wrong!')
+
+            contact_info, created = Contact_Info.objects.get_or_create(id=1)
+
+            context={
+                    'user_data':user_data,
+                    'all_sc_ag':sc_ag,
+                    'contact_info':contact_info
+                }
+            return render(request,'Manage Website/About/Contact/contact.html',context)
+        else:
+            return render(request, 'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission
@@ -2506,12 +2619,11 @@ def manage_view_access(request):
         has_access = Branch_View_Access.common_access(request.user.username)
         if has_access:
             # get access of the page first
-            all_insb_members=port_render.get_all_registered_members(request)
-            branch_data_access=Branch.get_branch_data_access(request)
+            current_panel_members=Branch.load_current_panel_members()
 
             if request.method=="POST":
-                if(request.POST.get('update_access')):
-                    ieee_id=request.POST['remove_member_data_access']
+                if('update_access' in request.POST):
+                    ieee_id=request.POST['ieee_id']
                     
                     # Setting Data Access Fields to false initially
                     create_event_access=False
@@ -2565,24 +2677,11 @@ def manage_view_access(request):
                                                             'manage_custom_notification_access':manage_custom_notification_access,
                                                             'manage_email_access':manage_email_access})):
                         return redirect('central_branch:manage_access')
-                    
-                if(request.POST.get('add_member_to_access')):
-                    selected_members=request.POST.getlist('member_select')
-                    if(Branch.add_member_to_branch_view_access(request=request,selected_members=selected_members)):
-                        return redirect('central_branch:manage_access')
                 
-                if(request.POST.get('remove_member')):
-                    ieee_id=request.POST['remove_member_data_access']
-                    if(Branch.remover_member_from_branch_access(request=request,ieee_id=ieee_id)):
-                        return redirect('central_branch:manage_access')
-
-                
-
             context={
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
-                'insb_members':all_insb_members,
-                'branch_data_access':branch_data_access,
+                'current_panel_members':current_panel_members,
             }
 
             return render(request,'Manage Access/manage_access.html',context)
@@ -2594,7 +2693,41 @@ def manage_view_access(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
+class GetAccessDataAjax(View):
 
+    # @login_required
+    def get(self, request):
+        has_access = Branch_View_Access.common_access(request.user.username)
+
+        if has_access:
+            if request.GET.get('ieee_id'):
+                ieee_id = request.GET.get('ieee_id')
+                data = Branch.get_branch_data_access_for_member(request, ieee_id)
+                if data:
+                    access_data = {
+                        "message":"success",
+                        "ieee_id":ieee_id,
+                        "name":data.ieee_id.name,
+                        "create_event_access":data.create_event_access,
+                        "event_details_page_access":data.event_details_page_access,
+                        "create_individual_task_access":data.create_individual_task_access,
+                        "create_team_task_access":data.create_team_task_access,
+                        "create_panels_access":data.create_panels_access,
+                        "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
+                        "team_details_page":data.team_details_page,
+                        "manage_award_access":data.manage_award_access,
+                        "manage_web_access":data.manage_web_access,
+                        "manage_custom_notification_access":data.manage_custom_notification_access,
+                        "manage_email_access":data.manage_email_access
+                    }
+                    return JsonResponse(access_data)
+                else:
+                    name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
+                    return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
+            else:
+                return JsonResponse({'message': "Invalid Response"})
+        else:
+            return JsonResponse({'message':'Not Allowed'})
 
 # Create your views here.
 
@@ -5576,6 +5709,11 @@ def task_edit(request,task_id,team_primary = None):
                 pass
         except:
             logged_in_user = adminUsers.objects.get(username=user)
+
+        # if not team_primary:
+        #     if task.task_type == 'Team' and type(logged_in_user) == Members:
+        #         app_name = Task_Assignation.get_team_app_name(team_primary=logged_in_user.team.primary)
+        #         return redirect(f'{app_name}:task_edit_team', team_primary=logged_in_user.team.primary,task_id=task.pk)
 
         print("before post")
         

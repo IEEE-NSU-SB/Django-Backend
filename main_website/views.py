@@ -7,6 +7,7 @@ from main_website.models import Research_Papers,Blog,Achievements,News
 from membership_development_team.renderData import MDT_DATA
 from port.renderData import PortData,HandleVolunteerAwards
 from port.models import Teams,Panels,Chapters_Society_and_Affinity_Groups,VolunteerAwards
+from recruitment.models import recruitment_session
 from .renderData import HomepageItems
 from django.conf import settings
 from users.models import Panel_Members, User_IP_Address,Members
@@ -37,6 +38,34 @@ logger=logging.getLogger(__name__)
 def homepage(request):
     try:
         bannerItems=HomepageItems.getHomepageBannerItems()
+        # Determine which media to show (image or video)
+        selected_media = 'image'
+        video_banner = None
+        video_embed_url = None
+        try:
+            toggle = MediaToggle.objects.first()
+            if toggle:
+                selected_media = toggle.media_type
+        except Exception:
+            selected_media = 'image'
+
+        # Prepare video banner data if video is selected
+        if selected_media == 'video':
+            try:
+                video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
+                # Build an embeddable YouTube URL if the saved URL is a YouTube link
+                if video_banner and video_banner.video_url:
+                    url = video_banner.video_url
+                    embed_id = None
+                    if 'youtube.com/watch' in url and 'v=' in url:
+                        embed_id = url.split('v=')[1].split('&')[0]
+                    elif 'youtu.be/' in url:
+                        embed_id = url.split('youtu.be/')[1].split('?')[0]
+                    if embed_id:
+                        # loop requires playlist param to loop the single video                        
+                        video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&playlist={embed_id}&controls=0&modestbranding=1&rel=0&fs=0&disablekb=1"
+            except Exception:
+                video_banner = None
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
         HomepageItems.get_ip_address(request)
         #getting all the thoughts
@@ -75,6 +104,9 @@ def homepage(request):
             'banner_pic_with_stat':bannerWithStat,
             'featured_events':get_featured_events,
             'media_url':settings.MEDIA_URL,
+            'selected_media': selected_media,
+            'video_banner': video_banner,
+            'video_embed_url': video_embed_url,
             'all_member_count':HomepageItems.getAllIEEEMemberCount(),
             'event_count':HomepageItems.getEventCount(),
             'achievement_count':HomepageItems.getAchievementCount(),
@@ -1618,24 +1650,26 @@ def contact(request):
 
         #loading all the teams of Branch
         branch_teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1)
+        contact_info = Contact_Info.objects.get(id=1)
 
         if request.method == "POST":
-                #when user hits submit button on main page
-                if request.POST.get('submit'):
-                    #getting the user's details
-                    name = request.POST.get('user_name')
-                    email = request.POST.get('user_email')
-                    message = request.POST.get('user_message')
-                    #passing them as arguments to the function to save the data
-                    if HomepageItems.save_feedback_information(request,1,name,email,message):
-                        messages.success(request,"You have reached us! Thanks for your feedback")  
-                    else:
-                        messages.error(request,"Sorry! Try to contact us later") 
-                    return redirect("main_website:contact")
+            #when user hits submit button on main page
+            if request.POST.get('submit'):
+                #getting the user's details
+                name = request.POST.get('user_name')
+                email = request.POST.get('user_email')
+                message = request.POST.get('user_message')
+                #passing them as arguments to the function to save the data
+                if HomepageItems.save_feedback_information(request,1,name,email,message):
+                    messages.success(request,"You have reached us! Thanks for your feedback")  
+                else:
+                    messages.error(request,"Sorry! Try to contact us later") 
+                return redirect("main_website:contact")
 
         context = {
             'page_title':'Contact',
-            'branch_teams':branch_teams
+            'branch_teams':branch_teams,
+            'contact_info':contact_info
         }
 
         return render(request, 'Contact/contact.html', context)
@@ -1673,9 +1707,17 @@ def join_insb(request):
 
         #loading all the teams of Branch
         branch_teams = PortData.get_teams_of_sc_ag_with_id(request=request,sc_ag_primary=1)
+        active_recruit_sessions = recruitment_session.objects.filter(is_active=True)
+
+        if len(active_recruit_sessions) > 0:
+            recruit_session = active_recruit_sessions[0]
+        else:
+            recruit_session = None
+
         context={
                 'page_title':"Join IEEE NSU SB",
                 'branch_teams':branch_teams,
+                'recruit_session':recruit_session
             }
     
         return render(request,"Get Involved/Join INSB/join_INSB.html",context=context)

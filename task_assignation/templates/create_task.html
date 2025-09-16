@@ -189,12 +189,16 @@
         }
         .individuals-table{
             border-radius: 4px;
-            /* min-height: 400px; */
+            min-height: 400px;
             max-height: 500px;
             margin-bottom: 15px;
         }
         .team-table{
             overflow-y: clip;
+            border-radius: 4px;
+            min-height: 400px;
+            max-height: 500px;
+            margin-bottom: 15px;
         }
         .box{
             padding: 2px 25px 0px 9px;
@@ -761,9 +765,9 @@
 }
 #team-table{
     width: 99%;
-    min-height: 0px;
+    /* min-height: 400px; */
     max-height: 500px;
-    box-shadow: 0px 0px 1px 1px #ddd;
+    /* box-shadow: 0px 0px 1px 1px #ddd; */
     margin: 10px 0 2px .5%;
 }
 #team-table > thead > th{
@@ -1135,7 +1139,12 @@
                 
 
                 <!--create task btn-->
-                <div style="text-align: center;">
+                <div style="text-align: center;
+                position: sticky;
+                bottom: 5px;
+                background: white;
+                /* padding-top: 16px; */
+                z-index: 1000;">
                     <button type="submit" class="create-task-btn" name="create_task">Create Task</button>
                 </div>
             </form>

@@ -8,6 +8,7 @@ from users.models import Members
 class Task_Category(models.Model):
     name = models.TextField(null=False,blank=False)
     points = models.FloatField(null=False,blank=False)
+    team = models.ForeignKey(Teams,null=False,blank=False,default=13,on_delete=models.SET_DEFAULT)
     enabled = models.BooleanField(null=False,blank=False,default=True)
 
     class Meta:

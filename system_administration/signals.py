@@ -3,6 +3,7 @@ import traceback
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+from system_administration.middleware import get_client_ip
 from system_administration.system_error_handling import ErrorHandling
 from system_administration.system_logs import System_Logs
 
@@ -30,7 +31,8 @@ def create_general_log(instance, action):
         if instance.__class__.__name__ in EXCLUDED_MODELS:
             return
         
-        System_Logs.save_logs(instance, action)
+        ip = get_client_ip()
+        System_Logs.save_logs(instance, action, ip)
                     
     except Exception as e:
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
