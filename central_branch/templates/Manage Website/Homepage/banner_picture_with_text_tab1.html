@@ -513,7 +513,18 @@
                                     <div class="img_overlay"></div>
                                     <div class="img_icons">
                                         
-                                            <i class="fas fa-edit open_modal_btn" data-target="#update_img_modal" title="Update" onclick="setFormValuesImageModal('{{i.id}}','{{i.banner_picture}}','{{i.first_layer_text}}','{{i.first_layer_text_colored}}','{{i.third_layer_text}}','{{i.button_text}}','{{i.button_url}}')"></i>
+                                            <i class="fas fa-edit open_modal_btn"
+                                                title="Update"
+                                                onclick="setFormValuesImageModal(
+                                                    '{{ i.id|escapejs }}',
+                                                    '{{ i.banner_picture|escapejs }}',
+                                                    '{{ i.first_layer_text|escapejs }}',
+                                                    '{{ i.first_layer_text_colored|escapejs }}',
+                                                    '{{ i.third_layer_text|escapejs }}',
+                                                    '{{ i.button_text|escapejs }}',
+                                                    '{{ i.button_url|escapejs }}'
+                                                )">
+                                                </i>
                                             <i class="fas fa-trash delete_modal_btn"
                                                 data-id="{{ i.id }}"
                                                 data-target="#delete_image_modal"
@@ -767,12 +778,6 @@
 
   function setFormValuesImageModal(id, heroImage, firstText, secondText, thirdText, buttonText, buttonUrl) {
     const modal = document.querySelector("#update_img_modal");
-    {% comment %} // Image preview (if needed)
-    if (heroImage) {
-        let fileInput = document.getElementById("hero-image");
-        fileInput.setAttribute("data-existing", heroImage); 
-        // You can use this attribute later to show preview from server
-    } {% endcomment %}
 
     // Set text values
     modal.querySelector('[name="first_layer_text"]').value = firstText;
@@ -790,6 +795,7 @@
         document.body.classList.add("modal-open"); // prevent scroll
 
         document.getElementById("image_id").value = id; // Set the image ID for update modal
+        console.log(id)
       }  
   }
 
@@ -843,21 +849,6 @@
     });
   });
 
-
-
-  {% comment %} // Video preview
-  const preview = document.querySelector(".preview-video-upload");
-  const videoInput = document.querySelector("#video-upload");
-  videoInput.addEventListener('change', function () {
-    if (this.files && this.files[0]) {
-      const fileURL = URL.createObjectURL(this.files[0]);
-      preview.src = fileURL;
-      preview.style.display = 'block';
-    } else {
-      preview.src = "";
-      preview.style.display = 'none';
-    }
-  }); {% endcomment %}
 </script>
 <script>
   // Open delete modal
