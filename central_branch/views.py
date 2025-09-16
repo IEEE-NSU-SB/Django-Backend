@@ -1132,8 +1132,8 @@ def manage_website_homepage(request):
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
             video_banner = HomePageTopBanner.objects.filter(media_type='video')
-            if video_banner.video:
-                video_banner = video_banner.first()
+            if video_banner[0].video:
+                video_banner = video_banner[0]
             else:
                 video_banner = False
             image_banners = HomePageTopBanner.objects.filter(media_type='image')
