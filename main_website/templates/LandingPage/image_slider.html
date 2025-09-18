@@ -307,7 +307,6 @@
         }
         .background_video {
             height: 100%;  /* full screen height */
-            scale: 2;
         }
     }
 </style>
@@ -368,7 +367,7 @@
         <source src="{{ video_banner.video.url }}" type="video/mp4">
       </video>
     {% endif %}
-    <div id="slider-container">
+    <!-- <div id="slider-container">
         <button id="prev-btn" class="slider-btn" onclick="prevSlide()">❮</button>
         <button id="next-btn" class="slider-btn" onclick="nextSlide()">❯</button>
         <div id="image-slider">
@@ -388,7 +387,7 @@
         {% endfor %}
         </div>
         <div class="slider-indicators" id="slider-indicators"></div>
-    </div>
+    </div> -->
     </div>
 {% else %}
   <!-- Image slider -->
