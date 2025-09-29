@@ -386,6 +386,32 @@
             }
         }
         /* modal CSS ends here */
+        .add_members{
+            background: #95d2f6;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            color: #00629B;
+            cursor: pointer;
+            transition: all .3s ease-in-out;
+        }
+        .add_members:hover{
+            background: #7ecefd;
+            border: 1px solid transparent;
+        }
+        .trash-btn{
+            color: black;
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: none;
+            position: relative;
+            bottom: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .trash-btn:hover {
+            background: #f64040;
+        }
     </style>
 </head>
 
@@ -426,7 +452,7 @@
                     <div class="search-container">
                         <input type="text" placeholder="Search..." class="search-input" id="searchInput">
                     </div>
-                    <button type="button" class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add Members</button>
+                    <button type="button" class="add_members" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add Members</button>
                 </div>
 
 
@@ -443,6 +469,7 @@
                                     <th style="background-color: #f0f0f0; color: #000000;">Position</th>
                                     <th style="background-color: #f0f0f0; color: #000000;">Team</th>
                                     <th style="background-color: #f0f0f0; color: #000000;">Edit Access</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Remove?</th>
                                 </tr>
                             </thead>
                             <tbody id="accessTableBody">
@@ -459,6 +486,11 @@
                                             </span>
                                         </button>
                                     </td>
+                                    <td>
+                                        <button class="trash-btn" data-target="#remove_access_modal" data-ieee_id="{{member.ieee_id.ieee_id}}">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -469,7 +501,26 @@
 
         </div>
     </div>
+        <div class="modal_view_access" id="remove_access_modal">
+        <form method="POST" id="remove_form">
+            {% csrf_token %}
+            <div class="modal_content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 5px;">
+                <h1 id="remove_access_text" style="margin-bottom: 10px; font-size: 16px;">
+                Are you sure you want to remove all access for this member?
+                </h1>
+                <button type="button" class="x_btn"><i class="fa fa-times"></i></button>
+            </div>
 
+            <input type="hidden" name="remove_ieee_id" id="remove_ieee_id">
+
+            <div style="display: flex; justify-content: center;">
+                <button type="button" class="close_btn">Cancel</button>
+                <button type="submit" class="confirm_btn" name="remove_access" style="margin-left: 10px;">Confirm</button>
+            </div>
+            </div>
+        </form>
+        </div>
         <div class="modal_view_access" id="view_access_modal">
         <form method="POST" id="form">
         {% csrf_token %}
@@ -549,7 +600,7 @@
 <div class="modal-footer">
     {% csrf_token %}
     <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">Cancel</button>
-    <input type="submit" class="btn btn-outline b-primary text-primary" name="add_member_to_access" value="Add Member"></input>
+    <input type="submit" class="add_members" name="add_member_to_access" value="Add Member"></input>
 </div>
 
 </div><!-- /.modal-content -->
@@ -629,6 +680,54 @@
       }
     });
   }
+
+  // Open remove access modal
+const trashBtns = document.querySelectorAll(".trash-btn");
+trashBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const modalId = btn.getAttribute("data-target");
+    const modal = document.querySelector("#remove_access_modal");
+    var ieee_id = btn.getAttribute("data-ieee_id");
+
+    document.getElementById("remove_ieee_id").value = ieee_id;
+
+    if (modal) {
+      modal.style.transform = "translateY(0px)";
+      modal.style.zIndex = "103100";
+      modal.style.opacity = "1";
+      document.body.classList.add("modal-open");
+    }
+  });
+});
+
+// Close remove access modal (X and Cancel)
+const removeCloseBtns = document.querySelectorAll("#remove_access_modal .x_btn, #remove_access_modal .close_btn");
+removeCloseBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const modal = btn.closest("#remove_access_modal");
+    if (modal) {
+      modal.style.transform = "translateY(-50px)";
+      modal.style.zIndex = "-100";
+      modal.style.opacity = "0";
+      document.body.classList.remove("modal-open");
+    }
+  });
+});
+
+// Close modal on background click
+const removeModal = document.querySelector("#remove_access_modal");
+if (removeModal) {
+  removeModal.addEventListener("click", (event) => {
+    const modalContent = removeModal.querySelector(".modal_content");
+    if (!modalContent.contains(event.target)) {
+      removeModal.style.transform = "translateY(-50px)";
+      removeModal.style.zIndex = "-100";
+      removeModal.style.opacity = "0";
+      document.body.classList.remove("modal-open");
+    }
+  });
+}
+
 </script>
 
 <script>
