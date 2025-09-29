@@ -22,7 +22,7 @@ jobs:
           script: |
             cd ~/ieeensusb_main_web
             git pull origin production
-            source "${{ secrets.ENV_PATH }}"
+            source "${{ secrets.CPANEL_ENV_PATH }}"
             pip install -r requirements.txt
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
