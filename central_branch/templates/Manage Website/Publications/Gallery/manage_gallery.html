@@ -181,7 +181,7 @@
                         <tr>
                             <td><a style="text-decoration:none;color:#00629B;" href="{% url 'central_branch:update_video' i.pk %}">{{i.pk}}</a></td>
                             <td>{{ i.video_title }}</td>
-                            <td>Here dynamic Description will be added leter....</td>
+                            <td>{{ i.video_description }}</td>
                             <td>{{ i.video_link }}</td>
                             <td>{{i.upload_date}}</td>
                             
@@ -278,8 +278,6 @@
                                                         <div class="form-control">
                                                             {{video_form.media}}
                                                             {{video_form.as_p}}
-                                                            <label for="video_description">Description</label>
-                                                            <input type="text" name="video_description">
                                                         </div>
                                                         <br>
                                                     </div>
