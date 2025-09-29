@@ -896,47 +896,22 @@ class Branch:
         '''This function updates the view permission of Branch Data Access.
         ****Remember that the passed keys in the keyword arguments must match with the models attributes.
         '''
+        # first get member
         try:
-            # Determine if all access values are False
-            all_false = all(value is False for value in kwargs['kwargs'].values())
-
-            try:
-                get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
-                
-                if all_false:
-                    get_member.delete()
-                    messages.success(request,f"Removed all view permissions for {ieee_id}")
-                    return True
-                else:
-                    # iterate through the fields of the member
-                    for field in get_member._meta.fields:
-                        # if field name matches with passed kwargs
-                        if field.name in kwargs['kwargs']:
-                            # set attribute of the member with the value from keyword argument
-                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
+            get_member=Branch_Data_Access.objects.get(ieee_id=ieee_id)
+            
+            # iterate through the fields of the member
+            for field in get_member._meta.fields:
+                # if field name matches with passed kwargs
+                if field.name in kwargs['kwargs']:
+                    # set attribute of the member with the value from keyword argument
+                    setattr(get_member,field.attname,kwargs['kwargs'][field.name])
+                    # save the member
                     get_member.save()
-                    messages.success(request,f"View Permission was updated for {ieee_id}")
-                    return True
-            except:
-                if not all_false:
-                    member = Members.objects.get(ieee_id=ieee_id)
-                    get_member = Branch_Data_Access.objects.create(ieee_id=member)
-                    # iterate through the fields of the member
-                    for field in get_member._meta.fields:
-                        # if field name matches with passed kwargs
-                        if field.name in kwargs['kwargs']:
-                            # set attribute of the member with the value from keyword argument
-                            setattr(get_member,field.attname,kwargs['kwargs'][field.name])
-                    get_member.save()
-                    messages.success(request,f"View Permission was updated for {ieee_id}")
-                    return True
-                else:
-                    #Do nothing
-                    return True
-
+            messages.success(request,f"View Permission was updated for {ieee_id}")
+            return True
         except:
-            messages.warning(request,"View Permission can not be updated!")
-            return False
+            messages.error(request,"View Permission can not be updated!")
         
 
     def remover_member_from_branch_access(request,ieee_id):

@@ -2641,8 +2641,14 @@ def manage_view_access(request):
         if has_access:
             # get access of the page first
             current_panel_members=Branch.load_current_panel_members()
+            access_members=Branch.get_branch_data_access(request)
 
             if request.method=="POST":
+                if('add_member_to_access' in request.POST):
+                    ieee_ids = request.POST.getlist('member_select')
+                    if Branch.add_member_to_branch_view_access(request, ieee_ids):
+                        return redirect('central_branch:manage_access')
+
                 if('update_access' in request.POST):
                     ieee_id=request.POST['ieee_id']
                     
@@ -2703,6 +2709,7 @@ def manage_view_access(request):
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
                 'current_panel_members':current_panel_members,
+                'access_members':access_members,
             }
 
             return render(request,'Manage Access/manage_access.html',context)
@@ -2716,37 +2723,39 @@ def manage_view_access(request):
 
 class GetAccessDataAjax(View):
 
-    # @login_required
     def get(self, request):
-        has_access = Branch_View_Access.common_access(request.user.username)
+        if request.user.is_authenticated:
+            has_access = Branch_View_Access.common_access(request.user.username)
 
-        if has_access:
-            if request.GET.get('ieee_id'):
-                ieee_id = request.GET.get('ieee_id')
-                data = Branch.get_branch_data_access_for_member(request, ieee_id)
-                if data:
-                    access_data = {
-                        "message":"success",
-                        "ieee_id":ieee_id,
-                        "name":data.ieee_id.name,
-                        "create_event_access":data.create_event_access,
-                        "event_details_page_access":data.event_details_page_access,
-                        "create_individual_task_access":data.create_individual_task_access,
-                        "create_team_task_access":data.create_team_task_access,
-                        "create_panels_access":data.create_panels_access,
-                        "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
-                        "team_details_page":data.team_details_page,
-                        "manage_award_access":data.manage_award_access,
-                        "manage_web_access":data.manage_web_access,
-                        "manage_custom_notification_access":data.manage_custom_notification_access,
-                        "manage_email_access":data.manage_email_access
-                    }
-                    return JsonResponse(access_data)
+            if has_access:
+                if request.GET.get('ieee_id'):
+                    ieee_id = request.GET.get('ieee_id')
+                    data = Branch.get_branch_data_access_for_member(request, ieee_id)
+                    if data:
+                        access_data = {
+                            "message":"success",
+                            "ieee_id":ieee_id,
+                            "name":data.ieee_id.name,
+                            "create_event_access":data.create_event_access,
+                            "event_details_page_access":data.event_details_page_access,
+                            "create_individual_task_access":data.create_individual_task_access,
+                            "create_team_task_access":data.create_team_task_access,
+                            "create_panels_access":data.create_panels_access,
+                            "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
+                            "team_details_page":data.team_details_page,
+                            "manage_award_access":data.manage_award_access,
+                            "manage_web_access":data.manage_web_access,
+                            "manage_custom_notification_access":data.manage_custom_notification_access,
+                            "manage_email_access":data.manage_email_access
+                        }
+                        return JsonResponse(access_data)
+                    else:
+                        name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
+                        return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
                 else:
-                    name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
-                    return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
+                    return JsonResponse({'message': "Invalid Response"})
             else:
-                return JsonResponse({'message': "Invalid Response"})
+                return JsonResponse({'message':'Not Allowed'})
         else:
             return JsonResponse({'message':'Not Allowed'})
 
