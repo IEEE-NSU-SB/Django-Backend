@@ -2649,7 +2649,7 @@ def manage_view_access(request):
                     if Branch.add_member_to_branch_view_access(request, ieee_ids):
                         return redirect('central_branch:manage_access')
 
-                if('update_access' in request.POST):
+                elif('update_access' in request.POST):
                     ieee_id=request.POST['ieee_id']
                     
                     # Setting Data Access Fields to false initially
@@ -2703,6 +2703,12 @@ def manage_view_access(request):
                                                             'team_details_page':team_details_page,'manage_web_access':manage_web_access,'manage_award_access':manage_award_access,
                                                             'manage_custom_notification_access':manage_custom_notification_access,
                                                             'manage_email_access':manage_email_access})):
+                        return redirect('central_branch:manage_access')
+                    
+                elif('remove_access' in request.POST):
+                    ieee_id = request.POST.get('remove_ieee_id')
+
+                    if(Branch.remover_member_from_branch_access(request, ieee_id)):
                         return redirect('central_branch:manage_access')
                 
             context={
