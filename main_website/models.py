@@ -244,6 +244,7 @@ class GalleryImages(models.Model):
 class GalleryVideos(models.Model):
     video_title=models.CharField(null=False,blank=False,max_length=100)
     video_link=models.URLField(null=False,blank=False,help_text="Please use embed link if you are pasting a link of Youtube video!")
+    video_description=models.TextField(null=False,blank=True,default='')
     upload_date=models.DateField(null=False,blank=False)
 
     class Meta:
