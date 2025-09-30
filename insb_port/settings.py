@@ -38,6 +38,11 @@ if(os.environ.get('SETTINGS')=='dev'):
 else:
     ALLOWED_HOSTS = ['ieeensusb.org','sandbox.ieeensusb.org']
 
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+
 
 LOGIN_URL='/portal/users/login'
 
@@ -79,12 +84,14 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_json_widget',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     
     'django.contrib.auth.middleware.AuthenticationMiddleware',

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from .views import LoadAwards, LoadTopPerformers
 from . import views
 
@@ -73,5 +73,8 @@ urlpatterns = [
     #for countdown
     path('count_down/',views.update_count_down,name="count_down"),
 
-    path('dev/privacy_policy/',views.privacy_policy,name='privacy_policy')
+    path('dev/privacy_policy/',views.privacy_policy,name='privacy_policy'),
+
+    # API
+    path('main_website/', include('main_website.api.urls'))
 ]
