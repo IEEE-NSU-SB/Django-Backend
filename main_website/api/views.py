@@ -38,6 +38,10 @@ class ScAgStats(View):
 
         return JsonResponse(data)
     
-class BlogsListView(ListAPIView):
+class BlogsListLandingView(ListAPIView):
     queryset = Blog.objects.filter(publish_blog=True).order_by('-date')[:6]
+    serializer_class = BlogSerializer
+    
+class BlogsListView(ListAPIView):
+    queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
     serializer_class = BlogSerializer
