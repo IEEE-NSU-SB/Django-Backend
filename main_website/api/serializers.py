@@ -26,7 +26,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ['image', 'date', 'author', 'category', 'title', 'description']
+        fields = ['id', 'image', 'date', 'author', 'category', 'title', 'description']
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
