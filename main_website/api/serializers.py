@@ -36,12 +36,15 @@ class TopPerformerSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(source='ieee_id')
     img = serializers.ImageField(source='user_profile_picture', use_url=True)
-    team = serializers.CharField(source='team.team_name')
+    team = serializers.SerializerMethodField()
     rank = serializers.SerializerMethodField()
 
     class Meta:
         model = Members
         fields = ['id', 'name', 'team','rank', 'img']
+
+    def get_team(self, obj):
+        return obj.team.team_name if obj.team else ''
 
     def get_rank(self, obj):
         return 1
