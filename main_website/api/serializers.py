@@ -5,18 +5,17 @@ from main_website.models import *
 class AchievementSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
     image = serializers.ImageField(source='award_picture', use_url=True)
-    title = serializers.SerializerMethodField()
+    title = serializers.CharField(source='award_name')
     description = serializers.CharField(source="award_description")
+    winner = serializers.CharField(source='award_of')
+    primaryColor = serializers.CharField(source='award_of.primary_color_code')
 
     class Meta:
         model = Achievements
-        fields = ["year", "image", "title", "description"]
+        fields = ["year", "image", "title", 'winner', 'primaryColor', "description"]
 
     def get_year(self, obj):
         return str(obj.award_winning_year)
-
-    def get_title(self, obj):
-        return f"{obj.award_name} - {obj.award_of}" if obj.award_of else obj.award_name
     
 class BlogSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(source='blog_banner_picture')
