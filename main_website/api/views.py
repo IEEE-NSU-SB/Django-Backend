@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from django.views import View
 
 from main_website.renderData import HomepageItems
+from port.models import Panels, VolunteerAwards
+from port.renderData import PortData
+from users.models import VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
 from rest_framework.generics import ListAPIView
@@ -45,3 +48,39 @@ class BlogsListLandingView(ListAPIView):
 class BlogsListView(ListAPIView):
     queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
     serializer_class = BlogSerializer
+
+class VolunteerAwardsListView(View):
+
+    def get(self, request):
+        top_5_performers = HomepageItems.get_top_5_performers()
+        top_5_teams = HomepageItems.get_top_5_teams()
+
+        current_panel_pk=PortData.get_current_panel()
+        all_awards = VolunteerAwards.objects.filter(panel=Panels.objects.get(pk=current_panel_pk))
+
+        json_data = [
+            {
+                'id': 1,
+                'label': "Top 5 Performers",
+                'people': TopPerformerSerializer(top_5_performers, many=True, context={'request': request}).data
+            },
+            {
+                'id': 2,
+                'label': "Top 5 Teams",
+                'people': TopTeamSerializer(top_5_teams, many=True, context={'request': request}).data
+            }
+        ]
+
+        id = 3
+        for award in all_awards:
+            awards_winners = VolunteerAwardRecievers.objects.filter(award=VolunteerAwards.objects.get(pk=award.id))
+            json_data.append(
+                {
+                    'id': id,
+                    'label': award.volunteer_award_name,
+                    'people': VolunteerAwardRecieversSerializer(awards_winners, many=True, context={'request': request}).data
+                }
+            )
+            id += 1
+
+        return JsonResponse(json_data, safe=False)

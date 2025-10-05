@@ -1,6 +1,8 @@
 
 from rest_framework import serializers
 from main_website.models import *
+from port.models import Teams
+from users.models import VolunteerAwardRecievers
 
 class AchievementSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
@@ -29,3 +31,56 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+    
+class TopPerformerSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source='ieee_id')
+    img = serializers.ImageField(source='user_profile_picture', use_url=True)
+    team = serializers.CharField(source='team.team_name')
+    rank = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Members
+        fields = ['id', 'name', 'team','rank', 'img']
+
+    def get_rank(self, obj):
+        return 1
+
+class TopTeamSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source='primary')
+    img = serializers.ImageField(source='team_picture', use_url=True)
+    name = serializers.CharField(source='team_name')
+    rank = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Teams
+        fields = ['id', 'name','rank', 'img']
+    
+    def to_representation(self, instance):
+        """Override default output to make null -> 'null' (string)."""
+        data = super().to_representation(instance)
+        if data.get('img') is None:
+            data['img'] = 'null'  # turn None into a string
+        return data
+
+    def get_rank(self, obj):
+        return 1
+    
+class VolunteerAwardRecieversSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source='award_reciever.ieee_id')
+    img = serializers.ImageField(source='award_reciever.user_profile_picture', use_url=True)
+    name = serializers.CharField(source='award_reciever.name')
+    team = serializers.CharField(source='award_reciever.team')
+
+    class Meta:
+        model = VolunteerAwardRecievers
+        fields = ['id', 'name', 'team', 'img']
+
+    def to_representation(self, instance):
+        """Override default output to make null -> 'null' (string)."""
+        data = super().to_representation(instance)
+        if data.get('img') is None:
+            data['img'] = 'null'  # turn None into a string
+        return data
