@@ -37,28 +37,23 @@ class TopPerformerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ieee_id')
     img = serializers.ImageField(source='user_profile_picture', use_url=True)
     team = serializers.SerializerMethodField()
-    rank = serializers.SerializerMethodField()
 
     class Meta:
         model = Members
-        fields = ['id', 'name', 'team','rank', 'img']
+        fields = ['id', 'name', 'team','img']
 
     def get_team(self, obj):
         return obj.team.team_name if obj.team else ''
-
-    def get_rank(self, obj):
-        return 1
 
 class TopTeamSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(source='primary')
     img = serializers.ImageField(source='team_picture', use_url=True)
     name = serializers.CharField(source='team_name')
-    rank = serializers.SerializerMethodField()
 
     class Meta:
         model = Teams
-        fields = ['id', 'name','rank', 'img']
+        fields = ['id', 'name', 'img']
     
     def to_representation(self, instance):
         """Override default output to make null -> 'null' (string)."""
@@ -66,9 +61,6 @@ class TopTeamSerializer(serializers.ModelSerializer):
         if data.get('img') is None:
             data['img'] = 'null'  # turn None into a string
         return data
-
-    def get_rank(self, obj):
-        return 1
     
 class VolunteerAwardRecieversSerializer(serializers.ModelSerializer):
 

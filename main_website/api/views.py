@@ -58,16 +58,27 @@ class VolunteerAwardsListView(View):
         current_panel_pk=PortData.get_current_panel()
         all_awards = VolunteerAwards.objects.filter(panel=Panels.objects.get(pk=current_panel_pk))
 
+        top_performers_serializer = TopPerformerSerializer(top_5_performers, many=True, context={'request': request}).data
+        top_teams_serializer = TopTeamSerializer(top_5_teams, many=True, context={'request': request}).data
+
+        if top_performers_serializer:
+            for i, item in enumerate(top_performers_serializer, start=1):
+                item['rank'] = i
+
+        if top_teams_serializer:
+            for i, item in enumerate(top_teams_serializer, start=1):
+                item['rank'] = i
+
         json_data = [
             {
                 'id': 1,
                 'label': "Top 5 Performers",
-                'people': TopPerformerSerializer(top_5_performers, many=True, context={'request': request}).data
+                'people': top_performers_serializer
             },
             {
                 'id': 2,
                 'label': "Top 5 Teams",
-                'people': TopTeamSerializer(top_5_teams, many=True, context={'request': request}).data
+                'people': top_teams_serializer
             }
         ]
 
