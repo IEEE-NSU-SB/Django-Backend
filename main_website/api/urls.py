@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_blogs/landing/', BlogsListLandingView.as_view(), name='blogs_list_landing'),
     path('get_blogs/', BlogsListView.as_view(), name='blogs_list'),
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
+    path('get_toolkit/', ToolkitListView.as_view(), name='toolkit_list'),
 ]

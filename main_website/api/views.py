@@ -95,3 +95,8 @@ class VolunteerAwardsListView(View):
             id += 1
 
         return JsonResponse(json_data, safe=False)
+
+class ToolkitListView(ListAPIView):
+
+    queryset = Toolkit.objects.all().order_by('pk')
+    serializer_class = ToolkitSerializer

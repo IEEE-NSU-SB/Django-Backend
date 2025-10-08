@@ -1,8 +1,10 @@
 
+import re
 from rest_framework import serializers
 from main_website.models import *
 from port.models import Teams
 from users.models import VolunteerAwardRecievers
+from django.utils.html import strip_tags
 
 class AchievementSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
@@ -79,3 +81,15 @@ class VolunteerAwardRecieversSerializer(serializers.ModelSerializer):
         if data.get('img') is None:
             data['img'] = 'null'  # turn None into a string
         return data
+    
+class ToolkitSerializer(serializers.ModelSerializer):
+
+    img = serializers.ImageField(source='picture')
+    colors = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Toolkit
+        fields = ['title', 'img', 'colors']
+
+    def get_colors(self, obj):
+        return re.split(r'[\r\n]+', strip_tags(str(obj.color_codes)))
