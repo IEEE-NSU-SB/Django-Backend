@@ -39,14 +39,7 @@ else:
     ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org','sandbox.ieeensusb.org']
 
 if(os.environ.get('SETTINGS')=='dev'):
-    CORS_ALLOWED_ORIGINS = [
-        "http://127.0.0.1:5173",
-        "http://localhost:5173",
-    ]
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "*",
-    ]
+    CORS_ALLOW_ALL_ORIGINS = True
 
 
 LOGIN_URL='/portal/users/login'
