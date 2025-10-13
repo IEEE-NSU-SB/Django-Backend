@@ -100,3 +100,7 @@ class ToolkitListView(ListAPIView):
 
     queryset = Toolkit.objects.all().order_by('pk')
     serializer_class = ToolkitSerializer
+    
+class ContactInfoView(ListAPIView):
+    queryset= Contact_Info.objects.all()
+    serializer_class = ContactInfoSerializer
