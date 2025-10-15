@@ -2,6 +2,7 @@
 from django.http import JsonResponse
 from django.views import View
 
+from central_events.models import Events, SuperEvents
 from main_website.renderData import HomepageItems
 from port.models import Panels, VolunteerAwards
 from port.renderData import PortData
@@ -13,6 +14,10 @@ import json
 
 class AchievementListView(ListAPIView):
     queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
+    serializer_class = AchievementSerializer
+
+class AchievementListLandingView(ListAPIView):
+    queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')[:6]
     serializer_class = AchievementSerializer
 
 class ScAgStats(View):
@@ -100,3 +105,41 @@ class ToolkitListView(ListAPIView):
 
     queryset = Toolkit.objects.all().order_by('pk')
     serializer_class = ToolkitSerializer
+
+class FeaturedEventsListView(View):
+
+    def get(self, request, sc_ag_primary):
+    
+        # sc_ag_primary = self.kwargs.get('sc_ag_primary')  # coming from URL kwargs
+        # or use: self.request.query_params.get('sc_ag_primary') if it comes from query params
+
+        organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
+
+        events_to_view = []
+        
+        flagship_events = FeaturedEventSerialiser(Events.objects.filter(
+            event_organiser=organiser,
+            flagship_event=True,
+            publish_in_main_web=True
+        ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+        featured_events = FeaturedEventSerialiser(Events.objects.filter(
+            event_organiser=organiser,
+            is_featured=True,
+            publish_in_main_web=True
+        ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+        # Combine while removing duplicates by unique ID
+        seen_ids = set()
+
+        for event in flagship_events + featured_events:
+            event_id = event.get('id')
+            if event_id not in seen_ids:
+                events_to_view.append(event)
+                seen_ids.add(event_id)
+
+        return JsonResponse(events_to_view, safe=False)
+    
+# class MegaEventsListLandingView(ListAPIView):
+
+#     queryset = SuperEvents.objects.filter(publish_mega_event = True).order_by('-start_date')
