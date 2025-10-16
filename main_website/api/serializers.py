@@ -1,6 +1,8 @@
 
 import re
 from rest_framework import serializers
+from central_events.models import Events
+from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from port.models import Teams
 from users.models import VolunteerAwardRecievers
@@ -93,3 +95,25 @@ class ToolkitSerializer(serializers.ModelSerializer):
 
     def get_colors(self, obj):
         return re.split(r'[\r\n]+', strip_tags(str(obj.color_codes)))
+    
+class FeaturedEventSerialiser(serializers.ModelSerializer):
+
+    image = serializers.SerializerMethodField()
+    alt = serializers.CharField(source='event_name')
+
+    class Meta:
+        model = Events
+        fields= ['id', 'image', 'alt']
+
+    def get_image(self, obj):
+
+        image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+
+        request = self.context.get('request')
+        if image and hasattr(image, 'url'):
+            return str(request.build_absolute_uri(image.url))
+        else:
+            return ''
+        
+# class MegaEventSerialiser(serializers.ModelSerializer):
+    
