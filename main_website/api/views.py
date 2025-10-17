@@ -58,14 +58,14 @@ class BlogsView(ListAPIView):
         return Response(serializer.data)
     
     @csrf_exempt
-    def post(self, request):     
+    def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message':'Blog submitted successfully!'}, status=status.HTTP_201_CREATED)
         else:
             print(serializer.errors)  # Debug
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
 
 class VolunteerAwardsListView(APIView):
 
