@@ -6,6 +6,7 @@ from .views import *
 app_name='main_website.api'
 
 urlpatterns = [
+    path('get_hero_section_landing/', HeroSectionLandingView.as_view(), name='hero_section_landing'),
     path('get_achievements/', AchievementListView.as_view(), name='achievements_list'),
     path('get_achievements/landing/', AchievementListLandingView.as_view(), name='achievements_list_landing'),
     path('get_sc_ag_stats/', ScAgStats.as_view(), name='sc_ag_stats'),

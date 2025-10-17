@@ -117,3 +117,40 @@ class FeaturedEventSerialiser(serializers.ModelSerializer):
         
 # class MegaEventSerialiser(serializers.ModelSerializer):
     
+class HomePageTopBannerSerializer(serializers.ModelSerializer):
+
+    banner_image = serializers.ImageField(source='banner_picture')
+    alt = serializers.SerializerMethodField()
+    firstText = serializers.CharField(source='first_layer_text')
+    secondText = serializers.CharField(source='first_layer_text_colored')
+    description = serializers.CharField(source='third_layer_text')
+    buttonText = serializers.CharField(source='button_text')
+    buttonLink = serializers.CharField(source='button_url')
+    link = serializers.FileField(source='video')
+
+    class Meta:
+        model = HomePageTopBanner
+        fields = [
+            'banner_image', 'alt', 'firstText', 'secondText', 'description', 'buttonText', 'buttonLink', 'link'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        media_type = self.context.get('media_type')
+
+        if media_type == 'image':
+            allowed = {'banner_image', 'alt', 'firstText', 'secondText', 'description', 'buttonText', 'buttonLink'}
+        elif media_type == 'video':
+            allowed = {'link'}
+        else:
+            allowed = set(self.fields.keys())  # default: all fields
+
+        # Remove any fields not in allowed list
+        for field_name in list(self.fields.keys()):
+            if field_name not in allowed:
+                self.fields.pop(field_name)
+    
+    def get_alt(self, obj):
+        return f'{obj.first_layer_text} {obj.first_layer_text_colored}'
+
+    
