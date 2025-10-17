@@ -192,3 +192,15 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
     def get_authors(self, obj):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
         return author_names
+    
+class MemberSerializer(serializers.ModelSerializer):
+
+    ieeeId = serializers.IntegerField(source='ieee_id')
+    nsuId = serializers.IntegerField(source='nsu_id')
+    ieeeEmail = serializers.CharField(source='email_ieee')
+    nsuEmail = serializers.CharField(source='email_nsu')
+    bloodGroup = serializers.CharField(source='blood_group')
+
+    class Meta:
+        model = Members
+        fields = ['ieeeId', 'nsuId', 'name', 'ieeeEmail', 'nsuEmail', 'bloodGroup']

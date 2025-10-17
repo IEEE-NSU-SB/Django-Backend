@@ -180,3 +180,8 @@ class ResearchPapersListView(ListAPIView):
 
     queryset = Research_Papers.objects.filter(publish_research=True).order_by('-publish_date')
     serializer_class = ResearchPaperSerializer
+
+class AllMembersListView(ListAPIView):
+
+    queryset = Members.objects.filter().all().order_by('position__rank')
+    serializer_class = MemberSerializer
