@@ -24,10 +24,10 @@ class AchievementSerializer(serializers.ModelSerializer):
         return str(obj.award_winning_year)
     
 class BlogSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(source='blog_banner_picture')
-    author = serializers.CharField(source='writer_name')
-    category = serializers.SerializerMethodField()
-    description = serializers.CharField(source='short_description')
+    image = serializers.ImageField(source='blog_banner_picture', read_only=True)
+    author = serializers.CharField(source='writer_name', read_only=True)
+    category = serializers.SerializerMethodField(read_only=True)
+    description = serializers.CharField(source='short_description', read_only=True)
 
     class Meta:
         model = Blog
@@ -35,6 +35,25 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+
+    def __init__(self, *args, **kwargs):
+        """
+        Dynamically modify fields depending on the request method.
+        """
+        super(BlogSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get('request', None)
+
+        # Only modify fields for POST request
+        if request and request.method == 'POST':
+            # Reset fields to include all model fields except `is_requested` and `publish_blog`
+            allowed_fields = [
+                f.name for f in Blog._meta.fields
+                if f.name not in ['id', 'is_requested', 'publish_blog']
+            ]
+            # Replace with standard model fields for POST
+            self.fields.clear()
+            for field_name in allowed_fields:
+                self.fields[field_name] = serializers.ModelField(model_field=Blog._meta.get_field(field_name))
     
 class TopPerformerSerializer(serializers.ModelSerializer):
 
@@ -162,3 +181,16 @@ class SBNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'title', 'description']
+
+class ResearchPaperSerializer(serializers.ModelSerializer):
+
+    authors = serializers.SerializerMethodField()
+    link = serializers.URLField(source='publication_link')
+
+    class Meta:
+        model = Research_Papers
+        fields = ['id', 'title', 'authors', 'link']
+
+    def get_authors(self, obj):
+        author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
+        return author_names

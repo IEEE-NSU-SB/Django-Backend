@@ -1,7 +1,4 @@
 
-from django.http import JsonResponse
-from django.views import View
-
 from central_events.models import Events, SuperEvents
 from main_website.renderData import HomepageItems
 from port.models import Panels, VolunteerAwards
@@ -10,7 +7,9 @@ from users.models import VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
 from rest_framework.generics import ListAPIView
-import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 
 class AchievementListView(ListAPIView):
     queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
@@ -20,7 +19,7 @@ class AchievementListLandingView(ListAPIView):
     queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')[:6]
     serializer_class = AchievementSerializer
 
-class ScAgStats(View):
+class ScAgStats(APIView):
 
     def get(self, request):
         data = {
@@ -44,17 +43,24 @@ class ScAgStats(View):
             ]
         }
 
-        return JsonResponse(data)
+        return Response(data)
     
 class BlogsListLandingView(ListAPIView):
     queryset = Blog.objects.filter(publish_blog=True).order_by('-date')[:6]
     serializer_class = BlogSerializer
     
-class BlogsListView(ListAPIView):
-    queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
-    serializer_class = BlogSerializer
+class BlogsView(ListAPIView):
 
-class VolunteerAwardsListView(View):
+    def get(self, request):
+        queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
+        serializer = BlogSerializer(queryset, many=True, context={'request':request})
+        return Response(serializer.data)
+    
+    @csrf_exempt
+    def post(self, request):
+        pass
+
+class VolunteerAwardsListView(APIView):
 
     def get(self, request):
         top_5_performers = HomepageItems.get_top_5_performers()
@@ -99,14 +105,14 @@ class VolunteerAwardsListView(View):
             )
             id += 1
 
-        return JsonResponse(json_data, safe=False)
+        return Response(json_data)
 
 class ToolkitListView(ListAPIView):
 
     queryset = Toolkit.objects.all().order_by('pk')
     serializer_class = ToolkitSerializer
 
-class FeaturedEventsListView(View):
+class FeaturedEventsListView(APIView):
 
     def get(self, request, sc_ag_primary):
     
@@ -138,13 +144,13 @@ class FeaturedEventsListView(View):
                 events_to_view.append(event)
                 seen_ids.add(event_id)
 
-        return JsonResponse(events_to_view, safe=False)
+        return Response(events_to_view)
     
 # class MegaEventsListLandingView(ListAPIView):
 
 #     queryset = SuperEvents.objects.filter(publish_mega_event = True).order_by('-start_date')
 
-class HeroSectionLandingView(View):
+class HeroSectionLandingView(APIView):
 
     def get(self, request):
         
@@ -156,9 +162,14 @@ class HeroSectionLandingView(View):
             'media': media_data
         }
 
-        return JsonResponse(data, safe=False)
+        return Response(data)
     
 class SBNewsListView(ListAPIView):
 
     queryset = News.objects.all().order_by('-news_date')
     serializer_class = SBNewsSerializer
+
+class ResearchPapersListView(ListAPIView):
+
+    queryset = Research_Papers.objects.filter(publish_research=True).order_by('-publish_date')
+    serializer_class = ResearchPaperSerializer
