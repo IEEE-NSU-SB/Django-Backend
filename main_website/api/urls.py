@@ -15,5 +15,6 @@ urlpatterns = [
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
     path('get_toolkit/', ToolkitListView.as_view(), name='toolkit_list'),
     path('get_featured_events/<int:sc_ag_primary>/', FeaturedEventsListView.as_view(), name='featured_events_list'),
+    path('get_sb_news/', SBNewsListView.as_view(), name='sb_news_list'),
     # path('get_mega_events/landing/', MegaEventsListLandingView.as_view(), name='mega_events_list_landing')
 ]

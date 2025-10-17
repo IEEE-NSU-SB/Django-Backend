@@ -153,4 +153,12 @@ class HomePageTopBannerSerializer(serializers.ModelSerializer):
     def get_alt(self, obj):
         return f'{obj.first_layer_text} {obj.first_layer_text_colored}'
 
-    
+class SBNewsSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(source='news_picture')
+    title = serializers.CharField(source='news_title')
+    description = serializers.CharField(source='news_subtitle')
+
+    class Meta:
+        model = News
+        fields = ['id', 'image', 'title', 'description']

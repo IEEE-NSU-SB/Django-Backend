@@ -157,3 +157,8 @@ class HeroSectionLandingView(View):
         }
 
         return JsonResponse(data, safe=False)
+    
+class SBNewsListView(ListAPIView):
+
+    queryset = News.objects.all().order_by('-news_date')
+    serializer_class = SBNewsSerializer
