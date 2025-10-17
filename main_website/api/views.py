@@ -143,3 +143,22 @@ class FeaturedEventsListView(View):
 # class MegaEventsListLandingView(ListAPIView):
 
 #     queryset = SuperEvents.objects.filter(publish_mega_event = True).order_by('-start_date')
+
+class HeroSectionLandingView(View):
+
+    def get(self, request):
+        
+        media_type = MediaToggle.objects.first()
+        media_data = HomePageTopBannerSerializer(HomePageTopBanner.objects.filter(media_type=media_type.media_type), context={'media_type': media_type.media_type, 'request': request}, many=True).data
+
+        data = {
+            'type': media_type.media_type,
+            'media': media_data
+        }
+
+        return JsonResponse(data, safe=False)
+    
+class SBNewsListView(ListAPIView):
+
+    queryset = News.objects.all().order_by('-news_date')
+    serializer_class = SBNewsSerializer
