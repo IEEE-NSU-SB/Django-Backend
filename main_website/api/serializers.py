@@ -1,4 +1,5 @@
 
+from datetime import datetime
 import re
 from rest_framework import serializers
 from central_events.models import Events
@@ -7,6 +8,7 @@ from main_website.models import *
 from port.models import Teams
 from users.models import VolunteerAwardRecievers
 from django.utils.html import strip_tags
+from datetime import date
 
 class AchievementSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
@@ -23,7 +25,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     def get_year(self, obj):
         return str(obj.award_winning_year)
     
-class BlogSerializer(serializers.ModelSerializer):
+class BlogListSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(source='blog_banner_picture')
     author = serializers.CharField(source='writer_name')
     category = serializers.SerializerMethodField()
@@ -35,6 +37,24 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+
+class BlogCreateSerializer(serializers.ModelSerializer):
+
+    date = serializers.DateField(default=date.today)  # auto-fill today if not provided
+
+    class Meta:
+        model = Blog
+        exclude = ['is_requested', 'publish_blog']
+
+    # def validate_branch_or_society(self, value):
+    #     """
+    #     Convert the frontend value to the actual ForeignKey instance.
+    #     """
+    #     try:
+    #         # Replace 'code' with the actual field in your Chapters_Society_and_Affinity_Groups model
+    #         return Chapters_Society_and_Affinity_Groups.objects.get(primary=value).pk
+    #     except Chapters_Society_and_Affinity_Groups.DoesNotExist:
+    #         raise serializers.ValidationError(f"No branch/society found with value '{value}'")
     
 class TopPerformerSerializer(serializers.ModelSerializer):
 
@@ -162,3 +182,16 @@ class SBNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'title', 'description']
+
+class ResearchPaperSerializer(serializers.ModelSerializer):
+
+    authors = serializers.SerializerMethodField()
+    link = serializers.URLField(source='publication_link')
+
+    class Meta:
+        model = Research_Papers
+        fields = ['id', 'title', 'authors', 'link']
+
+    def get_authors(self, obj):
+        author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
+        return author_names
