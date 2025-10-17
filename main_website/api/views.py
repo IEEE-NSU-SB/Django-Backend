@@ -10,6 +10,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 
 class AchievementListView(ListAPIView):
     queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
@@ -47,18 +48,24 @@ class ScAgStats(APIView):
     
 class BlogsListLandingView(ListAPIView):
     queryset = Blog.objects.filter(publish_blog=True).order_by('-date')[:6]
-    serializer_class = BlogSerializer
+    serializer_class = BlogListSerializer
     
 class BlogsView(ListAPIView):
 
     def get(self, request):
         queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
-        serializer = BlogSerializer(queryset, many=True, context={'request':request})
+        serializer = BlogListSerializer(queryset, many=True, context={'request':request})
         return Response(serializer.data)
     
     @csrf_exempt
-    def post(self, request):
-        pass
+    def post(self, request):     
+        serializer = BlogCreateSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VolunteerAwardsListView(APIView):
 

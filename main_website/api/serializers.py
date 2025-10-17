@@ -1,4 +1,5 @@
 
+from datetime import datetime
 import re
 from rest_framework import serializers
 from central_events.models import Events
@@ -7,6 +8,7 @@ from main_website.models import *
 from port.models import Teams
 from users.models import VolunteerAwardRecievers
 from django.utils.html import strip_tags
+from datetime import date
 
 class AchievementSerializer(serializers.ModelSerializer):
     year = serializers.SerializerMethodField()
@@ -23,11 +25,11 @@ class AchievementSerializer(serializers.ModelSerializer):
     def get_year(self, obj):
         return str(obj.award_winning_year)
     
-class BlogSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(source='blog_banner_picture', read_only=True)
-    author = serializers.CharField(source='writer_name', read_only=True)
-    category = serializers.SerializerMethodField(read_only=True)
-    description = serializers.CharField(source='short_description', read_only=True)
+class BlogListSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(source='blog_banner_picture')
+    author = serializers.CharField(source='writer_name')
+    category = serializers.SerializerMethodField()
+    description = serializers.CharField(source='short_description')
 
     class Meta:
         model = Blog
@@ -36,24 +38,23 @@ class BlogSerializer(serializers.ModelSerializer):
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
 
-    def __init__(self, *args, **kwargs):
-        """
-        Dynamically modify fields depending on the request method.
-        """
-        super(BlogSerializer, self).__init__(*args, **kwargs)
-        request = self.context.get('request', None)
+class BlogCreateSerializer(serializers.ModelSerializer):
 
-        # Only modify fields for POST request
-        if request and request.method == 'POST':
-            # Reset fields to include all model fields except `is_requested` and `publish_blog`
-            allowed_fields = [
-                f.name for f in Blog._meta.fields
-                if f.name not in ['id', 'is_requested', 'publish_blog']
-            ]
-            # Replace with standard model fields for POST
-            self.fields.clear()
-            for field_name in allowed_fields:
-                self.fields[field_name] = serializers.ModelField(model_field=Blog._meta.get_field(field_name))
+    date = serializers.DateField(default=date.today)  # auto-fill today if not provided
+
+    class Meta:
+        model = Blog
+        exclude = ['is_requested', 'publish_blog']
+
+    # def validate_branch_or_society(self, value):
+    #     """
+    #     Convert the frontend value to the actual ForeignKey instance.
+    #     """
+    #     try:
+    #         # Replace 'code' with the actual field in your Chapters_Society_and_Affinity_Groups model
+    #         return Chapters_Society_and_Affinity_Groups.objects.get(primary=value).pk
+    #     except Chapters_Society_and_Affinity_Groups.DoesNotExist:
+    #         raise serializers.ValidationError(f"No branch/society found with value '{value}'")
     
 class TopPerformerSerializer(serializers.ModelSerializer):
 
