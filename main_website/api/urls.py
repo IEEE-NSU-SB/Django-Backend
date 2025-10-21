@@ -12,5 +12,5 @@ urlpatterns = [
     path('get_blogs/', BlogsListView.as_view(), name='blogs_list'),
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
     path('get_toolkit/', ToolkitListView.as_view(), name='toolkit_list'),
-    path('get_contact-info/', ContactInfoView.as_view(), name='contact-info')
+    path('get_contact_info/', ContactInfoView.as_view(), name='contact_info')
 ]

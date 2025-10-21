@@ -102,5 +102,9 @@ class ToolkitListView(ListAPIView):
     serializer_class = ToolkitSerializer
     
 class ContactInfoView(ListAPIView):
-    queryset= Contact_Info.objects.all()
+    
     serializer_class = ContactInfoSerializer
+    
+    def get_queryset(self):
+        first_contact = Contact_Info.objects.first()
+        return [first_contact] if first_contact else []
