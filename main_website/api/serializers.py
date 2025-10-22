@@ -41,20 +41,17 @@ class BlogListSerializer(serializers.ModelSerializer):
 class BlogCreateSerializer(serializers.ModelSerializer):
 
     date = serializers.DateField(default=date.today)  # auto-fill today if not provided
+    branch_or_society = serializers.SlugRelatedField(
+        queryset=Chapters_Society_and_Affinity_Groups.objects.only('id', 'primary'),
+        slug_field='primary',   # frontend sends primary, not ID
+        required=False,
+        allow_null=True
+    )
 
     class Meta:
         model = Blog
         exclude = ['is_requested', 'publish_blog']
 
-    # def validate_branch_or_society(self, value):
-    #     """
-    #     Convert the frontend value to the actual ForeignKey instance.
-    #     """
-    #     try:
-    #         # Replace 'code' with the actual field in your Chapters_Society_and_Affinity_Groups model
-    #         return Chapters_Society_and_Affinity_Groups.objects.get(primary=value).pk
-    #     except Chapters_Society_and_Affinity_Groups.DoesNotExist:
-    #         raise serializers.ValidationError(f"No branch/society found with value '{value}'")
     
 class TopPerformerSerializer(serializers.ModelSerializer):
 
@@ -195,3 +192,15 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
     def get_authors(self, obj):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
         return author_names
+    
+class MemberSerializer(serializers.ModelSerializer):
+
+    ieeeId = serializers.IntegerField(source='ieee_id')
+    nsuId = serializers.IntegerField(source='nsu_id')
+    ieeeEmail = serializers.CharField(source='email_ieee')
+    nsuEmail = serializers.CharField(source='email_nsu')
+    bloodGroup = serializers.CharField(source='blood_group')
+
+    class Meta:
+        model = Members
+        fields = ['ieeeId', 'nsuId', 'name', 'ieeeEmail', 'nsuEmail', 'bloodGroup']

@@ -1,8 +1,12 @@
 
+import json
+import requests
 from central_events.models import Events, SuperEvents
+from insb_port import settings
 from main_website.renderData import HomepageItems
 from port.models import Panels, VolunteerAwards
 from port.renderData import PortData
+from recruitment.models import recruited_members, recruitment_session
 from users.models import VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
@@ -58,14 +62,14 @@ class BlogsView(ListAPIView):
         return Response(serializer.data)
     
     @csrf_exempt
-    def post(self, request):     
+    def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message':'Blog submitted successfully!'}, status=status.HTTP_201_CREATED)
         else:
             print(serializer.errors)  # Debug
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
 
 class VolunteerAwardsListView(APIView):
 
@@ -180,3 +184,75 @@ class ResearchPapersListView(ListAPIView):
 
     queryset = Research_Papers.objects.filter(publish_research=True).order_by('-publish_date')
     serializer_class = ResearchPaperSerializer
+
+class AllMembersListView(ListAPIView):
+
+    queryset = Members.objects.filter().all().order_by('position__rank')
+    serializer_class = MemberSerializer
+
+class AllMembersStats(APIView):
+
+    def get(self, request):
+
+        recruitment_stats=[]
+        
+        for i in recruitment_session.objects.all().order_by('id')[:5]:
+            recruitee_count=recruited_members.objects.filter(session_id=i.id).count()
+            recruitment_stats.append({'semester':i.session, 'recruits': recruitee_count})
+
+        data = {
+            'recruitment' : recruitment_stats,
+            'genderDistribution' : [
+                {'gender':'Male', 'count':Members.objects.filter(gender="Male").count()},
+                {'gender':'Female', 'count':Members.objects.filter(gender="Female").count()}
+            ]
+        }
+
+        return Response(data)
+
+class OnlineNewsListView(APIView):
+    
+    def get(self, request):
+        # apis to get online news
+        url_robotics=f'https://newsdata.io/api/1/news?apikey={settings.NEWS_API_KEY}&q=robotics&language=en&category=education,science,technology'
+        url_wie_news=f'https://newsdata.io/api/1/news?apikey={settings.NEWS_API_KEY}&q="women%20in%20STEM"&category=technology'
+        url_ai_machine_learning=f'https://newsdata.io/api/1/news?apikey={settings.NEWS_API_KEY}&q="artificial%20neural%20network"%20OR%20"deep%20learning"&language=en&category=technology,top '
+
+        # keeping urls as list
+        url_list=[url_robotics,url_ai_machine_learning,url_wie_news]
+        
+        json_datas=[]
+        # extracting response from the apis and keeping all the three datas of the api in a list
+        for url in url_list:
+            response=requests.get(url)
+            if(response.status_code==200):
+                # if response is okay then load data
+                json_datas.append(json.loads(response.text))
+
+        all_online_news=[]
+        # extracting article results
+        for i in json_datas:
+            articles=i.get('results',[])        
+            for article in articles:
+                # extracting article values
+                title=article.get('title',[])
+                article_link=article.get('link',[])
+                article_description=article.get('description',[])
+                article_picture=article.get('image_url',[])
+                article_creator=article.get('creator',[])
+                article_id=article.get('article_id',[])
+                article_publish_date=article.get('pubDate',[])
+                # storing all articles as dictionary key value items
+                news_item={
+                    'id':article_id,
+                    'date':article_publish_date,
+                    'title':title,
+                    'article_link':article_link,
+                    'description':article_description,
+                    'image':article_picture,
+                    'by':','.join(filter(None, article_creator))
+                }
+                # storing all articles in a list
+                all_online_news.append(news_item)
+
+        return Response(all_online_news)
