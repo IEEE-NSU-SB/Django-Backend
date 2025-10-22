@@ -16,7 +16,9 @@ urlpatterns = [
     path('get_toolkit/', ToolkitListView.as_view(), name='toolkit_list'),
     path('get_featured_events/<int:sc_ag_primary>/', FeaturedEventsListView.as_view(), name='featured_events_list'),
     path('get_sb_news/', SBNewsListView.as_view(), name='sb_news_list'),
+    path('get_online_news/', OnlineNewsListView.as_view(), name='online_news_list'),
     # path('get_mega_events/landing/', MegaEventsListLandingView.as_view(), name='mega_events_list_landing')
     path('get_research_papers/', ResearchPapersListView.as_view(), name='research_papers_list'),
     path('get_all_members/', AllMembersListView.as_view(), name='all_members_list'),
+    path('get_all_members_stats/', AllMembersStats.as_view(), name='all_members_stats'),
 ]
