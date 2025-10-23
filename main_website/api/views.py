@@ -256,3 +256,12 @@ class OnlineNewsListView(APIView):
                 all_online_news.append(news_item)
 
         return Response(all_online_news)
+    
+class SCAGDetails(APIView):
+
+    def get(self, request, sc_ag_primary):
+        
+        sc_ag = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
+        serialized = SCAGSerializer(sc_ag, context={'request':request})
+
+        return Response(serialized.data)

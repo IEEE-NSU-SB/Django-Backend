@@ -204,3 +204,34 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
         fields = ['ieeeId', 'nsuId', 'name', 'ieeeEmail', 'nsuEmail', 'bloodGroup']
+
+class SCAGSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='short_form_2')
+    pageTitle = serializers.CharField(source='page_title')
+    pageSubtitle = serializers.CharField(source='secondary_paragraph')
+    primaryColor = serializers.CharField(source='primary_color_code')
+    missionVisionColor = serializers.CharField(source='mission_vision_color_code')
+    secondaryColor = serializers.CharField(source='secondary_color_code')
+    textColor = serializers.CharField(source='text_color_code')
+    about = serializers.CharField(source='about_description')
+    parallax = serializers.ImageField(source='background_image')
+    mission = serializers.CharField(source='mission_description')
+    missionImage = serializers.ImageField(source='mission_picture')
+    vision = serializers.CharField(source='vision_description')
+    visionImage = serializers.ImageField(source='vision_picture')
+    question = serializers.SerializerMethodField()
+    fb = serializers.CharField(source='facebook_link')
+
+    class Meta:
+        model = Chapters_Society_and_Affinity_Groups
+        fields = ['name', 'pageTitle', 'pageSubtitle', 'primaryColor', 'secondaryColor', 'missionVisionColor', 'textColor', 'logo', 'about', 'parallax', 'mission', 'missionImage', 'vision', 'visionImage', 'question', 'email', 'fb']
+
+    def get_question(self, obj):
+        data = {
+            '1': obj.what_is_this_description,
+            '2': obj.why_join_it,
+            '3': obj.what_activites_it_has,
+            '4': obj.how_to_join
+        }
+        return data
