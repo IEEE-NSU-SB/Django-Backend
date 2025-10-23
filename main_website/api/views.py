@@ -239,7 +239,7 @@ class OnlineNewsListView(APIView):
                 article_link=article.get('link',[])
                 article_description=article.get('description',[])
                 article_picture=article.get('image_url',[])
-                article_creator=article.get('creator',[])
+                article_creator=article.get('creator',[]) or []
                 article_id=article.get('article_id',[])
                 article_publish_date=article.get('pubDate',[])
                 # storing all articles as dictionary key value items
