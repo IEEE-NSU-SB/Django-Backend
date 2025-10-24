@@ -196,12 +196,12 @@ class AllMembersStats(APIView):
 
         recruitment_stats=[]
         
-        for i in recruitment_session.objects.all().order_by('id')[:5]:
+        for i in recruitment_session.objects.all().order_by('-id')[:5]:
             recruitee_count=recruited_members.objects.filter(session_id=i.id).count()
             recruitment_stats.append({'semester':i.session, 'recruits': recruitee_count})
 
         data = {
-            'recruitment' : recruitment_stats,
+            'recruitment' : reversed(recruitment_stats),
             'genderDistribution' : [
                 {'gender':'Male', 'count':Members.objects.filter(gender="Male").count()},
                 {'gender':'Female', 'count':Members.objects.filter(gender="Female").count()}
@@ -239,7 +239,7 @@ class OnlineNewsListView(APIView):
                 article_link=article.get('link',[])
                 article_description=article.get('description',[])
                 article_picture=article.get('image_url',[])
-                article_creator=article.get('creator',[])
+                article_creator=article.get('creator',[]) or []
                 article_id=article.get('article_id',[])
                 article_publish_date=article.get('pubDate',[])
                 # storing all articles as dictionary key value items
@@ -256,3 +256,12 @@ class OnlineNewsListView(APIView):
                 all_online_news.append(news_item)
 
         return Response(all_online_news)
+    
+class SCAGDetails(APIView):
+
+    def get(self, request, sc_ag_primary):
+        
+        sc_ag = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
+        serialized = SCAGSerializer(sc_ag, context={'request':request})
+
+        return Response(serialized.data)

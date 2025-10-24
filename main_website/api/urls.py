@@ -21,4 +21,5 @@ urlpatterns = [
     path('get_research_papers/', ResearchPapersListView.as_view(), name='research_papers_list'),
     path('get_all_members/', AllMembersListView.as_view(), name='all_members_list'),
     path('get_all_members_stats/', AllMembersStats.as_view(), name='all_members_stats'),
+    path('get_sc_ag_details/<int:sc_ag_primary>/', SCAGDetails.as_view(), name='sc_ag_details'),
 ]
