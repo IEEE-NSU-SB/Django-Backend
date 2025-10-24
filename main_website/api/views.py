@@ -250,7 +250,7 @@ class OnlineNewsListView(APIView):
                     'article_link':article_link,
                     'description':article_description,
                     'image':article_picture,
-                    'by':','.join(filter(None, article_creator))
+                    'by': article_creator
                 }
                 # storing all articles in a list
                 all_online_news.append(news_item)
