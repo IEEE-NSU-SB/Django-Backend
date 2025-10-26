@@ -36,10 +36,17 @@ else:
 if(os.environ.get('SETTINGS')=='dev'):
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org','sandbox.ieeensusb.org']
+    ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org', 'portal.ieeensusb.org', 'sandbox.ieeensusb.org']
 
 if(os.environ.get('SETTINGS')=='dev'):
-    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOWED_ORIGINS = [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "https://react.ieeensusb.org",
+    ]
 
 
 LOGIN_URL='/portal/users/login'
@@ -86,10 +93,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -221,9 +228,16 @@ LOGOUT_REDIRECT_URL='users:logoutUser'
 LOGIN_URL='users:login'
 
 
-REST_FRAMEWORK={
-    'DEFAULT_RENDERER_CLASSES':('rest_framework.renderers.JSONRenderer',)
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
+
+if (os.environ.get('SETTINGS')=='dev'):
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append(
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    )
 
 handler404='central_branch.views.custom_404'
 handler500='central_branch.views.custom_500'
