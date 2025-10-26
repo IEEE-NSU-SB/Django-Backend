@@ -36,7 +36,7 @@ else:
 if(os.environ.get('SETTINGS')=='dev'):
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org','sandbox.ieeensusb.org']
+    ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org', 'portal.ieeensusb.org', 'sandbox.ieeensusb.org']
 
 if(os.environ.get('SETTINGS')=='dev'):
     CORS_ALLOWED_ORIGINS = [
@@ -45,7 +45,7 @@ if(os.environ.get('SETTINGS')=='dev'):
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
-        "*",
+        "https://api.ieeensusb.org",
     ]
 
 
@@ -228,8 +228,11 @@ LOGOUT_REDIRECT_URL='users:logoutUser'
 LOGIN_URL='users:login'
 
 
-REST_FRAMEWORK={
-    'DEFAULT_RENDERER_CLASSES':('rest_framework.renderers.JSONRenderer',)
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  # enables UI
+    ]
 }
 
 handler404='central_branch.views.custom_404'
