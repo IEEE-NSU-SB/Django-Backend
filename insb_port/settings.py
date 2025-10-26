@@ -231,9 +231,13 @@ LOGIN_URL='users:login'
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',  # enables UI
     ]
 }
+
+if (os.environ.get('SETTINGS')=='dev'):
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].append(
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    )
 
 handler404='central_branch.views.custom_404'
 handler500='central_branch.views.custom_500'
