@@ -5,7 +5,7 @@ from rest_framework import serializers
 from central_events.models import Events, SuperEvents
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
-from port.models import Teams
+from port.models import Panels, Teams
 from users.models import VolunteerAwardRecievers
 from django.utils.html import strip_tags
 from datetime import date
@@ -262,3 +262,9 @@ class SCAGSerializer(serializers.ModelSerializer):
             '4': obj.how_to_join
         }
         return data
+
+class PanelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Panels
+        fields = ['year']

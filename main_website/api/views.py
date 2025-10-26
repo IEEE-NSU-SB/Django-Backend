@@ -171,7 +171,6 @@ class MegaEvents_FeaturedEventsListView(APIView):
                 events_to_view.append(event)
                 seen_ids.add(event_id)
 
-
         mega_events_to_view = MegaEventSerializer(mega_events, many=True, context={'request':request}).data
 
         data = {
@@ -180,10 +179,6 @@ class MegaEvents_FeaturedEventsListView(APIView):
         }
 
         return Response(data)
-    
-# class MegaEventsListLandingView(ListAPIView):
-
-#     queryset = SuperEvents.objects.filter(publish_mega_event = True).order_by('-start_date')
 
 class HeroSectionLandingView(APIView):
 
@@ -289,3 +284,15 @@ class SCAGDetails(APIView):
         serialized = SCAGSerializer(sc_ag, context={'request':request})
 
         return Response(serialized.data)
+    
+class PanelsListView(APIView):
+
+    def get(self, request, sc_ag_primary=None):
+        if sc_ag_primary:
+            panels = Panels.objects.filter(panel_of__primary=sc_ag_primary).order_by('-current','-year')
+        else:
+            panels = Panels.objects.filter(panel_of__primary=1).order_by('-current','-year')
+            
+        serialized_data = PanelSerializer(panels, many=True).data
+
+        return Response(serialized_data)
