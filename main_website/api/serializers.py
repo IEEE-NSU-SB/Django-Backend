@@ -2,7 +2,7 @@
 from datetime import datetime
 import re
 from rest_framework import serializers
-from central_events.models import Events
+from central_events.models import Events, SuperEvents
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from port.models import Teams
@@ -116,11 +116,14 @@ class ToolkitSerializer(serializers.ModelSerializer):
 class FeaturedEventSerialiser(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
-    alt = serializers.CharField(source='event_name')
+    name = serializers.CharField(source='event_name')
+    description = serializers.CharField(source='event_description')
+    date = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
 
     class Meta:
         model = Events
-        fields= ['id', 'image', 'alt']
+        fields= ['id', 'name', 'image', 'description', 'date', 'category']
 
     def get_image(self, obj):
 
@@ -132,8 +135,32 @@ class FeaturedEventSerialiser(serializers.ModelSerializer):
         else:
             return ''
         
-# class MegaEventSerialiser(serializers.ModelSerializer):
+    def get_category(self, obj):
+        categories = obj.event_type.all()
+
+        data = ''
+        for cat in categories:
+            data += cat.event_category
+
+        return data
     
+    def get_date(self, obj):
+        return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+
+class MegaEventSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='super_event_name')
+    description = serializers.CharField(source='super_event_description')
+    image = serializers.ImageField(source='banner_image')
+    group_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SuperEvents
+        fields = ['id', 'name', 'description', 'image', 'group_name']
+
+    def get_group_name(self, obj):
+        return 'ras'
+        
 class HomePageTopBannerSerializer(serializers.ModelSerializer):
 
     banner_image = serializers.ImageField(source='banner_picture')

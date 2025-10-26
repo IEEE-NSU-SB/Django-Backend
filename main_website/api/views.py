@@ -54,11 +54,11 @@ class BlogsListLandingView(ListAPIView):
     queryset = Blog.objects.filter(publish_blog=True).order_by('-date')[:6]
     serializer_class = BlogListSerializer
     
-class BlogsView(ListAPIView):
+class BlogsView(APIView):
 
     def get(self, request):
-        queryset = Blog.objects.filter(publish_blog=True).order_by('-date')
-        serializer = BlogListSerializer(queryset, many=True, context={'request':request})
+        blogs = Blog.objects.filter(publish_blog=True).order_by('-date')
+        serializer = BlogListSerializer(blogs, many=True, context={'request':request})
         return Response(serializer.data)
     
     @csrf_exempt
@@ -123,28 +123,44 @@ class ToolkitListView(ListAPIView):
     queryset = Toolkit.objects.all().order_by('pk')
     serializer_class = ToolkitSerializer
 
-class FeaturedEventsListView(APIView):
+class MegaEvents_FeaturedEventsListView(APIView):
 
     def get(self, request, sc_ag_primary):
     
         # sc_ag_primary = self.kwargs.get('sc_ag_primary')  # coming from URL kwargs
         # or use: self.request.query_params.get('sc_ag_primary') if it comes from query params
 
-        organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
-
         events_to_view = []
-        
-        flagship_events = FeaturedEventSerialiser(Events.objects.filter(
-            event_organiser=organiser,
-            flagship_event=True,
-            publish_in_main_web=True
-        ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-        featured_events = FeaturedEventSerialiser(Events.objects.filter(
-            event_organiser=organiser,
-            is_featured=True,
-            publish_in_main_web=True
-        ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+        if sc_ag_primary != 1:
+            organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
+            
+            flagship_events = FeaturedEventSerialiser(Events.objects.filter(
+                event_organiser=organiser,
+                flagship_event=True,
+                publish_in_main_web=True
+            ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+            featured_events = FeaturedEventSerialiser(Events.objects.filter(
+                event_organiser=organiser,
+                is_featured=True,
+                publish_in_main_web=True
+            ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+            mega_events = SuperEvents.objects.filter(mega_event_of__primary=sc_ag_primary, publish_mega_event = True).order_by('-start_date')
+
+        else:
+            flagship_events = FeaturedEventSerialiser(Events.objects.filter(
+                flagship_event=True,
+                publish_in_main_web=True
+            ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+            featured_events = FeaturedEventSerialiser(Events.objects.filter(
+                is_featured=True,
+                publish_in_main_web=True
+            ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
+
+            mega_events = SuperEvents.objects.filter(publish_mega_event = True).order_by('-start_date')
 
         # Combine while removing duplicates by unique ID
         seen_ids = set()
@@ -155,7 +171,15 @@ class FeaturedEventsListView(APIView):
                 events_to_view.append(event)
                 seen_ids.add(event_id)
 
-        return Response(events_to_view)
+
+        mega_events_to_view = MegaEventSerializer(mega_events, many=True, context={'request':request}).data
+
+        data = {
+            'featuredEvents':events_to_view,
+            'megaEvents':mega_events_to_view
+        }
+
+        return Response(data)
     
 # class MegaEventsListLandingView(ListAPIView):
 
