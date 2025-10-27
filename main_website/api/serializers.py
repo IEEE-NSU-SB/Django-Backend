@@ -6,7 +6,7 @@ from central_events.models import Events, SuperEvents
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from port.models import Panels, Teams
-from users.models import VolunteerAwardRecievers
+from users.models import Panel_Members, VolunteerAwardRecievers
 from django.utils.html import strip_tags
 from datetime import date
 
@@ -268,3 +268,17 @@ class PanelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Panels
         fields = ['year']
+
+class PanelMembersSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source='member.ieee_id')
+    name = serializers.CharField(source='member.name')
+    image = serializers.ImageField(source='member.user_profile_picture')
+    linkedin = serializers.CharField(source='member.linkedin_url')
+    email = serializers.CharField(source='member.email_nsu')
+    position = serializers.StringRelatedField()
+    position_of = serializers.CharField(source='position.role_of.short_form')
+    
+    class Meta:
+        model = Panel_Members
+        fields = ['id', 'name', 'position', 'position_of', 'image', 'linkedin', 'email']

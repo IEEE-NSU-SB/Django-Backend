@@ -22,4 +22,6 @@ urlpatterns = [
     path('get_all_members_stats/', AllMembersStats.as_view(), name='all_members_stats'),
     path('get_sc_ag_details/<int:sc_ag_primary>/', SCAGDetails.as_view(), name='sc_ag_details'),
     path('get_panels/', PanelsListView.as_view(), name='panels_list'),
+    path('get_panels/<int:sc_ag_primary>/', PanelsListView.as_view(), name='panels_list_sc_ag'),
+    path('get_panel_executives/', PanelExecutives.as_view(), name='panel_executives'),
 ]

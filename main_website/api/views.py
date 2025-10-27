@@ -7,7 +7,7 @@ from main_website.renderData import HomepageItems
 from port.models import Panels, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
-from users.models import VolunteerAwardRecievers
+from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
 from rest_framework.generics import ListAPIView
@@ -147,7 +147,7 @@ class MegaEvents_FeaturedEventsListView(APIView):
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-            mega_events = SuperEvents.objects.filter(mega_event_of__primary=sc_ag_primary, publish_mega_event = True).order_by('-start_date')
+            mega_events = SuperEvents.objects.filter(mega_event_of=organiser, publish_mega_event = True).order_by('-start_date')
 
         else:
             flagship_events = FeaturedEventSerialiser(Events.objects.filter(
@@ -289,10 +289,60 @@ class PanelsListView(APIView):
 
     def get(self, request, sc_ag_primary=None):
         if sc_ag_primary:
-            panels = Panels.objects.filter(panel_of__primary=sc_ag_primary).order_by('-current','-year')
+            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')
+            print(panels.query)
         else:
-            panels = Panels.objects.filter(panel_of__primary=1).order_by('-current','-year')
-            
+            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).order_by('-current','-year')
+
         serialized_data = PanelSerializer(panels, many=True).data
 
         return Response(serialized_data)
+    
+class PanelExecutives(APIView):
+
+    def get(self, request):
+
+        # Get all current panels for primary 1–5 in one query
+        panels = Panels.objects.filter(current=True, panel_of__primary__in=range(1,6))
+
+        # Prefetch members for all panels at once
+        all_members = Panel_Members.objects.filter(tenure__in=panels).select_related('position', 'tenure')
+
+        current_panel_branch_counselors = []
+        current_panel_mentors = []
+        current_panel_excom = []
+        current_panel_sc_ag_chairs = []
+
+        for i in all_members:
+            if (i.position.role_of.primary==1):
+                if(i.position.is_faculty):
+                    current_panel_branch_counselors.append(i)
+                elif(i.position.is_eb_member):
+                    if(i.position.is_mentor):
+                        current_panel_mentors.append(i)
+                    else:
+                        current_panel_excom.append(i)
+            elif(i.position.is_sc_ag_eb_member):
+                if(i.position.role == 'Chair'):
+                    current_panel_sc_ag_chairs.append(i)
+
+        current_panel_faculty_advisors = [
+            m for m in all_members
+            if m.tenure.panel_of.primary in range(2,6) and m.position.is_sc_ag_eb_member and m.position.is_faculty
+        ]
+        
+        current_panel_branch_counselors_serialized = PanelMembersSerializer(current_panel_branch_counselors, many=True, context={'request': request}).data
+        current_panel_faculty_advisors_serialized = PanelMembersSerializer(current_panel_faculty_advisors, many=True, context={'request': request}).data
+        current_panel_mentors_serialized = PanelMembersSerializer(current_panel_mentors, many=True, context={'request': request}).data
+        current_panel_excom_serialized = PanelMembersSerializer(current_panel_excom, many=True, context={'request': request}).data
+        current_panel_sc_ag_chairs_serialized = PanelMembersSerializer(current_panel_sc_ag_chairs, many=True, context={'request': request}).data
+
+        data = {
+            'counselors':current_panel_branch_counselors_serialized,
+            'sc_ag_faculty_advisors': current_panel_faculty_advisors_serialized,
+            'mentors': current_panel_mentors_serialized,
+            'excom': current_panel_excom_serialized,
+            'sc_ag_chairs': current_panel_sc_ag_chairs_serialized
+        }
+
+        return Response(data)
