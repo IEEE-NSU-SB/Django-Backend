@@ -310,6 +310,7 @@ class PanelMembersSerializer(serializers.ModelSerializer):
                 'name': getattr(source, 'name', None),
                 'image': build_full_url(getattr(source, 'picture', None)),
                 'linkedin': getattr(source, 'linkedin_link', None),
+                'facebook': getattr(source, 'facebook_link', None),
                 'email': getattr(source, 'email', None),
             })
 
