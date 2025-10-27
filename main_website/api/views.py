@@ -300,10 +300,14 @@ class PanelsListView(APIView):
     
 class PanelExecutives(APIView):
 
-    def get(self, request):
+    def get(self, request, panel_year=None):
 
         # Get all current panels for primary 1–5 in one query
-        panels = Panels.objects.filter(current=True, panel_of__primary__in=range(1,6))
+
+        if panel_year:
+            panels = Panels.objects.filter(year=panel_year, panel_of__primary__in=range(1,6))
+        else:
+            panels = Panels.objects.filter(current=True, panel_of__primary__in=range(1,6))
 
         # Prefetch members for all panels at once
         all_members = Panel_Members.objects.filter(tenure__in=panels).select_related('position', 'tenure')

@@ -270,15 +270,36 @@ class PanelSerializer(serializers.ModelSerializer):
         fields = ['year']
 
 class PanelMembersSerializer(serializers.ModelSerializer):
+    # position = serializers.StringRelatedField()
+    # position_of = serializers.CharField(source='position.role_of.short_form')
 
-    id = serializers.IntegerField(source='member.ieee_id')
-    name = serializers.CharField(source='member.name')
-    image = serializers.ImageField(source='member.user_profile_picture')
-    linkedin = serializers.CharField(source='member.linkedin_url')
-    email = serializers.CharField(source='member.email_nsu')
-    position = serializers.StringRelatedField()
-    position_of = serializers.CharField(source='position.role_of.short_form')
-    
     class Meta:
         model = Panel_Members
         fields = ['id', 'name', 'position', 'position_of', 'image', 'linkedin', 'email']
+
+    def to_representation(self, obj):
+        data = {
+            'position': str(obj.position) if obj.position else None,
+            'position_of': getattr(obj.position.role_of, 'short_form', None) if obj.position else None,
+        }
+
+        if obj.member:
+            source = obj.member
+            data.update({
+                'id': getattr(source, 'ieee_id', None),
+                'name': getattr(source, 'name', None),
+                'image': source.user_profile_picture.url if getattr(source, 'user_profile_picture', None) else None,
+                'linkedin': getattr(source, 'linkedin_url', None),
+                'email': getattr(source, 'email_nsu', None),
+            })
+        elif obj.ex_member:
+            source = obj.ex_member
+            data.update({
+                'id': None,
+                'name': getattr(source, 'name', None),
+                'image': source.picture.url if getattr(source, 'picture', None) else None,
+                'linkedin': getattr(source, 'linkedin_link', None),
+                'email': getattr(source, 'email', None),
+            })
+
+        return data

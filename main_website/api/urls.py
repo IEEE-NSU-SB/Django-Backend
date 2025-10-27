@@ -24,4 +24,5 @@ urlpatterns = [
     path('get_panels/', PanelsListView.as_view(), name='panels_list'),
     path('get_panels/<int:sc_ag_primary>/', PanelsListView.as_view(), name='panels_list_sc_ag'),
     path('get_panel_executives/', PanelExecutives.as_view(), name='panel_executives'),
+    path('get_panel_executives/<str:panel_year>/', PanelExecutives.as_view(), name='panel_executives_sc_ag'),
 ]
