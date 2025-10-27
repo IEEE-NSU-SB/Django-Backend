@@ -277,7 +277,17 @@ class PanelMembersSerializer(serializers.ModelSerializer):
         model = Panel_Members
         fields = ['id', 'name', 'position', 'position_of', 'image', 'linkedin', 'email']
 
+
     def to_representation(self, obj):
+        request = self.context.get('request') 
+
+        def build_full_url(image_field):
+                if image_field and hasattr(image_field, 'url'):
+                    if request is not None:
+                        return request.build_absolute_uri(image_field.url)
+                    return image_field.url  # fallback (relative URL)
+                return None
+        
         data = {
             'position': str(obj.position) if obj.position else None,
             'position_of': getattr(obj.position.role_of, 'short_form', None) if obj.position else None,
@@ -288,7 +298,8 @@ class PanelMembersSerializer(serializers.ModelSerializer):
             data.update({
                 'id': getattr(source, 'ieee_id', None),
                 'name': getattr(source, 'name', None),
-                'image': source.user_profile_picture.url if getattr(source, 'user_profile_picture', None) else None,
+                'image': build_full_url(getattr(source, 'user_profile_picture', None)),
+                'facebook': getattr(source, 'facebook_url', None),
                 'linkedin': getattr(source, 'linkedin_url', None),
                 'email': getattr(source, 'email_nsu', None),
             })
@@ -297,7 +308,7 @@ class PanelMembersSerializer(serializers.ModelSerializer):
             data.update({
                 'id': None,
                 'name': getattr(source, 'name', None),
-                'image': source.picture.url if getattr(source, 'picture', None) else None,
+                'image': build_full_url(getattr(source, 'picture', None)),
                 'linkedin': getattr(source, 'linkedin_link', None),
                 'email': getattr(source, 'email', None),
             })
