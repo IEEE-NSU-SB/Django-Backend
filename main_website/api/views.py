@@ -289,10 +289,10 @@ class PanelsListView(APIView):
 
     def get(self, request, sc_ag_primary=None):
         if sc_ag_primary:
-            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')
+            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')[1:]
             print(panels.query)
         else:
-            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).order_by('-current','-year')
+            panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).order_by('-current','-year')[1:]
 
         serialized_data = PanelSerializer(panels, many=True).data
 
