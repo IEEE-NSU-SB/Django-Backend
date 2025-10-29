@@ -2,9 +2,10 @@
 from datetime import datetime
 import re
 from rest_framework import serializers
-from central_events.models import Events, SuperEvents
+from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
+from media_team.models import Media_Images
 from port.models import Panels, Teams
 from users.models import Panel_Members, VolunteerAwardRecievers
 from django.utils.html import strip_tags
@@ -152,14 +153,10 @@ class MegaEventSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='super_event_name')
     description = serializers.CharField(source='super_event_description')
     image = serializers.ImageField(source='banner_image')
-    group_name = serializers.SerializerMethodField()
 
     class Meta:
         model = SuperEvents
-        fields = ['id', 'name', 'description', 'image', 'group_name']
-
-    def get_group_name(self, obj):
-        return 'ras'
+        fields = ['id', 'name', 'description', 'image']
         
 class HomePageTopBannerSerializer(serializers.ModelSerializer):
 
@@ -315,3 +312,63 @@ class PanelMembersSerializer(serializers.ModelSerializer):
             })
 
         return data
+    
+class EventSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='event_name')
+    category = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    organizer = serializers.StringRelatedField(source='event_organiser')
+    collaboration = serializers.SerializerMethodField()
+    registration_fee_amount = serializers.SerializerMethodField()
+    register_link = serializers.URLField(source='form_link')
+    read_more_link = serializers.URLField(source='more_info_link')
+    description = serializers.CharField(source='event_description')
+    images = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Events
+        fields= ['id', 'title', 'category', 'image', 'organizer', 'collaboration', 'start_date', 'end_date', 'registration_fee_amount', 'register_link', 'read_more_link', 'description', 'images']
+
+    def get_image(self, obj):
+
+        image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+
+        request = self.context.get('request')
+        if image and hasattr(image, 'url'):
+            return str(request.build_absolute_uri(image.url))
+        else:
+            return ''
+        
+    def get_category(self, obj):
+        categories = obj.event_type.all()
+
+        data = ''
+        for cat in categories:
+            data += cat.event_category
+
+        return data
+    
+    def get_registration_fee_amount(self, obj):
+        if obj.registration_fee:
+            return obj.registration_fee_amount
+        else:
+            return 'Free'
+
+    def get_start_date(self, obj):
+        return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+    
+    def get_collaboration(self, obj):
+        get_inter_branch_collab=InterBranchCollaborations.objects.filter(event_id=obj.pk)
+        get_intra_branch_collab=IntraBranchCollaborations.objects.filter(event_id=obj.pk).first()
+        return 'Google Developers Group Dhaka'
+    
+    def get_images(self, obj):
+        request = self.context.get('request')
+        images = Media_Images.objects.filter(event_id=obj.pk)
+        selected_images = []
+
+        for image in images:
+            selected_images.append(str(request.build_absolute_uri(image.selected_images.url)))
+
+        return selected_images
