@@ -10,7 +10,7 @@ from recruitment.models import recruited_members, recruitment_session
 from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
@@ -350,3 +350,11 @@ class PanelExecutives(APIView):
         }
 
         return Response(data)
+    
+class EventView(RetrieveAPIView):
+
+    serializer_class = EventSerializer
+    queryset = Events.objects.all()
+    
+    lookup_field = 'id'              # model field name
+    lookup_url_kwarg = 'event_id'    # URL parameter name
