@@ -320,6 +320,7 @@ class EventSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     organizer = serializers.StringRelatedField(source='event_organiser')
     collaboration = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
     registration_fee_amount = serializers.SerializerMethodField()
     register_link = serializers.URLField(source='form_link')
     read_more_link = serializers.URLField(source='more_info_link')
