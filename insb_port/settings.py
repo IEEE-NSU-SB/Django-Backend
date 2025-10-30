@@ -43,13 +43,15 @@ if(os.environ.get('SETTINGS')=='dev'):
         "http://127.0.0.1:5173",
         "http://localhost:5173",
     ]
+    SECURE_SSL_REDIRECT = False
+
 else:
     CORS_ALLOWED_ORIGINS = [
         "http://react.ieeensusb.org",
         "https://react.ieeensusb.org"
     ]
+    SECURE_SSL_REDIRECT = True
 
-SECURE_SSL_REDIRECT = True
 
 LOGIN_URL='/portal/users/login'
 
