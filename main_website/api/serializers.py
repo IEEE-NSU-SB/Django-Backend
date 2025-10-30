@@ -129,7 +129,10 @@ class EventListSerialiser(serializers.ModelSerializer):
 
     def get_image(self, obj):
 
-        image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+        try:
+            image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+        except:
+            image = None
 
         request = self.context.get('request')
         if image and hasattr(image, 'url'):
