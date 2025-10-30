@@ -46,6 +46,7 @@ if(os.environ.get('SETTINGS')=='dev'):
 else:
     CORS_ALLOWED_ORIGINS = [
         "http://react.ieeensusb.org",
+        "https://react.ieeensusb.org"
     ]
 
 SECURE_SSL_REDIRECT = True
