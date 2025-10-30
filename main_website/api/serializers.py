@@ -2,6 +2,7 @@
 from datetime import datetime
 import re
 from rest_framework import serializers
+from central_branch.renderData import Branch
 from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
@@ -401,3 +402,73 @@ class ContactInfoSerializer(serializers.ModelSerializer):
             "https://www.instagram.com/ieeensusb/",
             "https://www.youtube.com/@IEEENSUStudentBranch"
         ]          
+
+class PageLinkSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Page_Link
+        fields = ['title', 'link']
+
+class IEEERegion10Serializer(serializers.ModelSerializer):
+    # Model fields
+    region10Description = serializers.CharField(source='ieee_region_10_description')
+    region10image = serializers.ImageField(source='ieee_region_10_image')
+    historyLink = serializers.CharField(source='ieee_region_10_history_link')
+
+    youngProfDescription = serializers.CharField(source='young_professionals_description')
+    youngProfImage = serializers.ImageField(source='young_professionals_image')
+    youngProfLinks = PageLinkSerializer(many=True, read_only=True)
+
+    WIEDescription = serializers.CharField(source='women_in_engineering_ddescription')
+    WIELinks = PageLinkSerializer(many=True, read_only=True)
+
+    StudentMemDescription = serializers.CharField(source='student_and_member_activities_description')
+    StudentMemLinks = PageLinkSerializer(many=True, read_only=True)
+
+    EduActivitiesDescription = serializers.CharField(source='educational_activities_and_involvements_description')
+    EduActivitiesLinks = PageLinkSerializer(many=True, read_only=True)
+
+    IndustryDescription = serializers.CharField(source='industry_relations_description')
+    IndustryLinks = PageLinkSerializer(many=True, read_only=True)
+
+    MembershipDescription = serializers.CharField(source='membership_development_description')
+    MembershipLinks = PageLinkSerializer(many=True, read_only=True)
+    MembershipImage = serializers.ImageField(source='membership_development_image')
+
+    EventConferenceDetails = serializers.CharField(source='events_and_conference_description')
+    EventConferenceImage = serializers.ImageField(source='events_and_conference_image')
+    EventConferenceLinks = PageLinkSerializer(many=True, read_only=True)
+
+    Parallax = serializers.ImageField(source='background_picture_parallax')
+    HomePageLink = serializers.CharField(source='home_page_link')
+    WebsiteLink = serializers.CharField(source='website_link')
+    MembershipInquiryLink = serializers.CharField(source='membership_inquiry_link')
+    ForVolunteersLink = serializers.CharField(source='for_volunteers_link')
+    Contact = serializers.CharField(source='contact_number')
+
+    class Meta:
+        model = IEEE_Region_10
+        fields = [
+            "region10Description", "region10image", "historyLink",
+            "youngProfDescription", "youngProfImage", "youngProfLinks",
+            "WIEDescription", "WIELinks",
+            "StudentMemDescription", "StudentMemLinks",
+            "EduActivitiesDescription", "EduActivitiesLinks",
+            "IndustryDescription", "IndustryLinks",
+            "MembershipDescription", "MembershipLinks", "MembershipImage",
+            "EventConferenceDetails", "EventConferenceImage", "EventConferenceLinks",
+            "Parallax", "HomePageLink", "WebsiteLink",
+            "MembershipInquiryLink", "ForVolunteersLink", "Contact"
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Assign dynamic link lists
+        page_links = Branch.get_about_page_links(page_title='ieee_region_10')
+        self.fields['youngProfLinks'].default = page_links.get('young_professionals_link', [])
+        self.fields['WIELinks'].default = page_links.get('women_in_engineering_link', [])
+        self.fields['StudentMemLinks'].default = page_links.get('student_and_member_activities_link', [])
+        self.fields['EduActivitiesLinks'].default = page_links.get('educational_activities_and_involvements_link', [])
+        self.fields['IndustryLinks'].default = page_links.get('industry_relations_link', [])
+        self.fields['MembershipLinks'].default = page_links.get('membership_development_link', [])
+        self.fields['EventConferenceLinks'].default = page_links.get('events_and_conference_link', [])

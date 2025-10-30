@@ -364,3 +364,10 @@ class ContactInfoView(RetrieveAPIView):
 
     def get_object(self):
         return Contact_Info.objects.first()
+    
+class IEEERegion10Details(RetrieveAPIView):
+    
+    serializer_class = IEEERegion10Serializer
+
+    def get_object(self):
+        return IEEE_Region_10.objects.first()

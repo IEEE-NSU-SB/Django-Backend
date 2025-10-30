@@ -26,5 +26,6 @@ urlpatterns = [
     path('get_panel_executives/', PanelExecutives.as_view(), name='panel_executives'),
     path('get_panel_executives/<str:panel_year>/', PanelExecutives.as_view(), name='panel_executives_sc_ag'),
     path('get_event_details/<int:event_id>/', EventView.as_view(), name='event_view'),
-    path('get_contact_info/', ContactInfoView.as_view(), name='contact_info')
+    path('get_contact_info/', ContactInfoView.as_view(), name='contact_info'),
+    path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
 ]
