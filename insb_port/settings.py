@@ -45,9 +45,10 @@ if(os.environ.get('SETTINGS')=='dev'):
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
-        "https://react.ieeensusb.org",
+        "http://react.ieeensusb.org",
     ]
 
+SECURE_SSL_REDIRECT = True
 
 LOGIN_URL='/portal/users/login'
 
