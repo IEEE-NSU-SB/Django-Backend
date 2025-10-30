@@ -358,3 +358,9 @@ class EventView(RetrieveAPIView):
     
     lookup_field = 'id'              # model field name
     lookup_url_kwarg = 'event_id'    # URL parameter name
+    
+class ContactInfoView(RetrieveAPIView):
+    serializer_class = ContactInfoSerializer
+
+    def get_object(self):
+        return Contact_Info.objects.first()

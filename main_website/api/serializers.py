@@ -373,3 +373,31 @@ class EventSerializer(serializers.ModelSerializer):
             selected_images.append(str(request.build_absolute_uri(image.selected_images.url)))
 
         return selected_images
+    
+class ContactInfoSerializer(serializers.ModelSerializer):
+    email_address = serializers.SerializerMethodField()
+    mobile_number = serializers.SerializerMethodField()
+    social_media_link = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Contact_Info
+        fields = ["address", "email_address", "mobile_number", "social_media_link"]
+        
+        
+    def get_email_address(self, obj):
+        return [obj.nsu_ieee_email, obj.chair_email]
+    
+    def get_mobile_number(self,obj):
+        return[
+            f"For Membership Queries : {obj.membership_queries_number}",    
+            f"For Corporate Engagement: {obj.corporate_engagement_number}"
+        ]
+    
+    def get_social_media_link (self, obj):
+        return [
+            "https://www.facebook.com/ieeensusb/",
+            "https://twitter.com/ieeensusb/",
+            "https://www.linkedin.com/company/ieeensusb/",
+            "https://www.instagram.com/ieeensusb/",
+            "https://www.youtube.com/@IEEENSUStudentBranch"
+        ]          
