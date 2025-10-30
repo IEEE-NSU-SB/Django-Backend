@@ -115,7 +115,7 @@ class ToolkitSerializer(serializers.ModelSerializer):
     def get_colors(self, obj):
         return re.split(r'[\r\n]+', strip_tags(str(obj.color_codes)))
     
-class EventSerialiser(serializers.ModelSerializer):
+class EventListSerialiser(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
     name = serializers.CharField(source='event_name')
