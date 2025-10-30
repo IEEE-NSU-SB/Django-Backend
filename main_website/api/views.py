@@ -136,13 +136,13 @@ class MegaEvents_FeaturedEventsListView(APIView):
         if sc_ag_primary != 1:
             organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
             
-            flagship_events = EventSerialiser(Events.objects.filter(
+            flagship_events = EventListSerialiser(Events.objects.filter(
                 event_organiser=organiser,
                 flagship_event=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-            featured_events = EventSerialiser(Events.objects.filter(
+            featured_events = EventListSerialiser(Events.objects.filter(
                 event_organiser=organiser,
                 is_featured=True,
                 publish_in_main_web=True
@@ -151,12 +151,12 @@ class MegaEvents_FeaturedEventsListView(APIView):
             mega_events = SuperEvents.objects.filter(mega_event_of=organiser, publish_mega_event = True).order_by('-start_date')
 
         else:
-            flagship_events = EventSerialiser(Events.objects.filter(
+            flagship_events = EventListSerialiser(Events.objects.filter(
                 flagship_event=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-            featured_events = EventSerialiser(Events.objects.filter(
+            featured_events = EventListSerialiser(Events.objects.filter(
                 is_featured=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
@@ -381,5 +381,5 @@ class EventPagination(PageNumberPagination):
 class EventsListView(ListAPIView):
 
     queryset = Events.objects.filter(publish_in_main_web= True,).order_by('-start_date','-event_date') 
-    serializer_class = EventSerializer
+    serializer_class = EventListSerialiser
     pagination_class = EventPagination
