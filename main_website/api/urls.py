@@ -28,4 +28,5 @@ urlpatterns = [
     path('get_event_details/<int:event_id>/', EventView.as_view(), name='event_view'),
     path('get_contact_info/', ContactInfoView.as_view(), name='contact_info'),
     path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
+    path('get_all_events/', EventsListView.as_view(), name='events_list'),
 ]

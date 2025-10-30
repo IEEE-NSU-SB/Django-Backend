@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 
 class AchievementListView(ListAPIView):
     queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
@@ -135,13 +136,13 @@ class MegaEvents_FeaturedEventsListView(APIView):
         if sc_ag_primary != 1:
             organiser = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
             
-            flagship_events = FeaturedEventSerialiser(Events.objects.filter(
+            flagship_events = EventSerialiser(Events.objects.filter(
                 event_organiser=organiser,
                 flagship_event=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-            featured_events = FeaturedEventSerialiser(Events.objects.filter(
+            featured_events = EventSerialiser(Events.objects.filter(
                 event_organiser=organiser,
                 is_featured=True,
                 publish_in_main_web=True
@@ -150,12 +151,12 @@ class MegaEvents_FeaturedEventsListView(APIView):
             mega_events = SuperEvents.objects.filter(mega_event_of=organiser, publish_mega_event = True).order_by('-start_date')
 
         else:
-            flagship_events = FeaturedEventSerialiser(Events.objects.filter(
+            flagship_events = EventSerialiser(Events.objects.filter(
                 flagship_event=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
 
-            featured_events = FeaturedEventSerialiser(Events.objects.filter(
+            featured_events = EventSerialiser(Events.objects.filter(
                 is_featured=True,
                 publish_in_main_web=True
             ).order_by('-start_date', '-event_date'), many=True, context={'request':request}).data
@@ -366,8 +367,19 @@ class ContactInfoView(RetrieveAPIView):
         return Contact_Info.objects.first()
     
 class IEEERegion10Details(RetrieveAPIView):
-    
+
     serializer_class = IEEERegion10Serializer
 
     def get_object(self):
         return IEEE_Region_10.objects.first()
+    
+class EventPagination(PageNumberPagination):
+    page_size = 20  # Events per page
+    # page_size_query_param = 'page_size'  # optional, allows ?page_size=3
+    # max_page_size = 50
+
+class EventsListView(ListAPIView):
+
+    queryset = Events.objects.filter(publish_in_main_web= True,).order_by('-start_date','-event_date') 
+    serializer_class = EventSerializer
+    pagination_class = EventPagination
