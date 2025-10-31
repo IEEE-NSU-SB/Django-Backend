@@ -31,4 +31,5 @@ urlpatterns = [
     path('get_contact_info/', ContactInfoView.as_view(), name='contact_info'),
     path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
     path('get_all_events/', EventsListView.as_view(), name='events_list'),
+    path('get_team_details/<int:team_primary>/', TeamInfoView.as_view(), name='team_info'),
 ]
