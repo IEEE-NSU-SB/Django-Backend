@@ -398,3 +398,41 @@ class EventsListView(ListAPIView):
     serializer_class = EventListSerialiser
     pagination_class = EventPagination
 
+class TeamInfoView(APIView):
+
+    def get(self, request, team_primary):
+        team_details = Teams.objects.get(primary=team_primary)
+        team_serialized = TeamSerializer(team_details).data
+
+        team_co_ordinators=[]
+        team_incharges=[]
+        core_volunteers=[]
+        volunteers=[]
+
+        get_team_members=PortData.get_specific_team_members_of_current_panel(request=request,team_primary=team_details.primary)
+        if(get_team_members):
+            for i in get_team_members:
+                if(i.position.is_officer):
+                    if(i.position.is_co_ordinator):
+                        team_co_ordinators.append(i)
+                    else:
+                        team_incharges.append(i)
+                elif(i.position.is_core_volunteer and i.position.is_volunteer):
+                    core_volunteers.append(i)
+                elif(i.position.is_volunteer):
+                    volunteers.append(i)
+
+        team_co_ordinators_serialized = TeamPanelMembersSerializer(team_co_ordinators, many=True, context={'request': request}).data
+        team_incharges_serialized = TeamPanelMembersSerializer(team_incharges, many=True, context={'request': request}).data
+        core_volunteers_serialized = TeamPanelMembersSerializer(core_volunteers, many=True, context={'request': request}).data
+        volunteers_serialized = TeamPanelMembersSerializer(volunteers, many=True, context={'request': request}).data
+
+        data = {
+            'team': team_serialized,
+            'subExecutive': team_co_ordinators_serialized,
+            'incharge': team_incharges_serialized,
+            'coreVolunteers': core_volunteers_serialized,
+            'volunteers': volunteers_serialized
+        }
+
+        return Response(data)

@@ -276,8 +276,7 @@ class PanelMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Panel_Members
-        fields = ['id', 'name', 'position', 'position_of', 'image', 'linkedin', 'email']
-
+        fields = ['id', 'name', 'position', 'position_of', 'image', 'facebook', 'linkedin', 'email']
 
     def to_representation(self, obj):
         request = self.context.get('request') 
@@ -475,3 +474,54 @@ class IEEERegion10Serializer(serializers.ModelSerializer):
         self.fields['IndustryLinks'].default = page_links.get('industry_relations_link', [])
         self.fields['MembershipLinks'].default = page_links.get('membership_development_link', [])
         self.fields['EventConferenceLinks'].default = page_links.get('events_and_conference_link', [])
+
+class TeamSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='team_name')
+    img = serializers.ImageField(source='team_picture')
+    details = serializers.CharField(source='team_short_description')
+
+    class Meta:
+        model = Teams
+        fields = ['title', 'img', 'details']
+
+class TeamPanelMembersSerializer(serializers.ModelSerializer):
+    # position = serializers.StringRelatedField()
+    # position_of = serializers.CharField(source='position.role_of.short_form')
+
+    class Meta:
+        model = Panel_Members
+        fields = ['id', 'name', 'position', 'image']
+
+
+    def to_representation(self, obj):
+        request = self.context.get('request') 
+
+        def build_full_url(image_field):
+                if image_field and hasattr(image_field, 'url'):
+                    if request is not None:
+                        return request.build_absolute_uri(image_field.url)
+                    return image_field.url  # fallback (relative URL)
+                return None
+        
+        data = {
+            'position': str(obj.position) if obj.position else None,
+            'position_of': getattr(obj.position.role_of, 'short_form', None) if obj.position else None,
+        }
+
+        if obj.member:
+            source = obj.member
+            data.update({
+                'id': getattr(source, 'ieee_id', None),
+                'name': getattr(source, 'name', None),
+                'image': build_full_url(getattr(source, 'user_profile_picture', None)),
+            })
+        elif obj.ex_member:
+            source = obj.ex_member
+            data.update({
+                'id': None,
+                'name': getattr(source, 'name', None),
+                'image': build_full_url(getattr(source, 'picture', None)),
+            })
+
+        return data
