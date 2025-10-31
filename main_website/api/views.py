@@ -18,12 +18,26 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 
 class AchievementListView(ListAPIView):
-    queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
     serializer_class = AchievementSerializer
 
+    def get_queryset(self):
+        sc_ag_primary = self.kwargs.get('sc_ag_primary')
+        
+        if sc_ag_primary:
+            return Achievements.objects.filter(award_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-award_winning_datefield__year','-award_winning_datefield__month')
+        else:
+            return Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')
+
 class AchievementListLandingView(ListAPIView):
-    queryset = Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')[:6]
     serializer_class = AchievementSerializer
+
+    def get_queryset(self):
+        sc_ag_primary = self.kwargs.get('sc_ag_primary')
+        
+        if sc_ag_primary:
+            return Achievements.objects.filter(award_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-award_winning_datefield__year','-award_winning_datefield__month')[:6]
+        else:
+            return Achievements.objects.all().order_by('-award_winning_datefield__year','-award_winning_datefield__month')[:6]
 
 class ScAgStats(APIView):
 
@@ -383,3 +397,4 @@ class EventsListView(ListAPIView):
     queryset = Events.objects.filter(publish_in_main_web= True,).order_by('-start_date','-event_date') 
     serializer_class = EventListSerialiser
     pagination_class = EventPagination
+
