@@ -305,7 +305,6 @@ class PanelsListView(APIView):
     def get(self, request, sc_ag_primary=None):
         if sc_ag_primary:
             panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')[1:]
-            print(panels.query)
         else:
             panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).order_by('-current','-year')[1:]
 
@@ -466,3 +465,24 @@ class SCAGPanelExecutives(APIView):
 
         return Response(data)
 
+class TeamsListView(ListAPIView):
+
+    queryset = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
+    serializer_class = TeamListSerializer
+
+class OfficersListView(ListAPIView):
+
+    serializer_class = PanelMembersSerializer
+
+    def get_queryset(self):
+
+        currentPanel=Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+        
+        team_primary = self.kwargs.get('team_primary')
+        if team_primary:
+            team = Teams.objects.get(primary=team_primary)            
+            officers=Panel_Members.objects.filter(tenure=currentPanel, team=team, position__is_officer=True)
+        else:
+            officers=Panel_Members.objects.filter(tenure=currentPanel, position__is_officer=True)
+
+        return officers
