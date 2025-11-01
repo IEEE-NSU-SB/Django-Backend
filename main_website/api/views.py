@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from users.renderData import getTypeOfEventStats, getEventNumberStat
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -62,6 +63,35 @@ class ScAgStats(APIView):
                     'label': 'ACHIEVEMENTS'
                 },
             ]
+        }
+
+        return Response(data)
+    
+class EventsStats(APIView):
+
+    def get(self, request):
+
+        get_event_stat=getTypeOfEventStats(request,1)
+        event_stat=[]
+        # prepare data from the tuple
+        categories, count, percentage_mapping = get_event_stat
+        for category, count in zip(categories, count):
+            event_stat_dict={}
+            # get event name
+            event_stat_dict['name']=category
+            # get event count according to category
+            event_stat_dict['value']=count
+            # append the dict to list
+            event_stat.append(event_stat_dict)
+
+        get_yearly_events=getEventNumberStat(request,1)
+
+        data = {
+            'eventCounts': event_stat,
+            'yearlyEvents': {
+                'years': get_yearly_events[0],
+                'count': get_yearly_events[1]
+            }
         }
 
         return Response(data)

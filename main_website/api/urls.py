@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_achievements/landing/', AchievementListLandingView.as_view(), name='achievements_list_landing'),
     path('get_achievements/landing/<int:sc_ag_primary>/', AchievementListLandingView.as_view(), name='achievements_list_landing_sc_ag'),
     path('get_sc_ag_stats/', ScAgStats.as_view(), name='sc_ag_stats'),
+    path('get_events_stats/', EventsStats.as_view(), name='events_stats'),
     path('get_blogs/landing/', BlogsListLandingView.as_view(), name='blogs_list_landing'),
     path('get_blogs/', BlogsView.as_view(), name='blogs_list'),
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
