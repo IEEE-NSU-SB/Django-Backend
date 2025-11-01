@@ -4,7 +4,7 @@ import requests
 from central_events.models import Events, SuperEvents
 from insb_port import settings
 from main_website.renderData import HomepageItems
-from port.models import Panels, VolunteerAwards
+from port.models import Panels, Roles_and_Position, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
 from users.models import Panel_Members, VolunteerAwardRecievers
@@ -436,3 +436,33 @@ class TeamInfoView(APIView):
         }
 
         return Response(data)
+    
+class SCAGPanelExecutives(APIView):
+
+    def get(self, request, sc_ag_primary):
+        #getting the particular society object
+        society = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)        
+        #getting current tenure
+        current_tenure = Panels.objects.get(current = True, panel_of = society)
+        #getting the faculty
+        faculty_advisor = Panel_Members.objects.get(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
+        faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, context={'request': request}).data
+
+        eb_members = []
+        roles = Roles_and_Position.objects.filter(is_sc_ag_eb_member = True,role_of = society,is_faculty=False).order_by('rank','role','role_of')
+        for role in roles:
+            try:
+                #getting the member of the particular society whose role matches with the role iteration in the list and is if current panel
+                member = Panel_Members.objects.filter(tenure = current_tenure,position = role)
+                eb_members.extend(member)
+            except:
+                pass
+        eb_members_serialized = PanelMembersSerializer(eb_members, many=True, context={'request': request}).data
+
+        data = {
+            'advisor': [faculty_advisor_serialized],
+            'executives': eb_members_serialized
+        }
+
+        return Response(data)
+
