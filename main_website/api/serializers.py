@@ -383,7 +383,7 @@ class EventSerializer(serializers.ModelSerializer):
     
     def get_inter_branch_collaboration(self, obj):
         get_inter_branch_collab=InterBranchCollaborations.objects.filter(event_id=obj.pk).select_related("collaboration_with")
-        data = ", ".join(get_inter_branch_collab.values_list("collaboration_with__short_form", flat=True))
+        data = " | ".join(get_inter_branch_collab.values_list("collaboration_with__short_form", flat=True))
         return data
     
     def get_intra_branch_collaboration(self, obj):
