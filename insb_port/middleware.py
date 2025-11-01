@@ -17,7 +17,7 @@ class BlockSiteMiddleWare:
         if (full_url[2] != '127.0.0.1:8000' and 
             full_url[2] != 'localhost:8000' and 
             full_url[2] != 'portal.ieeensusb.org' and not
-            (full_url[2] == 'api.ieeensusb.org' and full_url[3] == 'main_website')):
+            (full_url[2] == 'api.ieeensusb.org' and (full_url[3] == 'main_website' or full_url[3] == 'media_files'))):
             return HttpResponseForbidden()
 
         if(Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username)
