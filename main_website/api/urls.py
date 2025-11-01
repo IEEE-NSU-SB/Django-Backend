@@ -36,4 +36,6 @@ urlpatterns = [
     path('get_teams/', TeamsListView.as_view(), name='teams_list'),
     path('get_officers/', OfficersListView.as_view(), name='officers_list'),
     path('get_officers/<int:team_primary>/', OfficersListView.as_view(), name='team_officers_list'),
+    path('get_volunteers/', VolunteersListView.as_view(), name='volunteers_list'),
+    path('get_volunteers/<int:team_primary>/', VolunteersListView.as_view(), name='team_volunteers_list'),
 ]

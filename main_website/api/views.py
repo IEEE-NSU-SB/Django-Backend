@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -486,3 +487,19 @@ class OfficersListView(ListAPIView):
             officers=Panel_Members.objects.filter(tenure=currentPanel, position__is_officer=True)
 
         return officers
+    
+class VolunteersListView(ListAPIView):
+
+    serializer_class = PanelMembersSerializer
+
+    def get_queryset(self):
+        currentPanel=Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+        
+        team_primary = self.kwargs.get('team_primary')
+        if team_primary:
+            team = Teams.objects.get(primary=team_primary)            
+            volunteers=Panel_Members.objects.filter(Q(position__is_volunteer=True) | Q(position__is_core_volunteer=True), tenure=currentPanel, team=team)
+        else:
+            volunteers=Panel_Members.objects.filter(Q(position__is_volunteer=True) | Q(position__is_core_volunteer=True), tenure=currentPanel)
+
+        return volunteers
