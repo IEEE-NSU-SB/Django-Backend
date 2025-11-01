@@ -39,4 +39,5 @@ urlpatterns = [
     path('get_officers/<int:team_primary>/', OfficersListView.as_view(), name='team_officers_list'),
     path('get_volunteers/', VolunteersListView.as_view(), name='volunteers_list'),
     path('get_volunteers/<int:team_primary>/', VolunteersListView.as_view(), name='team_volunteers_list'),
+    path('get_sb_news_details/<int:news_id>/', SBNewsDetails.as_view(), name='sb_news_details'),
 ]

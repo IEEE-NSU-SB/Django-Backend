@@ -39,6 +39,12 @@ class BlogListSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+    
+class BlogListTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Blog
+        fields = ['id', 'title']
 
 class BlogCreateSerializer(serializers.ModelSerializer):
 
@@ -198,7 +204,7 @@ class HomePageTopBannerSerializer(serializers.ModelSerializer):
     def get_alt(self, obj):
         return f'{obj.first_layer_text} {obj.first_layer_text_colored}'
 
-class SBNewsSerializer(serializers.ModelSerializer):
+class SBNewsListSerializer(serializers.ModelSerializer):
 
     image = serializers.ImageField(source='news_picture')
     title = serializers.CharField(source='news_title')
@@ -207,6 +213,17 @@ class SBNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'title', 'description']
+
+class SBNewsSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(source='news_picture')
+    title = serializers.CharField(source='news_title')
+    description = serializers.CharField(source='news_description')
+    date = serializers.DateField(source='news_date')
+
+    class Meta:
+        model = News
+        fields = ['id', 'title', 'image', 'date', 'description']
 
 class ResearchPaperSerializer(serializers.ModelSerializer):
 

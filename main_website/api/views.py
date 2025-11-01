@@ -243,7 +243,7 @@ class HeroSectionLandingView(APIView):
 class SBNewsListView(ListAPIView):
 
     queryset = News.objects.all().order_by('-news_date')
-    serializer_class = SBNewsSerializer
+    serializer_class = SBNewsListSerializer
 
 class ResearchPapersListView(ListAPIView):
 
@@ -533,3 +533,26 @@ class VolunteersListView(ListAPIView):
             volunteers=Panel_Members.objects.filter(Q(position__is_volunteer=True) | Q(position__is_core_volunteer=True), tenure=currentPanel)
 
         return volunteers
+    
+class SBNewsDetails(APIView):
+
+    def get(self, request, news_id):
+
+        news=News.objects.get(pk=news_id)
+        news_serialized = SBNewsSerializer(news, context={'request':request}).data   
+        # get recent 3 news
+        recent_news=News.objects.all().order_by('-news_date').exclude(pk=news_id)[:3]
+        recent_news_serialized = SBNewsSerializer(recent_news, many=True, context={'request':request}).data
+        
+        # get recent 5 blogs
+        recent_blogs=Blog.objects.filter(publish_blog=True).order_by('-date')[:5]
+        recent_blogs_serialized = BlogListTitleSerializer(recent_blogs, many=True).data
+
+        data = {
+            'recentNews': recent_news_serialized,
+            'recentBlogs': recent_blogs_serialized
+        }
+
+        news_serialized.update(data)
+
+        return Response(news_serialized)
