@@ -33,4 +33,7 @@ urlpatterns = [
     path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
     path('get_all_events/', EventsListView.as_view(), name='events_list'),
     path('get_team_details/<int:team_primary>/', TeamInfoView.as_view(), name='team_info'),
+    path('get_teams/', TeamsListView.as_view(), name='teams_list'),
+    path('get_officers/', OfficersListView.as_view(), name='officers_list'),
+    path('get_officers/<int:team_primary>/', OfficersListView.as_view(), name='team_officers_list'),
 ]

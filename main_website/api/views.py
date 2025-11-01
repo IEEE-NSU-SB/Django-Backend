@@ -305,7 +305,6 @@ class PanelsListView(APIView):
     def get(self, request, sc_ag_primary=None):
         if sc_ag_primary:
             panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)).order_by('-current','-year')[1:]
-            print(panels.query)
         else:
             panels = Panels.objects.filter(panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).order_by('-current','-year')[1:]
 
@@ -445,8 +444,8 @@ class SCAGPanelExecutives(APIView):
         #getting current tenure
         current_tenure = Panels.objects.get(current = True, panel_of = society)
         #getting the faculty
-        faculty_advisor = Panel_Members.objects.get(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
-        faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, context={'request': request}).data
+        faculty_advisor = Panel_Members.objects.filter(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
+        faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, many=True, context={'request': request}).data
 
         eb_members = []
         roles = Roles_and_Position.objects.filter(is_sc_ag_eb_member = True,role_of = society,is_faculty=False).order_by('rank','role','role_of')
@@ -460,9 +459,30 @@ class SCAGPanelExecutives(APIView):
         eb_members_serialized = PanelMembersSerializer(eb_members, many=True, context={'request': request}).data
 
         data = {
-            'advisor': [faculty_advisor_serialized],
+            'advisor': faculty_advisor_serialized,
             'executives': eb_members_serialized
         }
 
         return Response(data)
 
+class TeamsListView(ListAPIView):
+
+    queryset = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
+    serializer_class = TeamListSerializer
+
+class OfficersListView(ListAPIView):
+
+    serializer_class = PanelMembersSerializer
+
+    def get_queryset(self):
+
+        currentPanel=Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+        
+        team_primary = self.kwargs.get('team_primary')
+        if team_primary:
+            team = Teams.objects.get(primary=team_primary)            
+            officers=Panel_Members.objects.filter(tenure=currentPanel, team=team, position__is_officer=True)
+        else:
+            officers=Panel_Members.objects.filter(tenure=currentPanel, position__is_officer=True)
+
+        return officers

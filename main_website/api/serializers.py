@@ -276,7 +276,7 @@ class PanelMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Panel_Members
-        fields = ['id', 'name', 'position', 'position_of', 'image', 'facebook', 'linkedin', 'email']
+        fields = ['id', 'name', 'position', 'position_of', 'team', 'image', 'facebook', 'linkedin', 'email']
 
     def to_representation(self, obj):
         request = self.context.get('request') 
@@ -291,6 +291,7 @@ class PanelMembersSerializer(serializers.ModelSerializer):
         data = {
             'position': str(obj.position) if obj.position else None,
             'position_of': getattr(obj.position.role_of, 'short_form', None) if obj.position else None,
+            'team': str(obj.team) if obj.team else None
         }
 
         if obj.member:
@@ -484,6 +485,14 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
         fields = ['title', 'img', 'details']
+
+class TeamListSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='team_name')
+
+    class Meta:
+        model = Teams
+        fields = ['title']
 
 class TeamPanelMembersSerializer(serializers.ModelSerializer):
     # position = serializers.StringRelatedField()
