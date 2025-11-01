@@ -445,8 +445,8 @@ class SCAGPanelExecutives(APIView):
         #getting current tenure
         current_tenure = Panels.objects.get(current = True, panel_of = society)
         #getting the faculty
-        faculty_advisor = Panel_Members.objects.get(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
-        faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, context={'request': request}).data
+        faculty_advisor = Panel_Members.objects.filter(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
+        faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, many=True, context={'request': request}).data
 
         eb_members = []
         roles = Roles_and_Position.objects.filter(is_sc_ag_eb_member = True,role_of = society,is_faculty=False).order_by('rank','role','role_of')
@@ -460,7 +460,7 @@ class SCAGPanelExecutives(APIView):
         eb_members_serialized = PanelMembersSerializer(eb_members, many=True, context={'request': request}).data
 
         data = {
-            'advisor': [faculty_advisor_serialized],
+            'advisor': faculty_advisor_serialized,
             'executives': eb_members_serialized
         }
 
