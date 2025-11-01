@@ -39,6 +39,12 @@ class BlogListSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+    
+class BlogListTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Blog
+        fields = ['id', 'title']
 
 class BlogCreateSerializer(serializers.ModelSerializer):
 
@@ -198,7 +204,7 @@ class HomePageTopBannerSerializer(serializers.ModelSerializer):
     def get_alt(self, obj):
         return f'{obj.first_layer_text} {obj.first_layer_text_colored}'
 
-class SBNewsSerializer(serializers.ModelSerializer):
+class SBNewsListSerializer(serializers.ModelSerializer):
 
     image = serializers.ImageField(source='news_picture')
     title = serializers.CharField(source='news_title')
@@ -207,6 +213,17 @@ class SBNewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'title', 'description']
+
+class SBNewsSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(source='news_picture')
+    title = serializers.CharField(source='news_title')
+    description = serializers.CharField(source='news_description')
+    date = serializers.DateField(source='news_date')
+
+    class Meta:
+        model = News
+        fields = ['id', 'title', 'image', 'date', 'description']
 
 class ResearchPaperSerializer(serializers.ModelSerializer):
 
@@ -323,7 +340,8 @@ class EventSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     organizer = serializers.StringRelatedField(source='event_organiser')
-    collaboration = serializers.SerializerMethodField()
+    inter_branch_collaboration = serializers.SerializerMethodField()
+    intra_branch_collaboration = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()
     registration_fee_amount = serializers.SerializerMethodField()
     register_link = serializers.URLField(source='form_link')
@@ -333,7 +351,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Events
-        fields= ['id', 'title', 'category', 'image', 'organizer', 'collaboration', 'start_date', 'end_date', 'registration_fee_amount', 'register_link', 'read_more_link', 'description', 'images']
+        fields= ['id', 'title', 'category', 'image', 'organizer', 'inter_branch_collaboration', 'intra_branch_collaboration', 'start_date', 'end_date', 'registration_fee_amount', 'register_link', 'read_more_link', 'description', 'images']
 
     def get_image(self, obj):
 
@@ -363,10 +381,17 @@ class EventSerializer(serializers.ModelSerializer):
     def get_start_date(self, obj):
         return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
     
-    def get_collaboration(self, obj):
-        get_inter_branch_collab=InterBranchCollaborations.objects.filter(event_id=obj.pk)
+    def get_inter_branch_collaboration(self, obj):
+        get_inter_branch_collab=InterBranchCollaborations.objects.filter(event_id=obj.pk).select_related("collaboration_with")
+        data = " | ".join(get_inter_branch_collab.values_list("collaboration_with__short_form", flat=True))
+        return data
+    
+    def get_intra_branch_collaboration(self, obj):
         get_intra_branch_collab=IntraBranchCollaborations.objects.filter(event_id=obj.pk).first()
-        return 'Google Developers Group Dhaka'
+        if get_intra_branch_collab:
+            return get_intra_branch_collab.collaboration_with
+        else:
+            return None
     
     def get_images(self, obj):
         request = self.context.get('request')

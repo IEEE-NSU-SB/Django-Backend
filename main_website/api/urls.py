@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_achievements/landing/', AchievementListLandingView.as_view(), name='achievements_list_landing'),
     path('get_achievements/landing/<int:sc_ag_primary>/', AchievementListLandingView.as_view(), name='achievements_list_landing_sc_ag'),
     path('get_sc_ag_stats/', ScAgStats.as_view(), name='sc_ag_stats'),
+    path('get_events_stats/', EventsStats.as_view(), name='events_stats'),
     path('get_blogs/landing/', BlogsListLandingView.as_view(), name='blogs_list_landing'),
     path('get_blogs/', BlogsView.as_view(), name='blogs_list'),
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
@@ -36,4 +37,7 @@ urlpatterns = [
     path('get_teams/', TeamsListView.as_view(), name='teams_list'),
     path('get_officers/', OfficersListView.as_view(), name='officers_list'),
     path('get_officers/<int:team_primary>/', OfficersListView.as_view(), name='team_officers_list'),
+    path('get_volunteers/', VolunteersListView.as_view(), name='volunteers_list'),
+    path('get_volunteers/<int:team_primary>/', VolunteersListView.as_view(), name='team_volunteers_list'),
+    path('get_sb_news_details/<int:news_id>/', SBNewsDetails.as_view(), name='sb_news_details'),
 ]

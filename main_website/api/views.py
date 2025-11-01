@@ -16,6 +16,8 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
+from users.renderData import getTypeOfEventStats, getEventNumberStat
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -61,6 +63,35 @@ class ScAgStats(APIView):
                     'label': 'ACHIEVEMENTS'
                 },
             ]
+        }
+
+        return Response(data)
+    
+class EventsStats(APIView):
+
+    def get(self, request):
+
+        get_event_stat=getTypeOfEventStats(request,1)
+        event_stat=[]
+        # prepare data from the tuple
+        categories, count, percentage_mapping = get_event_stat
+        for category, count in zip(categories, count):
+            event_stat_dict={}
+            # get event name
+            event_stat_dict['name']=category
+            # get event count according to category
+            event_stat_dict['value']=count
+            # append the dict to list
+            event_stat.append(event_stat_dict)
+
+        get_yearly_events=getEventNumberStat(request,1)
+
+        data = {
+            'eventCounts': event_stat,
+            'yearlyEvents': {
+                'years': get_yearly_events[0],
+                'count': get_yearly_events[1]
+            }
         }
 
         return Response(data)
@@ -212,7 +243,7 @@ class HeroSectionLandingView(APIView):
 class SBNewsListView(ListAPIView):
 
     queryset = News.objects.all().order_by('-news_date')
-    serializer_class = SBNewsSerializer
+    serializer_class = SBNewsListSerializer
 
 class ResearchPapersListView(ListAPIView):
 
@@ -486,3 +517,42 @@ class OfficersListView(ListAPIView):
             officers=Panel_Members.objects.filter(tenure=currentPanel, position__is_officer=True)
 
         return officers
+    
+class VolunteersListView(ListAPIView):
+
+    serializer_class = PanelMembersSerializer
+
+    def get_queryset(self):
+        currentPanel=Panels.objects.get(current=True,panel_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1))
+        
+        team_primary = self.kwargs.get('team_primary')
+        if team_primary:
+            team = Teams.objects.get(primary=team_primary)            
+            volunteers=Panel_Members.objects.filter(Q(position__is_volunteer=True) | Q(position__is_core_volunteer=True), tenure=currentPanel, team=team)
+        else:
+            volunteers=Panel_Members.objects.filter(Q(position__is_volunteer=True) | Q(position__is_core_volunteer=True), tenure=currentPanel)
+
+        return volunteers
+    
+class SBNewsDetails(APIView):
+
+    def get(self, request, news_id):
+
+        news=News.objects.get(pk=news_id)
+        news_serialized = SBNewsSerializer(news, context={'request':request}).data   
+        # get recent 3 news
+        recent_news=News.objects.all().order_by('-news_date').exclude(pk=news_id)[:3]
+        recent_news_serialized = SBNewsSerializer(recent_news, many=True, context={'request':request}).data
+        
+        # get recent 5 blogs
+        recent_blogs=Blog.objects.filter(publish_blog=True).order_by('-date')[:5]
+        recent_blogs_serialized = BlogListTitleSerializer(recent_blogs, many=True).data
+
+        data = {
+            'recentNews': recent_news_serialized,
+            'recentBlogs': recent_blogs_serialized
+        }
+
+        news_serialized.update(data)
+
+        return Response(news_serialized)
