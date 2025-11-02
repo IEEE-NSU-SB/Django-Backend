@@ -7,7 +7,7 @@ from central_events.models import Events, InterBranchCollaborations, IntraBranch
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from media_team.models import Media_Images
-from port.models import Panels, Teams
+from port.models import Panels, Roles_and_Position, Teams
 from users.models import Panel_Members, VolunteerAwardRecievers
 from django.utils.html import strip_tags
 from datetime import date
@@ -108,6 +108,15 @@ class VolunteerAwardRecieversSerializer(serializers.ModelSerializer):
         if data.get('img') is None:
             data['img'] = 'null'  # turn None into a string
         return data
+    
+class VolunteerAwardTitleSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='award.volunteer_award_name')
+    tenure = serializers.CharField(source='award.panel')
+
+    class Meta:
+        model = VolunteerAwardRecievers
+        fields = ['title', 'tenure']
     
 class ToolkitSerializer(serializers.ModelSerializer):
 
@@ -263,7 +272,7 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
         return author_names
     
-class MemberSerializer(serializers.ModelSerializer):
+class MembersListSerializer(serializers.ModelSerializer):
 
     ieeeId = serializers.IntegerField(source='ieee_id')
     nsuId = serializers.IntegerField(source='nsu_id')
@@ -605,3 +614,25 @@ class MegaEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = SuperEvents
         fields = ['id', 'title', 'image', 'publishedFrom', 'startDate', 'finalDate', 'description']
+
+class MemberSerializer(serializers.ModelSerializer):
+
+    memberId = serializers.IntegerField(source='ieee_id')
+    ieeeEmail = serializers.CharField(source='email_ieee')
+    nsuEmail = serializers.CharField(source='email_nsu')
+    bloodGroup = serializers.CharField(source='blood_group')
+    recruitmentSession = serializers.CharField(source='session')
+    image = serializers.ImageField(source='user_profile_picture')
+    facebook = serializers.URLField(source='facebook_url')
+    linkedin = serializers.URLField(source='linkedin_url')
+    position = serializers.CharField(source='position.role')
+
+    class Meta:
+        model = Members
+        fields = ['name', 'position', 'memberId', 'recruitmentSession', 'image', 'facebook', 'linkedin', 'ieeeEmail', 'nsuEmail', 'bloodGroup']
+
+# class PanelMemberPositionSerializer(serializers.ModelField):
+
+#     class Meta:
+#         models = Roles_and_Position
+#         fields = ['organization', 'currentPosition']
