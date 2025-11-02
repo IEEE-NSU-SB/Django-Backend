@@ -30,6 +30,7 @@ urlpatterns = [
     path('get_sc_ag_panel_executives/<int:sc_ag_primary>/', SCAGPanelExecutives.as_view(), name='sc_ag_panel_executives'),
     path('get_panel_executives/<str:panel_year>/', PanelExecutives.as_view(), name='panel_executives_sc_ag'),
     path('get_event_details/<int:event_id>/', EventView.as_view(), name='event_view'),
+    path('get_mega_event_details/<int:event_id>/', MegaEventView.as_view(), name='mega_event_view'),
     path('get_contact_info/', ContactInfoView.as_view(), name='contact_info'),
     path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
     path('get_all_events/', EventsListView.as_view(), name='events_list'),
@@ -40,4 +41,5 @@ urlpatterns = [
     path('get_volunteers/', VolunteersListView.as_view(), name='volunteers_list'),
     path('get_volunteers/<int:team_primary>/', VolunteersListView.as_view(), name='team_volunteers_list'),
     path('get_sb_news_details/<int:news_id>/', SBNewsDetails.as_view(), name='sb_news_details'),
+    path('get_member_details/<int:ieee_id>/', MemberProfileView.as_view(), name='member_')
 ]

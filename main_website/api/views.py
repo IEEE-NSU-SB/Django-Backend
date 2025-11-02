@@ -2,6 +2,7 @@
 import json
 import requests
 from central_events.models import Events, SuperEvents
+from chapters_and_affinity_group.models import SC_AG_Members
 from insb_port import settings
 from main_website.renderData import HomepageItems
 from port.models import Panels, Roles_and_Position, VolunteerAwards
@@ -217,7 +218,7 @@ class MegaEvents_FeaturedEventsListView(APIView):
                 events_to_view.append(event)
                 seen_ids.add(event_id)
 
-        mega_events_to_view = MegaEventSerializer(mega_events, many=True, context={'request':request}).data
+        mega_events_to_view = MegaEventListSerializer(mega_events, many=True, context={'request':request}).data
 
         data = {
             'featuredEvents':events_to_view,
@@ -253,7 +254,7 @@ class ResearchPapersListView(ListAPIView):
 class AllMembersListView(ListAPIView):
 
     queryset = Members.objects.filter().all().order_by('position__rank')
-    serializer_class = MemberSerializer
+    serializer_class = MembersListSerializer
 
 class AllMembersStats(APIView):
 
@@ -556,3 +557,60 @@ class SBNewsDetails(APIView):
         news_serialized.update(data)
 
         return Response(news_serialized)
+    
+class MegaEventView(APIView):
+
+    def get(self, request, event_id):
+
+        mega_event = SuperEvents.objects.get(id=event_id)
+        mega_event_serialized = MegaEventSerializer(mega_event, context={'request':request}).data
+
+        organised_events = Events.objects.filter(super_event_id=mega_event,publish_in_main_web=True).order_by('-start_date','-event_date')
+        organised_events_serialized = EventSmallListSerialiser(organised_events, many=True, context={'request':request}).data
+
+        other_mega_events = SuperEvents.objects.filter(publish_mega_event=True).exclude(id=mega_event.id).order_by('-start_date')[:6]
+        other_mega_events_serialized = MegaEventListTitleSerializer(other_mega_events, many=True, context={'request':request}).data
+        
+        data = {
+            'organisedEvents': organised_events_serialized,
+            'megaEvents': other_mega_events_serialized
+        }
+        mega_event_serialized.update(data)
+
+        return Response(mega_event_serialized)
+    
+class MemberProfileView(APIView):
+
+    def get(self, request, ieee_id):
+
+        member_details = Members.objects.get(ieee_id=ieee_id)
+        member_details_serialized = MemberSerializer(member_details, context={'request':request}).data
+
+        awards = VolunteerAwardRecievers.objects.filter(award_reciever=member_details)
+        awards_serialized = VolunteerAwardTitleSerializer(awards, many=True).data
+
+        #get current sc_ag position data for all sc_ag
+        sc_ag_position_data = SC_AG_Members.objects.filter(member=ieee_id).order_by('sc_ag__primary')
+
+        #get previous branch position data
+        # branch_prev_position_data = PortData.get_branch_previous_position_data(ieee_id)
+        # branch_prev_position_data_serialized = PanelMemberPositionSerializer(branch_prev_position_data, many=True).data
+        # #get previous sc_ag position data for all sc_ag
+        # sc_ag_previous_position_data = PortData.get_sc_ag_previous_position_data(request,ieee_id)
+
+        # has_branch_prev_position=False
+        # if branch_prev_position_data.count() > 0:
+        #     has_branch_prev_position = True
+
+        has_current_branch_position = True
+        #if there is no current position but there is a previous position then don't display text
+        #otherwise show it
+        # if has_branch_prev_position and member_data.team is None:
+        #     has_current_branch_position = False
+
+        data = {
+            'achievements':awards_serialized
+        }
+        member_details_serialized.update(data)
+
+        return Response(member_details_serialized)
