@@ -5,7 +5,7 @@ from . import views
 app_name = "main_website"
 
 urlpatterns = [
-    path('',views.homepage,name="homepage"),
+    path('old_homepage/',views.homepage,name="homepage"),
     # get award winners
     path('award_winners/',LoadAwards.as_view(),name="load_awards"),
     path('top_performers/',LoadTopPerformers.as_view(),name="load_top_performers"),

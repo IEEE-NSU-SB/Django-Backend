@@ -46,6 +46,8 @@ if(os.environ.get('SETTINGS')=='dev'):
 
 else:
     CORS_ALLOWED_ORIGINS = [
+        "http://ieeensusb.org",
+        "https://ieeensusb.org",
         "http://react.ieeensusb.org",
         "https://react.ieeensusb.org"
     ]
