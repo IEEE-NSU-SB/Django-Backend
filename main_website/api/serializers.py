@@ -157,8 +157,33 @@ class EventListSerialiser(serializers.ModelSerializer):
     
     def get_date(self, obj):
         return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+    
+class EventSmallListSerialiser(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    name = serializers.CharField(source='event_name')
+    date = serializers.SerializerMethodField()
 
-class MegaEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Events
+        fields= ['id', 'name', 'image', 'date']
+
+    def get_image(self, obj):
+
+        try:
+            image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+        except:
+            image = None
+
+        request = self.context.get('request')
+        if image and hasattr(image, 'url'):
+            return str(request.build_absolute_uri(image.url))
+        else:
+            return ''
+    
+    def get_date(self, obj):
+        return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+
+class MegaEventListSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField(source='super_event_name')
     description = serializers.CharField(source='super_event_description')
@@ -403,6 +428,14 @@ class EventSerializer(serializers.ModelSerializer):
 
         return selected_images
     
+class MegaEventListTitleSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='super_event_name')
+
+    class Meta:
+        model = SuperEvents
+        fields = ['id', 'title']
+    
 class ContactInfoSerializer(serializers.ModelSerializer):
     email_address = serializers.SerializerMethodField()
     mobile_number = serializers.SerializerMethodField()
@@ -559,3 +592,16 @@ class TeamPanelMembersSerializer(serializers.ModelSerializer):
             })
 
         return data
+    
+class MegaEventSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='super_event_name')
+    description = serializers.CharField(source='super_event_description')
+    image = serializers.ImageField(source='banner_image')
+    publishedFrom = serializers.StringRelatedField(source='mega_event_of')
+    startDate = serializers.DateField(source='start_date')
+    finalDate = serializers.DateField(source='end_date')
+
+    class Meta:
+        model = SuperEvents
+        fields = ['id', 'title', 'image', 'publishedFrom', 'startDate', 'finalDate', 'description']
