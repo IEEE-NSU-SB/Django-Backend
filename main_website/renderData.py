@@ -481,7 +481,6 @@ class HomepageItems:
         '''This function will return top 5 performers of all time'''
 
         performers = Members.objects.all().order_by('-completed_task_points')[:5]
-        print(performers)
         return performers
 
     def get_top_5_teams():
