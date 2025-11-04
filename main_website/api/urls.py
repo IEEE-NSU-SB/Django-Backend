@@ -15,6 +15,7 @@ urlpatterns = [
     path('get_events_stats/', EventsStats.as_view(), name='events_stats'),
     path('get_blogs/landing/', BlogsListLandingView.as_view(), name='blogs_list_landing'),
     path('get_blogs/', BlogsView.as_view(), name='blogs_list'),
+    path('get_blog_details/<int:blog_id>/', BlogView.as_view(), name='blog_view'),
     path('get_volunteer_awards/', VolunteerAwardsListView.as_view(), name='volunteer_awards_list'),
     path('get_toolkit/', ToolkitListView.as_view(), name='toolkit_list'),
     path('get_mega_featured_events/<int:sc_ag_primary>/', MegaEvents_FeaturedEventsListView.as_view(), name='mega_featured_events_list'),
