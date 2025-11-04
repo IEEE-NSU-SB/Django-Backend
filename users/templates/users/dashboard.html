@@ -868,7 +868,7 @@
 									</div>
 									<h5 class="silver_rank">2nd</h5>
 									{% if monthly_top_3_members.1 %}
-									<a href="{% url 'main_website:member_profile' monthly_top_3_members.1.0.ieee_id %}" class="ranker-name"><h5>{{monthly_top_3_members.1.0.name}}</h5></a>
+									<a href="https://ieeensusb.org/member-profile/{{monthly_top_3_members.1.0.ieee_id}}/" class="ranker-name"><h5>{{monthly_top_3_members.1.0.name}}</h5></a>
 									<a>{{monthly_top_3_members.1.0.position}}</a>
 									<a>{{monthly_top_3_members.1.0.team}}</a>
 									<!-- <a>Points : {{monthly_top_3_members.1.1|floatformat:2}}</a> -->
@@ -1017,7 +1017,7 @@
 									</div>
 									<h5 class="gold_rank">1st</h5>
 									{% if monthly_top_3_members.0 %}
-									<a href="{% url 'main_website:member_profile' monthly_top_3_members.0.0.ieee_id %}" class="ranker-name"><h5>{{monthly_top_3_members.0.0.name}}</h5></a>
+									<a href="https://ieeensusb.org/member-profile/{{monthly_top_3_members.0.0.ieee_id}}/" class="ranker-name"><h5>{{monthly_top_3_members.0.0.name}}</h5></a>
 									<a>{{monthly_top_3_members.0.0.position}}</a>
 									<a>{{monthly_top_3_members.0.0.team}}</a>
 									<!-- <a>Points : {{monthly_top_3_members.0.1|floatformat:2}}</a> -->
@@ -1168,7 +1168,7 @@
 									</div>
 									<h5 class="bronze_rank">3rd</h5>
 									{% if monthly_top_3_members.2 %}
-									<a href="{% url 'main_website:member_profile' monthly_top_3_members.2.0.ieee_id %}" class="ranker-name"><h5>{{monthly_top_3_members.2.0.name}}</h5></a>
+									<a href="https://ieeensusb.org/member-profile/{{monthly_top_3_members.2.0.ieee_id}}/" class="ranker-name"><h5>{{monthly_top_3_members.2.0.name}}</h5></a>
 									<a>{{monthly_top_3_members.2.0.position}}</a>
 									<a>{{monthly_top_3_members.2.0.team}}</a>
 									<!-- <a>Points : {{monthly_top_3_members.2.1|floatformat:2}}</a> -->
@@ -1261,7 +1261,7 @@
 										<div style="display: flex; align-items: center;">
 											<h6 class="numbering">#1</h6>
 											{% if performer %}
-											<a href="{% url 'main_website:member_profile' performer.ieee_id %}"><h1>{{performer.name}}</h1></a>
+											<a href="https://ieeensusb.org/member-profile/{{performer.ieee_id}}/"><h1>{{performer.name}}</h1></a>
 											{% else %}
 											<a><h1>Waiting...</h1></a>
 											{% endif %}
