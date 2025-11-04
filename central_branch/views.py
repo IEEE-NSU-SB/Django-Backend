@@ -1131,7 +1131,16 @@ def manage_website_homepage(request):
                 return DatabaseError
             
             toggle, created = MediaToggle.objects.get_or_create(id=1)
-            video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
+            video_banner = None
+            try:
+                # Get the first video banner if it exists
+                vid = HomePageTopBanner.objects.filter(media_type='video').first()
+                
+                if vid and vid.video:  # Check if a banner exists and has a video
+                    video_banner = vid
+            except Exception as e:
+                video_banner = None
+
             image_banners = HomePageTopBanner.objects.filter(media_type='image')
             
             # Getting Form response
@@ -1203,19 +1212,31 @@ def manage_website_homepage(request):
                         traceback.print_exc()
                 elif request.POST.get('update_video'):
                     try:
-                        # Try to find an existing video banner
-                        if video_banner:
-                            # Update existing video banner
-                            video_banner.video_url = request.POST['video_url']
-                            video_banner.save()
-                            messages.success(request, "Video banner updated successfully!")
+                        uploaded_file = request.FILES.get('video_file')  # get the uploaded file
+                        print(request.FILES.get('video_file'))
+
+                        if not uploaded_file:
+                            messages.error(request, "No video file uploaded!")
                         else:
-                            # Create new video banner if none exists
-                            HomePageTopBanner.objects.create(
-                                media_type='video',
-                                video_url=request.POST['video_url'],
-                            )
-                            messages.success(request, "Video banner created successfully!")
+                            try:
+                                if video_banner:
+                                    # Delete old file if exists
+                                    if video_banner.video and os.path.isfile(video_banner.video.path):
+                                        os.remove(video_banner.video.path)
+
+                                    # Update existing video banner
+                                    video_banner.video = uploaded_file
+                                    video_banner.save()
+                                    messages.success(request, "Video banner updated successfully!")
+                                else:
+                                    # Create new video banner
+                                    HomePageTopBanner.objects.create(
+                                        media_type='video',
+                                        video=uploaded_file
+                                    )
+                                    messages.success(request, "Video banner created successfully!")
+                            except Exception as e:
+                                messages.error(request, f"Error updating video banner: {e}")
 
                         return redirect('central_branch:manage_website_home')   
                     except Exception as e:
@@ -2620,9 +2641,15 @@ def manage_view_access(request):
         if has_access:
             # get access of the page first
             current_panel_members=Branch.load_current_panel_members()
+            access_members=Branch.get_branch_data_access(request)
 
             if request.method=="POST":
-                if('update_access' in request.POST):
+                if('add_member_to_access' in request.POST):
+                    ieee_ids = request.POST.getlist('member_select')
+                    if Branch.add_member_to_branch_view_access(request, ieee_ids):
+                        return redirect('central_branch:manage_access')
+
+                elif('update_access' in request.POST):
                     ieee_id=request.POST['ieee_id']
                     
                     # Setting Data Access Fields to false initially
@@ -2677,11 +2704,18 @@ def manage_view_access(request):
                                                             'manage_custom_notification_access':manage_custom_notification_access,
                                                             'manage_email_access':manage_email_access})):
                         return redirect('central_branch:manage_access')
+                    
+                elif('remove_access' in request.POST):
+                    ieee_id = request.POST.get('remove_ieee_id')
+
+                    if(Branch.remover_member_from_branch_access(request, ieee_id)):
+                        return redirect('central_branch:manage_access')
                 
             context={
                 'user_data':user_data,
                 'all_sc_ag':sc_ag,
                 'current_panel_members':current_panel_members,
+                'access_members':access_members,
             }
 
             return render(request,'Manage Access/manage_access.html',context)
@@ -2695,37 +2729,39 @@ def manage_view_access(request):
 
 class GetAccessDataAjax(View):
 
-    # @login_required
     def get(self, request):
-        has_access = Branch_View_Access.common_access(request.user.username)
+        if request.user.is_authenticated:
+            has_access = Branch_View_Access.common_access(request.user.username)
 
-        if has_access:
-            if request.GET.get('ieee_id'):
-                ieee_id = request.GET.get('ieee_id')
-                data = Branch.get_branch_data_access_for_member(request, ieee_id)
-                if data:
-                    access_data = {
-                        "message":"success",
-                        "ieee_id":ieee_id,
-                        "name":data.ieee_id.name,
-                        "create_event_access":data.create_event_access,
-                        "event_details_page_access":data.event_details_page_access,
-                        "create_individual_task_access":data.create_individual_task_access,
-                        "create_team_task_access":data.create_team_task_access,
-                        "create_panels_access":data.create_panels_access,
-                        "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
-                        "team_details_page":data.team_details_page,
-                        "manage_award_access":data.manage_award_access,
-                        "manage_web_access":data.manage_web_access,
-                        "manage_custom_notification_access":data.manage_custom_notification_access,
-                        "manage_email_access":data.manage_email_access
-                    }
-                    return JsonResponse(access_data)
+            if has_access:
+                if request.GET.get('ieee_id'):
+                    ieee_id = request.GET.get('ieee_id')
+                    data = Branch.get_branch_data_access_for_member(request, ieee_id)
+                    if data:
+                        access_data = {
+                            "message":"success",
+                            "ieee_id":ieee_id,
+                            "name":data.ieee_id.name,
+                            "create_event_access":data.create_event_access,
+                            "event_details_page_access":data.event_details_page_access,
+                            "create_individual_task_access":data.create_individual_task_access,
+                            "create_team_task_access":data.create_team_task_access,
+                            "create_panels_access":data.create_panels_access,
+                            "panel_member_add_remove_access":data.panel_memeber_add_remove_access,
+                            "team_details_page":data.team_details_page,
+                            "manage_award_access":data.manage_award_access,
+                            "manage_web_access":data.manage_web_access,
+                            "manage_custom_notification_access":data.manage_custom_notification_access,
+                            "manage_email_access":data.manage_email_access
+                        }
+                        return JsonResponse(access_data)
+                    else:
+                        name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
+                        return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
                 else:
-                    name = Members.objects.filter(ieee_id=ieee_id).values_list('name', flat=True)[0]
-                    return JsonResponse({"message" : "Access data not found", "ieee_id":ieee_id, "name":name})
+                    return JsonResponse({'message': "Invalid Response"})
             else:
-                return JsonResponse({'message': "Invalid Response"})
+                return JsonResponse({'message':'Not Allowed'})
         else:
             return JsonResponse({'message':'Not Allowed'})
 

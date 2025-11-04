@@ -86,7 +86,12 @@
                                     <div class="clear"></div>
                                 </div>
 
-                                <h3 class="gdlr-blog-title event_name"><a href="{% if  events.id %}{% url 'main_website:mega_event_description_page'  events.id  %}{% endif %}">{{events.super_event_name}}</a></h3>
+                                <h3 class="gdlr-blog-title event_name" style="display: -webkit-box;
+                                overflow: hidden;
+                                -webkit-box-orient: vertical;
+                                text-overflow: ellipsis;
+                                -webkit-line-clamp: 2;">
+                                <a href="{% if  events.id %}{% url 'main_website:mega_event_description_page'  events.id  %}{% endif %}">{{events.super_event_name}}</a></h3>
                                 <div class="clear"></div>
                             </header>
                             <!-- entry-header -->

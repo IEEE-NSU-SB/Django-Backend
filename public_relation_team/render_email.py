@@ -46,6 +46,25 @@ class PRT_Email_System:
         cc_email_list = cc_email_list[0].split(',')
         bcc_email_list = bcc_email_list[0].split(',')
 
+
+        ## EMAIL EXPORT
+        # general_members = Branch.load_all_active_members_of_branch()
+
+        # # define CSV filename
+        # csv_filename = "active_members.csv"
+
+        # # open a CSV file for writing
+        # with open(csv_filename, mode="w", newline="", encoding="utf-8") as file:
+        #     writer = csv.writer(file)
+
+        #     # write header row
+        #     writer.writerow(["Name", "Email"])
+
+        #     # loop through members and write their name and email
+        #     for member in general_members:
+        #         if member.email_nsu and member.email_nsu != 'None':
+        #             writer.writerow([member.name, member.email_nsu])
+
         # print(to_email_list)
         # print(cc_email_list)
         # print(bcc_email_list)

@@ -205,7 +205,7 @@ class GalleryImageForm(forms.ModelForm):
 class GalleryVideoForm(forms.ModelForm):
     class Meta:
         model=GalleryVideos
-        fields=['video_title','video_link']
+        fields=['video_title','video_link','video_description']
     
     def save(self, commit=True):
         # Get the existing instance from the database

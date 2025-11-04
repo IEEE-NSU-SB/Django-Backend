@@ -40,8 +40,6 @@ def homepage(request):
         bannerItems=HomepageItems.getHomepageBannerItems()
         # Determine which media to show (image or video)
         selected_media = 'image'
-        video_banner = None
-        video_embed_url = None
         try:
             toggle = MediaToggle.objects.first()
             if toggle:
@@ -50,22 +48,17 @@ def homepage(request):
             selected_media = 'image'
 
         # Prepare video banner data if video is selected
+        video_banner = None
         if selected_media == 'video':
             try:
-                video_banner = HomePageTopBanner.objects.filter(media_type='video').first()
-                # Build an embeddable YouTube URL if the saved URL is a YouTube link
-                if video_banner and video_banner.video_url:
-                    url = video_banner.video_url
-                    embed_id = None
-                    if 'youtube.com/watch' in url and 'v=' in url:
-                        embed_id = url.split('v=')[1].split('&')[0]
-                    elif 'youtu.be/' in url:
-                        embed_id = url.split('youtu.be/')[1].split('?')[0]
-                    if embed_id:
-                        # loop requires playlist param to loop the single video                        
-                        video_embed_url = f"https://www.youtube.com/embed/{embed_id}?autoplay=1&mute=1&loop=1&playlist={embed_id}&controls=0&modestbranding=1&rel=0&fs=0&disablekb=1"
-            except Exception:
+                # Get the first video banner if it exists
+                vid = HomePageTopBanner.objects.filter(media_type='video').first()
+                
+                if vid and vid.video:  # Check if a banner exists and has a video
+                    video_banner = vid
+            except Exception as e:
                 video_banner = None
+                
         bannerWithStat=HomepageItems.getBannerPictureWithStat()
         HomepageItems.get_ip_address(request)
         #getting all the thoughts
@@ -106,7 +99,6 @@ def homepage(request):
             'media_url':settings.MEDIA_URL,
             'selected_media': selected_media,
             'video_banner': video_banner,
-            'video_embed_url': video_embed_url,
             'all_member_count':HomepageItems.getAllIEEEMemberCount(),
             'event_count':HomepageItems.getEventCount(),
             'achievement_count':HomepageItems.getAchievementCount(),
