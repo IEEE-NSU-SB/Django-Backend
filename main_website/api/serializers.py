@@ -27,7 +27,23 @@ class AchievementSerializer(serializers.ModelSerializer):
     def get_year(self, obj):
         return str(obj.award_winning_year)
     
+class BlogSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(source='blog_banner_picture')
+    writer = serializers.CharField(source='writer_name')
+    ieeeId = serializers.CharField(source='ieee_id')
+    publishedFrom = serializers.StringRelatedField(source='branch_or_society')
+    category = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Blog
+        fields = ['title', 'date', 'image', 'category', 'writer', 'ieeeId', 'publishedFrom', 'description']
+
+    def get_category(self, obj):
+        return obj.category.blog_category if obj.category else ''
+    
 class BlogListSerializer(serializers.ModelSerializer):
+
     image = serializers.ImageField(source='blog_banner_picture')
     author = serializers.CharField(source='writer_name')
     category = serializers.SerializerMethodField()
@@ -39,6 +55,14 @@ class BlogListSerializer(serializers.ModelSerializer):
 
     def get_category(self, obj):
         return obj.category.blog_category if obj.category else ''
+    
+class BlogSmallListSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(source='blog_banner_picture')
+
+    class Meta:
+        model = Blog
+        fields = ['id', 'image', 'date', 'title']
     
 class BlogListTitleSerializer(serializers.ModelSerializer):
 
@@ -247,6 +271,14 @@ class SBNewsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'title', 'description']
+
+class SBNewsTitleListSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='news_title')
+
+    class Meta:
+        model = News
+        fields = ['id', 'title']
 
 class SBNewsSerializer(serializers.ModelSerializer):
 

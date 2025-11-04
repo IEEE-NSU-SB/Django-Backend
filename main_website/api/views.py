@@ -614,3 +614,26 @@ class MemberProfileView(APIView):
         member_details_serialized.update(data)
 
         return Response(member_details_serialized)
+    
+class BlogView(APIView):
+
+    def get(self, request, blog_id):
+        blog = Blog.objects.get(pk=blog_id)
+           
+        blog_serialized = BlogSerializer(blog, context={'request':request}).data
+        if blog.branch_or_society == None:
+            blog_serialized['publishedFrom'] = 'IEEE NSU Student Branch'
+        
+        recent_blogs = Blog.objects.filter(publish_blog=True).order_by('-date').exclude(pk=blog_id)[:3]
+        recent_blogs_serialized = BlogSmallListSerializer(recent_blogs, many=True, context={'request':request}).data
+        recent_news = News.objects.all().order_by('-news_date')[:5]
+        recent_news_serialized = SBNewsTitleListSerializer(recent_news, many=True).data
+
+        data = {
+            'recentBlogs': recent_blogs_serialized,
+            'recentNews': recent_news_serialized
+        }
+        blog_serialized.update(data)
+
+        return Response(blog_serialized)
+    
