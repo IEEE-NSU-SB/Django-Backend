@@ -99,9 +99,9 @@
         </section>
         <!--Page end-->
 
-        {% block footer %}
+        {% comment %} {% block footer %}
             {% include "footer_block.html" %}
-        {% endblock footer %}
+        {% endblock footer %} {% endcomment %}
     </div>
     
     {% block common_js %}
