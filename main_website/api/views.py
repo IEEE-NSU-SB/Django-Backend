@@ -497,10 +497,13 @@ class SCAGPanelExecutives(APIView):
 
         return Response(data)
 
-class TeamsListView(ListAPIView):
+class TeamsListView(APIView):
 
-    queryset = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
-    serializer_class = TeamListSerializer
+    def get(self, request):
+        teams = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
+        teams_serializer = TeamListSerializer(teams, many=True).data
+
+        return Response(teams_serializer)
 
 class OfficersListView(ListAPIView):
 
