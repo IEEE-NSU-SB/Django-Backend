@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from users.renderData import getTypeOfEventStats, getEventNumberStat
+from django.utils import timezone
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -639,4 +640,15 @@ class BlogView(APIView):
         blog_serialized.update(data)
 
         return Response(blog_serialized)
+
+class UpcomingEvent(APIView):
+
+    def get(self, request):
+        current_datetime = timezone.now()
+        upcoming_event = Events.objects.filter(publish_in_main_web = True,start_date__gt=current_datetime).order_by('start_date')[:1]
+        if upcoming_event:
+            upcoming_event = upcoming_event[0]
+        upcoming_event_serialized = UpcomingEventSerializer(upcoming_event, context={'request':request}).data
+
+        return Response(upcoming_event_serialized)
     
