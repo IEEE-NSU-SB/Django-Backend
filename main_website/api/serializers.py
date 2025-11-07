@@ -215,6 +215,47 @@ class EventSmallListSerialiser(serializers.ModelSerializer):
     
     def get_date(self, obj):
         return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+    
+class UpcomingEventSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='event_name')
+    registration_link = serializers.URLField(source='form_link')
+    image = serializers.SerializerMethodField()
+    description = serializers.CharField(source='event_description')
+    countdown_target = serializers.DateTimeField(source='start_date')
+    event_time = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Events
+        fields = ['id', 'title', 'image', 'description', 'event_time', 'countdown_target', 'registration_link']
+
+    def get_image(self, obj):
+
+        try:
+            image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+        except:
+            image = None
+
+        request = self.context.get('request')
+        if image and hasattr(image, 'url'):
+            return str(request.build_absolute_uri(image.url))
+        else:
+            return ''
+        
+    def get_event_time(self, obj):
+
+        # Example: "28 July, 2025 6:00 PM"
+        date_part = obj.start_date.strftime("%d %B, %Y")
+        start_time = obj.start_date.strftime("%I:%M %p").lstrip("0")
+
+        if obj.end_date:
+            if obj.end_date.date() == obj.start_date.date():
+                end_time = obj.end_date.strftime("%I:%M %p").lstrip("0")
+                return f"{date_part} ({start_time} - {end_time})"
+            else:
+                return f"{date_part} ({start_time})"
+        else:
+            return f"{date_part} ({start_time})"
 
 class MegaEventListSerializer(serializers.ModelSerializer):
 

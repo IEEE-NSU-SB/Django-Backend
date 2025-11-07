@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_SSH_KEY }}
           script: |
-            cd ~/ieeensusb_main_web
+            cd ~/ieeensusb_api
             git pull origin production
             source "${{ secrets.CPANEL_ENV_PATH }}"
             pip install -r requirements.txt

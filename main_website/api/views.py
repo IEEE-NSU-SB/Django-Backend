@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from users.renderData import getTypeOfEventStats, getEventNumberStat
+from django.utils import timezone
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -497,10 +498,13 @@ class SCAGPanelExecutives(APIView):
 
         return Response(data)
 
-class TeamsListView(ListAPIView):
+class TeamsListView(APIView):
 
-    queryset = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
-    serializer_class = TeamListSerializer
+    def get(self, request):
+        teams = Teams.objects.filter(is_active=True,team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1)).all().order_by('id')
+        teams_serializer = TeamListSerializer(teams, many=True).data
+
+        return Response(teams_serializer)
 
 class OfficersListView(ListAPIView):
 
@@ -636,4 +640,15 @@ class BlogView(APIView):
         blog_serialized.update(data)
 
         return Response(blog_serialized)
+
+class UpcomingEvent(APIView):
+
+    def get(self, request):
+        current_datetime = timezone.now()
+        upcoming_event = Events.objects.filter(publish_in_main_web = True,start_date__gt=current_datetime).order_by('start_date').first()
+        if upcoming_event:
+            upcoming_event_serialized = UpcomingEventSerializer(upcoming_event, context={'request':request}).data
+            return Response(upcoming_event_serialized)
+        else:
+            return Response({})
     
