@@ -9,6 +9,7 @@ from main_website.models import *
 from media_team.models import Media_Images
 from port.models import Panels, Roles_and_Position, Teams
 from users.models import Panel_Members, VolunteerAwardRecievers
+from django.utils import timezone
 from django.utils.html import strip_tags
 from datetime import date
 
@@ -243,14 +244,15 @@ class UpcomingEventSerializer(serializers.ModelSerializer):
             return ''
         
     def get_event_time(self, obj):
-
-        # Example: "28 July, 2025 6:00 PM"
-        date_part = obj.start_date.strftime("%d %B, %Y")
-        start_time = obj.start_date.strftime("%I:%M %p").lstrip("0")
+        # Convert to local time
+        start_local = timezone.localtime(obj.start_date)
+        date_part = start_local.strftime("%d %B, %Y")
+        start_time = start_local.strftime("%I:%M %p").lstrip("0")
 
         if obj.end_date:
-            if obj.end_date.date() == obj.start_date.date():
-                end_time = obj.end_date.strftime("%I:%M %p").lstrip("0")
+            end_local = timezone.localtime(obj.end_date)
+            if end_local.date() == start_local.date():
+                end_time = end_local.strftime("%I:%M %p").lstrip("0")
                 return f"{date_part} ({start_time} - {end_time})"
             else:
                 return f"{date_part} ({start_time})"
