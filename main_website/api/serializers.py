@@ -706,6 +706,12 @@ class MemberSerializer(serializers.ModelSerializer):
         model = Members
         fields = ['name', 'position', 'memberId', 'recruitmentSession', 'image', 'facebook', 'linkedin', 'ieeeEmail', 'nsuEmail', 'bloodGroup']
 
+class ExemplaryMemberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ExemplaryMembers
+        fields = '__all__'
+
 # class PanelMemberPositionSerializer(serializers.ModelField):
 
 #     class Meta:

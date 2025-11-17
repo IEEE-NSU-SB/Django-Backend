@@ -651,4 +651,8 @@ class UpcomingEvent(APIView):
             return Response(upcoming_event_serialized)
         else:
             return Response({})
-    
+
+class ExemplaryMembersListView(ListAPIView):
+
+    queryset = ExemplaryMembers.objects.all().order_by('rank')
+    serializer_class = ExemplaryMemberSerializer
