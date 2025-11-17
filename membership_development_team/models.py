@@ -27,6 +27,7 @@ class Renewal_requests(models.Model):
     contact_no=models.CharField(null=False,blank=False,max_length=30,default="null")
     email_associated=models.EmailField(null=False,blank=False)
     email_ieee=models.EmailField(null=True,blank=True)
+    team=models.ForeignKey(Teams, null=True, blank=True, on_delete=models.SET_NULL)
     _ieee_account_password = models.CharField(db_column='ieee_account_password', null=False, blank=False, max_length=500)
     
     #this *_check fields refers to the subscriptions the user is selecting on the forms.
@@ -36,6 +37,8 @@ class Renewal_requests(models.Model):
     ias_renewal_check=models.BooleanField(null=False,blank=False,default=False)
     wie_renewal_check=models.BooleanField(null=False,blank=False,default=False)
     
+    payment_type=models.CharField(null=False, blank=False, max_length=9, choices=(('mdt', 'MDT'), ('self', 'Self'), ('not_set', 'Not Set')), default='not_set')
+    renewal_screenshot=ResizedImageField(null=True,blank=True,upload_to='MDT/Renewal_Screenshots/')
     transaction_id=models.CharField(null=True,blank=True,max_length=80)
     # The comment will be from applicant
     comment=models.CharField(null=True,blank=True,max_length=100) #the comment left by the applicant while applying
