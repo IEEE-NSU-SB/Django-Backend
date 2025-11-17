@@ -4,7 +4,7 @@ from django.db import DatabaseError
 from system_administration.system_logs import System_Logs
 import users
 from users.models import MemberSkillSets, Members
-from port.models import Teams
+from port.models import Chapters_Society_and_Affinity_Groups, Teams
 from system_administration.models import MDT_Data_Access
 from recruitment import renderData
 from django.db import connections
@@ -443,6 +443,8 @@ def membership_renewal_form(request,pk):
         
         if(form_credentials==False):
             messages.info(request,"No Form Data was Updated. Please Update form data from the Renewal Session page, Edit Renewal Form Credentials")
+
+        teams=Teams.objects.filter(team_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=1), is_active=True)
         
         
         context={
@@ -450,6 +452,7 @@ def membership_renewal_form(request,pk):
             'form_credentials':form_credentials,
             'further_contact':form_credentials_further_contact_info,
             'has_access_to_view':has_access_to_view,
+            'teams':teams,
         }
         
         if request.method=="POST":
@@ -464,6 +467,11 @@ def membership_renewal_form(request,pk):
                 email_ieee=request.POST['email_ieee']
                 password=request.POST['password']
                 confirm_password=request.POST['confirm_password']
+                team=request.POST.get('team')
+                if team == 'general':
+                    team = None
+                else:
+                    team = Teams.objects.get(id=team)
                 
                 #check if check marks are checked in the form
                 ieee_renewal=False
@@ -481,6 +489,8 @@ def membership_renewal_form(request,pk):
                     ias_renewal=True
                 if(request.POST.get('wie')):
                     wie_renewal=True
+                payment_type=request.POST.get('payment_type')
+                renewal_screenshot=request.FILES.get('self_screenshot')
                 transaction_id=request.POST['trx_id']
                 comment=request.POST['comment']
                 if(password==confirm_password):
@@ -490,7 +500,7 @@ def membership_renewal_form(request,pk):
                     #get_ieee_id=Members.objects.filter(email_personal=email_personal).values_list('ieee_id')
                     
                     try:
-                        renewal_instance=Renewal_requests(timestamp=datetime.now(),session_id=Renewal_Sessions.objects.get(id=pk,session_name=session_name),ieee_id=ieee_id,nsu_id=nsu_id,name=name,contact_no=contact_no,email_associated=email_associated,email_ieee=email_ieee,ieee_renewal_check=ieee_renewal,pes_renewal_check=pes_renewal,ras_renewal_check=ras_renewal,ias_renewal_check=ias_renewal,wie_renewal_check=wie_renewal,transaction_id=transaction_id,comment=comment,renewal_status=False,view_status=False)
+                        renewal_instance=Renewal_requests(timestamp=datetime.now(),session_id=Renewal_Sessions.objects.get(id=pk,session_name=session_name),ieee_id=ieee_id,nsu_id=nsu_id,name=name,contact_no=contact_no,email_associated=email_associated,email_ieee=email_ieee,team=team,ieee_renewal_check=ieee_renewal,pes_renewal_check=pes_renewal,ras_renewal_check=ras_renewal,ias_renewal_check=ias_renewal,wie_renewal_check=wie_renewal,payment_type=payment_type,renewal_screenshot=renewal_screenshot,transaction_id=transaction_id,comment=comment,renewal_status=False,view_status=False)
                         renewal_instance.set_ieee_account_password(password)
                         renewal_instance.save()
                         
