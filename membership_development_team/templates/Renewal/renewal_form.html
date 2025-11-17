@@ -107,6 +107,12 @@
             .label-section{
                 grid-template-columns: 1fr ;
             }
+            .payment_type input, .payment_section input{
+                transform: none;
+            }
+            .payment_section label{
+                font-size: 14px;
+            }
         }
     </style>
     <body>
@@ -336,46 +342,56 @@
                                         <div class="row my-5">
                                             <h6>Options: <span style="color:red;">*</span></h6>
                                             <div class="col-md-8 mt-2 mt-md-0 payment_section">
-                                                <input
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="branch" name="ieee" required
-                                                />
-                                                <label class="me-4" for="branch"
+                                                    />
+                                                    <label class="me-4" for="branch"
                                                     >Institute of Electrical and Electronics Engineers (IEEE)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="pes" name="pes"
-                                                />
-                                                <label class="me-4" for="pes"
+                                                    />
+                                                    <label class="me-4" for="pes"
                                                     >IEEE Power and Energy Society (PES)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="ras" name="ras"
-                                                />
-                                                <label class="me-4" for="ras"
+                                                    />
+                                                    <label class="me-4" for="ras"
                                                     >IEEE Robotics and Automation Society (RAS)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                    <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="ias" name="ias"
-                                                />
-                                                <label class="me-4" for="ias"
+                                                    />
+                                                    <label class="me-4" for="ias"
                                                     >IEEE Industry Application Society (IAS)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="wie" name="wie"
-                                                />
-                                                <label class="me-4" for="wie"
+                                                    />
+                                                    <label class="me-4" for="wie"
                                                     >IEEE Women in Engineering Affinity Group (WIE)</label
-                                                ><br>
+                                                    ><br>
+                                                </div>
                                             </div>
                                         </div>
 
