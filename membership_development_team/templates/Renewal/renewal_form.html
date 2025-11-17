@@ -44,35 +44,33 @@
         
         <!-- header start -->
         <section class="banner">
-            <div class="container">
-                
-                <div class="row">
-                    
+            <div style="max-width: 95%; margin: auto;">                    
                     <form method="POST" action="">
                         {% csrf_token %}
-                        <div class="container p-5 bg-white my-5 rounded">
-                            <div class="logo">
-                                <img src="{% static 'INSB.png' %}" alt="logo" style="width:10%;">
-                            </div>
-                            <div class="d-flex flex-column justify-content-center">
-                                <h1 class="text-center mt-5 text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
+                        <div class="p-5 bg-white my-5 rounded">
+                            <div style="display:flex; align-items:center; margin-bottom: 1.5rem;">
+                                    <div class="display:flex; align-items:center;"></div>
+                                    <div class="logo" style="flex:1; text-align:left;">
+                                        <img src="{% static 'INSB.png' %}" alt="logo" style="width:20%;">
+                                    </div>
+                                    <h1 style="flex:1; text-align:center;" class="text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
+                                <div style="flex:1;"></div>
                             </div>
                             {% if form_credentials.accepting_response %}
                             <div class="p-2 mb-4">
-                                <br>
-                                <h6 style="font-size:20px; line-height: 1.5;">{{form_credentials.form_description}}</h6>
+                                <h6 style="font-size:18px; line-height: 1.5;">{{form_credentials.form_description}}</h6>
                                 <h4
-                                    class="pt-4" style="font-weight:bold;"
+                                    class="pt-4" style="font-weight:bold; font-size:16px;"
                                 >
                                     Read the instructions given below carefully Before you submit your Renewal Request:
                                 </h4>
                                 <ul class="lh-lg">
-                                    <li style="font-size:18px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
-                                    <li style="font-size:18px">Your password will stay confidential and would not be shared anywhere.</li>
-                                    <li style="font-size:18px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
-                                    <li style="font-size:18px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
-                                    <li style="font-size:18px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
-                                    <li style="font-size:18px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
+                                    <li style="font-size:14px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
+                                    <li style="font-size:14px">Your password will stay confidential and would not be shared anywhere.</li>
+                                    <li style="font-size:14px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
+                                    <li style="font-size:14px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
+                                    <li style="font-size:14px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
+                                    <li style="font-size:14px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
                                 </ul>
                                 <br>
                                 <div class="py-3 text-center">
@@ -413,7 +411,6 @@
                                 Thank you for staying connected with us!
                             </h3>
                         {% endif %} 
-                    </div>
                 </div>
             </div>
     </section>
