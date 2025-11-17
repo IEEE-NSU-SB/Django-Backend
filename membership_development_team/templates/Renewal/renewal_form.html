@@ -48,7 +48,7 @@
                 
                 <div class="row">
                     
-                    <form method="POST" action="">
+                    <form method="POST" enctype="multipart/form-data" action="">
                         {% csrf_token %}
                         <div class="container p-5 bg-white my-5 rounded">
                             <div class="logo">
@@ -167,14 +167,12 @@
                                         </div>
                                     </div>
                                     <div class="label-section">
-                                        <h6>Select Your Team: <span style="color:red;">*</span></h6>
+                                        <h6>Select Your Current Team: <span style="color:red;">*</span></h6>
                                         <select name="team" class="form-control w-100" required>
                                             <option value="general" selected>General Member</option>
-                                            <option value="management">Management Team</option>
-                                            <option value="technical">Technical Team</option>
-                                            <option value="creative">Creative Team</option>
-                                            <option value="research">Research Team</option>
-                                            <option value="event">Event Team</option>
+                                            {% for team in teams %}
+                                            <option value="{{team.id}}">{{team.team_name}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="label-section">
