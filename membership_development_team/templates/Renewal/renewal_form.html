@@ -28,7 +28,18 @@
         />
         <link rel="stylesheet" href="{% static 'renewal_form.css' %}" />
     </head>
-
+    <style>
+        .label-section {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            grid-gap: 1rem;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .label-section h6 {
+            margin-bottom: 0;
+        }
+    </style>
     <body>
         
         <!-- header start -->
@@ -39,29 +50,29 @@
                     
                     <form method="POST" action="">
                         {% csrf_token %}
-                        <div class="container p-2 bg-white my-5 rounded">
+                        <div class="container p-5 bg-white my-5 rounded">
                             <div class="logo">
                                 <img src="{% static 'INSB.png' %}" alt="logo" style="width:10%;">
                             </div>
                             <div class="d-flex flex-column justify-content-center">
-                                <h1 class="text-center fw-bold mt-3 text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
+                                <h1 class="text-center mt-5 text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
                             </div>
                             {% if form_credentials.accepting_response %}
                             <div class="p-2 mb-4">
                                 <br>
-                                <h6 style="font-size:20px; font-style:italic;">{{form_credentials.form_description}}</h6>
+                                <h6 style="font-size:20px; line-height: 1.5;">{{form_credentials.form_description}}</h6>
                                 <h4
-                                    class="p-3 mb-4" style="font-weight:bold;"
+                                    class="pt-4" style="font-weight:bold;"
                                 >
                                     Read the instructions given below carefully Before you submit your Renewal Request:
                                 </h4>
-                                <ul>
-                                    <li style="font-size:15px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
-                                    <li style="font-size:15px">Your password will stay confidential and would not be shared anywhere.</li>
-                                    <li style="font-size:15px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
-                                    <li style="font-size:15px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
-                                    <li style="font-size:15px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
-                                    <li style="font-size:15px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
+                                <ul class="lh-lg">
+                                    <li style="font-size:18px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
+                                    <li style="font-size:18px">Your password will stay confidential and would not be shared anywhere.</li>
+                                    <li style="font-size:18px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
+                                    <li style="font-size:18px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
+                                    <li style="font-size:18px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
+                                    <li style="font-size:18px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
                                 </ul>
                                 <br>
                                 <div class="py-3 text-center">
@@ -75,10 +86,10 @@
                     
                                 </div>
                                 
-                                <div class="px-0 px-md-5">
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">Name: <span style="color:red;">*</span></div>
-                                        <div class="col-md-8">
+                                <div class="px-5 px-md-0 mx-auto">
+                                    <div class="label-section">
+                                        <h6>Name: <span style="color:red;">*</span></h6>
+                                        <div>
                                             <input
                                                 required
                                                 placeholder="Enter Your Name"
@@ -91,11 +102,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">
+                                    <div class="label-section">
+                                        <h6>
                                             Contact No.: <span style="color:red;">*</span>
-                                        </div>
-                                        <div class="col-md-8">
+                                        </h6>
+                                        <div>
                                             <input
                                                 required placeholder="Enter Your Contact no"
                                                 class="form-control w-100"
@@ -105,9 +116,9 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">Email (Associated with your IEEE account): <span style="color:red;">*</span></div>
-                                        <div class="col-md-8">
+                                    <div class="label-section">
+                                        <h6>Email: <span style="color:red;">*</span> <br>(Associated with your IEEE account)</h6>
+                                        <div>
                                             <input
                                                 required
                                                 class="form-control w-100"
@@ -117,9 +128,9 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">Email (IEEE):</div>
-                                        <div class="col-md-8">
+                                    <div class="label-section">
+                                        <h6>Email (IEEE):</h6>
+                                        <div>
                                             <input
                                             
                                                 class="form-control w-100"
@@ -129,9 +140,9 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">IEEE Membership ID: <span style="color:red;">*</span></div>
-                                        <div class="col-md-8">
+                                    <div class="label-section">
+                                        <h6>IEEE Membership ID: <span style="color:red;">*</span></h6>
+                                        <div>
                                             <input
                                                 placeholder="IEEE ID"
                                                 class="form-control w-100"
@@ -142,9 +153,9 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">NSU ID: <span style="color:red;">*</span></div>
-                                        <div class="col-md-8">
+                                    <div class="label-section">
+                                        <h6>NSU ID: <span style="color:red;">*</span></h6>
+                                        <div>
                                             <input
                                                 placeholder="NSU ID"
                                                 class="form-control w-100"
@@ -155,11 +166,22 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">
+                                    <div class="label-section">
+                                        <h6>Select Your Team: <span style="color:red;">*</span></h6>
+                                        <select name="team" class="form-control w-100" required>
+                                            <option value="general" selected>General Member</option>
+                                            <option value="management">Management Team</option>
+                                            <option value="technical">Technical Team</option>
+                                            <option value="creative">Creative Team</option>
+                                            <option value="research">Research Team</option>
+                                            <option value="event">Event Team</option>
+                                        </select>
+                                    </div>
+                                    <div class="label-section">
+                                        <h6>
                                             Password: <span style="color:red;">*</span>
-                                        </div>
-                                        <div class="col-md-8">
+                                        </h6>
+                                        <div>
                                             <input
                                                 required
                                                 class="form-control w-100"
@@ -168,11 +190,11 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="row my-3">
-                                        <div class="col-md-2 mt-1">
+                                    <div class="label-section">
+                                        <h6>
                                             Confirm Password: <span style="color:red;">*</span>
-                                        </div>
-                                        <div class="col-md-8">
+                                        </h6>
+                                        <div>
                                             <input
                                                 required
                                                 class="form-control w-100"
@@ -217,7 +239,7 @@
                                     
 
                                         <div class="row my-0">
-                                            <div class="col-md-2 mt-1">Options: <span style="color:red;">*</span></div>
+                                            <div>Options: <span style="color:red;">*</span></div>
                                             <div class="col-md-8 mt-2 mt-md-0">
                                                 <input
                                                     class="form-check-input"
@@ -263,25 +285,59 @@
                                         </div>
                                     </div>
                                     <div class="px-0 px-md-5">
-                                        <div class="row my-3">
-                                            <div class="col-md-2 mt-1">
+                                        <label><strong>Payment Type: <span style="color:red">*</span></strong></label>
+
+                                        <div>
+                                            <label>
+                                                <input type="radio" name="payment_type" value="mdt" required onchange="togglePaymentSection()" />
+                                                Payment through MDT
+                                            </label>
+                                            <br />
+                                            <label>
+                                                <input type="radio" name="payment_type" value="self" required onchange="togglePaymentSection()" />
+                                                Payment by Self
+                                            </label>
+                                        </div>
+
+                                        <input type="hidden" name="payment_selected" id="payment_selected" />
+
+                                        <!-- MDT – Transaction ID Section -->
+                                        <div id="mdt_section" style="display:none; margin-top:15px;">
+                                        <div class="label-section">
+                                            <div>
                                                 Transaction ID: <span style="color:red;">*</span>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div>
                                                 <input
-                                                    required
                                                     class="form-control w-100"
                                                     type="text"
-                                                    name="trx_id" required placeholder="Enter the Transaction ID"
+                                                    name="trx_id"
+                                                    id="trx_id"
+                                                    placeholder="Enter the Transaction ID"
                                                 />
                                             </div>
                                         </div>
+                                        </div>
 
-                                        <div class="row my-3">
-                                            <div class="col-md-2 mt-1">
+                                        <!-- SELF – Screenshot Upload Section -->
+                                        <div id="self_section" style="display:none; margin-top:15px;">
+                                        <label>
+                                            Upload a screenshot of your IEEE account to confirm <span style="color:red;">*</span>
+                                        </label>
+                                        <input
+                                            type="file"
+                                            name="self_screenshot"
+                                            id="self_screenshot"
+                                            accept="image/*"
+                                            class="form-control"
+                                        />
+                                        </div>
+
+                                        <div class="label-section">
+                                            <div>
                                                 Comments:
                                             </div>
-                                            <div class="col-md-8">
+                                            <div>
                                                 <input
                                                     class="form-control w-100"
                                                     type="text"
@@ -368,4 +424,34 @@
         </footer>
         <!-- footer end -->
     </body>
+    <script>
+    function togglePaymentSection() {
+    const paymentType = document.querySelector('input[name="payment_type"]:checked').value;
+
+    // Update hidden field
+    document.getElementById("payment_selected").value = paymentType;
+
+    // Sections
+    const mdt = document.getElementById("mdt_section");
+    const self = document.getElementById("self_section");
+
+    // Inputs
+    const trx = document.getElementById("trx_id");
+    const screenshot = document.getElementById("self_screenshot");
+
+    if (paymentType === "mdt") {
+        mdt.style.display = "block";
+        self.style.display = "none";
+
+        trx.required = true;
+        screenshot.required = false;
+    } else {
+        mdt.style.display = "none";
+        self.style.display = "block";
+
+        trx.required = false;
+        screenshot.required = true;
+    }
+    }
+    </script>
 </html>
