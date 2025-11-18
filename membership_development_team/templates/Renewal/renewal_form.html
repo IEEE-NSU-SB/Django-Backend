@@ -29,6 +29,10 @@
         <link rel="stylesheet" href="{% static 'renewal_form.css' %}" />
     </head>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+        }
         .label-section {
             display: grid;
             grid-template-columns: 1fr 3fr;
@@ -39,40 +43,108 @@
         .label-section h6 {
             margin-bottom: 0;
         }
+        .label-section input,
+        .label-section select {
+            text-decoration: none;
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #00629B;
+            padding: 0.75rem;
+            color: rgb(113, 112, 112);
+        }
+        .label-section input:focus,
+        .label-section select:focus {
+            border: 1px solid #00629B;
+            box-shadow: 0px 0px 5px #00629B;
+        }
+        .payment_section label {
+            font-size: 16px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .payment_section input {
+            transform: scale(1.5);
+            position: relative; 
+            top: 1px;
+            cursor: pointer;
+        }
+        .payment_type label {
+            font-size: 16px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .payment_type input {
+            transform: scale(1.5);
+            position: relative; 
+            top: 1px;
+            cursor: pointer;
+        }
+        .form-container {
+            max-width: 1080px;
+            margin: auto;
+        }
+        .inner-container {
+            padding: 55px 65px 0 ;
+            background: white;
+            border-radius: 4px;    
+            margin: 50px 0;
+        }
+        @media screen and (max-width:500px) {
+            .form-container {
+                padding: 0 10px;
+            }
+            .logo{
+                display: none;
+            }
+            .empty{
+                display: none;
+            }
+            .header{
+                font-size: 24px;
+            }
+            .inner-container{
+                padding: 20px 15px 0 ;
+            }
+            .label-section{
+                grid-template-columns: 1fr ;
+            }
+            .payment_type input, .payment_section input{
+                transform: none;
+            }
+            .payment_section label{
+                font-size: 14px;
+            }
+        }
     </style>
     <body>
         
         <!-- header start -->
-        <section class="banner">
-            <div class="container">
-                
-                <div class="row">
-                    
-                    <form method="POST" action="">
+                <div class="form-container">                    
+                    <form method="POST" enctype="multipart/form-data" action="">
                         {% csrf_token %}
-                        <div class="container p-5 bg-white my-5 rounded">
-                            <div class="logo">
-                                <img src="{% static 'INSB.png' %}" alt="logo" style="width:10%;">
-                            </div>
-                            <div class="d-flex flex-column justify-content-center">
-                                <h1 class="text-center mt-5 text-uppercase text-black">Renewal Form - {{ session_name }}</h1>
+                        <div class="inner-container">
+                            <div style="display:flex; align-items:center; margin-bottom: 1.5rem;">
+                                    <div class="display:flex; align-items:center;"></div>
+                                    <div class="logo" style="flex:1; text-align:left;">
+                                        <img src="{% static 'INSB.png' %}" alt="logo" style="width:20%;">
+                                    </div>
+                                    <h4 style="flex:1; text-align:center;" class="text-uppercase text-black header">Renewal Form - {{ session_name }}</h4>
+                                <div style="flex:1;" class="empty"></div>
                             </div>
                             {% if form_credentials.accepting_response %}
-                            <div class="p-2 mb-4">
-                                <br>
-                                <h6 style="font-size:20px; line-height: 1.5;">{{form_credentials.form_description}}</h6>
+                            <div class="mb-4">
+                                <h6 style="line-height: 1.5; text-align: justify;">{{form_credentials.form_description}}</h6>
                                 <h4
-                                    class="pt-4" style="font-weight:bold;"
+                                    class="pt-4" style="font-weight:bold; font-size:16px;"
                                 >
                                     Read the instructions given below carefully Before you submit your Renewal Request:
                                 </h4>
                                 <ul class="lh-lg">
-                                    <li style="font-size:18px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
-                                    <li style="font-size:18px">Your password will stay confidential and would not be shared anywhere.</li>
-                                    <li style="font-size:18px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
-                                    <li style="font-size:18px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
-                                    <li style="font-size:18px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
-                                    <li style="font-size:18px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
+                                    <li style="font-size:14px">Enter the correct password only for your IEEE account and Enter the e-mail which is associated with your IEEE account!</li>
+                                    <li style="font-size:14px">Your password will stay confidential and would not be shared anywhere.</li>
+                                    <li style="font-size:14px">If you want to Renew your Chapter or Affinity Group Membership, Select them in the form. You must Renew your IEEE membership to renew you SC/AG membership.</li>
+                                    <li style="font-size:14px">If you have Paid by yourself or via any Society / Affinity Group, write "Self" / "Society / Affinity Group name" in the Transaction ID field. Write "Payment Reciever Name" if you have paid by cash.</li>
+                                    <li style="font-size:14px">If you have a free subscription of any kind, tick mark the option for which you have free subscription and Mention it under the comment section</li>
+                                    <li style="font-size:14px">If you have any further queries, Please refer to: <b>{{further_contact.name}}, {{further_contact.position}}, {{further_contact.team}} Team, IEEE NSU SB</b>.<br>Contact Informations:<br> <a href={{further_contact.facebook_url}}>Facebook</a>, <a href={{further_contact.linkedin_url}}>Linkedin</a>, Cell: {{further_contact.contact_no}}</li>
                                 </ul>
                                 <br>
                                 <div class="py-3 text-center">
@@ -85,8 +157,12 @@
                                 
                     
                                 </div>
-                                
-                                <div class="px-5 px-md-0 mx-auto">
+                                    <h4
+                                        class="mb-4 text-center text-uppercase"
+                                    >
+                                        Personal Information
+                                    </h4>
+                                <div class="personal_info_section">
                                     <div class="label-section">
                                         <h6>Name: <span style="color:red;">*</span></h6>
                                         <div>
@@ -167,14 +243,12 @@
                                         </div>
                                     </div>
                                     <div class="label-section">
-                                        <h6>Select Your Team: <span style="color:red;">*</span></h6>
+                                        <h6>Select Your Current Team: <span style="color:red;">*</span></h6>
                                         <select name="team" class="form-control w-100" required>
                                             <option value="general" selected>General Member</option>
-                                            <option value="management">Management Team</option>
-                                            <option value="technical">Technical Team</option>
-                                            <option value="creative">Creative Team</option>
-                                            <option value="research">Research Team</option>
-                                            <option value="event">Event Team</option>
+                                            {% for team in teams %}
+                                            <option value="{{team.id}}">{{team.team_name}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="label-section">
@@ -205,94 +279,131 @@
                                     </div>
 
                         
-
-                                <div class="p-2 mb-4">
-                                    <h3
-                                        class="bg-light border rounded text-center p-2 text-uppercase mb-4"
+                            </div>
+                                    <h4
+                                        style="margin: 40px 0;"
+                                        class="text-center text-uppercase"
                                     >
                                         Payment Section
-                                    </h3>
-                                    <div class="px-0 px-md-5">
+                                    </h4>
+                                        <div>
+                                            <h6 style="font-weight:bold;">Payment Details for Bkash {% if form_credentials.nagad_payment_number %}and Nagad{% endif %} :</h6>
+                                            <ol style="font-size: 16px;">
+                                                <li>Bkash Number: {{form_credentials.bkash_payment_number}}</li>
+                                                {% if form_credentials.nagad_payment_number %}
+                                                <li>Nagad Number:> {{form_credentials.nagad_payment_number}}</li>
+                                                {% endif %}
+                                                <li>During payment, add reference note: <span style="font-weight:bold; ">"Renewal_IEEE_NSU_your_name"</span></li>
+                                                <li>Provide your<span style="font-weight:bold;"> "Bkash{% if form_credentials.nagad_payment_number %}/Nagad{% endif %} Transaction ID"</span></li>
+                                                
+                                            </ol>
+                                        </div>
+                                       <div>
+                                        <h6 style="font-weight:bold;">Renewal Fee Amount & Details:</h6>
 
-                                        <h5 class="" style="font-weight:bold;">Renewal Fee Amount & Details:</h5>
-                                        <ul>
-                                            <li><span style="font-weight:bold; font-size:15px;">IEEE Membership:</span> <span style="font-style:italic;font-weight:bold;font-size:15px;">BDT {{form_credentials.ieee_membership_amount}}</span> </li>
-                                            <li><span style="font-weight:bold;font-size:15px;">IEEE RAS Membership:</span> <span style="font-style:italic;font-weight:bold;font-size:15px;">BDT {{form_credentials.ieee_ras_membership_amount}}</span> </li>
-                                            <li><span style="font-weight:bold;font-size:15px;">IEEE IAS Membership:</span> <span style="font-style:italic;font-weight:bold;font-size:15px;">BDT {{form_credentials.ieee_ias_membership_amount}}</span> </li>
-                                            <li><span style="font-weight:bold;font-size:15px;">IEEE PES Membership:</span> <span style="font-style:italic;font-weight:bold;font-size:15px;">BDT {{form_credentials.ieee_pes_membership_amount}}</span> </li>
-                                            <li><span style="font-weight:bold;font-size:15px;">IEEE WIE Membership:</span> <span style="font-style:italic;font-weight:bold;font-size:15px;">BDT {{form_credentials.ieee_wie_membership_amount}}</span> </li>
+                                        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                                            <tr>
+                                                <td style="font-size:16px; padding:6px;">IEEE Membership</td>
+                                                <td style="font-size:16px; padding:6px;">
+                                                    BDT {{form_credentials.ieee_membership_amount}}
+                                                </td>
+                                            </tr>
 
-                                        </ul>
-                                        <h5 class="" style="font-weight:bold;">Payment Details for Bkash and Nagad:</h5>
-                                        <ol>
-                                            <li><span style="font-weight:bold;font-size:15px;">Bkash Number:</span><span style="font-weight:bold;font-style:italic;font-size:15px;"> {{form_credentials.bkash_payment_number}}</span></li>
-                                            {% if form_credentials.nagad_payment_number %}
-                                            <li><span style="font-weight:bold;font-size:15px;">Nagad Number:</span><span style="font-weight:bold;font-style:italic;font-size:15px;"> {{form_credentials.nagad_payment_number}}</span></li>
-                                            {% endif %}
-                                            <li><span style="font-size:15px;">During payment, add </span> <span style="font-weight:bold; font-size:15px;">referrence</span> <span style="font-size:15px;">note: </span><span style="font-weight:bold; font-size:15px;">"Renewal_IEEE_NSU_your_name"</span></li>
-                                            <li><span style="font-size:15px;">Provide your</span><span style="font-weight:bold; font-size:15px;"> "Bkash/Nagad Transaction ID"</span></li>
+                                            <tr>
+                                                <td style="font-size:16px; padding:6px;">IEEE RAS Membership</td>
+                                                <td style="font-size:16px; padding:6px;">
+                                                    BDT {{form_credentials.ieee_ras_membership_amount}}
+                                                </td>
+                                            </tr>
 
-                                        </ol>
+                                            <tr>
+                                                <td style="font-size:16px; padding:6px;">IEEE IAS Membership</td>
+                                                <td style="font-size:16px; padding:6px;">
+                                                    BDT {{form_credentials.ieee_ias_membership_amount}}
+                                                </td>
+                                            </tr>
 
+                                            <tr>
+                                                <td style="font-size:16px; padding:6px;">IEEE PES Membership</td>
+                                                <td style="font-size:16px; padding:6px;">
+                                                    BDT {{form_credentials.ieee_pes_membership_amount}}
+                                                </td>
+                                            </tr>
 
+                                            <tr>
+                                                <td style="font-size:16px; padding:6px;">IEEE WIE Membership</td>
+                                                <td style="font-size:16px; padding:6px;">
+                                                    BDT {{form_credentials.ieee_wie_membership_amount}}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
 
-                                    
-
-                                        <div class="row my-0">
-                                            <div>Options: <span style="color:red;">*</span></div>
-                                            <div class="col-md-8 mt-2 mt-md-0">
-                                                <input
+                                        <div class="row my-5">
+                                            <h6>Options: <span style="color:red;">*</span></h6>
+                                            <div class="col-md-8 mt-2 mt-md-0 payment_section">
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="branch" name="ieee" required
-                                                />
-                                                <label class="me-4" for="branch"
-                                                    >Institute of Electrical and Electronics Engineers(IEEE)</label
-                                                ><br>
-                                                <input
+                                                    />
+                                                    <label class="me-4" for="branch"
+                                                    >Institute of Electrical and Electronics Engineers (IEEE)</label
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="pes" name="pes"
-                                                />
-                                                <label class="me-4" for="pes"
+                                                    />
+                                                    <label class="me-4" for="pes"
                                                     >IEEE Power and Energy Society (PES)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="ras" name="ras"
-                                                />
-                                                <label class="me-4" for="ras"
+                                                    />
+                                                    <label class="me-4" for="ras"
                                                     >IEEE Robotics and Automation Society (RAS)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                    <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="ias" name="ias"
-                                                />
-                                                <label class="me-4" for="ias"
+                                                    />
+                                                    <label class="me-4" for="ias"
                                                     >IEEE Industry Application Society (IAS)</label
-                                                ><br>
-                                                <input
+                                                    ><br>
+                                                </div>
+                                                <div style="display: flex">
+                                                    <input
                                                     class="form-check-input"
                                                     type="checkbox"
                                                     id="wie" name="wie"
-                                                />
-                                                <label class="me-4" for="wie"
+                                                    />
+                                                    <label class="me-4" for="wie"
                                                     >IEEE Women in Engineering Affinity Group (WIE)</label
-                                                ><br>
+                                                    ><br>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="px-0 px-md-5">
-                                        <label><strong>Payment Type: <span style="color:red">*</span></strong></label>
 
-                                        <div>
-                                            <label>
+                                    <div>
+                                        <h6>Payment Type: <span style="color:red">*</span></h6>
+
+                                        <div class="payment_type">
+                                            <label style="margin-bottom: 4px;">
                                                 <input type="radio" name="payment_type" value="mdt" required onchange="togglePaymentSection()" />
                                                 Payment through MDT
                                             </label>
-                                            <br />
+                                            <br>
                                             <label>
                                                 <input type="radio" name="payment_type" value="self" required onchange="togglePaymentSection()" />
                                                 Payment by Self
@@ -304,9 +415,9 @@
                                         <!-- MDT – Transaction ID Section -->
                                         <div id="mdt_section" style="display:none; margin-top:15px;">
                                         <div class="label-section">
-                                            <div>
+                                            <h6>
                                                 Transaction ID: <span style="color:red;">*</span>
-                                            </div>
+                                            </h6>
                                             <div>
                                                 <input
                                                     class="form-control w-100"
@@ -320,8 +431,8 @@
                                         </div>
 
                                         <!-- SELF – Screenshot Upload Section -->
-                                        <div id="self_section" style="display:none; margin-top:15px;">
-                                        <label>
+                                        <div id="self_section" style="display:none; margin:25px 0;">
+                                        <label style="font-size: 14px;">
                                             Upload a screenshot of your IEEE account to confirm <span style="color:red;">*</span>
                                         </label>
                                         <input
@@ -334,9 +445,9 @@
                                         </div>
 
                                         <div class="label-section">
-                                            <div>
+                                            <h6>
                                                 Comments:
-                                            </div>
+                                            </h6>
                                             <div>
                                                 <input
                                                     class="form-control w-100"
@@ -346,14 +457,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="p-2 mb-4">
                                     <div class="py-3 text-center">
                                         <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#update">Place Renewal Request</button>
                                     </div>
-                                </div>
-                            </div>
 
                             <!-- Confirmation Modal -->
                                 <div
@@ -379,11 +485,11 @@
                                             ></button>
                                         </div>
                                         <div class="modal-body">
-                                            <h3>Are you sure you want to Submit your Renewal Application?</h3>
-                                            <p class="mt-3">
+                                            <h4>Are you sure you want to Submit your Renewal Application?</h4>
+                                            <h6 class="mt-3">
                                                 These informations you provided will be forwarded to IEEE NSU SB Membership Development Team to Renew your Membership with Global IEEE<br>
                                                 
-                                            </p>
+                                            </h6>
                                         </div>
                                         <div class="modal-footer">
                                             <button
@@ -413,14 +519,12 @@
                                 Thank you for staying connected with us!
                             </h3>
                         {% endif %} 
-                    </div>
                 </div>
             </div>
-    </section>
 
 
-        <footer class="py-3 right-bg text-white text-center">
-            <small>&copy; All Rights Reserved by IEEE NSU STUDENT BRANCH</small>
+        <footer class="py-3 text-white text-center">
+            &copy; All Rights Reserved by IEEE NSU STUDENT BRANCH
         </footer>
         <!-- footer end -->
     </body>
