@@ -287,14 +287,14 @@
                                         Payment Section
                                     </h4>
                                         <div>
-                                            <h6 style="font-weight:bold;">Payment Details for Bkash and Nagad:</h6>
+                                            <h6 style="font-weight:bold;">Payment Details for Bkash {% if form_credentials.nagad_payment_number %}and Nagad{% endif %} :</h6>
                                             <ol style="font-size: 16px;">
                                                 <li>Bkash Number: {{form_credentials.bkash_payment_number}}</li>
                                                 {% if form_credentials.nagad_payment_number %}
                                                 <li>Nagad Number:> {{form_credentials.nagad_payment_number}}</li>
                                                 {% endif %}
-                                                <!-- <li>During payment, add reference note: <span style="font-weight:bold; ">"Renewal_IEEE_NSU_your_name"</span></li> -->
-                                                <li>Provide your<span style="font-weight:bold;"> "Bkash/Nagad Transaction ID"</span></li>
+                                                <li>During payment, add reference note: <span style="font-weight:bold; ">"Renewal_IEEE_NSU_your_name"</span></li>
+                                                <li>Provide your<span style="font-weight:bold;"> "Bkash{% if form_credentials.nagad_payment_number %}/Nagad{% endif %} Transaction ID"</span></li>
                                                 
                                             </ol>
                                         </div>
