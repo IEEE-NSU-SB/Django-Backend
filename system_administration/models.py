@@ -312,7 +312,7 @@ class SystemErrors(models.Model):
 class General_Log(models.Model):
 
     content_type = models.ForeignKey(ContentType,null=True,blank=True, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField(null=True,blank=True)
+    object_id = models.BigIntegerField(null=True,blank=True)
     log_of=GenericForeignKey("content_type", "object_id")
     log_details = models.JSONField()
     update_number = models.IntegerField(null=True,blank=True,default = 0)

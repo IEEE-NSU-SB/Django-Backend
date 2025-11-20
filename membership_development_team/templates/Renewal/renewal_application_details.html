@@ -181,6 +181,7 @@
                                 <p class="items"><span><b>Email (Associated with IEEE Account): </b></span>{{details.email_associated}} </p>
                                 <p class="items"><span><b>IEEE Email: </b></span>{{details.email_ieee}} </p>
                                 <p class="items"><span><b>Contact No: </b></span>{{details.contact_no}} </p>
+                                <p class="items"><span><b>Team: </b></span>{% if details.team %}{{details.team}}{% else %}General Member{% endif %} </p>
                                 <p class="items">
                                     <span><b>Account Password:</b></span>
                                     <span id="masked-password">{{ masked_password }}</span>
@@ -283,7 +284,11 @@
                             Order status: <span class="label danger">Membership Not yet Renewed</span><br>
 
                         {% endif %}
+                        {% if details.payment_type == 'mdt' or details.payment_type == 'not_set' %}
                         Transaction ID: <strong>{{details.transaction_id}}</strong>
+                        {% elif details.payment_type == 'self' %}
+                        Applicant Screenshot: <strong><a href="{{media_url}}{{details.renewal_screenshot}}" target="_blank">{{media_url}}{{details.renewal_screenshot}}</a></strong>
+                        {% endif %}
                     </p>
                 {% endfor %}
                 
@@ -312,7 +317,7 @@
                       
                       
                       <tr>
-                        <td colspan="3" class="text-right no-border"><strong>Total</strong></td>
+                        <td colspan="1" class="text-right no-border"><strong>Total</strong></td>
                         <td><strong>BDT {{total_amount}}</strong></td>
                       </tr>
                     </tbody>

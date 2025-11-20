@@ -103,7 +103,8 @@
             <div class="profile">
                 <div class="details">
                     <h5>{{team_details.team_name}} Team</h5>
-                    <a href="{% url 'main_website:team_intro' team_details.primary %}" target="_blank">Team Homepage</a>
+                    {% comment %} <a href="{% url 'main_website:team_intro' team_details.primary %}" target="_blank">Team Homepage</a> {% endcomment %}
+                    <a href="#">Team Homepage</a>
                 
                 </div>
                 <div class="badges"></div>

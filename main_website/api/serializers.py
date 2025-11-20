@@ -9,6 +9,7 @@ from main_website.models import *
 from media_team.models import Media_Images
 from port.models import Panels, Roles_and_Position, Teams
 from users.models import Panel_Members, VolunteerAwardRecievers
+from django.utils import timezone
 from django.utils.html import strip_tags
 from datetime import date
 
@@ -215,6 +216,48 @@ class EventSmallListSerialiser(serializers.ModelSerializer):
     
     def get_date(self, obj):
         return obj.event_date if obj.event_date and obj.start_date == None else obj.start_date
+    
+class UpcomingEventSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='event_name')
+    registration_link = serializers.URLField(source='form_link')
+    image = serializers.SerializerMethodField()
+    description = serializers.CharField(source='event_description')
+    countdown_target = serializers.DateTimeField(source='start_date')
+    event_time = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Events
+        fields = ['id', 'title', 'image', 'description', 'event_time', 'countdown_target', 'registration_link']
+
+    def get_image(self, obj):
+
+        try:
+            image = Graphics_Banner_Image.objects.get(event_id = obj.id).selected_image
+        except:
+            image = None
+
+        request = self.context.get('request')
+        if image and hasattr(image, 'url'):
+            return str(request.build_absolute_uri(image.url))
+        else:
+            return ''
+        
+    def get_event_time(self, obj):
+        # Convert to local time
+        start_local = timezone.localtime(obj.start_date)
+        date_part = start_local.strftime("%d %B, %Y")
+        start_time = start_local.strftime("%I:%M %p").lstrip("0")
+
+        if obj.end_date:
+            end_local = timezone.localtime(obj.end_date)
+            if end_local.date() == start_local.date():
+                end_time = end_local.strftime("%I:%M %p").lstrip("0")
+                return f"{date_part} ({start_time} - {end_time})"
+            else:
+                return f"{date_part} ({start_time})"
+        else:
+            return f"{date_part} ({start_time})"
 
 class MegaEventListSerializer(serializers.ModelSerializer):
 
@@ -662,6 +705,12 @@ class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
         fields = ['name', 'position', 'memberId', 'recruitmentSession', 'image', 'facebook', 'linkedin', 'ieeeEmail', 'nsuEmail', 'bloodGroup']
+
+class ExemplaryMemberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ExemplaryMembers
+        fields = '__all__'
 
 # class PanelMemberPositionSerializer(serializers.ModelField):
 
