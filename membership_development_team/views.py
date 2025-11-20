@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render,redirect
 from django.db import DatabaseError
 from system_administration.system_logs import System_Logs
+from django.db.models import F
 import users
 from users.models import MemberSkillSets, Members
 from port.models import Chapters_Society_and_Affinity_Groups, Teams
@@ -614,8 +615,7 @@ def renewal_session_data(request,pk):
         get_all_sc_ag=PortData.get_all_sc_ag(request=request)
         session_name=renewal_data.get_renewal_session_name(pk)
         session_id=renewal_data.get_renewal_session_id(session_name=session_name)
-        get_renewal_requests=Renewal_requests.objects.filter(session_id=session_id).values('id','name','email_associated','email_ieee','contact_no','ieee_id','renewal_status','team').order_by('id')
-            
+        get_renewal_requests=Renewal_requests.objects.filter(session_id=session_id).annotate(team_name=F('team__team_name')).values('id','name','email_associated','email_ieee','contact_no','ieee_id','renewal_status','team_name').order_by('id')
         #loading team member data for form credential edit
         load_team_members=renderData.MDT_DATA.load_team_members()
         

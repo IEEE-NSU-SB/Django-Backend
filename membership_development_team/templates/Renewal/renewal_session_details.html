@@ -291,7 +291,7 @@
                           <tr>
                               <td style="color:#00629B"><a href="{% url 'membership_development_team:request_details' session_id request.id %}">{{ request.ieee_id  }}</a></td>
                               <td>{{ request.name  }}</td>
-                              <td>{% if request.team %}{{request.team.team_name}}{% else %}General Member{% endif %}</td>
+                              <td>{% if request.team_name %}{{request.team_name}}{% else %}General Member{% endif %}</td>
                               <td>{{ request.email_ieee }}</td>
                               <td>{{ request.contact_no }}</td>
                               {% if request.renewal_status %}
