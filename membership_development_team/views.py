@@ -807,6 +807,7 @@ def renewal_request_details(request,pk,request_id):
             'name':name,
             'renewal_amount':renewal_amount_dict,
             'total_amount':total_amount,
+            'media_url': settings.MEDIA_URL
         }
         
         
