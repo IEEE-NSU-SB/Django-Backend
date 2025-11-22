@@ -712,8 +712,24 @@ class ExemplaryMemberSerializer(serializers.ModelSerializer):
         model = ExemplaryMembers
         fields = '__all__'
 
-# class PanelMemberPositionSerializer(serializers.ModelField):
+class PanelMemberPositionSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         models = Roles_and_Position
-#         fields = ['organization', 'currentPosition']
+    organization = serializers.SerializerMethodField()
+    currentPosition = serializers.CharField(source='position')
+    tenure = serializers.StringRelatedField()
+    team = serializers.StringRelatedField()
+    current = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Panel_Members
+        fields = ['organization', 'currentPosition', 'tenure', 'team', 'current']
+
+    def get_organization(self, obj):
+        return obj.position.role_of.short_form
+
+    def get_current(self, obj):        
+        current = self.context.get('current')
+        if current:
+            return current
+        else:
+            return False
