@@ -613,20 +613,20 @@ class MemberProfileView(APIView):
         # sc_ag_previous_position_data_serialized = PanelMemberPositionSerializer(sc_ag_previous_position_data, many=True).data
         sc_ag_position_data_serialized = []
         for data in sc_ag_position_data:
-            sc_ag_position_data_serialized.append(
-                {
-                    'organization': data.sc_ag.short_form,
-                    'currentPosition': data.position.role if data.position else 'None',
-                    'team': data.team.team_name if data.team else '',
-                    'tenure': '',
-                    'current': True
-                }
-            )
+            if data.position:
+                sc_ag_position_data_serialized.append(
+                    {
+                        'organization': data.sc_ag.short_form,
+                        'currentPosition': data.position.role if data.position else 'None',
+                        'team': data.team.team_name if data.team else '',
+                        'tenure': '',
+                        'current': True
+                    }
+                )
 
             for prev_data in sc_ag_previous_position_data:
-                if data.position:
-                    if prev_data.position.role_of.primary == data.position.role_of.primary:
-                        sc_ag_position_data_serialized.append(PanelMemberPositionSerializer(prev_data).data)
+                if prev_data.position.role_of.primary == data.sc_ag.primary:
+                    sc_ag_position_data_serialized.append(PanelMemberPositionSerializer(prev_data).data)
 
         roles = []
         roles.append(branch_current_position_data)
