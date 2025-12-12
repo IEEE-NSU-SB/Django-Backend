@@ -434,7 +434,7 @@ class TeamInfoView(APIView):
 
     def get(self, request, team_primary):
         team_details = Teams.objects.get(primary=team_primary)
-        team_serialized = TeamSerializer(team_details).data
+        team_serialized = TeamSerializer(team_details, context={'request':request}).data
 
         team_co_ordinators=[]
         team_incharges=[]
@@ -687,7 +687,7 @@ class FAQView(APIView):
         data = {}
 
         for category in all_categories:
-            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title__in=all_categories).order_by('pk'), many=True).data
+            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title=category).order_by('pk'), many=True).data
             data.update({
                 category.title: question_answers_serialized
             })
