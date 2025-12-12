@@ -45,4 +45,5 @@ urlpatterns = [
     path('get_sb_news_details/<int:news_id>/', SBNewsDetails.as_view(), name='sb_news_details'),
     path('get_member_details/<int:ieee_id>/', MemberProfileView.as_view(), name='member_profile'),
     path('get_exemplary_members/', ExemplaryMembersListView.as_view(), name='exemplary_members_list'),
+    path('get_faq/', FAQView.as_view(), name='faq_details')
 ]

@@ -678,3 +678,19 @@ class ExemplaryMembersListView(ListAPIView):
 
     queryset = ExemplaryMembers.objects.all().order_by('rank')
     serializer_class = ExemplaryMemberSerializer
+
+class FAQView(APIView):
+
+    def get(self, request):
+        all_categories = FAQ_Question_Category.objects.all().order_by('id')
+
+        data = {}
+
+        for category in all_categories:
+            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title__in=all_categories).order_by('pk'), many=True).data
+            data.update({
+                category.title: question_answers_serialized
+            })
+
+        return Response(data)
+
