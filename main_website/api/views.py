@@ -593,27 +593,49 @@ class MemberProfileView(APIView):
         awards = VolunteerAwardRecievers.objects.filter(award_reciever=member_details)
         awards_serialized = VolunteerAwardTitleSerializer(awards, many=True).data
 
+        branch_current_position_data = {
+            'organization': 'IEEE NSU SB',
+            'currentPosition': member_details.position.role if member_details.position else 'None',
+            'team': member_details.team.team_name if member_details.team else '',
+            'tenure': '',
+            'current': True
+        }
+
         #get current sc_ag position data for all sc_ag
         sc_ag_position_data = SC_AG_Members.objects.filter(member=ieee_id).order_by('sc_ag__primary')
 
         #get previous branch position data
-        # branch_prev_position_data = PortData.get_branch_previous_position_data(ieee_id)
-        # branch_prev_position_data_serialized = PanelMemberPositionSerializer(branch_prev_position_data, many=True).data
-        # #get previous sc_ag position data for all sc_ag
-        # sc_ag_previous_position_data = PortData.get_sc_ag_previous_position_data(request,ieee_id)
+        branch_prev_position_data = PortData.get_branch_previous_position_data(ieee_id)
+        branch_prev_position_data_serialized = PanelMemberPositionSerializer(branch_prev_position_data, many=True).data
+        
+        #get previous sc_ag position data for all sc_ag
+        sc_ag_previous_position_data=Panel_Members.objects.filter(~Q(tenure__panel_of__primary=1), member=Members.objects.get(ieee_id=ieee_id),tenure__current=False).order_by('-tenure__year')
+        # sc_ag_previous_position_data_serialized = PanelMemberPositionSerializer(sc_ag_previous_position_data, many=True).data
+        sc_ag_position_data_serialized = []
+        for data in sc_ag_position_data:
+            if data.position:
+                sc_ag_position_data_serialized.append(
+                    {
+                        'organization': data.sc_ag.short_form,
+                        'currentPosition': data.position.role if data.position else 'None',
+                        'team': data.team.team_name if data.team else '',
+                        'tenure': '',
+                        'current': True
+                    }
+                )
 
-        # has_branch_prev_position=False
-        # if branch_prev_position_data.count() > 0:
-        #     has_branch_prev_position = True
+            for prev_data in sc_ag_previous_position_data:
+                if prev_data.position.role_of.primary == data.sc_ag.primary:
+                    sc_ag_position_data_serialized.append(PanelMemberPositionSerializer(prev_data).data)
 
-        has_current_branch_position = True
-        #if there is no current position but there is a previous position then don't display text
-        #otherwise show it
-        # if has_branch_prev_position and member_data.team is None:
-        #     has_current_branch_position = False
+        roles = []
+        roles.append(branch_current_position_data)
+        roles.extend(branch_prev_position_data_serialized)
+        roles.extend(sc_ag_position_data_serialized)
 
         data = {
-            'achievements':awards_serialized
+            'achievements':awards_serialized,
+            'roles':roles,
         }
         member_details_serialized.update(data)
 

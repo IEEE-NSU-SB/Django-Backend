@@ -48,6 +48,8 @@ else:
     CORS_ALLOWED_ORIGINS = [
         "http://ieeensusb.org",
         "https://ieeensusb.org",
+        "http://www.ieeensusb.org",
+        "https://www.ieeensusb.org",
         "http://react.ieeensusb.org",
         "https://react.ieeensusb.org"
     ]

@@ -831,7 +831,7 @@ def renewal_request_details(request,pk,request_id):
                     # #show success message
                     messages.success(request,f"Membership with IEEE ID {ieee_id} has been renewed!")
                     # Send an Email to the Applicants Associated Email
-                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0]['email_associated'],reciever_name=renewal_request_details[0]['name'])
+                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0].email_associated,reciever_name=renewal_request_details[0].name)
                     if email_stat:
                         messages.success(request,"Renewal Confirmation email was sent to the member's Associated email address.")
                     else:
@@ -847,9 +847,9 @@ def renewal_request_details(request,pk,request_id):
                     #update the member in INSB Registered Members Database
                     try:
                         new_member_from_renewal=Members.objects.create(
-                            ieee_id=ieee_id,nsu_id=renewal_request_details[0]['nsu_id'],name=name,contact_no=renewal_request_details[0]['contact_no'],
-                            email_personal=renewal_request_details[0]['email_associated'],
-                            email_ieee=renewal_request_details[0]['email_ieee'],last_renewal_session=Renewal_Sessions.objects.get(id=get_renewal_session.id)
+                            ieee_id=ieee_id,nsu_id=renewal_request_details[0].nsu_id,name=name,contact_no=renewal_request_details[0].contact_no,
+                            email_personal=renewal_request_details[0].email_associated,
+                            email_ieee=renewal_request_details[0].email_ieee,last_renewal_session=Renewal_Sessions.objects.get(id=get_renewal_session.id)
                         )
                         new_member_from_renewal.save()
                     except:
@@ -859,7 +859,7 @@ def renewal_request_details(request,pk,request_id):
                     messages.success(request,f"Membership has been renewed!\nThis member with the associated IEEE ID: {ieee_id} was not found in the IEEE NSU SB Registered Member Database!\nHowever, the system kept the Data of renewal!")
                     
                     # Send an Email to the Applicants Associated Email
-                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0]['email_associated'],reciever_name=renewal_request_details[0]['name'])
+                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0].email_associated,reciever_name=renewal_request_details[0].name)
                     if email_stat:
                         messages.success(request,"Renewal Confirmation email was sent to the member's Associated email address.")
                     else:
