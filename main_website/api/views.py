@@ -687,7 +687,7 @@ class FAQView(APIView):
         data = {}
 
         for category in all_categories:
-            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title__in=category).order_by('pk'), many=True).data
+            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title=category).order_by('pk'), many=True).data
             data.update({
                 category.title: question_answers_serialized
             })
