@@ -733,3 +733,9 @@ class PanelMemberPositionSerializer(serializers.ModelSerializer):
             return current
         else:
             return False
+        
+class FAQ_QuestionsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FAQ_Questions
+        fields = ['question', 'answer']
