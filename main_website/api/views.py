@@ -434,7 +434,7 @@ class TeamInfoView(APIView):
 
     def get(self, request, team_primary):
         team_details = Teams.objects.get(primary=team_primary)
-        team_serialized = TeamSerializer(team_details).data
+        team_serialized = TeamSerializer(team_details, context={'request':request}).data
 
         team_co_ordinators=[]
         team_incharges=[]
