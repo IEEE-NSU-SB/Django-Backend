@@ -338,10 +338,11 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
 
     authors = serializers.SerializerMethodField()
     link = serializers.URLField(source='publication_link')
+    img = serializers.ImageField(source='research_banner_picture')
 
     class Meta:
         model = Research_Papers
-        fields = ['id', 'title', 'authors', 'link']
+        fields = ['id', 'img', 'title', 'authors', 'link']
 
     def get_authors(self, obj):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
