@@ -739,3 +739,19 @@ class FAQ_QuestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ_Questions
         fields = ['question', 'answer']
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GalleryImages
+        fields = ['id', 'image']
+
+class GalleryVideoSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='video_title')
+    link = serializers.CharField(source='video_link')
+    description = serializers.CharField(source='video_description')
+
+    class Meta:
+        model = GalleryVideos
+        fields = ['id', 'title', 'link', 'description']
