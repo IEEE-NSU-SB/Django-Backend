@@ -693,4 +693,22 @@ class FAQView(APIView):
             })
 
         return Response(data)
+    
+class GalleryView(APIView):
+
+    def get(self, request):
+
+        all_images=GalleryImages.objects.all().order_by('-pk')
+        all_videos=GalleryVideos.objects.all().order_by('-pk')
+
+        all_images_serialized = GalleryImageSerializer(all_images, many=True, context={'request':request}).data
+        all_videos_serialized = GalleryVideoSerializer(all_videos, many=True).data
+
+        data = {
+            'images': all_images_serialized,
+            'videos': all_videos_serialized
+        }
+
+        return Response(data)
+
 

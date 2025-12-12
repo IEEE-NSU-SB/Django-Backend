@@ -338,10 +338,11 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
 
     authors = serializers.SerializerMethodField()
     link = serializers.URLField(source='publication_link')
+    img = serializers.ImageField(source='research_banner_picture')
 
     class Meta:
         model = Research_Papers
-        fields = ['id', 'title', 'authors', 'link']
+        fields = ['id', 'img', 'title', 'authors', 'link']
 
     def get_authors(self, obj):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
@@ -739,3 +740,19 @@ class FAQ_QuestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ_Questions
         fields = ['question', 'answer']
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GalleryImages
+        fields = ['id', 'image']
+
+class GalleryVideoSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='video_title')
+    link = serializers.CharField(source='video_link')
+    description = serializers.CharField(source='video_description')
+
+    class Meta:
+        model = GalleryVideos
+        fields = ['id', 'title', 'link', 'description']
