@@ -14,159 +14,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+    
     {% block common_css %}
-        {% include "common_css.html" %}
+    {% include "common_css.html" %}
     {% endblock common_css %}
-
-
-
-    <style>
-
-        body, html {
-            margin: 0;
-            align-items: center;
-            background-color: white ;
-            justify-content: center;
-        }
-
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        
-        .btn-container {
-            text-align: center;
-        }
-        
-        .btn {
-            max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-        }
-        
-        /* Media query for smaller screens (adjust the breakpoint as needed) */
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%; /* Make the button full width on smaller screens */
-            }
-        }
-
-        .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
-            max-width: 80%; 
-            height: 90%; 
-            z-index: 1500;
-        }
-        @media screen and (max-width:700px){
-            .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
-                max-width:100%;
-            }
-        }
-
-        h1{
-            text-align:center;
-            font-size:30px;
-            font-weight:bold;
-        }
-    
-        label{
-            font-size:20px;
-        }
-
-        .app-body{
-            justify-content:center; 
-            margin-left:15%;
-            margin-right:15%;
-        }
-        
-        @media (max-width: 760px) {
-            .app-body {
-                margin-left: 5%;
-                margin-right: 5%;
-            }
-        }
-        .image-button {
-            display: inline-block;
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
-        
-        /* Add additional styling for image appearance, such as size and alignment */
-        .image-button img {
-            height:50px;
-            width: 50px; /* Adjust as needed */
-            height: auto; /* Maintain aspect ratio */
-            border-radius: 5px; /* Add rounded corners if desired */
-        }
-        .btn-container {
-          text-align: center;
-        }
-        
-        .btn {
-          max-width: 100%;
-          width: auto;
-          display: inline-block;
-          white-space: normal; /* Allow text to wrap within the button */
-          word-wrap: break-word; /* Break long words if necessary */
-          font-size: 16px; /* Adjust the font size as needed */
-        }
-        .tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip-container.right {
-        float: right; /* Float the container to the right */
-        margin-right: 0; /* Reset the margin for the right-aligned button */
-        }
-        
-        .image-button:hover + .tooltip-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(10px); /* Adjust the distance from the link */
-        }
-        
-        .tooltip-text {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translateY(-50%);
-            white-space: nowrap;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-        }
-
-        /* Banner styles */
-        .banner {
-            background-color: #b4252b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    
-        .banner p {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    
-        .lock-icon {
-            margin-right: 10px;
-        }
-        
-    </style>
+    <!--Event page css-->
+    <link rel="stylesheet" href="{% static 'css/event_form.css' %}" type="text/css" />
 </head>
 <body>
     <!-- ############ LAYOUT START-->
@@ -202,12 +55,11 @@
             <div class="container">
                 <br>
                 <br>
-                <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span
-                    style="color:#00629B;">{{event_details.event_name}}</b></span></h2>
+                <h2 class="event_name">{{event_details.event_name}}</h2>
                 
             
                 <h6 style="font-weight: bold; color: #00629B;">Note:</h6>
-                <ol style="justify-content:center;margin-bottom:15px;"><b>
+                <ol class="note_instructions"><b>
                     <li>If you want to add new venues, <span><b>update</b></span> any changes made first or <b>add</b> the venues first to prevent data loss</li>
                         <li>If you don't want to submit a form link, then just erase the value None from the text field if it appears</li>
                 </ol></b>
@@ -227,8 +79,8 @@
 
                 <br>
             </div>
-            <!--Back Arrow-->
 
+            <!--Back Arrow-->
             <div class="tooltip-container">
                 {% if is_branch %}
                 <a href="{% url 'central_branch:event_control' %}" class="image-button">

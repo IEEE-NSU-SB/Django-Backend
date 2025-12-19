@@ -1,12 +1,9 @@
 {% load static %}
 {% block collaboration_form %}
 
-    <div class="container">
-        <div class="box">
-            <br>
-            <div class="box-header" style="text-align:center;">
-                <h1>Provide Event Collaboration Details</h1>
-            </div>
+    <div class="container" id="PseudonameForContainer">
+        <div class="box" id="boxID">
+            <h1 class="form-title">Event Collaboration Details</h1>
             {% comment %} <!--Error Message-->
             <div class="py-3 text-center">
                 {% for message in messages %}
@@ -17,7 +14,7 @@
                 {% csrf_token %}
                 <div class="box-body">
                     <div class="form-group">
-                        <label>Inter Branch Collaboration With: (Press CTRL to select multiple options) </label>
+                        <label class="label-heading">Inter Branch Collaboration With: (Press CTRL to select multiple options) </label>
                         <select multiple class="form-control" name="inter_branch_collaboration">
                         <option selected value="null">--------------------</option>
                         {% for inter_branch_collaboration_option in inter_branch_collaboration_options %}
@@ -28,10 +25,10 @@
                     </div>
                     <br>
                     <div class="form-group">
-                        <label>Intra Branch Collaboration With: (Add comma to add multiple options)</label>
+                        <label class="label-heading">Intra Branch Collaboration With: (Add comma to add multiple options)</label>
                         <input
                             placeholder="Name of the Branches/Organizations"
-                            class="form-control"
+                            class="label-input"
                             type="text"
                             name="intra_branch_collaboration"                                        
                             />
@@ -40,7 +37,6 @@
                     <div style="text-align: center;">
                         <input type="submit" class="btn btn-outline b-success text-success" name="next" value="Continue to Venue & Permissions Tab">
                     </div>
-                    <br> 
                 </div>
             </form>
         </div>

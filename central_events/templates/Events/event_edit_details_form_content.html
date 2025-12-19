@@ -1,84 +1,6 @@
 {% load static %}
 {% block event_details_form %}
 <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-
-<style>
-    .publish-switch {
-        display: flex;
-        justify-content: flex-end; /* Align to the right end */
-        align-items: center;
-        position: relative;
-    }
-
-    .registration-fee-switch, .flagship-event-switch{
-        display: flex;
-        justify-content: flex-start; /* Align to the right end */
-        align-items: center;
-        position: relative;
-    }
-
-    .ui-switch{
-        /* Add shadow to the icon */
-        box-shadow: 4px 5px 4px rgba(0, 0, 0, 0.2);
-        display: inline-block;
-
-        /* You can customize the shadow properties */
-    }
-    .form-control-label.slider-checkbox {
-        display: inline-block;
-        margin-right: 10px; /* Add margin for spacing between elements */
-    }
-
-    .registration-hidden-field{
-        opacity: 0; 
-        height: 0; 
-        overflow: hidden; 
-        visibility: hidden; 
-        transition: all 0.5s 
-        ease-in-out;
-    }
-    .icon_position{
-        position: relative;
-        bottom: 30px;
-        left: 95%;
-      }
-    
-    .update_cancel{
-        text-align: center;
-        position: sticky;
-        top: 88px;
-        background: white;
-        padding-top: 16px;
-        z-index: 1000;
-    }
-    .publish_google_calendar{
-        margin: 0;
-        text-align: center;
-        padding: .25rem;
-        cursor: pointer;
-        width: 320px;
-        color: #f0f0f0;
-        background: #2a9d8f;
-        border-radius: .25rem;
-        border: 1px solid #2a9d8f;
-        transition: all .3s ease-in-out;
-    }
-    #PseudonameForContainer
-    {
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            padding: 4px;
-            border-radius: 4px;
-            max-width: 895px;
-            margin: 0 auto; 
-
-    }
-    #boxID
-    {
-        background-color: white;
-        box-shadow: none !important;
-    }
-  
-</style>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     
                         
@@ -93,8 +15,9 @@
         <form id="myForm" method = "POST">
         {% csrf_token %}
             <div class="box-body">
+
+                <!--Update changes and cancel button..-->
                 <div class="update_cancel">
-                    
                     {% if is_branch %}
                     <input type="submit" name="update_event" class="btn btn-outline b-success text-success mb-2" value="Update Changes">
                     <a href="{% url 'central_branch:event_control' %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
@@ -105,256 +28,244 @@
                     <a href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}" class="btn btn-outline b-danger text-danger mb-2">Cancel</a>
                     {% endif %}
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: .75rem 0">
-                    <div class="publish-switch">
-                        <label style="font-weight: bold; font-size: 18px;">Publish Event:</label>
-                        <span>                                            
-                            <label class="ui-switch m-t-xs m-r">
-                                <input name="publish_event" type="checkbox" {% if is_event_published %} checked {% endif %}>
-                                <i></i>
-                            </label>                
-                        </span>
+
+                <!--Event Toggle Sections -->
+                <div class="event-toggle-section">
+                    <div class="event-switch">
+                        <label class="form-control-label slider-checkbox" style="font-size: 18px;">Publish Event:</label>
+                        <label class="ui-switch m-t-xs m-r">
+                            <input name="publish_event" type="checkbox" {% if is_event_published %} checked {% endif %}>
+                            <i></i>
+                        </label>                
                     </div>
+                    <div class="event-switch">
+                        <label class="form-control-label slider-checkbox" style="font-size: 18px;">Is Featured Event:</label>
+                        <label class="ui-switch m-t-xs m-r">
+                            <input name="is_featured_event" type="checkbox" id="Checkbox" {% if is_featured_event %} checked {% endif %}>
+                            <i></i>
+                        </label>                
                     </div>
-                    <div class="form-group">
-                    <div class="flagship-event-switch">
-                        <label class="form-control-label slider-checkbox" style="font-weight: bold; font-size: 18px;">Is Featured Event:</label>
-                        <span>                                            
-                            <label class="ui-switch m-t-xs m-r">
-                                <input name="is_featured_event" type="checkbox" id="Checkbox" {% if is_featured_event %} checked {% endif %}>
-                                <i></i>
-                            </label>                
-                        </span>
+                    <div class="event-switch">
+                        <label class="form-control-label slider-checkbox" style="font-size: 18px;">Registration Fee:</label>
+                        <label class="ui-switch m-t-xs m-r">
+                            <input name="registration_fee" type="checkbox" id="registrationCheckbox" {% if is_registration_fee_required %} checked {% endif %}>
+                            <i></i>
+                        </label>                
                     </div>
-                </div>
-                    <div class="form-group">
-                    <div class="registration-fee-switch">
-                        <label class="form-control-label slider-checkbox" style="font-weight: bold; font-size: 18px;">Registration Fee:</label>
-                        <span>                                            
-                            <label class="ui-switch m-t-xs m-r">
-                                <input name="registration_fee" type="checkbox" id="registrationCheckbox" {% if is_registration_fee_required %} checked {% endif %}>
-                                <i></i>
-                            </label>                
-                        </span>
-                    </div>
-                </div>
-                <!-- Hidden textfield with transition -->
-                
-                <div class="form-group registration-hidden-field" id="registrationFeeInput">
-                    <label for="registrationFeeValue" style="font-weight: bold; font-size: 18px;">Enter amount:</label>
-                    <textarea
-                        type="text"
-                        name="registration_fee_amount"
-                        id="registrationFeeValue"
-                        class="form-control"
-                        value = "{{event_details.registration_fee_amount | safe }}"
-                        {% if is_registration_fee_required %} required {% endif %}
-                    >{{event_details.registration_fee_amount | safe }}</textarea>
-                </div>
-                <div class="form-group">
-                    <div class="flagship-event-switch" style="font-weight: bold; font-size: 18px;">
+
+                    <div class="event-switch" style="font-size: 18px;">
                         <label class="form-control-label slider-checkbox">Flagship:</label>
-                        <span>                                            
-                            <label class="ui-switch m-t-xs m-r">
-                                <input name="flagship_event" type="checkbox" id="Checkbox" {% if is_flagship_event%} checked {% endif %}>
-                                <i></i>
-                            </label>                
-                        </span>
+                        <label class="ui-switch m-t-xs m-r">
+                            <input name="flagship_event" type="checkbox" id="Checkbox" {% if is_flagship_event%} checked {% endif %}>
+                            <i></i>
+                        </label>                
                     </div>
-                </div>
-                        <div class="form-group">
-                            <label style="font-weight: bold; font-size: 18px;">Event Name: <span style="color:red">*<span></label> 
-                                <input
-                        placeholder="Event Name"
-                        class="form-control"
-                        type="text"
-                        autocomplete="off"
-                        required
-                        name="event_name"
-                        value="{{event_details.event_name}}" 
-                    />
-                        
                 </div>
 
+                <!--Event Name-->
+                <label class="label-heading" style="margin-top:6px">Event Name: <span style="color:red; font-weight: normal;">*<span></label> 
+                <input
+                placeholder="Event Name"
+                class="label-input"
+                type="text"
+                autocomplete="off"
+                required
+                name="event_name"
+                value="{{event_details.event_name}}" 
+                />
                 
-                <br>
-                <div class="form-group" style="font-weight: bold; font-size: 18px;">
+                <!--Event Description-->
+                <div class="label-heading">
                     {{form.media}}
                     {{form.as_p}}
                 </div>
-                <br>
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 18px;">Mega Event of</label>    
-                    <select class="form-control" name="super_event">
-                        <option value="null" {% if event_details.super_event_id is none %}selected{% endif %}>--------------------</option>
-                        {% for super_event in super_events %}
-                            <option value="{{ super_event.id }}" 
-                            {% if super_event and super_event == event_details.super_event_id %}selected{% endif %}>
-                                {{ super_event.super_event_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <br>
-                <div class="form-group">
-                    <label>Select Event Type: <span style="color:red">*<span></label>
-                    <select multiple class="form-control" name="event_type" required>
-                        <option value="null" {% if event_details.event_type is none %}selected{% endif %}>--------------------</option>
-                        {% for event_type in event_types %}
-                            <option value="{{ event_type.id }}" 
-                            {% if event_type and event_type in event_details.event_type.all %}selected{% endif %}>
-                                {{ event_type.event_category }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% if event_details.event_date and event_details.start_date == None %}
-                <br>
-                <div class="form-group">
 
-                    <label for="exampleInputPassword3" style="font-weight: bold; font-size: 18px;">(Update Starting Date of Event According to this date)</label>
-                    <input
-                        placeholder="Event Date"
-                        name="event_date"
-                        type="date"
-                        class="form-control"
-                        value="{{event_details.event_date|date:"Y-m-d"}}"
-                        disabled
-                    />
-                </div>
-                {% endif %}
-                <br>
-                <div class="form-group">
-                    <label for="startDateTime" style="font-weight: bold; font-size: 18px;">Add a (tentative) start date for the Event: </label>
-                    <input type="datetime-local" id="startDateTime" name="start_date_time" required value = "{{event_details.start_date|date:"Y-m-d\TH:i" }}">
-                </div>
-                <br>
-                <div class="form-group">
-                    <label for="endDateTime" style="font-weight: bold; font-size: 18px;">Add a end date for the Event (if any): </label>
-                    <input type="datetime-local" id="endDateTime" name="end_date_time" value = "{{event_details.end_date|date:"Y-m-d\TH:i" }}">
-                </div>
-                <div id="error-message" style="color: red; display: none;"></div><br>
-                <br>
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 18px;">Inter Branch Collaboration With: (Press CTRL to select multiple options) </label>
-                    <select multiple class="form-control" name="inter_branch_collaboration">
-                        <option value="null" {% if not hasCollaboration %}selected{% endif %}>--------------------</option>
-                        {% for inter_branch_collaboration_option in inter_branch_collaboration_options %}
-                            <option value="{{ inter_branch_collaboration_option.primary }}" {% if inter_branch_collaboration_option and inter_branch_collaboration_option in interBranchCollaborations %}selected{% endif %}>
-                                {{ inter_branch_collaboration_option.group_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <br>
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 18px;">Intra Branch Collaboration With:  (Add comma to add multiple)</label>
-                    <input
-                        placeholder="Name of the Branches/Organizations"
-                        class="form-control"
-                        type="text"
-                        name="intra_branch_collaboration"
-                        value="{{intraBranchCollaborations.collaboration_with}}"
-                    />
-                </div>
-                <br>
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 18px;">Select Probable Venues For the Event: (Press CTRL to select multiple options)</label>
-                    <select multiple class="form-control" name="event_venues">
-                        <option value="null" {% if selected_venues is none %}selected{% endif %}>--------------------</option>
-                        {% for venue in venues %}
-                            <option value="{{ venue.id }}" {% if venue.venue_name in selected_venues %}selected{% endif %}>
-                                {{ venue.venue_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <button type="button" class="btn btn-outline-success buttons mt-2" data-toggle="modal" data-target="#addVenueModal">Add Venue</button>
-                </div>
-                
-                <br>
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 18px;">Select Permission Criterias For the Event: (Press CTRL to select multiple options) <span style="color:red">*</span></label>
-                    <select multiple class="form-control" name="permission_criteria" required>
-                        <option value="null" {% if selectedPermissionId is none %}selected{% endif %}>----------</option>
-                        {% for permission in permission_criterias %}
-                            <option value="{{ permission.id }}" {% if selectedPermissionId and permission.id == selectedPermissionId %}selected{% endif %}>
-                                {{ permission.permission_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <br>
-                
-                
-                
-
-                
-
-                
-
-                <br>
-                <div class="form-group">
-                    <label class="form-control-label" style="font-weight: bold; font-size: 18px;">More Info Link:</label>
-  
-                    <div style="display: flex; align-items: center;">
-                    <input
-                    placeholder="Provide More Info Link"
+                <!-- Hidden textfield of registration fees -->
+                <div class="label-heading registration-hidden-field" id="registrationFeeInput">
+                    <label for="registrationFeeValue" style="font-size: 18px;">Enter Registration amount:</label>
+                    <textarea
+                    type="text"
+                    name="registration_fee_amount"
+                    id="registrationFeeValue"
                     class="form-control"
-                    type="url"
-                    autocomplete="off"
-                    id="field1"
-                    value="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}"
-                    name="more_info_link"
-                    />
-    
-                    <a 
-                    href="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}" 
-                    target="_blank"
-                    style="
-                    margin-left: 8px;
-                    background: white;
-                    padding: 6px;
-                    border-radius: 4px;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                    text-decoration: none;
-                    display: inline-block;">
-                    <i class="fa fa-external-link" aria-hidden="true"></i>
-                    </a>
+                    value = "{{event_details.registration_fee_amount | safe }}"
+                    {% if is_registration_fee_required %} required {% endif %}
+                    >{{event_details.registration_fee_amount | safe }}</textarea>
+                </div>
+
+                <!--Mega Event of-->
+                <label class="label-heading" for="customSearchInput">Mega Event of</label> 
+                
+                <input type="hidden" name="super_event" id="hiddenSuperEventId" 
+                    value="{{ event_details.super_event_id|default:'null' }}">
+
+                <div class="custom-select-container">
+                    
+                    <input type="text" 
+                        class="label-input"
+                        style="margin-bottom: 0;" 
+                        id="customSearchInput" 
+                        placeholder="Search and Select for a Mega Event..." 
+                        autocomplete="off"
+                        readonly 
+                        
+                        value="{% for super_event in super_events %}{% if super_event.id == event_details.super_event_id %}{{ super_event.super_event_name }}{% endif %}{% endfor %}">
+                    
+                    <ul id="customDropdownList" class="custom-dropdown-list">
+                        <li data-value="null" class="dropdown-item {% if event_details.super_event_id is none %}selected{% endif %}">None</li>
+                        
+                        {% for super_event in super_events %}
+                            <li data-value="{{ super_event.id }}" 
+                                class="dropdown-item 
+                                {% if super_event and super_event.id == event_details.super_event_id %}selected{% endif %}">
+                                {{ super_event.super_event_name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!--Event Type-->
+                <label class="label-heading">Select Event Type: <span style="color:red">*<span></label>
+                <select multiple class="form-control" name="event_type" required>
+                    <option value="null" {% if event_details.event_type is none %}selected{% endif %}>--------------------</option>
+                    {% for event_type in event_types %}
+                        <option value="{{ event_type.id }}" 
+                        {% if event_type and event_type in event_details.event_type.all %}selected{% endif %}>
+                            {{ event_type.event_category }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <!--Event Dates-->
+                {% if event_details.event_date and event_details.start_date == None %}
+                <label for="exampleInputPassword3" class="label-heading">(Update Starting Date of Event According to this date)</label>
+                <input
+                    placeholder="Event Date"
+                    name="event_date"
+                    type="date"
+                    class="form-control"
+                    value="{{event_details.event_date|date:"Y-m-d"}}"
+                    disabled
+                />
+                {% endif %}
+
+                <!--Event Start and End DateTime-->
+                <label for="startDateTime" class="label-heading">Tentative start date for the Event: </label>
+                <input class="label-input" type="datetime-local" id="startDateTime" name="start_date_time" required value = "{{event_details.start_date|date:"Y-m-d\TH:i" }}">
+
+                <label for="endDateTime" class="label-heading">Tentative end date for the Event: </label>
+                <input class="label-input" type="datetime-local" id="endDateTime" name="end_date_time" required value = "{{event_details.end_date|date:"Y-m-d\TH:i" }}">
+
+                <!--Inter Branch Collaboration-->
+                <div id="error-message" style="color: red; display: none;"></div><br>
+                <label class="label-heading">Inter Branch Collaboration With: (Press CTRL to select multiple options) </label>
+                <select multiple class="form-control" name="inter_branch_collaboration">
+                    <option value="null" {% if not hasCollaboration %}selected{% endif %}>--------------------</option>
+                    {% for inter_branch_collaboration_option in inter_branch_collaboration_options %}
+                        <option value="{{ inter_branch_collaboration_option.primary }}" {% if inter_branch_collaboration_option and inter_branch_collaboration_option in interBranchCollaborations %}selected{% endif %}>
+                            {{ inter_branch_collaboration_option.group_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <!--Intra Branch Collaboration-->
+                <label class="label-heading">Intra Branch Collaboration With:  (Add comma to add multiple)</label>
+                <input
+                    placeholder="Name of the Branches/Organizations"
+                    class="form-control"
+                    type="text"
+                    name="intra_branch_collaboration"
+                    value="{{intraBranchCollaborations.collaboration_with}}"
+                />
+
+                <!--Event Venues-->
+                <label class="label-heading">Select Probable Venues For the Event:</label>
+
+                <div class="custom_select_venue"> <div class="select_box_venue">
+                        <input type="text" class="tags_input_venue" name="tags_venue" hidden >
+                        <div class="selected_options_venue">
+                            <span class="placeholder_venue">Select probable venues</span>
+                        </div>
+                        <div class="arrow_icon">
+                            <i class="fa fa-chevron-down"></i>
+                        </div>
                     </div>
+
+                    <div class="options_venue">
+                        <div class="option_search_tags">
+                            <input type="text" class="search_tags_venue" placeholder="Search Venues...">
+                            <button type="button" class="clear_venue"><i class="fa fa-close"></i></button>
+                        </div>
+                        
+                        {% for venue in venues %}
+                        <div class="option_venue" 
+                            data-id="{{ venue.id }}"
+                            data-name="{{ venue.venue_name }}"
+                            onclick="selectVenue('{{ venue.venue_name | escapejs }}', '{{ venue.id }}', this)">
+                            {{ venue.venue_name }}
+                        </div>
+                        {% endfor %}
+
+                        <div class="option_venue no-result-message-venue" style="display: none; color: red;">Venue doesn't exist</div>
+                    </div>
+                    <span class="tag_error_msg_venue"></span>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-control-label" style="font-weight: bold; font-size: 18px;">Event Form Link:</label>
+                <input type="hidden" name="event_venues" id="hiddenVenueIds" value="{{ initial_venue_ids }}"> 
+                <button type="button" class="btn btn-outline-success buttons mt-2" data-toggle="modal" data-target="#addVenueModal">Add Venue</button>
+                <br>
+            
+                <!--Permission Criterias-->
+                <label class="label-heading">Select Permission Criterias For the Event: (Press CTRL to select multiple options) <span style="color:red">*</span></label>
+                <select multiple class="form-control" name="permission_criteria" required>
+                    <option value="null" {% if selectedPermissionId is none %}selected{% endif %}>----------</option>
+                    {% for permission in permission_criterias %}
+                        <option value="{{ permission.id }}" {% if selectedPermissionId and permission.id == selectedPermissionId %}selected{% endif %}>
+                            {{ permission.permission_name }}
+                        </option>
+                    {% endfor %}
+                </select>                
+                <label class="label-heading">More Info Link:</label>
+                <div style="display: flex; align-items: center;">
+                <input
+                placeholder="Provide More Info Link"
+                class="label-input"
+                type="url"
+                autocomplete="off"
+                id="field1"
+                value="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}"
+                name="more_info_link"
+                />
 
-                    <div style="display: flex; align-items: center;">
-                        <input
-                            placeholder="Provide Form Link"
-                            class="form-control"
-                            type="url"
-                            autocomplete="off"
-                            id="field1"
-                            value="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}"
-                            name="drive_link_of_event"
-                        />
-
-                    <a
-                        href="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}"
-                        target="_blank"
-                        style="
-                        margin-left: 8px;
-                        padding: 6px;
-                        background: white;
-                        border-radius: 4px;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-                        text-decoration: none;
-                        display: inline-block;"
-                    >
-                        <i class="fa fa-external-link" aria-hidden="true"></i>
-                    </a>
+                <a 
+                href="{% if event_details.more_info_link %}{{event_details.more_info_link}}{% endif %}" 
+                target="_blank"
+                class="event-link-icon">
+                <i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
                 </div>
+
+
+                <label class="label-heading">Event Form Link:</label>
+
+                <div style="display: flex; align-items: center;">
+                    <input
+                        placeholder="Provide Form Link"
+                        class="label-input"
+                        type="url"
+                        autocomplete="off"
+                        id="field1"
+                        value="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}"
+                        name="drive_link_of_event"
+                    />
+
+                <a
+                    href="{% if event_details.form_link %}{{event_details.form_link}}{% endif %}"
+                    target="_blank"
+                    class="event-link-icon"
+                >
+                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
             </div>
 
                 
@@ -433,10 +344,10 @@
             checkbox.change(function () {
                 if (checkbox.is(':checked')) {
                     // Show the textfield with a fixed height
-                    feeInput.css({ opacity: 1, height: 'auto', visibility: 'visible' }); // Adjust the height value as needed
+                    feeInput.css({ opacity: 1, height: 'auto', visibility: 'visible', display:'block' }); // Adjust the height value as needed
                 } else {
                     // Hide the textfield with a fixed height
-                    feeInput.css({ opacity: 0, height: 0, visibility: 'hidden' });
+                    feeInput.css({ opacity: 0, height: 0, visibility: 'hidden', display:'none' }); // Adjust the height value as needed
                 }
             });
             checkbox.change();
@@ -465,5 +376,345 @@
             }
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.custom-select-container');
+        const input = document.getElementById('customSearchInput');
+        const list = document.getElementById('customDropdownList');
+        const hiddenInput = document.getElementById('hiddenSuperEventId');
+        const items = list.querySelectorAll('.dropdown-item');
+
+        // 1. Toggle Dropdown and Search Mode
+        input.addEventListener('click', (e) => {
+            container.classList.toggle('open');
+            
+            // When opening, make the input searchable
+            if (container.classList.contains('open')) {
+                input.readOnly = false;
+                input.focus();
+                input.select();
+            } else {
+                // When closing, revert to display mode
+                input.readOnly = true;
+                filterList(''); // Clear filter
+                
+                // If the input is empty, restore the selected text
+                if (input.value === "") {
+                    const selectedItem = list.querySelector('.dropdown-item.selected');
+                    input.value = selectedItem ? selectedItem.textContent.trim() : "";
+                }
+            }
+        });
+
+        // 2. Filter Function
+        const filterList = (searchTerm) => {
+            const term = searchTerm.toLowerCase();
+            items.forEach(item => {
+                const text = item.textContent.trim().toLowerCase();
+                if (text.includes(term)) {
+                    item.style.display = ''; // Show
+                } else {
+                    item.style.display = 'none'; // Hide
+                }
+            });
+        };
+
+        // Listen for input changes to filter the list
+        input.addEventListener('input', (e) => {
+            if (!container.classList.contains('open')) {
+                container.classList.add('open');
+            }
+            filterList(e.target.value);
+        });
+
+        // 3. Selection Function
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const selectedValue = e.target.getAttribute('data-value');
+                const selectedText = e.target.textContent.trim();
+
+                // Update hidden form field
+                hiddenInput.value = selectedValue;
+
+                // Update the display input
+                input.value = selectedText;
+                input.readOnly = true; // Revert to display mode
+
+                // Update selection state
+                items.forEach(i => i.classList.remove('selected'));
+                e.target.classList.add('selected');
+
+                // Close the dropdown
+                container.classList.remove('open');
+                filterList(''); // Clear the filter to show all options next time
+            });
+        });
+
+        // 4. Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                container.classList.remove('open');
+                input.readOnly = true;
+                filterList(''); 
+                
+                // Restore the selected text if the user didn't make a selection
+                const selectedItem = list.querySelector('.dropdown-item.selected');
+                input.value = selectedItem ? selectedItem.textContent.trim() : "";
+            }
+        });
+        
+                const customSelectVenue = document.querySelector('.custom_select_venue');
+        const selectBoxVenue = customSelectVenue.querySelector('.select_box_venue');
+        const tagsInputVenue = customSelectVenue.querySelector('.tags_input_venue');
+        const selectedOptionsVenue = customSelectVenue.querySelector('.selected_options_venue');
+        const optionsContainerVenue = customSelectVenue.querySelector('.options_venue');
+        const searchInputVenue = customSelectVenue.querySelector('.search_tags_venue');
+        const clearButtonVenue = customSelectVenue.querySelector('.clear_venue');
+        const noResultMessageVenue = customSelectVenue.querySelector('.no-result-message-venue');
+        const venueOptions = customSelectVenue.querySelectorAll('.option_venue');
+        
+        let selectedVenues = {}; // {id: name}
+
+        // --- Core Functions ---
+
+        function updateSelectedVenues() {
+            const selectedValues = Object.keys(selectedVenues);
+            tagsInputVenue.value = selectedValues.join(",");
+
+            let tagsHTML = "";
+            const venueNames = Object.values(selectedVenues);
+
+            if (venueNames.length === 0) {
+                tagsHTML = '<span class="placeholder_venue">Select probable venues</span>';
+            } else {
+                venueNames.forEach(function(name) {
+                    // Find the ID for the name (reverse lookup, needed for removal)
+                    const id = Object.keys(selectedVenues).find(key => selectedVenues[key] === name);
+                    if (id) {
+                         // Use 'removeVenueTag(this)' for dynamic removal
+                        tagsHTML += `<span class="tag">${name}<span class="remove_tag" onclick="removeVenueTag(this)" data-id="${id}">&times;</span></span>`;
+                    }
+                });
+            }
+            selectedOptionsVenue.innerHTML = tagsHTML;
+        }
+
+        function toggleVenueSelection(id, name, element) {
+            id = id.toString(); // Ensure consistency
+            if (selectedVenues.hasOwnProperty(id)) {
+                delete selectedVenues[id];
+                element.classList.remove("active");
+            } else {
+                selectedVenues[id] = name;
+                element.classList.add("active");
+            }
+            updateSelectedVenues();
+        }
+
+        // --- Event Listeners ---
+        
+        // Handle dropdown toggle
+        selectBoxVenue.addEventListener("click", function(event) {
+            // Prevent dropdown toggle if clicking on an existing tag
+            if (!event.target.closest(".tag")) { 
+                customSelectVenue.classList.toggle('open');
+            }
+        });
+
+        // Handle selection via clicking an option in the list
+        venueOptions.forEach(function(option) {
+            option.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                const name = this.getAttribute("data-name");
+                toggleVenueSelection(id, name, this);
+            });
+        });
+        
+        // Search Filter
+        searchInputVenue.addEventListener("input", function() {
+            const searchTerm = searchInputVenue.value.toLowerCase();
+            let matchesFound = 0;
+
+            venueOptions.forEach(function(option) {
+                const optionText = option.textContent.trim().toLowerCase();
+                const shouldShow = optionText.includes(searchTerm);
+                option.style.display = shouldShow ? "block" : "none"; // Use 'block' since options are just text rows
+                if (shouldShow) {
+                    matchesFound++;
+                }
+            });
+
+            noResultMessageVenue.style.display = (matchesFound === 0) ? "block" : "none";
+        });
+        
+        // Clear Search Button
+        clearButtonVenue.addEventListener("click", function() {
+            searchInputVenue.value = "";
+            venueOptions.forEach(function(option) {
+                option.style.display = "block";
+            });
+            noResultMessageVenue.style.display = 'none';
+        });
+
+        // Close on click outside
+        document.addEventListener("click", function(event) {
+            if (!event.target.closest(".custom_select_venue") && !event.target.classList.contains("remove_tag")) {
+                customSelectVenue.classList.remove("open");
+            }
+        });
+
+        // --- Initialization ---
+
+        // Function to initialize selectedVenues from server-side selected options (if any)
+        function initializeVenueTags() {
+            venueOptions.forEach(function(option) {
+                // Check if the option should be pre-selected (if your Django logic supports this)
+                // Since the original Select2 was removed, we manually check if the ID is present 
+                // in the hidden input or if you manually marked options as 'active' in HTML.
+                // Assuming we use the existing option selection mechanism for simplicity:
+                const isSelectedInTemplate = option.hasAttribute('data-initial-selected'); 
+                
+                // FALLBACK: If your Django template sets the initial list in #hiddenVenueIds
+                const initialIds = document.getElementById('hiddenVenueIds').value.split(',').map(id => id.trim());
+                const optionId = option.getAttribute("data-id");
+
+                if (initialIds.includes(optionId) || isSelectedInTemplate) {
+                    const id = option.getAttribute("data-id");
+                    const name = option.getAttribute("data-name");
+                    selectedVenues[id] = name;
+                    option.classList.add("active");
+                }
+            });
+            updateSelectedVenues();
+        }
+        
+        initializeVenueTags(); // Run initialization
+    });
+</script>
+    <script>
+    // Function called by the 'onclick' attribute on the dynamically created tags
+    function removeVenueTag(element) {
+        const idToRemove = element.getAttribute("data-id").toString();
+        const customSelectVenue = element.closest(".custom_select_venue");
+        
+        // 1. Remove from JS model (selectedVenues)
+        const selectedVenues = JSON.parse(customSelectVenue.getAttribute('data-venues-state')) || {};
+        delete selectedVenues[idToRemove];
+        customSelectVenue.setAttribute('data-venues-state', JSON.stringify(selectedVenues)); // Re-save state
+        
+        // 2. De-activate option in dropdown
+        const optionToRemove = customSelectVenue.querySelector(`.option_venue[data-id="${idToRemove}"]`);
+        if (optionToRemove) {
+            optionToRemove.classList.remove("active");
+        }
+        
+        // 3. Update the display/hidden inputs
+        updateSelectedVenues(); // Re-render the tags and update hidden input
+    }
     
+    // NOTE: This utility function needs to be outside DOMContentLoaded or made global/passed in.
+    // The previous implementation used a simple global function for tag removal.
+    // Let's modify the in-place removal and selection functions to be scoped or simplify their usage.
+    
+    // --- REVISING GLOBAL FUNCTIONS FOR SIMPLICITY ---
+    
+    // 1. Move the select/toggle logic to a global function (since options use onclick)
+    function selectVenue(venueName, venueID, element) {
+        const customSelectVenue = element.closest('.custom_select_venue');
+        
+        // Find the relevant JS functions/objects, or just use the IDs to manage state
+        const id = venueID.toString();
+        
+        // Access/update the global (or scoped) state for the specific custom select
+        // To make this work globally without complex state management:
+        
+        // 1. Read current IDs from hidden input
+        const hiddenInput = document.getElementById('hiddenVenueIds');
+        let currentIds = hiddenInput.value.split(',').filter(i => i);
+        
+        // 2. Toggle selection state
+        if (element.classList.contains("active")) {
+            // Deselect
+            element.classList.remove("active");
+            currentIds = currentIds.filter(val => val !== id);
+        } else {
+            // Select
+            element.classList.add("active");
+            if (!currentIds.includes(id)) {
+                 currentIds.push(id);
+            }
+        }
+        
+        // 3. Update hidden input
+        hiddenInput.value = currentIds.join(',');
+        
+        // 4. Trigger re-rendering of tags
+        const selectedVenues = {};
+        customSelectVenue.querySelectorAll('.option_venue.active').forEach(opt => {
+             selectedVenues[opt.getAttribute('data-id')] = opt.getAttribute('data-name');
+        });
+        
+        // Re-run the update logic based on the element's state
+        const tagsInputVenue = customSelectVenue.querySelector('.tags_input_venue');
+        const selectedOptionsVenue = customSelectVenue.querySelector('.selected_options_venue');
+
+        let tagsHTML = "";
+        const venueNames = Object.values(selectedVenues);
+
+        if (venueNames.length === 0) {
+            tagsHTML = '<span class="placeholder_venue">Select probable venues</span>';
+        } else {
+            venueNames.forEach(function(name) {
+                const id = Object.keys(selectedVenues).find(key => selectedVenues[key] === name);
+                if (id) {
+                     tagsHTML += `<span class="tag">${name}<span class="remove_tag" onclick="removeVenueTagGlobal(this)" data-id="${id}">&times;</span></span>`;
+                }
+            });
+        }
+        selectedOptionsVenue.innerHTML = tagsHTML;
+        tagsInputVenue.value = currentIds.join(','); // Keep the value updated
+    }
+    
+    // 2. Separate global function for tag removal
+    function removeVenueTagGlobal(element) {
+        const idToRemove = element.getAttribute("data-id").toString();
+        const customSelectVenue = element.closest(".custom_select_venue");
+        const hiddenInput = document.getElementById('hiddenVenueIds');
+
+        // 1. De-activate option in dropdown
+        const optionToRemove = customSelectVenue.querySelector(`.option_venue[data-id="${idToRemove}"]`);
+        if (optionToRemove) {
+            optionToRemove.classList.remove("active");
+        }
+        
+        // 2. Update hidden input by filtering out the ID
+        let currentIds = hiddenInput.value.split(',').filter(id => id.trim() !== idToRemove && id.trim());
+        hiddenInput.value = currentIds.join(',');
+        
+        // 3. Re-render the tags
+        const selectedVenues = {};
+        customSelectVenue.querySelectorAll('.option_venue.active').forEach(opt => {
+             selectedVenues[opt.getAttribute('data-id')] = opt.getAttribute('data-name');
+        });
+        
+        const tagsInputVenue = customSelectVenue.querySelector('.tags_input_venue');
+        const selectedOptionsVenue = customSelectVenue.querySelector('.selected_options_venue');
+
+        let tagsHTML = "";
+        const venueNames = Object.values(selectedVenues);
+
+        if (venueNames.length === 0) {
+            tagsHTML = '<span class="placeholder_venue">Select probable venues</span>';
+        } else {
+            venueNames.forEach(function(name) {
+                const id = Object.keys(selectedVenues).find(key => selectedVenues[key] === name);
+                if (id) {
+                     tagsHTML += `<span class="tag">${name}<span class="remove_tag" onclick="removeVenueTagGlobal(this)" data-id="${id}">&times;</span></span>`;
+                }
+            });
+        }
+        selectedOptionsVenue.innerHTML = tagsHTML;
+        tagsInputVenue.value = currentIds.join(',');
+    }
+</script>
 {% endblock event_details_form %}
