@@ -56,6 +56,8 @@ else:
         "https://react.ieeensusb.org",
         "http://www.react.ieeensusb.org",
         "https://www.react.ieeensusb.org"
+        "http://api.ieeensusb.org",
+        "https://api.ieeensusb.org",
     ]
 
 
