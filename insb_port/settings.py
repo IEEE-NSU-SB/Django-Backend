@@ -38,6 +38,8 @@ if(os.environ.get('SETTINGS')=='dev'):
 else:
     ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org', 'portal.ieeensusb.org', 'sandbox.ieeensusb.org']
 
+CORS_ALLOW_CREDENTIALS = True
+
 if(os.environ.get('SETTINGS')=='dev'):
     CORS_ALLOWED_ORIGINS = [
         "http://127.0.0.1:5173",
@@ -51,7 +53,9 @@ else:
         "http://www.ieeensusb.org",
         "https://www.ieeensusb.org",
         "http://react.ieeensusb.org",
-        "https://react.ieeensusb.org"
+        "https://react.ieeensusb.org",
+        "http://www.react.ieeensusb.org",
+        "https://www.react.ieeensusb.org"
     ]
 
 
