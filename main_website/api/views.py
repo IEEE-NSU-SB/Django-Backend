@@ -109,7 +109,7 @@ class BlogsView(APIView):
         serializer = BlogListSerializer(blogs, many=True, context={'request':request})
         return Response(serializer.data)
     
-    @csrf_exempt
+    # @csrf_exempt
     def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
