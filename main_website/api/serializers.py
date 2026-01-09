@@ -4,6 +4,7 @@ import re
 from rest_framework import serializers
 from central_branch.renderData import Branch
 from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from chapters_and_affinity_group.models import SC_AG_FeedBack
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from media_team.models import Media_Images
@@ -756,3 +757,17 @@ class GalleryVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = GalleryVideos
         fields = ['id', 'title', 'link', 'description']
+
+class SC_AG_FeedBack_CreateSerializer(serializers.ModelSerializer):
+
+    date = serializers.DateField(default=date.today)  # auto-fill today if not provided
+    society = serializers.SlugRelatedField(
+        queryset=Chapters_Society_and_Affinity_Groups.objects.only('id', 'primary'),
+        slug_field='primary',   # frontend sends primary, not ID
+        required=False,
+        allow_null=True
+    )
+
+    class Meta:
+        model = SC_AG_FeedBack
+        fields = ['date', 'society', 'name', 'email', 'message']

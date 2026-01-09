@@ -47,4 +47,5 @@ urlpatterns = [
     path('get_exemplary_members/', ExemplaryMembersListView.as_view(), name='exemplary_members_list'),
     path('get_faq/', FAQView.as_view(), name='faq_details'),
     path('get_gallery/', GalleryView.as_view(), name='gallery_view'),
+    path('sc_ag_feedback/', SC_AG_FeedBack.as_view(), name='sc_ag_feedback'),
 ]

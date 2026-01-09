@@ -15,6 +15,8 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -109,7 +111,7 @@ class BlogsView(APIView):
         serializer = BlogListSerializer(blogs, many=True, context={'request':request})
         return Response(serializer.data)
     
-    # @csrf_exempt
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -711,4 +713,15 @@ class GalleryView(APIView):
 
         return Response(data)
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class SC_AG_FeedBack(APIView):
 
+    def post(self, request):
+        request.data['society'] = 1
+        serializer = SC_AG_FeedBack_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
