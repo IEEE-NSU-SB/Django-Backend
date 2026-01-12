@@ -28,9 +28,10 @@ from django.utils import timezone
 class SwitchesAPI(APIView):
 
     def get(self, request):
+        get_system=system.objects.first()
+
         if request.user.is_authenticated:
-            get_system=system.objects.first()
-            
+
             if(Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username)
                 or Access_Render.eb_access(username=request.user.username) or Access_Render.belongs_to_sc_ag_panels(username=request.user.username)):
                 
@@ -47,6 +48,13 @@ class SwitchesAPI(APIView):
                         'main_website_under_maintenance': get_system.main_website_under_maintenance,
                     },
                     "is_authenticated": True,
+                })
+        else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                    "is_authenticated": False,
                 })
 
 class AchievementListView(ListAPIView):
