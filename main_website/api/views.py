@@ -8,6 +8,8 @@ from main_website.renderData import HomepageItems
 from port.models import Panels, Roles_and_Position, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
+from system_administration.models import system
+from system_administration.render_access import Access_Render
 from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
@@ -22,6 +24,30 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from users.renderData import getTypeOfEventStats, getEventNumberStat
 from django.utils import timezone
+
+class SwitchesAPI(APIView):
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            get_system=system.objects.first()
+            
+            if(Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username)
+                or Access_Render.eb_access(username=request.user.username) or Access_Render.belongs_to_sc_ag_panels(username=request.user.username)):
+                
+                
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': False,
+                    },
+                    "is_authenticated": False,
+                })
+            else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                    "is_authenticated": True,
+                })
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer

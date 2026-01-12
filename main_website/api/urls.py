@@ -48,4 +48,5 @@ urlpatterns = [
     path('get_faq/', FAQView.as_view(), name='faq_details'),
     path('get_gallery/', GalleryView.as_view(), name='gallery_view'),
     path('sc_ag_feedback/', SC_AG_FeedBack.as_view(), name='sc_ag_feedback'),
+    path('api/switches/', SwitchesAPI.as_view()),
 ]

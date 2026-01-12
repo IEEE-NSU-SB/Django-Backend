@@ -41,12 +41,22 @@ else:
 CORS_ALLOW_CREDENTIALS = True
 
 if(os.environ.get('SETTINGS')=='dev'):
+    SESSION_COOKIE_SAMESITE = "Lax"  # works on localhost
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
     CORS_ALLOWED_ORIGINS = [
         "http://127.0.0.1:5173",
         "http://localhost:5173",
     ]
 
 else:
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
     CORS_ALLOWED_ORIGINS = [
         "http://ieeensusb.org",
         "https://ieeensusb.org",
