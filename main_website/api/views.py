@@ -40,21 +40,18 @@ class SwitchesAPI(APIView):
                     "config": {
                         'main_website_under_maintenance': False,
                     },
-                    "is_authenticated": False,
                 })
             else:
                 return Response({
                     "config": {
                         'main_website_under_maintenance': get_system.main_website_under_maintenance,
                     },
-                    "is_authenticated": True,
                 })
         else:
                 return Response({
                     "config": {
                         'main_website_under_maintenance': get_system.main_website_under_maintenance,
                     },
-                    "is_authenticated": False,
                 })
 
 class AchievementListView(ListAPIView):
@@ -749,9 +746,16 @@ class GalleryView(APIView):
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class SC_AG_FeedBack(APIView):
+    # authentication_classes = []
 
-    def post(self, request):
-        request.data['society'] = 1
+    def post(self, request, sc_ag_primary=None):
+
+        print(sc_ag_primary)
+        if sc_ag_primary:
+            request.data['society'] = sc_ag_primary
+        else:
+            request.data['society'] = 1
+
         serializer = SC_AG_FeedBack_CreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
