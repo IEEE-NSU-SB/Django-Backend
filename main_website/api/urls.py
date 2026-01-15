@@ -49,5 +49,6 @@ urlpatterns = [
     path('get_gallery/', GalleryView.as_view(), name='gallery_view'),
     path('sc_ag_feedback/', SC_AG_FeedBack.as_view(), name='branch_feedback'),
     path('sc_ag_feedback/<int:sc_ag_primary>/', SC_AG_FeedBack.as_view(), name='sc_ag_feedback'),
+    path('add_research_paper/', AddResearchPaperView.as_view(), name='add_research_paper'),
     path('api/switches/', SwitchesAPI.as_view()),
 ]

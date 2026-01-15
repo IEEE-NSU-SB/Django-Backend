@@ -746,11 +746,9 @@ class GalleryView(APIView):
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class SC_AG_FeedBack(APIView):
-    # authentication_classes = []
 
     def post(self, request, sc_ag_primary=None):
 
-        print(sc_ag_primary)
         if sc_ag_primary:
             request.data['society'] = sc_ag_primary
         else:
@@ -760,6 +758,19 @@ class SC_AG_FeedBack(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")   
+class AddResearchPaperView(APIView):
+
+    def post(self, request):
+        
+        serializer = ResearchPaper_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Research Paper submitted successfully!'}, status=status.HTTP_201_CREATED)
         else:
             print(serializer.errors)  # Debug
         return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)

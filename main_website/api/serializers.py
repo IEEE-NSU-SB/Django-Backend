@@ -771,3 +771,26 @@ class SC_AG_FeedBack_CreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SC_AG_FeedBack
         fields = ['date', 'society', 'name', 'email', 'message']
+
+class ResearchPaper_CreateSerializer(serializers.ModelSerializer):
+
+    chapter = serializers.SlugRelatedField(
+        source='group',
+        queryset=Chapters_Society_and_Affinity_Groups.objects.only('id', 'primary'),
+        slug_field='primary',   # frontend sends primary, not ID
+        required=False,
+        allow_null=True
+    )
+    publish_date = serializers.DateField(default=date.today)
+    authors = serializers.CharField(source='author_names')
+    abstract = serializers.CharField(source='short_description')
+    bannerFile = serializers.ImageField(source='research_banner_picture')
+    publicationLink = serializers.URLField(source='publication_link')
+
+    class Meta:
+        model = Research_Papers
+        fields = ['chapter', 'authors', 'title', 'category', 'abstract', 'publicationLink', 'bannerFile', 'publish_date']
+
+    def create(self, validated_data):
+        validated_data['is_requested'] = True  # direct assignment
+        return super().create(validated_data)
