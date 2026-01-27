@@ -784,7 +784,7 @@ class EventFeedbackView(APIView):
         serializer = EventFeedback_CreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message':'Research Paper submitted successfully!'}, status=status.HTTP_201_CREATED)
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
         else:
             print(serializer.errors)  # Debug
         return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
