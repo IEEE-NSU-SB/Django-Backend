@@ -774,3 +774,17 @@ class AddResearchPaperView(APIView):
         else:
             print(serializer.errors)  # Debug
         return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")       
+class EventFeedbackView(APIView):
+
+    def post(self, request, event_id):
+        
+        request.data['event_id'] = event_id
+        serializer = EventFeedback_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Research Paper submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)

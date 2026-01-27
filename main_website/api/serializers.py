@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 from rest_framework import serializers
 from central_branch.renderData import Branch
-from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from central_events.models import Event_Feedback, Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from chapters_and_affinity_group.models import SC_AG_FeedBack
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
@@ -794,3 +794,9 @@ class ResearchPaper_CreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['is_requested'] = True  # direct assignment
         return super().create(validated_data)
+
+class EventFeedback_CreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Event_Feedback
+        fields = ['event_id', 'name', 'email', 'satisfaction', 'comment']
