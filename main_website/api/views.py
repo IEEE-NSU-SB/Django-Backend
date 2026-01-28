@@ -775,9 +775,16 @@ class AddResearchPaperView(APIView):
             print(serializer.errors)  # Debug
         return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(ensure_csrf_cookie, name="dispatch")       
 class EventFeedbackView(APIView):
 
+    def get(self, request, event_id):
+
+        event_feedbacks = Event_Feedback.objects.filter(event_id=event_id, approved=True)
+        event_feedbacks_serialized = EventFeedbackSerializer(event_feedbacks, many=True).data
+
+        return Response(event_feedbacks_serialized)
+
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request, event_id):
         
         request.data['event_id'] = event_id

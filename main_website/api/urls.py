@@ -52,4 +52,5 @@ urlpatterns = [
     path('add_research_paper/', AddResearchPaperView.as_view(), name='add_research_paper'),
     path('api/switches/', SwitchesAPI.as_view()),
     path('event_feedback/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback'),
+    path('get_event_feedbacks/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback_list'),
 ]

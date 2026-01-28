@@ -800,3 +800,12 @@ class EventFeedback_CreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event_Feedback
         fields = ['event_id', 'name', 'email', 'satisfaction', 'comment']
+
+class EventFeedbackSerializer(serializers.ModelSerializer):
+
+    feedback = serializers.CharField(source='comment')
+    satisfaction = serializers.CharField(source='get_satisfaction_display')
+
+    class Meta:
+        model = Event_Feedback
+        fields = ['name', 'satisfaction', 'feedback']
