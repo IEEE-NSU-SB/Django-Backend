@@ -1,49 +1,102 @@
 {% load static %}
 {% block event_edit_tab %}
+
 <style>
-    .tab a.active {
-        color: green;
-        background-color: yellow;
+    .event-edit-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 6px;
+        list-style: none;
+        margin: 0;
+        width: 50%;
+        background-color: #ffffff;
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     }
 
-    .tabs li:hover {
+    .event-edit-tabs li {
+        padding: 12px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: bold;
+        color: #333333b7;
+        border-radius: 6px;
         transition: all 0.3s ease-in-out;
     }
+
+    .event-edit-tabs li a {
+        text-decoration: none;
+        color: inherit;
+        font-size: 14px;
+        display: block;
+        width: 100%;
+    }
+
+    .event-edit-tabs li.active_tab {
+        background-color: rgba(0, 40, 85, 0.9);
+        color: #ffffff;
+    }
+
+    .event-edit-tabs li:hover {
+        background-color: #00629b3b;
+        color: #002855db;
+    }
+
+    @media screen and (max-width: 768px) {
+        .event-edit-tabs {
+            width: 100%;
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Get the current page's URL
         const currentPageUrl = window.location.href;
-      
-        // Find the links in the navigation bar
-        const tabs = document.querySelectorAll(".tabs li");
-      
-        // Loop through the tabs and add a "active" class to the matching tab
-        tabs.forEach(function (tab) {
-          const link = tab.querySelector("a");
-          if (link.href === currentPageUrl) {
-            link.classList.add("active");
-          }
-          
-          // Add click event listener to the entire tab
-          tab.addEventListener("click", function() {
-            window.location.href = link.href;
-          });
+        const tabs = document.querySelectorAll(".event-edit-tabs li");
+
+        tabs.forEach(tab => {
+            const link = tab.querySelector("a");
+
+            if (link && currentPageUrl.includes(link.getAttribute("href"))) {
+                tab.classList.add("active_tab");
+            }
+
+            tab.addEventListener("click", function (e) {
+                e.preventDefault();
+                tabs.forEach(t => t.classList.remove("active_tab"));
+                tab.classList.add("active_tab");
+                if (link) window.location.href = link.href;
+            });
         });
     });
 </script>
 
-<div class="tabs-container" style="display: flex; flex-direction: column;">
-    <ul class="tabs" style="display: flex; margin-right: 0px; justify-content: center;">
+    <ul class="event-edit-tabs">
         {% if is_branch %}
-        <li class="tab"><a href="{% url 'central_branch:mega_event_edit' mega_event.pk %}">Edit</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'central_branch:mega_event_add_event' mega_event.pk %}">Add Events</a></li>
+            <li>
+                <a href="{% url 'central_branch:mega_event_edit' mega_event.pk %}">
+                    Edit
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'central_branch:mega_event_add_event' mega_event.pk %}">
+                    Add Events
+                </a>
+            </li>
         {% else %}
-        <li class="tab"><a href="{% url 'chapters_and_affinity_group:mega_event_edit' primary mega_event.pk %}">Edit</a></li>
-        <li class="tab" style="border-right: 1px solid #00629B;"><a href="{% url 'chapters_and_affinity_group:mega_event_add_event' primary mega_event.pk%}">Add Events</a></li>
+            <li>
+                <a href="{% url 'chapters_and_affinity_group:mega_event_edit' primary mega_event.pk %}">
+                    Edit
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'chapters_and_affinity_group:mega_event_add_event' primary mega_event.pk %}">
+                    Add Events
+                </a>
+            </li>
         {% endif %}
     </ul>
-    <br>
-</div>
 
 {% endblock event_edit_tab %}

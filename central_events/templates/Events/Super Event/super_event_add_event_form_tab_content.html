@@ -2,49 +2,7 @@
 {% block super_event_add_event_form_tab_content %}
 
 <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
-
-<style>
-
-
-    .circle-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 45px; /* Set minimum width */
-        height: 45px; /* Set minimum height */
-        background-color: transparent; /* Set to transparent or any other color for the inside */
-        border: 2px solid #78BE20; /* Border color is green */
-        border-radius: 50%;
-        color: #78BE20; /* Text color is green */
-        font-size: 24px; /* Adjust the font size as needed */
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s; /* Add smooth transition effect */
-    }
-
-    .circle-btn:hover {
-        background-color: #78BE20; /* Hover background color is green */
-        color: #fff; /* Hover text color is white */
-    }
-
-    .plus-sign::before {
-        content: '+';
-    }
-    
-
-    .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
-        max-width: 80%; 
-        height: 90%; 
-        z-index: 1500;
-    }
-    @media screen and (max-width:700px){
-        .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
-            max-width:100%;
-        }
-    }
-    
-  </style>
-
-<div class="container">
+<div class="container" id="PseudonameForContainer">
     <!--for error messages-->
     {% for message in messages  %}
         <p>
@@ -59,14 +17,8 @@
     <!--for error messages end-->
 
 
-    <div class="box">
-        <br>
-
-        <div class="box-header">
-            <h1 style="text-align:center;font-size:30px;">Add Events to {{mega_event.super_event_name}}</h1>
-        </div>
-
-        
+    <div class="box" id="boxID">
+        <h1 class="form-title">Add Events to {{mega_event.super_event_name}}</h1>
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -74,7 +26,7 @@
                 
                 {% if is_branch %}
                 <div class="form-group row align-items-center">
-                    <label for="events" class="col-sm-3 form-control-label">Add Events:</label>
+                    <label for="events" class="col-sm-3 label-heading">Add Events:</label>
                     <div class="col-sm-7">
                         <!-- Add input field for events here if needed -->
                     </div>
@@ -87,7 +39,7 @@
                 {% else %}
                     {% if has_access_for_sc_ag_updates %}
                     <div class="form-group row align-items-center">
-                        <label for="events" class="col-sm-3 form-control-label">Add Events:</label>
+                        <label for="events" class="col-sm-3 label-heading">Add Events:</label>
                         <div class="col-sm-7">
                             <!-- Add input field for events here if needed -->
                         </div>
@@ -100,7 +52,7 @@
                     {% endif %}
                 {% endif %}
                 <div id="events-container" class="mt-3">
-                    <label>Events:</label> 
+                    <label class="label-heading">Events:</label> 
                     {% for event in events_of_mega_event %}
                     <div class="row container-fluid bg-light mt-3" style="margin:auto;">
                         <div class="col-sm-11">

@@ -14,66 +14,8 @@
         {% include "common_css.html" %}
     {% endblock common_css %}
     <link rel="stylesheet" href="{% static 'tab_view.css' %}" type="text/css" />
-
-
-
-    <style>
-        body, html {
-            margin: 0;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .btn-container {
-            text-align: center;
-        }
-        
-        .btn {
-            max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-        }
-        
-        /* Media query for smaller screens (adjust the breakpoint as needed) */
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%; /* Make the button full width on smaller screens */
-            }
-        }
-        
-        h1{
-            text-align:center;
-            font-size:30px;
-            font-weight:bold;
-        }
-    
-        label{
-            font-size:20px;
-        }
-
-        .app-body{
-            justify-content:center; 
-            margin-left:15%;
-            margin-right:15%;
-        }
-        
-        @media (max-width: 760px) {
-            .app-body {
-                margin-left: 5%;
-                margin-right: 5%;
-            }
-        }
-    </style>
+    <!--Event page css-->
+    <link rel="stylesheet" href="{% static 'css/event_form.css' %}" type="text/css" />
 </head>
 <body>
     <!-- ############ LAYOUT START-->
@@ -107,11 +49,11 @@
         <div ui-view class="app-body" id="view">
             
             <div class="container">
-                <!--Instruction Section Start-->
-                {% block instruction %}
-                {% include "Events/instructions.html" %}
-                {% endblock instruction %}
-                <!--Instruction Section End-->
+                 <!--Note Section Start-->
+                {% block note %}
+                {% include "Events/event_note.html" %}
+                {% endblock note %}
+                <!--Note Section End-->
             </div>
 
             <!--for error messages-->
@@ -137,7 +79,7 @@
                 {% block collaboration_form %}
                     {% include "Events/event_collaboration_details_form_content.html" %}
                 {% endblock collaboration_form %}
-            
+                <br>
                 <div>
                     {% for message in messages %}
                     <p>{{message}}</p>

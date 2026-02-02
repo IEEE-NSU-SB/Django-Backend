@@ -20,142 +20,8 @@
     {% endblock common_css %}
 
 
-
-    <style>
-
-        body, html {
-            margin: 0;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        
-        .btn-container {
-            text-align: center;
-        }
-        
-        .btn {
-            max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-        }
-        
-        /* Media query for smaller screens (adjust the breakpoint as needed) */
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%; /* Make the button full width on smaller screens */
-            }
-        }
-
-
-        h1{
-            text-align:center;
-            font-size:30px;
-            font-weight:bold;
-        }
-    
-        label{
-            font-size:20px;
-        }
-        
-
-        .app-body{
-            justify-content:center; 
-            margin-left:15%;
-            margin-right:15%;
-        }
-        
-        @media (max-width: 760px) {
-            .app-body {
-                margin-left: 5%;
-                margin-right: 5%;
-            }
-        }
-        .image-button {
-            display: inline-block;
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
-        
-        /* Add additional styling for image appearance, such as size and alignment */
-        .image-button img {
-            height:50px;
-            width: 50px; /* Adjust as needed */
-            height: auto; /* Maintain aspect ratio */
-            border-radius: 5px; /* Add rounded corners if desired */
-        }
-        .btn-container {
-          text-align: center;
-        }
-        
-        .btn {
-          max-width: 100%;
-          width: auto;
-          display: inline-block;
-          white-space: normal; /* Allow text to wrap within the button */
-          word-wrap: break-word; /* Break long words if necessary */
-          font-size: 16px; /* Adjust the font size as needed */
-        }
-        .tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip-container.right {
-        float: right; /* Float the container to the right */
-        margin-right: 0; /* Reset the margin for the right-aligned button */
-        }
-        
-        .image-button:hover + .tooltip-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(10px); /* Adjust the distance from the link */
-        }
-        
-        .tooltip-text {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translateY(-50%);
-            white-space: nowrap;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-        }
-
-        /* Banner styles */
-        .banner {
-            background-color: #b4252b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-    
-        .banner p {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    
-        .lock-icon {
-            margin-right: 10px;
-        }
-    </style>
+    <!--Event page css--> 
+    <link rel="stylesheet" href="{% static 'css/event_form.css' %}" type="text/css" />
 </head>
 <body>
     <!-- ############ LAYOUT START-->
@@ -188,26 +54,6 @@
       <!-- ############ PAGE START-->
       <div ui-view class="app-body" id="view">
 
-
-        <div class="container">
-          <br>
-          <br>
-          <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span style="color:#00629B;">{{event_name}}</b></span></h2>
-          <h6>Note:</h6>
-          <ol style="justify-content:center;margin-bottom:15px;"><b>
-          <li>Add events for the {{mega_event.super_event_name}} by clicking on the (+) icon</li>
-          <li>Make sure to save any changes you make before leaving</li>
-          </ol></b>
-
-          {% if show_restriction_banner %}
-            <div class="banner">
-                <p>
-                    <span class="lock-icon"><i class="fa fa-lock"></i></span>
-                    All updates to Society and Affinity groups have been locked by the administrator
-                </p>
-            </div>
-            {% endif %}
-        </div>
         <!--Back Arrow-->
         <br>
         <div class="tooltip-container">
@@ -225,28 +71,39 @@
         </div>
         <!--Tab view for Events-->
         <!--Tab view Start-->
-        {% block super_event_edit_tab %}
+        <br>
+        <br>
+        <div class="container">
+            {% block super_event_edit_tab %}
             {% include "Events/Super Event/super_event_edit_tabs.html" %}
-        {% endblock super_event_edit_tab %}
+            {% endblock super_event_edit_tab %}
+        </div>
         <!--Tab view end-->
 
+        <br>
+        <div class="container note-container">
+          <h6 style="font-weight: bold; color: #00629b">Note:</h6>
+          <ol class="note_instructions">
+          <li>Add events for the {{mega_event.super_event_name}} by clicking on the (+) icon</li>
+          <li>Make sure to save any changes you make before leaving</li>
+          </ol>
+
+          {% if show_restriction_banner %}
+            <div class="banner">
+                <p>
+                    <span class="lock-icon"><i class="fa fa-lock"></i></span>
+                    All updates to Society and Affinity groups have been locked by the administrator
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        <br>
         {% block super_event_add_event_form %}
             {% include "Events/Super Event/super_event_add_event_form_tab_content.html" %}
         {% endblock super_event_add_event_form %}
                             
-                            
-
-
         </div>
         <!--PAGE END-->
-
-        
-        
-        
-
-        
-
-    
 
         <!--Theme Switcher-->
 

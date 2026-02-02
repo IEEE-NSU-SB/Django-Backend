@@ -1,185 +1,121 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8" />
     {% if is_branch %}
     <title>Create Mega Event | IEEE NSU Student Branch</title>
     {% else %}
     <title>Create Mega Event | {{sc_ag_info.group_name}}</title>
     {% endif %}
-    <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     {% block common_css %}
-        {% include "common_css.html" %}
+     {% include "common_css.html" %} 
     {% endblock common_css %}
     <link rel="stylesheet" href="{% static 'tab_view.css' %}" type="text/css" />
-
-    <style>
-        body, html {
-            margin: 0;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .btn-container {
-            text-align: center;
-        }
-
-        .btn {
-            max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-        }
-
-        /* Media query for smaller screens (adjust the breakpoint as needed) */
-        @media (max-width: 768px) {
-            .btn {
-                width: 100%; /* Make the button full width on smaller screens */
-            }
-        }
-
-
-        h1{
-            text-align:center;
-            font-size:30px;
-            font-weight:bold;
-        }
-    
-        label{
-            font-size:20px;
-        }
-        
-
-        .app-body{
-            justify-content:center; 
-            margin-left:15%;
-            margin-right:15%;
-        }
-        
-        @media (max-width: 760px) {
-            .app-body {
-                margin-left: 5%;
-                margin-right: 5%;
-            }
-        }
-    </style>
-</head>
-<body>
+    <!--Event page css-->
+    <link
+      rel="stylesheet"
+      href="{% static 'css/event_form.css' %}"
+      type="text/css"
+    />
+  </head>
+  <body>
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
+      <!-- aside -->
+      <div id="aside" class="app-aside modal nav-dropdown">
+        {% block sidebar %} {% include 'users/sidebar.html' %} {% endblock %}
+      </div>
+      <!-- aside end -->
 
-        <!-- aside -->
-        <div id="aside" class="app-aside modal nav-dropdown">
-  
-            {% block sidebar %}
-                {% include 'users/sidebar.html' %}
-            {% endblock %}
-  
-        </div>
-        <!-- aside end -->
-  
-        <!-- navbar content -->
-        <div id="content" class="app-content box-shadow-z0" role="main">
-            {% if is_branch %}
-              {% block navbar %}
-                  {% include 'navbar.html' %}
-              {% endblock navbar %}
-            {% else %}
-              {% block sc_ag_navbar %}
-                {% include 'sc_ag_navbar.html' %}
-              {% endblock sc_ag_navbar %}
-            {% endif %}
+      <!-- navbar content -->
+      <div id="content" class="app-content box-shadow-z0" role="main">
+        {% if is_branch %} 
+            {% block navbar %} 
+            {% include 'navbar.html' %} 
+            {% endblock navbar %} 
+        {% else %} 
+            {% block sc_ag_navbar %} 
+            {% include 'sc_ag_navbar.html' %}
+            {% endblock sc_ag_navbar %} 
+        {% endif %}
+      </div>
+      <!--navbar content-->
+
+      <!-- ############ PAGE START-->
+      <div ui-view class="app-body" id="view">
+        <br>
+        <div class="container note-container">
+          <h6 style="font-weight: bold; color: #00629b">Note:</h6>
+          <ol class="note_instructions">
+            <li>All ( * ) marked fields are mandatory to be filled</li>
+            <li>Maximum 1 picture can be uploaded in dedicated sections</li>
+            <li>Don’t forget to save the changes by clicking save button</li>
+            {% comment %} All ( * ) marked fields are mandatory to be filled
+            Keep in mind your description does not exceed the character count
+            Maximum 1 picture can be uploaded in dedicated sections To replace a
+            picture, delete the previous one and add a new one You can view the
+            image by clicking on it You can add as many links as you want You
+            can see your changes by clicking the preview button Don’t forget to
+            save the changes by clicking save button {% endcomment %}
+          </ol>
+
+          <!--for error messages-->
+          <div class="container">
+            {% for message in messages %}
+            <div
+              class="alert alert-success alert-dismissible fade show"
+              role="alert"
+            >
+              <button
+                type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <p style="margin: 0">{{message}}</p>
+            </div>
+            {% endfor %}
           </div>
-        <!--navbar content-->
-        
-        <!-- ############ PAGE START-->
-        <div ui-view class="app-body" id="view">
-            
-            <div class="container">
-                <br>
-                <br>
-                <h2 style="justify-content:center;text-align:center;margin-bottom:15px;"> <span
-                    style="color:#00629B;">{{event_name}}</b></span></h2><br>
-                
-            
-                <h6>Note:</h6>
-                <ol style="justify-content:center;margin-bottom:15px;"><b>
-                    <li>All ( * ) marked fields are mandatory to be filled</li>
-                    <li>Maximum 1 picture can be uploaded in dedicated sections</li>
-                    <li>Don’t forget to save the changes by clicking save button</li>
-                       {% comment %} All ( * ) marked fields are mandatory to be filled
- Keep in mind your description does not exceed the character count
-Maximum 1 picture can be uploaded in dedicated sections
-To replace a picture, delete the previous one and add a new one
-You can view the image by clicking on it
-You can add as many links as you want
-You can see your changes by clicking the preview button
-Don’t forget to save the changes by clicking save button {% endcomment %}
-                </ol></b>
-
-                <!--for error messages-->
-                <div class="container">
-                    <br>
-                    {% for message in messages  %}
-                        <p>
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <p style="margin: 0;">{{message}}</p>
-                            </div>
-                        </p>
-                    {% endfor %}
-                    <br>
-                </div>
-                <!--for error messages end-->
-
-            </div>
-
-            <!--TabView for event creation-->
-        
-            <div>
-                {% block super_event_creation_form %}
-                    {% include "Events/Super Event/super_event_details_form_content.html" %}
-                {% endblock super_event_creation_form %}
-                {% comment %} <div>
-                    {% for message in messages %}
-                        <p>{{message}}</p>
-                    {% endfor %}
-                    <p></p>
-                </div> {% endcomment %}
-            </div>
-            <!--End of TabView-->
+          <!--for error messages end-->
         </div>
-        <!--PAGE END-->
+        <br>
+        <!--TabView for event creation-->
 
+        <div>
+          {% block super_event_creation_form %} 
+            {% include "Events/Super Event/super_event_details_form_content.html" %} 
+          {% endblock super_event_creation_form %} 
+          {% comment %}
+          <div>
+            {% for message in messages %}
+            <p>{{message}}</p>
+            {% endfor %}
+            <p></p>
+          </div>
+          {% endcomment %}
+        </div>
+        <!--End of TabView-->
+      </div>
+      <!--PAGE END-->
 
-
-        <!--Theme Switcher-->
-        {% block theme_switcher %}
-            {% include "theme_switcher.html" %}
-        {% endblock theme_switcher %}
-    
+      <!--Theme Switcher-->
+      {% block theme_switcher %} {% include "theme_switcher.html" %} {% endblock theme_switcher %}
     </div>
     <!-- app end-->
 
-    {% block common_js %}
-        {% include "common_js.html" %}
+    {% block common_js %} 
+      {% include "common_js.html" %} 
     {% endblock common_js %}
 
     <script src="{% static 'tab_view.js'%}"></script>
-
-</body>
+  </body>
 </html>
