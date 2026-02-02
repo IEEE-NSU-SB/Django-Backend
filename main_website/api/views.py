@@ -8,6 +8,8 @@ from main_website.renderData import HomepageItems
 from port.models import Panels, Roles_and_Position, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
+from system_administration.models import system
+from system_administration.render_access import Access_Render
 from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
@@ -15,11 +17,42 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from users.renderData import getTypeOfEventStats, getEventNumberStat
 from django.utils import timezone
+
+class SwitchesAPI(APIView):
+
+    def get(self, request):
+        get_system=system.objects.first()
+
+        if request.user.is_authenticated:
+
+            if(Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username)
+                or Access_Render.eb_access(username=request.user.username) or Access_Render.belongs_to_sc_ag_panels(username=request.user.username)):
+                
+                
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': False,
+                    },
+                })
+            else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                })
+        else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                })
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -109,7 +142,7 @@ class BlogsView(APIView):
         serializer = BlogListSerializer(blogs, many=True, context={'request':request})
         return Response(serializer.data)
     
-    @csrf_exempt
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -711,4 +744,54 @@ class GalleryView(APIView):
 
         return Response(data)
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class SC_AG_FeedBack(APIView):
 
+    def post(self, request, sc_ag_primary=None):
+
+        if sc_ag_primary:
+            request.data['society'] = sc_ag_primary
+        else:
+            request.data['society'] = 1
+
+        serializer = SC_AG_FeedBack_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")   
+class AddResearchPaperView(APIView):
+
+    def post(self, request):
+        
+        serializer = ResearchPaper_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Research Paper submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+class EventFeedbackView(APIView):
+
+    def get(self, request, event_id):
+
+        event_feedbacks = Event_Feedback.objects.filter(event_id=event_id, approved=True)
+        event_feedbacks_serialized = EventFeedbackSerializer(event_feedbacks, many=True).data
+
+        return Response(event_feedbacks_serialized)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, event_id):
+        
+        request.data['event_id'] = event_id
+        serializer = EventFeedback_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)

@@ -19,7 +19,7 @@ class Events(admin.ModelAdmin):
     
 @admin.register(Event_Feedback)
 class Event_Feedback(admin.ModelAdmin):
-    list_display = ['id', 'name', 'email', 'comment']
+    list_display = ['id', 'approved', 'name', 'email', 'comment']
 
 
 @admin.register(InterBranchCollaborations)
