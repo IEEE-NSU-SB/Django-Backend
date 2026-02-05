@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Certificate | Graphics Team</title>
+
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+
+    {% include "common_css.html" %}
+
+    <style>
+        .page-title {
+            text-align: center;
+            margin-top: 100px;
+            font-size: 40px;
+            color: #00629B;
+            font-weight: bold;
+        }
+
+        .event-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+        }
+
+        .event-modal-box {
+            width: 50%;
+            margin: 7% auto;
+            background: white;
+            padding: 45px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+            animation: modalFadeIn 0.25s ease;
+        }
+
+        .event-modal-title {
+            text-align: left;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .event-modal-select {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            background: #f4f8fc;
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+            margin-bottom: 35px;
+        }
+
+        .event-modal-btn {
+            background: #00629B;
+            color: white;
+            padding: 12px 45px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,98,155,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .event-modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app" id="app">
+
+    <!-- Sidebar -->
+    <div id="aside" class="app-aside modal nav-dropdown">
+        {% include 'users/sidebar.html' %}
+    </div>
+
+    <!-- Navbar -->
+    <div id="content" class="app-content box-shadow-z0" role="main">
+        {% include 'graphics_navbar.html' %}
+    </div>
+
+    <!-- Page Body -->
+    <div class="app-body" style="margin-left:15%; margin-right:15%;">
+        <br>
+        <h2 style="justify-content:center;text-align:center;">
+            Graphics Team - 
+            <span style="color:#00629B;">
+                <b>Certificate</b>
+            </span>
+        </h2>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button type="button" onclick="openEventModal()" style="
+                background-color:#00629B;
+                color:white;
+                padding:12px 25px;
+                font-size:16px;
+                border:none;
+                border-radius:5px;
+                cursor:pointer;
+            ">
+                Select Event For Certificate
+            </button>
+
+        </div>
+        <br>
+        <table border="1" width="100%" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr style="background-color:#f2f2f2;">
+                    <th>SL No.</th>
+                    <th>Event Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>SPAC 2026</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div id="eventModal" class="event-modal-overlay">
+
+            <div id="modalContent" class="event-modal-box">
+
+                <div class="event-modal-title">
+                    Select Event
+                </div>
+
+                <select class="event-modal-select">
+                    <option>Sample Event 1</option>
+                    <option>Sample Event 2</option>
+                </select>
+
+                <button class="event-modal-btn">
+                    Confirm
+                </button>
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+{% include "common_js.html" %}
+
+<script>
+function openEventModal() {
+    document.getElementById("eventModal").style.display = "block";
+}
+
+document.getElementById("eventModal").addEventListener("click", function(e) {
+    if (!document.getElementById("modalContent").contains(e.target)) {
+        this.style.display = "none";
+    }
+});
+</script>
+
+
+
+</body>
+</html>
