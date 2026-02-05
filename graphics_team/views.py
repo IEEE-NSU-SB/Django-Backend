@@ -385,3 +385,25 @@ def graphics_drive_links(request):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
+    
+@login_required
+@member_login_permission
+def certificate_page(request):
+
+    try:
+        sc_ag = PortData.get_all_sc_ag(request=request)
+
+        current_user = renderData.LoggedinUser(request.user)
+        user_data = current_user.getUserData()
+
+        context = {
+            'all_sc_ag': sc_ag,
+            'user_data': user_data,
+        }
+
+        return render(request, "certificate/certificate_page.html", context)
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e, error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
