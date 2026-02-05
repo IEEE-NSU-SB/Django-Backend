@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Certificate Type | Graphics Team</title>
+
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+
+    {% include "common_css.html" %}
+
+    <style>
+        .page-title {
+            text-align: center;
+            margin-top: 100px;
+            font-size: 40px;
+            color: #00629B;
+            font-weight: bold;
+        }
+
+        .event-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event-modal-overlay.active {
+            display: flex;
+        }
+
+        .event-modal-box {
+            width: 50%;
+            max-width: 600px;
+            background: white;
+            padding: 45px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+            animation: modalFadeIn 0.25s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .event-modal-title {
+            text-align: left;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .event-modal-select,
+        .event-modal-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            background: #f4f8fc;
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
+        .event-modal-input::placeholder {
+            color: #6c757d;
+        }
+
+        .event-modal-input[type="file"] {
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .event-modal-input[type="file"]::file-selector-button {
+            background: #00629B;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .event-modal-input[type="file"]::file-selector-button:hover {
+            background: #004d7a;
+        }
+
+        .event-modal-btn {
+            background: #00629B;
+            color: white;
+            padding: 12px 45px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,98,155,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .event-modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app" id="app">
+
+    <!-- Sidebar -->
+    <div id="aside" class="app-aside modal nav-dropdown">
+        {% include 'users/sidebar.html' %}
+    </div>
+
+    <!-- Navbar -->
+    <div id="content" class="app-content box-shadow-z0" role="main">
+        {% include 'graphics_navbar.html' %}
+    </div>
+
+    <!-- Page Body -->
+    <div class="app-body" style="margin-left:15%; margin-right:15%;">
+        <br>
+        <h2 style="justify-content:center;text-align:center;">
+            Graphics Team - 
+            <span style="color:#00629B;">
+                <b>Certificate Type</b>
+            </span>
+        </h2>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button type="button" onclick="openCertificateTypeModal()" style="
+                background-color:#00629B;
+                color:white;
+                padding:12px 25px;
+                font-size:16px;
+                border:none;
+                border-radius:5px;
+                cursor:pointer;
+            ">
+                Select Certificate Type
+            </button>
+
+        </div>
+        <br>
+        <table border="1" width="100%" cellpadding="10" cellspacing="0">
+    <thead>
+        <tr style="background-color:#f2f2f2;">
+            <th>SL No.</th>
+            <th>Type of Certificate</th>
+            <th>Download (svg)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Participation Certificate</td>
+            <td style="text-align:center;">
+                <a href="#" style="color:#00629B; text-decoration:none; font-weight:600;">
+                    Download
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Winner Certificate</td>
+            <td style="text-align:center;">
+                <a href="#" style="color:#00629B; text-decoration:none; font-weight:600;">
+                    Download
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+        <!-- Modal -->
+        <div id="certificateTypeModal" class="event-modal-overlay">
+
+            <div id="modalContent" class="event-modal-box">
+
+                <div class="event-modal-title">
+                    Name of certificate
+                </div>
+
+                <select class="event-modal-select" id="certificateType">
+                    <option value="">Participant, Appreciation</option>
+                    <option>Participation Certificate</option>
+                    <option>Winner Certificate</option>
+                    <option>Appreciation Certificate</option>
+                    <option>Completion Certificate</option>
+                </select>
+
+                <div class="event-modal-title">
+                    Add template (svg)
+                </div>
+
+                <input type="file" class="event-modal-input" accept=".svg" id="templateFile" />
+
+                <div class="event-modal-title">
+                    Names to be placed (csv)
+                </div>
+
+                <input type="file" class="event-modal-input" accept=".csv" id="csvFile" />
+
+                <button class="event-modal-btn" onclick="confirmSelection()">
+                    Confirm
+                </button>
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+{% include "common_js.html" %}
+
+<script>
+function openCertificateTypeModal() {
+    document.getElementById("certificateTypeModal").classList.add("active");
+}
+
+function closeModal() {
+    document.getElementById("certificateTypeModal").classList.remove("active");
+}
+
+function confirmSelection() {
+    // Add your confirmation logic here
+    const certificateType = document.getElementById("certificateType").value;
+    const templateFile = document.getElementById("templateFile").files[0];
+    const csvFile = document.getElementById("csvFile").files[0];
+    
+    console.log("Certificate Type:", certificateType);
+    console.log("Template File:", templateFile);
+    console.log("CSV File:", csvFile);
+    
+    // Close modal after confirmation
+    closeModal();
+}
+
+document.getElementById("certificateTypeModal").addEventListener("click", function(e) {
+    if (!document.getElementById("modalContent").contains(e.target)) {
+        closeModal();
+    }
+});
+</script>
+
+
+
+</body>
+</html>

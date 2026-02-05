@@ -154,7 +154,14 @@
                     <option>Sample Event 2</option>
                 </select>
 
-                <button class="event-modal-btn">
+                <!-- <button class="event-modal-btn"
+                onclick="navigateToCertificateType()"  
+                >
+                    Confirm
+                </button> -->
+                <button class="event-modal-btn"
+              
+                >
                     Confirm
                 </button>
 
@@ -174,6 +181,10 @@
 function openEventModal() {
     document.getElementById("eventModal").style.display = "block";
 }
+
+// function navigateToCertificateType() {
+//    
+// }
 
 document.getElementById("eventModal").addEventListener("click", function(e) {
     if (!document.getElementById("modalContent").contains(e.target)) {

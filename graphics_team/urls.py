@@ -32,4 +32,6 @@ urlpatterns = [
     path('meeting_minutes/<int:team_primary>/edit/<int:pk>/', meeting_minutes_edit, name="meeting_minutes_edit_team"),
     #Certificate Page
     path('certificate/', views.certificate_page, name="certificate_page"),
+    #Certificate type page
+    path('certificate_type_page/', views.certificate_page_type, name="certificate_type_page"),
 ]
