@@ -8,7 +8,7 @@ from main_website.renderData import HomepageItems
 from port.models import Panels, Roles_and_Position, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
-from system_administration.models import system
+from system_administration.models import Project_Developers, Project_leads, system
 from system_administration.render_access import Access_Render
 from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
@@ -795,3 +795,20 @@ class EventFeedbackView(APIView):
         else:
             print(serializer.errors)  # Debug
         return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+    
+class PortalDevelopersList(APIView):
+
+    def get(self, request):
+        
+        project_leads=Project_leads.objects.all()
+        project_developers=Project_Developers.objects.all().order_by('-reputation_point')
+
+        project_leads_serialized = ProjectLeadsSerializer(project_leads, many=True, context={'request':request}).data
+        project_developers_serialized = ProjectDevelopersSerializer(project_developers, many=True, context={'request':request}).data
+
+        data = {
+            'project_leads':project_leads_serialized,
+            'project_developers':project_developers_serialized
+        }
+
+        return Response(data)
