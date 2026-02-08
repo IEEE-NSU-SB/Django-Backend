@@ -10,7 +10,7 @@ urlpatterns = [
     #landing_page
     path('',views.homepage, name='homepage'),
     #developed by
-    path('portal/developers',views.developed_by,name='developers'),
+    # path('portal/developers',views.developed_by,name='developers'),
     
     path('portal/authorize/', views.authorize, name='authorize'),
     path('portal/oauth2callback/', views.oauth2callback, name='oauth2callback'),

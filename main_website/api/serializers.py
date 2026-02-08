@@ -9,6 +9,7 @@ from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from media_team.models import Media_Images
 from port.models import Panels, Roles_and_Position, Teams
+from system_administration.models import Project_Developers, Project_leads
 from users.models import Panel_Members, VolunteerAwardRecievers
 from django.utils import timezone
 from django.utils.html import strip_tags
@@ -809,3 +810,23 @@ class EventFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event_Feedback
         fields = ['name', 'satisfaction', 'feedback']
+
+class ProjectLeadsSerializer(serializers.ModelSerializer):
+
+    role = serializers.CharField(source='developer_type')
+    quote = serializers.CharField(source='developer_decription')
+    image = serializers.ImageField(source='developers_picture')
+
+    class Meta:
+        model = Project_leads
+        fields = ['name', 'role', 'quote', 'image', 'github_url', 'linkedin_url', 'facebook_url']
+
+class ProjectDevelopersSerializer(serializers.ModelSerializer):
+
+    role = serializers.CharField(source='developer_type')
+    quote = serializers.CharField(source='developer_decription')
+    image = serializers.ImageField(source='developers_picture')
+
+    class Meta:
+        model = Project_Developers
+        fields = ['name', 'role', 'quote', 'image', 'github_url', 'linkedin_url', 'facebook_url']

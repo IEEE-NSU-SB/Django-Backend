@@ -53,4 +53,5 @@ urlpatterns = [
     path('api/switches/', SwitchesAPI.as_view()),
     path('event_feedback/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback'),
     path('get_event_feedbacks/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback_list'),
+    path('get_portal_developers/', PortalDevelopersList.as_view(), name='portal_developers_list'),
 ]
