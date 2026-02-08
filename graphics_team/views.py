@@ -399,3 +399,9 @@ def certificate_page(request):
 @member_login_permission
 def certificate_page_type(request):
     return render(request, "certificate/certificate_type_page.html")
+
+
+@login_required
+@member_login_permission
+def certificate_details_page(request):
+    return render(request, "certificate/certificate_details_page.html")
