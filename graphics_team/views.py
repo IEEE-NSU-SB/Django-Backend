@@ -385,3 +385,23 @@ def graphics_drive_links(request):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
+    
+    
+    
+@login_required
+@member_login_permission
+def certificate_page(request):
+    return render(request, "certificate/certificate_page.html")
+
+ 
+
+@login_required
+@member_login_permission
+def certificate_page_type(request):
+    return render(request, "certificate/certificate_type_page.html")
+
+
+@login_required
+@member_login_permission
+def certificate_details_page(request):
+    return render(request, "certificate/certificate_details_page.html")
