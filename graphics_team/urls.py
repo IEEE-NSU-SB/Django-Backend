@@ -35,4 +35,5 @@ urlpatterns = [
     #Certificate type page
     path('certificate_type_page/', views.certificate_page_type, name="certificate_type_page"),
     path('certificate_details_page/', views.certificate_details_page, name="certificate_details_page"),
+    path('certificate_otp/', views.certificate_otp, name="certificate_otp"),
 ]
