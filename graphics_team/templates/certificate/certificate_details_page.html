@@ -353,7 +353,7 @@
       </div>
 
       <div class="app-body" style="margin-left: 15%; margin-right: 15%">
-        <h1 class="page-title">Participant Certificate of SPAC2026</h1>
+        <h1 class="page-title">{{certificate.title}} of {{event_name}}</h1>
 
         <div class="top-actions">
           <button onclick="openModal('importModal')">Import Names</button>
@@ -391,6 +391,7 @@
           <table class="table">
             <thead>
               <tr>
+                <th>Sl.</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Download certificate (.svg)</th>
@@ -399,24 +400,15 @@
             </thead>
 
             <tbody id="participantTableBody">
+              {% for receiver in certificate_receivers %}
               <tr>
-                <td>John Doe</td>
-                <td>john@email.com</td>
+                <td>{{forloop.counter}}</td>
+                <td>{{receiver.name}}</td>
+                <td>{{receiver.email}}</td>
                 <td><a href="#">Download</a></td>
                 <td><button>Delete</button></td>
               </tr>
-              <tr>
-                <td>Jane Smith</td>
-                <td>jane@email.com</td>
-                <td><a href="#">Download</a></td>
-                <td><button>Delete</button></td>
-              </tr>
-              <tr>
-                <td>Arman Hasan</td>
-                <td>arman@email.com</td>
-                <td><a href="#">Download</a></td>
-                <td><button>Delete</button></td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -426,19 +418,25 @@
 
     <div id="importModal" class="modal-overlay">
       <div class="modal-box" onclick="event.stopPropagation()">
-        <h3>Names (csv)</h3>
-        <input type="file" class="input" accept=".csv" />
-        <button class="confirm-btn">Confirm</button>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <h3>Names (csv)</h3>
+          <input type="file" name="csv_file" class="input" accept=".csv" />
+          <button class="confirm-btn" type="submit" name="add_csv">Confirm</button>
+        </form>
       </div>
     </div>
 
     <div id="addModal" class="modal-overlay">
       <div class="modal-box" onclick="event.stopPropagation()">
-        <h3>Name</h3>
-        <input type="text" class="input" />
-        <h3>Email</h3>
-        <input type="email" class="input" />
-        <button class="confirm-btn">Confirm</button>
+        <form method="POST">
+          {% csrf_token %}
+          <h3>Name</h3>
+          <input type="text" name="name" class="input" />
+          <h3>Email</h3>
+          <input type="email" name="email" class="input" />
+          <button class="confirm-btn" type="submit" name="add_receiver">Confirm</button>
+        </form>
       </div>
     </div>
 

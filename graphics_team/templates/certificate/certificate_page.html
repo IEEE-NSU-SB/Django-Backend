@@ -144,13 +144,14 @@
                 </tr>
             </thead>
             <tbody>
+                {% for event in events_with_certificates %}
                 <tr>
-                    <td>1</td>
+                    <td>{{forloop.counter}}</td>
                     <td style="cursor: pointer; font-weight: bold">
-                        <a href="" class="hover-link">SPAC 2026
-                        </a>
+                        <a href="{% url 'graphics_team:event_certificates' event.id %}" class="hover-link">{{event.event_name}}</a>
                     </td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -158,26 +159,22 @@
         <div id="eventModal" class="event-modal-overlay">
 
             <div id="modalContent" class="event-modal-box">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="event-modal-title">
+                        Select Event
+                    </div>
+    
+                    <select class="event-modal-select" name="event_id">
+                        {% for event in all_events %}
+                        <option value="{{event.id}}">{{event.event_name}}</option>
+                        {% endfor %}
+                    </select>
 
-                <div class="event-modal-title">
-                    Select Event
-                </div>
-
-                <select class="event-modal-select">
-                    <option>Sample Event 1</option>
-                    <option>Sample Event 2</option>
-                </select>
-
-                <!-- <button class="event-modal-btn"
-                onclick="navigateToCertificateType()"  
-                >
-                    Confirm
-                </button> -->
-                <button class="event-modal-btn"
-              
-                >
-                    Confirm
-                </button>
+                    <button class="event-modal-btn" type="submit">
+                        Confirm
+                    </button>
+                </form>
 
             </div>
         </div>
@@ -196,9 +193,6 @@ function openEventModal() {
     document.getElementById("eventModal").style.display = "block";
 }
 
-// function navigateToCertificateType() {
-//    
-// }
 
 document.getElementById("eventModal").addEventListener("click", function(e) {
     if (!document.getElementById("modalContent").contains(e.target)) {

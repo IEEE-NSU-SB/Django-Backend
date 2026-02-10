@@ -1,3 +1,5 @@
+import csv
+import os
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from graphics_team.manage_access import GraphicsTeam_Render_Access
@@ -12,16 +14,17 @@ from users.renderData import LoggedinUser
 from . import renderData
 from django.conf import settings
 from central_events.models import Events
-from .models import Graphics_Banner_Image,Graphics_Link,Graphics_Drive_links
+from .models import Certificate, Certificate_Receivers, Certificate_Template, Graphics_Banner_Image,Graphics_Link,Graphics_Drive_links
 import traceback
 import logging
 from system_administration.system_error_handling import ErrorHandling
-from django.http import Http404,HttpResponseBadRequest
+from django.http import Http404, HttpResponse,HttpResponseBadRequest
 from datetime import datetime
 from port.renderData import PortData
 from users.renderData import PanelMembersData,member_login_permission
 from users import renderData
 from central_branch import views as cv
+from django.db.models import Count
 
 logger=logging.getLogger(__name__)
 # Create your views here.
@@ -386,27 +389,153 @@ def graphics_drive_links(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
     
+
+@login_required
+@member_login_permission
+def certificates_homepage(request):
     
-    
+    if request.method == 'POST':
+        event_id = request.POST.get('event_id')
+
+        return redirect('graphics_team:event_certificates', event_id)
+
+    all_events = Events.objects.all().values('id', 'event_name').order_by('-start_date','-event_date')[:20]
+    events_with_certificates = (
+        Events.objects
+        .annotate(cert_count=Count('certificate_types'))
+        .filter(cert_count__gt=0)
+        .values('id', 'event_name')
+    )
+
+    context = {
+        'all_events':all_events,
+        'events_with_certificates':events_with_certificates,
+    }
+
+    return render(request, "certificate/certificate_page.html", context)
+
 @login_required
 @member_login_permission
-def certificate_page(request):
-    return render(request, "certificate/certificate_page.html")
+def event_certificates(request, event_id):
 
- 
+    if request.method == 'POST':
+        if 'create_certificate' in request.POST:
+            certificate_title = request.POST.get('certificate_name')
+
+            certificate = Certificate.objects.create(event_id=event_id, title=certificate_title)
+            
+            if request.FILES.get('svg_template'):
+                svg_template = request.FILES.get('svg_template')
+                Certificate_Template.objects.create(certificate_id=certificate.id, svg_template=svg_template)
+
+            if request.FILES.get('csv_file'):
+                csv_file = request.FILES.get('csv_file')
+
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.reader(decoded_file)
+                
+                # Optional: skip header
+                next(reader, None)
+
+                for row in reader:
+                    name, email = row  # assuming each row has exactly 2 columns
+                    # Save to database
+                    Certificate_Receivers.objects.create(
+                        certificate_id=certificate.id,
+                        name=name.strip(),
+                        email=email.strip()
+                    )
+        elif 'download_svg' in request.POST:
+            certificate_id = request.POST.get('download_svg')
+            certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+
+            # File path on disk (e.g., from a FileField or stored path)
+            file_path = certificate_template.svg_template.path
+
+            if not os.path.exists(file_path):
+                raise Http404("File not found")
+
+            # Read file and send as attachment
+            with open(file_path, 'rb') as f:
+                response = HttpResponse(f.read(), content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+                return response
+
+    all_certificates_of_event = Certificate.objects.filter(event=event_id)
+
+    context = {
+        'all_certificates_of_event':all_certificates_of_event,
+    }
+
+    return render(request, "certificate/certificate_type_page.html", context)
 
 @login_required
 @member_login_permission
-def certificate_page_type(request):
-    return render(request, "certificate/certificate_type_page.html")
+def certificate_details(request, certificate_id):
 
+    if request.method == 'POST':
+        if 'add_receiver' in request.POST:
+            name = request.POST.get('name')
+            email = request.POST.get('email')
 
-@login_required
-@member_login_permission
-def certificate_details_page(request):
-    return render(request, "certificate/certificate_details_page.html")
+            Certificate_Receivers.objects.create(certificate_id=certificate_id, name=name, email=email)
+
+        elif 'add_csv' in request.POST:
+            csv_file = request.FILES.get('csv_file')
+
+            if Certificate_Receivers.objects.filter(certificate_id=certificate_id).exists():
+                Certificate_Receivers.objects.filter(certificate_id=certificate_id).delete()
+
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.reader(decoded_file)
+            
+            # Optional: skip header
+            next(reader, None)
+
+            for row in reader:
+                name, email = row  # assuming each row has exactly 2 columns
+                # Save to database
+                Certificate_Receivers.objects.create(
+                    certificate_id=certificate_id,
+                    name=name.strip(),
+                    email=email.strip()
+                )
+
+    certificate = Certificate.objects.get(id=certificate_id)
+    event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
+
+    certificate_receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
+
+    context = {
+        'certificate':certificate,
+        'event_name':event_name_of_certificate,
+        'certificate_receivers':certificate_receivers,
+    }    
+
+    return render(request, "certificate/certificate_details_page.html", context)
 
 @login_required
 @member_login_permission
 def certificate_otp(request):
     return render(request, "certificate/certificate_otp.html")
+
+
+# def download_file(request, certificate_id):
+#     if request.method == "POST":
+#         # Get the certificate object
+#         certificate = get_object_or_404(Certificate, pk=certificate_id)
+
+#         # File path on disk (e.g., from a FileField or stored path)
+#         file_path = certificate.file.path  # or certificate.file_url if stored differently
+
+#         if not os.path.exists(file_path):
+#             raise Http404("File not found")
+
+#         # Read file and send as attachment
+#         with open(file_path, 'rb') as f:
+#             response = HttpResponse(f.read(), content_type='application/octet-stream')
+#             response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+#             return response
+
+#     # Block GET requests
+#     return Http404("Invalid request")

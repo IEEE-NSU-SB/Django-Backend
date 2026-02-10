@@ -174,80 +174,75 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td style="cursor: pointer; font-weight: bold">
-                <a href="#" class="hover-link"> Participation Certificate</a>
-              </td>
-              <td style="text-align: center">
-                <a
-                  href="#"
-                  style="
-                    color: #00629b;
-                    text-decoration: none;
-                    font-weight: 600;
-                    cursor: pointer;
-                  "
-                >
-                  Download
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td style="cursor: pointer; font-weight: bold">
-                <a href="#" class="hover-link"> Winner Certificate </a>
-              </td>
-              <td style="text-align: center">
-                <a
-                  href="#"
-                  style="
-                    color: #00629b;
-                    text-decoration: none;
-                    font-weight: 600;
-                    cursor: pointer;
-                  "
-                >
-                  Download
-                </a>
-              </td>
-            </tr>
+            <form method="POST">
+              {% csrf_token %}
+              {% for certificate in all_certificates_of_event %}
+              <tr>
+                <td>{{forloop.counter}}</td>
+                <td style="cursor: pointer; font-weight: bold">
+                  <a href="{% url 'graphics_team:certificate_details' certificate.id %}" class="hover-link">{{certificate.title}}</a>
+                </td>
+                <td style="text-align: center">
+                  <button
+                    type="submit"
+                    name="download_svg"
+                    value="{{certificate.id}}"
+                    style="
+                      color: #00629b;
+                      text-decoration: none;
+                      font-weight: 600;
+                      cursor: pointer;
+                    "
+                  >
+                    Download
+                </button>
+                </td>
+              </tr>
+    
+              {% endfor %}
+            </form>
           </tbody>
         </table>
 
         <!-- Modal -->
         <div id="certificateTypeModal" class="event-modal-overlay">
           <div id="modalContent" class="event-modal-box">
-            <div class="event-modal-title">Name of certificate</div>
-
-            <input
-              type="text"
-              class="event-modal-input"
-              id="certificate_name"
-              placeholder="Enter the name of the certificate"
-            />
-
-            <div class="event-modal-title">Add template (svg)</div>
-
-            <input
-              type="file"
-              class="event-modal-input"
-              accept=".svg"
-              id="templateFile"
-            />
-
-            <div class="event-modal-title">Names to be placed (csv)</div>
-
-            <input
-              type="file"
-              class="event-modal-input"
-              accept=".csv"
-              id="csvFile"
-            />
-
-            <button class="event-modal-btn" onclick="confirmSelection()">
-              Confirm
-            </button>
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="event-modal-title">Name of certificate</div>
+  
+              <input
+                type="text"
+                class="event-modal-input"
+                id="certificate_name"
+                name="certificate_name"
+                placeholder="Enter the name of the certificate"
+              />
+  
+              <div class="event-modal-title">Add template (svg)</div>
+  
+              <input
+                type="file"
+                class="event-modal-input"
+                name="svg_template"
+                accept=".svg"
+                id="templateFile"
+              />
+  
+              <div class="event-modal-title">Names to be placed (csv)</div>
+  
+              <input
+                type="file"
+                class="event-modal-input"
+                name="csv_file"
+                accept=".csv"
+                id="csvFile"
+              />
+  
+              <button class="event-modal-btn" name="create_certificate" type="submit">
+                Confirm
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -264,21 +259,6 @@
         document
           .getElementById("certificateTypeModal")
           .classList.remove("active");
-      }
-
-      function confirmSelection() {
-        // Add your confirmation logic here
-        const certificateType =
-          document.getElementById("certificateType").value;
-        const templateFile = document.getElementById("templateFile").files[0];
-        const csvFile = document.getElementById("csvFile").files[0];
-
-        console.log("Certificate Type:", certificateType);
-        console.log("Template File:", templateFile);
-        console.log("CSV File:", csvFile);
-
-        // Close modal after confirmation
-        closeModal();
       }
 
       document

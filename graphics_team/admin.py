@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Graphics_Link,Graphics_Banner_Image,Graphics_Form_Link,Graphics_Drive_links
+from .models import Graphics_Link,Graphics_Banner_Image,Graphics_Form_Link,Graphics_Drive_links,Certificate,Certificate_Receivers,Certificate_Template
 # Register your models here.
 @admin.register(Graphics_Link)
 class Graphics_Link(admin.ModelAdmin):
@@ -15,3 +15,7 @@ class Graphics_Form_Link(admin.ModelAdmin):
 @admin.register(Graphics_Drive_links)
 class Graphics_Drive_Link(admin.ModelAdmin):
     list_display = ['link_title','link','created_at']
+
+admin.site.register(Certificate)
+admin.site.register(Certificate_Receivers)
+admin.site.register(Certificate_Template)
