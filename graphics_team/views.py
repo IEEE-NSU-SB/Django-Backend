@@ -1,5 +1,8 @@
 import csv
+import io
 import os
+import re
+import cairosvg
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from graphics_team.manage_access import GraphicsTeam_Render_Access
@@ -25,6 +28,7 @@ from users.renderData import PanelMembersData,member_login_permission
 from users import renderData
 from central_branch import views as cv
 from django.db.models import Count
+import xml.etree.ElementTree as ET
 
 logger=logging.getLogger(__name__)
 # Create your views here.
@@ -426,7 +430,52 @@ def event_certificates(request, event_id):
             
             if request.FILES.get('svg_template'):
                 svg_template = request.FILES.get('svg_template')
-                Certificate_Template.objects.create(certificate_id=certificate.id, svg_template=svg_template)
+                tree = ET.parse(svg_template)
+                root = tree.getroot()
+                ns = {'svg': 'http://www.w3.org/2000/svg'}
+
+                # Regex to parse transform="translate(x y)"
+                translate_re = re.compile(r'translate\(\s*([\d.-]+)\s+([\d.-]+)\s*\)')
+                # Loop over all <text> elements
+
+                for text_elem in root.findall('.//svg:text', ns):
+                    transform = text_elem.get('transform')
+                    if transform:
+                        match = translate_re.match(transform)
+                        if match:
+                            x, y = match.groups()
+                            font_size = int(text_elem.get('font-size', '40').replace('px',''))
+                            font = ImageFont.truetype("C:/Users/Hp/Downloads/Gistesy.ttf", font_size)
+                            text_width = font.getlength('Mirza Farhan Shahriar')
+                            original_x = float(x)
+                            center_x = original_x + (text_width / 2)
+
+                            # Remove transform and set x/y attributes
+                            text_elem.attrib.pop('transform')
+                            text_elem.set('x', str(center_x))
+                            text_elem.set('y', y)
+                            # Add centering attributes
+                            text_elem.set('text-anchor', 'middle')
+                    
+                            # Handle <tspan> children
+                            for tspan in text_elem.findall('.//svg:tspan', ns):
+                                # Remove x and y attributes so they inherit from parent <text>
+                                if 'x' in tspan.attrib:
+                                    tspan.attrib.pop('x')
+                                if 'y' in tspan.attrib:
+                                    tspan.attrib.pop('y')
+                                    
+                # Serialize modified SVG to bytes
+                svg_bytes = io.BytesIO()
+                tree.write(svg_bytes, encoding='utf-8', xml_declaration=True)
+                svg_bytes.seek(0)  # rewind to the beginning
+
+                # Save to model using Django File
+                from django.core.files.base import ContentFile
+                Certificate_Template.objects.create(
+                    certificate_id=certificate.id,
+                    svg_template=ContentFile(svg_bytes.read(), name=svg_template.name)
+                )
 
             if request.FILES.get('csv_file'):
                 csv_file = request.FILES.get('csv_file')
@@ -500,6 +549,42 @@ def certificate_details(request, certificate_id):
                     name=name.strip(),
                     email=email.strip()
                 )
+        
+        elif 'delete_receiver' in request.POST:
+            receiver_id = request.POST.get('delete_receiver')
+
+            Certificate_Receivers.objects.filter(id=receiver_id).delete()
+
+        elif 'download_receiver_certificate' in request.POST:
+            # Get the object with the SVG FileField
+            certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+            svg_file = certificate_template.svg_template
+
+            receiver_id = request.POST.get('download_receiver_certificate')
+            receiver_name = Certificate_Receivers.objects.get(id=receiver_id).name
+
+            svg_content = svg_file.read().decode('utf-8')
+            tree = ET.ElementTree(ET.fromstring(svg_content))
+            root = tree.getroot()
+            ns = {'svg': 'http://www.w3.org/2000/svg'}
+
+            # The text to search for
+            old_text = 'Mirza Farhan Shahriar'
+
+            # Loop over all <text> elements
+            for text_elem in root.findall('.//svg:text', ns):                            
+                replace_text_in_element(text_elem, old_text, receiver_name)
+
+            updated_svg = ET.tostring(root, encoding='unicode')
+
+            png_bytes = cairosvg.svg2png(
+                bytestring=updated_svg.encode('utf-8'),
+                background_color='white'  # remove transparency
+            )
+
+            response = HttpResponse(png_bytes, content_type='image/png')
+            response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+            return response
 
     certificate = Certificate.objects.get(id=certificate_id)
     event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
@@ -539,3 +624,14 @@ def certificate_otp(request):
 
 #     # Block GET requests
 #     return Http404("Invalid request")
+
+def replace_text_in_element(element, old_text, new_text):
+    """
+    Recursively searches element text and children to replace old_text with new_text.
+    """
+    if element.text and old_text in element.text:
+        element.text = element.text.replace(old_text, new_text)
+    for child in element:
+        replace_text_in_element(child, old_text, new_text)
+        if child.tail and old_text in child.tail:
+            child.tail = child.tail.replace(old_text, new_text)

@@ -400,15 +400,18 @@
             </thead>
 
             <tbody id="participantTableBody">
-              {% for receiver in certificate_receivers %}
-              <tr>
-                <td>{{forloop.counter}}</td>
-                <td>{{receiver.name}}</td>
-                <td>{{receiver.email}}</td>
-                <td><a href="#">Download</a></td>
-                <td><button>Delete</button></td>
-              </tr>
-              {% endfor %}
+              <form method="POST">
+                {% csrf_token %}
+                {% for receiver in certificate_receivers %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{receiver.name}}</td>
+                  <td>{{receiver.email}}</td>
+                  <td><button type="submit" name="download_receiver_certificate" value="{{receiver.id}}">Download</button></td>
+                  <td><button type="submit" name="delete_receiver" value="{{receiver.id}}">Delete</button></td>
+                </tr>
+                {% endfor %}
+              </form>
             </tbody>
           </table>
         </div>
