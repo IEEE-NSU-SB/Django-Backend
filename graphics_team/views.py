@@ -398,87 +398,173 @@ def graphics_drive_links(request):
 @member_login_permission
 def certificates_homepage(request):
     
-    if request.method == 'POST':
-        event_id = request.POST.get('event_id')
+    try:
+        if request.method == 'POST':
+            event_id = request.POST.get('event_id')
 
-        return redirect('graphics_team:event_certificates', event_id)
+            return redirect('graphics_team:event_certificates', event_id)
+        
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
 
-    all_events = Events.objects.all().values('id', 'event_name').order_by('-start_date','-event_date')[:20]
-    events_with_certificates = (
-        Events.objects
-        .annotate(cert_count=Count('certificate_types'))
-        .filter(cert_count__gt=0)
-        .values('id', 'event_name')
-    )
+        all_events = Events.objects.all().values('id', 'event_name').order_by('-start_date','-event_date')[:20]
+        events_with_certificates = (
+            Events.objects
+            .annotate(cert_count=Count('certificate_types'))
+            .filter(cert_count__gt=0)
+            .values('id', 'event_name')
+        )
 
-    context = {
-        'all_events':all_events,
-        'events_with_certificates':events_with_certificates,
-    }
+        context = {
+            'user_data':user_data,
+            'all_sc_ag':sc_ag,
+            'all_events':all_events,
+            'events_with_certificates':events_with_certificates,
+        }
 
-    return render(request, "certificate/certificate_page.html", context)
+        return render(request, "certificate/certificate_page.html", context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
 
+from PIL import ImageFont
 @login_required
 @member_login_permission
 def event_certificates(request, event_id):
 
-    if request.method == 'POST':
-        if 'create_certificate' in request.POST:
-            certificate_title = request.POST.get('certificate_name')
+    try:
+        if request.method == 'POST':
+            if 'create_certificate' in request.POST:
+                certificate_title = request.POST.get('certificate_name')
 
-            certificate = Certificate.objects.create(event_id=event_id, title=certificate_title)
-            
-            if request.FILES.get('svg_template'):
-                svg_template = request.FILES.get('svg_template')
-                tree = ET.parse(svg_template)
-                root = tree.getroot()
-                ns = {'svg': 'http://www.w3.org/2000/svg'}
+                certificate = Certificate.objects.create(event_id=event_id, title=certificate_title)
+                
+                if request.FILES.get('svg_template'):
+                    svg_template = request.FILES.get('svg_template')
+                    tree = ET.parse(svg_template)
+                    root = tree.getroot()
+                    ns = {'svg': 'http://www.w3.org/2000/svg'}
 
-                # Regex to parse transform="translate(x y)"
-                translate_re = re.compile(r'translate\(\s*([\d.-]+)\s+([\d.-]+)\s*\)')
-                # Loop over all <text> elements
+                    # Regex to parse transform="translate(x y)"
+                    translate_re = re.compile(r'translate\(\s*([\d.-]+)\s+([\d.-]+)\s*\)')
+                    # Loop over all <text> elements
 
-                for text_elem in root.findall('.//svg:text', ns):
-                    transform = text_elem.get('transform')
-                    if transform:
-                        match = translate_re.match(transform)
-                        if match:
-                            x, y = match.groups()
-                            font_size = int(text_elem.get('font-size', '40').replace('px',''))
-                            font = ImageFont.truetype("C:/Users/Hp/Downloads/Gistesy.ttf", font_size)
-                            text_width = font.getlength('Mirza Farhan Shahriar')
-                            original_x = float(x)
-                            center_x = original_x + (text_width / 2)
+                    for text_elem in root.findall('.//svg:text', ns):
+                        transform = text_elem.get('transform')
+                        if transform:
+                            match = translate_re.match(transform)
+                            if match:
+                                x, y = match.groups()
+                                font_size = int(text_elem.get('font-size', '40').replace('px',''))
+                                font = ImageFont.truetype("C:/Users/Hp/Downloads/Gistesy.ttf", font_size)
+                                text_width = font.getlength('Mirza Farhan Shahriar')
+                                original_x = float(x)
+                                center_x = original_x + (text_width / 2)
 
-                            # Remove transform and set x/y attributes
-                            text_elem.attrib.pop('transform')
-                            text_elem.set('x', str(center_x))
-                            text_elem.set('y', y)
-                            # Add centering attributes
-                            text_elem.set('text-anchor', 'middle')
+                                # Remove transform and set x/y attributes
+                                text_elem.attrib.pop('transform')
+                                text_elem.set('x', str(center_x))
+                                text_elem.set('y', y)
+                                # Add centering attributes
+                                text_elem.set('text-anchor', 'middle')
+                        
+                                # Handle <tspan> children
+                                for tspan in text_elem.findall('.//svg:tspan', ns):
+                                    # Remove x and y attributes so they inherit from parent <text>
+                                    if 'x' in tspan.attrib:
+                                        tspan.attrib.pop('x')
+                                    if 'y' in tspan.attrib:
+                                        tspan.attrib.pop('y')
+                                        
+                    # Serialize modified SVG to bytes
+                    svg_bytes = io.BytesIO()
+                    tree.write(svg_bytes, encoding='utf-8', xml_declaration=True)
+                    svg_bytes.seek(0)  # rewind to the beginning
+
+                    # Save to model using Django File
+                    from django.core.files.base import ContentFile
+                    Certificate_Template.objects.create(
+                        certificate_id=certificate.id,
+                        svg_template=ContentFile(svg_bytes.read(), name=svg_template.name)
+                    )
+
+                if request.FILES.get('csv_file'):
+                    csv_file = request.FILES.get('csv_file')
+
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.reader(decoded_file)
                     
-                            # Handle <tspan> children
-                            for tspan in text_elem.findall('.//svg:tspan', ns):
-                                # Remove x and y attributes so they inherit from parent <text>
-                                if 'x' in tspan.attrib:
-                                    tspan.attrib.pop('x')
-                                if 'y' in tspan.attrib:
-                                    tspan.attrib.pop('y')
-                                    
-                # Serialize modified SVG to bytes
-                svg_bytes = io.BytesIO()
-                tree.write(svg_bytes, encoding='utf-8', xml_declaration=True)
-                svg_bytes.seek(0)  # rewind to the beginning
+                    # Optional: skip header
+                    next(reader, None)
 
-                # Save to model using Django File
-                from django.core.files.base import ContentFile
-                Certificate_Template.objects.create(
-                    certificate_id=certificate.id,
-                    svg_template=ContentFile(svg_bytes.read(), name=svg_template.name)
-                )
+                    for row in reader:
+                        name, email = row  # assuming each row has exactly 2 columns
+                        # Save to database
+                        Certificate_Receivers.objects.create(
+                            certificate_id=certificate.id,
+                            name=name.strip(),
+                            email=email.strip()
+                        )
+                
+                return redirect('graphics_team:event_certificates', event_id)
+            
+            elif 'download_svg' in request.POST:
+                certificate_id = request.POST.get('download_svg')
+                certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
 
-            if request.FILES.get('csv_file'):
+                # File path on disk (e.g., from a FileField or stored path)
+                file_path = certificate_template.svg_template.path
+
+                if not os.path.exists(file_path):
+                    raise Http404("File not found")
+
+                # Read file and send as attachment
+                with open(file_path, 'rb') as f:
+                    response = HttpResponse(f.read(), content_type='application/octet-stream')
+                    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+                    return response
+
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+
+        all_certificates_of_event = Certificate.objects.filter(event=event_id)
+
+        context = {
+            'user_data':user_data,
+            'all_sc_ag':sc_ag,
+            'all_certificates_of_event':all_certificates_of_event,
+        }
+
+        return render(request, "certificate/certificate_type_page.html", context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
+
+@login_required
+@member_login_permission
+def certificate_details(request, certificate_id):
+
+    try:
+        if request.method == 'POST':
+            if 'add_receiver' in request.POST:
+                name = request.POST.get('name')
+                email = request.POST.get('email')
+
+                Certificate_Receivers.objects.create(certificate_id=certificate_id, name=name, email=email)
+
+                return redirect('graphics_team:certificate_details', certificate_id)
+
+            elif 'add_csv' in request.POST:
                 csv_file = request.FILES.get('csv_file')
+
+                if Certificate_Receivers.objects.filter(certificate_id=certificate_id).exists():
+                    Certificate_Receivers.objects.filter(certificate_id=certificate_id).delete()
 
                 decoded_file = csv_file.read().decode('utf-8').splitlines()
                 reader = csv.reader(decoded_file)
@@ -490,114 +576,74 @@ def event_certificates(request, event_id):
                     name, email = row  # assuming each row has exactly 2 columns
                     # Save to database
                     Certificate_Receivers.objects.create(
-                        certificate_id=certificate.id,
+                        certificate_id=certificate_id,
                         name=name.strip(),
                         email=email.strip()
                     )
-        elif 'download_svg' in request.POST:
-            certificate_id = request.POST.get('download_svg')
-            certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
 
-            # File path on disk (e.g., from a FileField or stored path)
-            file_path = certificate_template.svg_template.path
-
-            if not os.path.exists(file_path):
-                raise Http404("File not found")
-
-            # Read file and send as attachment
-            with open(file_path, 'rb') as f:
-                response = HttpResponse(f.read(), content_type='application/octet-stream')
-                response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
-                return response
-
-    all_certificates_of_event = Certificate.objects.filter(event=event_id)
-
-    context = {
-        'all_certificates_of_event':all_certificates_of_event,
-    }
-
-    return render(request, "certificate/certificate_type_page.html", context)
-
-@login_required
-@member_login_permission
-def certificate_details(request, certificate_id):
-
-    if request.method == 'POST':
-        if 'add_receiver' in request.POST:
-            name = request.POST.get('name')
-            email = request.POST.get('email')
-
-            Certificate_Receivers.objects.create(certificate_id=certificate_id, name=name, email=email)
-
-        elif 'add_csv' in request.POST:
-            csv_file = request.FILES.get('csv_file')
-
-            if Certificate_Receivers.objects.filter(certificate_id=certificate_id).exists():
-                Certificate_Receivers.objects.filter(certificate_id=certificate_id).delete()
-
-            decoded_file = csv_file.read().decode('utf-8').splitlines()
-            reader = csv.reader(decoded_file)
+                return redirect('graphics_team:certificate_details', certificate_id)
             
-            # Optional: skip header
-            next(reader, None)
+            elif 'delete_receiver' in request.POST:
+                receiver_id = request.POST.get('delete_receiver')
 
-            for row in reader:
-                name, email = row  # assuming each row has exactly 2 columns
-                # Save to database
-                Certificate_Receivers.objects.create(
-                    certificate_id=certificate_id,
-                    name=name.strip(),
-                    email=email.strip()
+                Certificate_Receivers.objects.filter(id=receiver_id).delete()
+
+                return redirect('graphics_team:certificate_details', certificate_id)
+
+            elif 'download_receiver_certificate' in request.POST:
+                # Get the object with the SVG FileField
+                certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+                svg_file = certificate_template.svg_template
+
+                receiver_id = request.POST.get('download_receiver_certificate')
+                receiver_name = Certificate_Receivers.objects.get(id=receiver_id).name
+
+                svg_content = svg_file.read().decode('utf-8')
+                tree = ET.ElementTree(ET.fromstring(svg_content))
+                root = tree.getroot()
+                ns = {'svg': 'http://www.w3.org/2000/svg'}
+
+                # The text to search for
+                old_text = 'Mirza Farhan Shahriar'
+
+                # Loop over all <text> elements
+                for text_elem in root.findall('.//svg:text', ns):                            
+                    replace_text_in_element(text_elem, old_text, receiver_name)
+
+                updated_svg = ET.tostring(root, encoding='unicode')
+
+                png_bytes = cairosvg.svg2png(
+                    bytestring=updated_svg.encode('utf-8'),
+                    background_color='white'  # remove transparency
                 )
+
+                response = HttpResponse(png_bytes, content_type='image/png')
+                response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+                return response
         
-        elif 'delete_receiver' in request.POST:
-            receiver_id = request.POST.get('delete_receiver')
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
 
-            Certificate_Receivers.objects.filter(id=receiver_id).delete()
+        certificate = Certificate.objects.get(id=certificate_id)
+        event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
 
-        elif 'download_receiver_certificate' in request.POST:
-            # Get the object with the SVG FileField
-            certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
-            svg_file = certificate_template.svg_template
+        certificate_receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
 
-            receiver_id = request.POST.get('download_receiver_certificate')
-            receiver_name = Certificate_Receivers.objects.get(id=receiver_id).name
+        context = {
+            'user_data':user_data,
+            'all_sc_ag':sc_ag,
+            'certificate':certificate,
+            'event_name':event_name_of_certificate,
+            'certificate_receivers':certificate_receivers,
+        }    
 
-            svg_content = svg_file.read().decode('utf-8')
-            tree = ET.ElementTree(ET.fromstring(svg_content))
-            root = tree.getroot()
-            ns = {'svg': 'http://www.w3.org/2000/svg'}
-
-            # The text to search for
-            old_text = 'Mirza Farhan Shahriar'
-
-            # Loop over all <text> elements
-            for text_elem in root.findall('.//svg:text', ns):                            
-                replace_text_in_element(text_elem, old_text, receiver_name)
-
-            updated_svg = ET.tostring(root, encoding='unicode')
-
-            png_bytes = cairosvg.svg2png(
-                bytestring=updated_svg.encode('utf-8'),
-                background_color='white'  # remove transparency
-            )
-
-            response = HttpResponse(png_bytes, content_type='image/png')
-            response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
-            return response
-
-    certificate = Certificate.objects.get(id=certificate_id)
-    event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
-
-    certificate_receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
-
-    context = {
-        'certificate':certificate,
-        'event_name':event_name_of_certificate,
-        'certificate_receivers':certificate_receivers,
-    }    
-
-    return render(request, "certificate/certificate_details_page.html", context)
+        return render(request, "certificate/certificate_details_page.html", context)
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
 
 @login_required
 @member_login_permission
