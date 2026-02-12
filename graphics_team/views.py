@@ -500,14 +500,22 @@ def event_certificates(request, event_id):
                     # Optional: skip header
                     next(reader, None)
 
+                    receivers = []
+
                     for row in reader:
-                        name, email = row  # assuming each row has exactly 2 columns
-                        # Save to database
-                        Certificate_Receivers.objects.create(
-                            certificate_id=certificate.id,
-                            name=name.strip(),
-                            email=email.strip()
+                        if len(row) < 2:
+                            continue  # skip invalid rows
+
+                        name, email = row
+                        receivers.append(
+                            Certificate_Receivers(
+                                certificate_id=certificate.id,
+                                name=name.strip(),
+                                email=email.strip()
+                            )
                         )
+
+                    Certificate_Receivers.objects.bulk_create(receivers, batch_size=1000)
                 
                 return redirect('graphics_team:event_certificates', event_id)
             
@@ -572,14 +580,22 @@ def certificate_details(request, certificate_id):
                 # Optional: skip header
                 next(reader, None)
 
+                receivers = []
+
                 for row in reader:
-                    name, email = row  # assuming each row has exactly 2 columns
-                    # Save to database
-                    Certificate_Receivers.objects.create(
-                        certificate_id=certificate_id,
-                        name=name.strip(),
-                        email=email.strip()
+                    if len(row) < 2:
+                        continue  # skip invalid rows
+
+                    name, email = row
+                    receivers.append(
+                        Certificate_Receivers(
+                            certificate_id=certificate_id,
+                            name=name.strip(),
+                            email=email.strip()
+                        )
                     )
+
+                Certificate_Receivers.objects.bulk_create(receivers, batch_size=1000)
 
                 return redirect('graphics_team:certificate_details', certificate_id)
             
