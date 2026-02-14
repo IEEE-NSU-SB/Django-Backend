@@ -266,9 +266,10 @@
 </head>
 <body>
     <div class="container">
+        {% if is_request_valid %}
         <h1>Check your email</h1>
         <p class="subtitle">Please enter the six digit verification code we sent to</p>
-        <p class="email-display">{{ email|default:"example@gmail.com" }}</p>
+        <p class="email-display">{{ certificate_receiver.email }}</p>
 
         <div class="error-message" id="errorMessage"></div>
         <div class="success-message" id="successMessage"></div>
@@ -287,6 +288,7 @@
             <input type="hidden" name="otp_code" id="otpCode">
 
             <button type="submit" class="confirm-btn" id="confirmBtn">Confirm</button>
+            <p class="subtitle">Your request ID is: {{cert_req_id}}</p>
         </form>
 
         <div class="timer-container">
@@ -304,6 +306,10 @@
         <a href="javascript:history.back()" class="back-link">
             <span class="back-arrow">←</span> Go Back
         </a>
+        {% else %}
+        <h1 style="color:red">Invalid Request!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please use the link that was given in your email and request again!</p>
+        {% endif %}
     </div>
 
     <script>

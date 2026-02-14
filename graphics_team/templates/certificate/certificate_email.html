@@ -183,8 +183,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>Download Your Certificate</h1>
-        <p class="subtitle">Enter your email address to download your certificate.</p>
+        {% if is_key_valid %}
+        <h1>Download Your {{certificate_title}} Certificate for {{event_name}}</h1>
+        <p class="subtitle">Enter your registered email address to download your certificate.</p>
 
         <form method="POST" id="emailForm">
             {% csrf_token %}
@@ -200,9 +201,16 @@
                     autocomplete="email"
                 >
                 <p class="error-message" id="errorMessage">Please enter a valid email address</p>
+                {% for message in messages %}
+                <p class="error-message show" id="errorMessage">{{message}}</p>
+                {% endfor %}
             </div>
-            <button type="submit" class="confirm-btn" id="confirmBtn">Confirm</button>
+            <button type="submit" class="confirm-btn" name="confirm_email" id="confirmBtn">Confirm</button>
         </form>
+        {% else %}
+        <h1 style="color:red">Invalid Link!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please use the link that was given in your email!</p>
+        {% endif %}
     </div>
 
     <script>

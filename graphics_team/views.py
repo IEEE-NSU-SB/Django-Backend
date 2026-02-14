@@ -2,14 +2,44 @@ import csv
 import io
 import os
 import re
-# import cairosvg
+import sys
+from ctypes import CDLL
+# from ctypes.util import find_library
+
+def load_cairo_dll():
+    """Explicitly load Cairo DLL on Windows, do nothing on Linux."""
+    if sys.platform.startswith("win"):
+        # Folder containing cairo-2.dll and dependencies
+        dll_folder = 'CairoSVG Libs'
+        if os.path.isdir(dll_folder):
+            # Prepend to PATH so all dependencies are found
+            os.environ["PATH"] = dll_folder + os.pathsep + os.environ.get("PATH", "")
+            # Load cairo-2.dll explicitly
+            dll_path = os.path.join(dll_folder, "cairo-2.dll")
+            try:
+                CDLL(dll_path)
+            except OSError as e:
+                print(f'Failed to load Cairo DLL: {e}')
+        else:
+            print(f"Cairo DLL folder not found: {dll_folder}")
+                
+        # # Use ctypes.util.find_library to locate cairo
+        # dll_name = find_library("cairo-2")
+        # print("Cairo DLL found by ctypes:", dll_name)
+
+# Call this early, before using CairoSVG
+load_cairo_dll()
+
+try:
+    import cairosvg
+except:
+    pass
+
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from graphics_team.manage_access import GraphicsTeam_Render_Access
-from system_administration.render_access import Access_Render
 from users.models import Members
 from central_branch.renderData import Branch
-from port.models import Roles_and_Position
 from django.contrib import messages
 from system_administration.models import Graphics_Data_Access
 from .renderData import GraphicsTeam
@@ -17,8 +47,9 @@ from users.renderData import LoggedinUser
 from . import renderData
 from django.conf import settings
 from central_events.models import Events
-from .models import Certificate, Certificate_Receivers, Certificate_Template, Graphics_Banner_Image,Graphics_Link,Graphics_Drive_links
+from .models import Certificate, Certificate_Public_URL, Certificate_Receiver_Download_Request, Certificate_Receivers, Certificate_Template, Graphics_Banner_Image,Graphics_Link,Graphics_Drive_links
 import traceback
+from django.utils import timezone
 import logging
 from system_administration.system_error_handling import ErrorHandling
 from django.http import Http404, HttpResponse,HttpResponseBadRequest
@@ -26,6 +57,7 @@ from datetime import datetime
 from port.renderData import PortData
 from users.renderData import PanelMembersData,member_login_permission
 from users import renderData
+from django.core.files.base import ContentFile
 from central_branch import views as cv
 from django.db.models import Count
 import xml.etree.ElementTree as ET
@@ -485,11 +517,12 @@ def event_certificates(request, event_id):
                     svg_bytes.seek(0)  # rewind to the beginning
 
                     # Save to model using Django File
-                    from django.core.files.base import ContentFile
                     Certificate_Template.objects.create(
                         certificate_id=certificate.id,
                         svg_template=ContentFile(svg_bytes.read(), name=svg_template.name)
                     )
+
+                    Certificate_Public_URL.objects.create(certificate_id=certificate.id)
 
                 if request.FILES.get('csv_file'):
                     csv_file = request.FILES.get('csv_file')
@@ -534,6 +567,19 @@ def event_certificates(request, event_id):
                     response = HttpResponse(f.read(), content_type='application/octet-stream')
                     response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
                     return response
+            
+            elif 'delete_certificate' in request.POST:
+                certificate_id = request.POST.get('delete_certificate_id')
+                certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+
+                path = settings.MEDIA_ROOT+str(certificate_template.svg_template)
+                if os.path.exists(path):
+                    os.remove(path)
+                certificate_template.delete()
+
+                Certificate.objects.get(id=certificate_id).delete()
+
+                return redirect('graphics_team:event_certificates', event_id)
 
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -628,14 +674,17 @@ def certificate_details(request, certificate_id):
 
                 updated_svg = ET.tostring(root, encoding='unicode')
 
-                # png_bytes = cairosvg.svg2png(
-                #     bytestring=updated_svg.encode('utf-8'),
-                #     background_color='white'  # remove transparency
-                # )
+                try:
+                    png_bytes = cairosvg.svg2png(
+                        bytestring=updated_svg.encode('utf-8'),
+                        background_color='white'  # remove transparency
+                    )
 
-                # response = HttpResponse(png_bytes, content_type='image/png')
-                # response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
-                # return response
+                    response = HttpResponse(png_bytes, content_type='image/png')
+                    response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+                    return response
+                except:
+                    print('Cairo SVG Error')
         
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -643,6 +692,10 @@ def certificate_details(request, certificate_id):
 
         certificate = Certificate.objects.get(id=certificate_id)
         event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
+        try:
+            certificate_public_url = Certificate_Public_URL.objects.get(certificate_id=certificate.id).get_public_url(request)
+        except:
+            certificate_public_url = ''
 
         certificate_receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
 
@@ -651,6 +704,7 @@ def certificate_details(request, certificate_id):
             'all_sc_ag':sc_ag,
             'certificate':certificate,
             'event_name':event_name_of_certificate,
+            'certificate_public_url':certificate_public_url,
             'certificate_receivers':certificate_receivers,
         }    
 
@@ -663,8 +717,81 @@ def certificate_details(request, certificate_id):
 
 @login_required
 @member_login_permission
+def certificate_email(request, key):
+
+    if request.method == 'POST':
+        email_address = request.POST.get('email')
+
+        event_certificate = Certificate_Public_URL.objects.values_list('certificate_id', flat=True).get(url_key=key)
+
+        try:
+            certificate_receiver = Certificate_Receivers.objects.get(certificate_id=event_certificate, email=email_address)
+        except:
+            messages.warning(request, 'Email does not exist!')
+            return redirect('port:certificate_base', key)
+
+        try:
+            download_request = Certificate_Receiver_Download_Request.objects.create(certificate_receiver=certificate_receiver, certificate_id=event_certificate, otp_code='', otp_expires_at=timezone.now())
+            print(download_request.set_otp())
+            request.session['cert_req_id'] = str(download_request.request_id)
+
+            return redirect('port:certificate_otp')
+        except Exception as e:
+            print(e)
+            messages.warning(request, 'Unable to request for download!')    
+            return redirect('port:certificate_base', key)
+    
+    if request.session.get('cert_req_id'):
+        request.session.pop('cert_req_id')
+
+    is_key_valid = Certificate_Public_URL.objects.filter(url_key=key).exists()
+    if is_key_valid:
+        certificate_title, event_name = Certificate_Public_URL.objects.filter(url_key=key).values_list('certificate__title', 'certificate__event__event_name').first()
+    else:
+        certificate_title = ''
+        event_name = ''
+
+    context = {
+        'is_key_valid': is_key_valid,
+        'certificate_title': certificate_title,
+        'event_name': event_name,
+    }
+
+    return render(request, "certificate/certificate_email.html", context)
+
+@login_required
+@member_login_permission
 def certificate_otp(request):
-    return render(request, "certificate/certificate_otp.html")
+
+    if request.method == 'POST':
+        otp_code = request.POST.get('otp_code')
+
+        if request.session.get('cert_req_id'):
+            cert_req_id = request.session.get('cert_req_id')
+
+        if Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id).verify_otp(raw_otp=otp_code)[0]:
+            return redirect('port:certificate_download')
+
+    if request.session.get('cert_req_id'):
+        cert_req_id = request.session.get('cert_req_id')
+        is_request_valid = True
+
+        certificate_download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
+        certificate_receiver = certificate_download_request.certificate_receiver
+
+        print(certificate_download_request.otp_code)
+    else:
+        cert_req_id = None
+        certificate_receiver = None
+        is_request_valid = False
+
+    context = {
+        'is_request_valid': is_request_valid,
+        'cert_req_id': cert_req_id,
+        'certificate_receiver': certificate_receiver,
+    }
+
+    return render(request, "certificate/certificate_otp.html", context)
 
 
 @login_required
@@ -672,10 +799,6 @@ def certificate_otp(request):
 def certificate_download(request):
     return render(request, "certificate/certificate_download.html")
 
-@login_required
-@member_login_permission
-def certificate_email(request):
-    return render(request, "certificate/certificate_email.html")
 
 
 # def download_file(request, certificate_id):

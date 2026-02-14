@@ -1,6 +1,7 @@
-import imp
+
 from django.urls import path,include
 from port import views
+from graphics_team.views import certificate_otp, certificate_email, certificate_download
 
 app_name='port'
 
@@ -14,4 +15,7 @@ urlpatterns = [
     
     path('portal/authorize/', views.authorize, name='authorize'),
     path('portal/oauth2callback/', views.oauth2callback, name='oauth2callback'),
+    path('certificates/get/<str:key>/', certificate_email, name="certificate_base"),
+    path('certificates/otp/', certificate_otp, name="certificate_otp"),
+    path('certificates/download/', certificate_download, name="certificate_download"),
 ]
