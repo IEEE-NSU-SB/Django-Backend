@@ -358,6 +358,7 @@
         <div class="top-actions">
           <button onclick="openModal('importModal')">Import Names</button>
           <button onclick="openModal('addModal')">Add people</button>
+          <button onclick="openModal('updateTemplateModal')">Update Template</button>
         </div>
 
         <div class="link-box">
@@ -384,6 +385,7 @@
               <input type="checkbox" id="toggleSwitch" />
               <span class="slider"></span>
             </label>
+            <span id="publishStatus" style="margin-left: 10px; font-weight: bold; color: red;">Not Published</span>
           </div>
         </div>
 
@@ -416,6 +418,11 @@
           </table>
         </div>
         <br><br>
+
+        <form method="POST" id="publishForm" style="display: none;">
+          {% csrf_token %}
+          <input type="hidden" name="toggle_publish" id="publishAction">
+        </form>
       </div>
     </div>
 
@@ -440,6 +447,28 @@
           <input type="email" name="email" class="input" />
           <button class="confirm-btn" type="submit" name="add_receiver">Confirm</button>
         </form>
+      </div>
+    </div>
+
+    <div id="updateTemplateModal" class="modal-overlay">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <h3>Update Template (SVG)</h3>
+          <input type="file" name="svg_template" class="input" accept=".svg" />
+          <button class="confirm-btn" type="submit" name="update_template">Confirm</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="publishModal" class="modal-overlay">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <h3 id="publishModalTitle">Confirm Publish</h3>
+        <p id="publishModalMessage">Are you sure you want to publish this certificate?</p>
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+          <button class="confirm-btn" style="background: #6c757d;" onclick="closePublishModal()">Cancel</button>
+          <button class="confirm-btn" id="confirmPublishBtn" onclick="confirmPublish()">Confirm</button>
+        </div>
       </div>
     </div>
 
@@ -490,6 +519,68 @@
             row.style.display = 'none';
           }
         });
+      });
+
+      // Publish toggle functionality
+      const toggleSwitch = document.getElementById('toggleSwitch');
+      const publishStatus = document.getElementById('publishStatus');
+      const publishModal = document.getElementById('publishModal');
+      const publishModalTitle = document.getElementById('publishModalTitle');
+      const publishModalMessage = document.getElementById('publishModalMessage');
+      const confirmPublishBtn = document.getElementById('confirmPublishBtn');
+      const publishForm = document.getElementById('publishForm');
+      const publishAction = document.getElementById('publishAction');
+
+      let pendingPublishState = null;
+
+      toggleSwitch.addEventListener('change', function(e) {
+        e.preventDefault();
+        const isChecked = toggleSwitch.checked;
+        toggleSwitch.checked = !isChecked; // revert
+
+        pendingPublishState = isChecked;
+        if (isChecked) {
+          publishModalTitle.textContent = 'Confirm Publish';
+          publishModalMessage.textContent = 'Are you sure you want to publish this certificate?';
+          confirmPublishBtn.textContent = 'Publish';
+        } else {
+          publishModalTitle.textContent = 'Confirm Unpublish';
+          publishModalMessage.textContent = 'Are you sure you want to unpublish this certificate?';
+          confirmPublishBtn.textContent = 'Unpublish';
+        }
+        publishModal.classList.add('active');
+      });
+
+      function closePublishModal() {
+        publishModal.classList.remove('active');
+        pendingPublishState = null;
+      }
+
+      function confirmPublish() {
+        if (pendingPublishState !== null) {
+          publishAction.value = pendingPublishState ? 'publish' : 'unpublish';
+          publishForm.submit();
+        }
+      }
+
+      // Update status text based on toggle
+      function updatePublishStatus() {
+        if (toggleSwitch.checked) {
+          publishStatus.textContent = 'Published';
+          publishStatus.style.color = 'green';
+        } else {
+          publishStatus.textContent = 'Not Published';
+          publishStatus.style.color = 'red';
+        }
+      }
+
+      updatePublishStatus(); // initial
+
+      // Close modal on overlay click
+      publishModal.addEventListener('click', function(e) {
+        if (e.target === publishModal) {
+          closePublishModal();
+        }
       });
     </script>
   </body>
