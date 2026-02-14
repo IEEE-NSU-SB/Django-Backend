@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Certificate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #00629B 0%, #002855 100%);
+            background: #00629b59;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .email-input-container {
+            margin-bottom: 20px;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .email-input:focus {
+            border-color: #00629B;
+            box-shadow: 0 0 0 3px rgba(0, 98, 155, 0.1);
+        }
+
+        .email-input::placeholder {
+            color: #aaa;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00629B 0%, #002855 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirm-btn:active {
+            transform: translateY(0);
+        }
+
+        .confirm-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .back-link {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #667eea;
+        }
+
+        .back-arrow {
+            font-size: 18px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 25px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+            .email-input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .confirm-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-bottom: 12px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .email-input {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+
+            .confirm-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Download Your Certificate</h1>
+        <p class="subtitle">Enter your email address to download your certificate.</p>
+
+        <form method="POST" id="emailForm">
+            {% csrf_token %}
+            <input type="hidden" name="certificate_id" value="{{ certificate_id }}">
+            <div class="email-input-container">
+                <input 
+                    type="email" 
+                    name="email" 
+                    class="email-input" 
+                    id="emailInput"
+                    placeholder="Enter your email address"
+                    required
+                    autocomplete="email"
+                >
+                <p class="error-message" id="errorMessage">Please enter a valid email address</p>
+            </div>
+            <button type="submit" class="confirm-btn" id="confirmBtn">Confirm</button>
+        </form>
+    </div>
+
+    <script>
+        const emailForm = document.getElementById('emailForm');
+        const emailInput = document.getElementById('emailInput');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Clear error when user starts typing
+        emailInput.addEventListener('input', () => {
+            hideError();
+        });
+
+        // Form submission
+        emailForm.addEventListener('submit', (e) => {
+            const email = emailInput.value.trim();
+
+            if (!email || !emailRegex.test(email)) {
+                e.preventDefault();
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            // Disable button to prevent double submission
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Processing...';
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            emailInput.style.borderColor = '#e74c3c';
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('show');
+            emailInput.style.borderColor = '#e0e0e0';
+        }
+
+        // Auto-focus email input on page load
+        window.addEventListener('load', () => {
+            emailInput.focus();
+        });
+    </script>
+</body>
+</html>

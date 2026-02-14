@@ -2,7 +2,7 @@ import csv
 import io
 import os
 import re
-import cairosvg
+# import cairosvg
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from graphics_team.manage_access import GraphicsTeam_Render_Access
@@ -628,14 +628,14 @@ def certificate_details(request, certificate_id):
 
                 updated_svg = ET.tostring(root, encoding='unicode')
 
-                png_bytes = cairosvg.svg2png(
-                    bytestring=updated_svg.encode('utf-8'),
-                    background_color='white'  # remove transparency
-                )
+                # png_bytes = cairosvg.svg2png(
+                #     bytestring=updated_svg.encode('utf-8'),
+                #     background_color='white'  # remove transparency
+                # )
 
-                response = HttpResponse(png_bytes, content_type='image/png')
-                response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
-                return response
+                # response = HttpResponse(png_bytes, content_type='image/png')
+                # response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+                # return response
         
         sc_ag=PortData.get_all_sc_ag(request=request)
         current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
@@ -665,6 +665,17 @@ def certificate_details(request, certificate_id):
 @member_login_permission
 def certificate_otp(request):
     return render(request, "certificate/certificate_otp.html")
+
+
+@login_required
+@member_login_permission
+def certificate_download(request):
+    return render(request, "certificate/certificate_download.html")
+
+@login_required
+@member_login_permission
+def certificate_email(request):
+    return render(request, "certificate/certificate_email.html")
 
 
 # def download_file(request, certificate_id):

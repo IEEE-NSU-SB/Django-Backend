@@ -36,4 +36,6 @@ urlpatterns = [
     path('certificates/<int:event_id>/', views.event_certificates, name="event_certificates"),
     path('certificates/details/<int:certificate_id>/', views.certificate_details, name="certificate_details"),
     path('certificate_otp/', views.certificate_otp, name="certificate_otp"),
+    path('certificate_download/', views.certificate_download, name="certificate_download"),
+    path('certificate_email/', views.certificate_email, name="certificate_email"),
 ]

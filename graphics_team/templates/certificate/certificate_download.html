@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification - OTP</title>
+    <title>Download Certificate</title>
     <style>
         * {
             margin: 0;
@@ -47,44 +47,11 @@
             line-height: 1.5;
         }
 
-        .email-display {
-            color: #333;
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 35px;
-        }
 
-        .otp-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
 
-        .otp-input {
-            width: 55px;
-            height: 55px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            transition: all 0.3s ease;
-            outline: none;
-        }
 
-        .otp-input:focus {
-            border-color: #00629B;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
 
-        .otp-input:not(:placeholder-shown) {
-            border-color: #00629B;
-            background-color: #f8f9ff;
-        }
-
-        .confirm-btn {
+        .download-btn {
             width: 100%;
             padding: 16px;
             background: linear-gradient(135deg, #00629B 0%, #002855 100%);
@@ -98,59 +65,16 @@
             margin-bottom: 20px;
         }
 
-        .confirm-btn:active {
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:active {
             transform: translateY(0);
         }
 
-        .confirm-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-        }
 
-        .timer-container {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        .timer {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .timer.expired {
-            color: #e74c3c;
-        }
-
-        .resend-container {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .resend-btn {
-            background: none;
-            border: none;
-            color: #667eea;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-            font-size: 14px;
-            padding: 0;
-            transition: color 0.3s ease;
-        }
-
-        .resend-btn:hover:not(:disabled) {
-            color: #764ba2;
-        }
-
-        .resend-btn:disabled {
-            color: #cccccc;
-            cursor: not-allowed;
-            text-decoration: none;
-        }
 
         .back-link {
             color: #888;
@@ -170,27 +94,7 @@
             font-size: 18px;
         }
 
-        .error-message {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-bottom: 15px;
-            display: none;
-        }
 
-        .error-message.show {
-            display: block;
-        }
-
-        .success-message {
-            color: #27ae60;
-            font-size: 14px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -207,21 +111,9 @@
                 font-size: 14px;
             }
 
-            .email-display {
-                font-size: 14px;
-            }
 
-            .otp-container {
-                gap: 8px;
-            }
 
-            .otp-input {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-            }
-
-            .confirm-btn {
+            .download-btn {
                 padding: 14px;
                 font-size: 15px;
             }
@@ -241,18 +133,9 @@
                 font-size: 13px;
             }
 
-            .otp-container {
-                gap: 6px;
-            }
 
-            .otp-input {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-                border-radius: 8px;
-            }
 
-            .confirm-btn {
+            .download-btn {
                 padding: 12px;
                 font-size: 14px;
             }
@@ -266,40 +149,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Check your email</h1>
-        <p class="subtitle">Please enter the six digit verification code we sent to</p>
-        <p class="email-display">{{ email|default:"example@gmail.com" }}</p>
+        <h1>Download Your Certificate</h1>
+        <p class="subtitle">Click the button below to download your certificate.</p>
 
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
 
-        <form method="POST" id="otpForm">
+
+
+        <form method="POST" action="">
             {% csrf_token %}
-            <div class="otp-container">
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp1" name="otp1" required>
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp2" name="otp2" required>
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp3" name="otp3" required>
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp4" name="otp4" required>
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp5" name="otp5" required>
-                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp6" name="otp6" required>
-            </div>
-
-            <input type="hidden" name="otp_code" id="otpCode">
-
-            <button type="submit" class="confirm-btn" id="confirmBtn">Confirm</button>
+            <input type="hidden" name="certificate_id" value="{{ certificate_id }}">
+            <input type="hidden" name="receiver_id" value="{{ receiver_id }}">
+            <button type="submit" class="download-btn">Download Certificate</button>
         </form>
-
-        <div class="timer-container">
-            <span id="timerText">Code expires in</span>
-            <span class="timer" id="timer">02:00</span>
-        </div>
-
-        <div class="resend-container">
-            Didn't get the email? 
-            <button type="button" class="resend-btn" id="resendBtn" disabled>
-                Resend code
-            </button>
-        </div>
 
         <a href="javascript:history.back()" class="back-link">
             <span class="back-arrow">←</span> Go Back
