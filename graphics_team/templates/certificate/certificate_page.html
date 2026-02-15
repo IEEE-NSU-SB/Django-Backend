@@ -121,6 +121,7 @@
             </span>
         </h2>
 
+        {% if has_certificates_access %}
         <div style="text-align:center; margin-top:20px;">
             <button type="button" onclick="openEventModal()" style="
                 background-color:#00629B;
@@ -133,8 +134,9 @@
             ">
                 Select Event For Certificate
             </button>
-
         </div>
+        {% endif %}
+
         <br>
         <table border="1" width="100%" cellpadding="10" cellspacing="0">
             <thead>
@@ -155,6 +157,7 @@
             </tbody>
         </table>
 
+        {% if has_certificates_access %}
         <!-- Modal -->
         <div id="eventModal" class="event-modal-overlay">
 
@@ -178,6 +181,7 @@
 
             </div>
         </div>
+        {% endif %}
 
 
 
@@ -188,6 +192,7 @@
 
 {% include "common_js.html" %}
 
+{% if has_certificates_access %}
 <script>
 function openEventModal() {
     document.getElementById("eventModal").style.display = "block";
@@ -200,7 +205,7 @@ document.getElementById("eventModal").addEventListener("click", function(e) {
     }
 });
 </script>
-
+{% endif %}
 
 
 </body>

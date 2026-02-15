@@ -308,6 +308,22 @@
                                         <input type="checkbox" class="checkbox" value="graphics_view_access" name="graphics_view_access">
                                         <label for="graphics_view_access">Graphics View Access</label><br>
                                         {% endif %}
+
+                                        {% if data_access.certificates_access %}
+                                        <input type="checkbox" checked="True" class="checkbox" value="certificates_access" name="certificates_access">
+                                        <label for="certificates_access">Certificates Create/Edit Access</label><br>
+                                        {% else %}
+                                        <input type="checkbox" class="checkbox" value="certificates_access" name="certificates_access">
+                                        <label for="certificates_access">Certificates Create/Edit Access</label><br>
+                                        {% endif %}
+
+                                        {% if data_access.certificates_view_access %}
+                                        <input type="checkbox" checked="True" class="checkbox" value="certificates_view_access" name="certificates_view_access">
+                                        <label for="certificates_view_access">Certificates View Access</label><br>
+                                        {% else %}
+                                        <input type="checkbox" class="checkbox" value="certificates_view_access" name="certificates_view_access">
+                                        <label for="certificates_view_access">Certificates View Access</label><br>
+                                        {% endif %}
                                             
                                     </td>
                                 

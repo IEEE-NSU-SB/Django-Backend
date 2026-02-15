@@ -218,6 +218,7 @@
           </span>
         </h2>
 
+        {% if has_certificates_access %}
         <div style="text-align: center; margin-top: 20px">
           <button
             type="button"
@@ -235,6 +236,7 @@
             Select Certificate Type
           </button>
         </div>
+        {% endif %}
         <br />
         <table border="1" width="100%" cellpadding="10" cellspacing="0">
           <thead>
@@ -242,7 +244,9 @@
               <th>SL No.</th>
               <th>Type of Certificate</th>
               <th>Download (svg)</th>
+              {% if has_certificates_access %}
               <th>Action?</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -268,7 +272,9 @@
                   >
                     Download
                 </button>
-                </td>                <td style="text-align: center">
+                </td>      
+                {% if has_certificates_access %}
+                <td style="text-align: center">
                   <button
                     type="button"
                     onclick="openDeleteModal({{certificate.id}})"
@@ -283,13 +289,16 @@
                   >
                     Delete
                   </button>
-                </td>              </tr>
+                </td>
+                {% endif %}          
+              </tr>
     
               {% endfor %}
             </form>
           </tbody>
         </table>
 
+        {% if has_certificates_access %}
         <!-- Modal -->
         <div id="certificateTypeModal" class="event-modal-overlay">
           <div id="modalContent" class="event-modal-box">
@@ -373,11 +382,13 @@
             </div>
           </div>
         </div>
+        {% endif %}
       </div>
     </div>
 
     {% include "common_js.html" %}
 
+    {% if has_certificates_access %}
     <script>
       function openCertificateTypeModal() {
         document.getElementById("certificateTypeModal").classList.add("active");
@@ -424,5 +435,6 @@
           }
         });
     </script>
+    {% endif %}
   </body>
 </html>

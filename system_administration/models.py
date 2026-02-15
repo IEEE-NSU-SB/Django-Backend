@@ -207,6 +207,8 @@ class Graphics_Data_Access(models.Model):
     event_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Event Access")
     graphics_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Graphics Access")
     graphics_view_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Graphics View Access")
+    certificates_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Certificates Access")
+    certificates_view_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Certificates View Access")
 
     class Meta:
 

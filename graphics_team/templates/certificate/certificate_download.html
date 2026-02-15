@@ -155,12 +155,7 @@
 
 
 
-        <form method="POST" action="">
-            {% csrf_token %}
-            <input type="hidden" name="certificate_id" value="{{ certificate_id }}">
-            <input type="hidden" name="receiver_id" value="{{ receiver_id }}">
-            <button type="submit" class="download-btn">Download Certificate</button>
-        </form>
+        <button onclick="window.location.href='{{download_url}}'" class="download-btn">Download Certificate</button>
 
         <a href="javascript:history.back()" class="back-link">
             <span class="back-arrow">←</span> Go Back

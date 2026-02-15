@@ -166,36 +166,40 @@ class Certificate_Receiver_Download_Request(models.Model):
     def __str__(self):
         return str(self.pk)
     
-# class Certificate_Receiver_Download_URL(models.Model):
+class Certificate_Receiver_Download_URL(models.Model):
 
-#     download_request = models.OneToOneField(Certificate_Receiver_Download_Request, null=False, blank=False)
-#     url_key = models.CharField(null=False, blank=False, max_length=40, unique=True)
-#     is_active = models.BooleanField(null=False, blank=False, default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     expires_at = models.DateTimeField(null=False, blank=False)
+    download_request = models.OneToOneField(Certificate_Receiver_Download_Request, null=False, blank=False, on_delete=models.CASCADE)
+    url_key = models.CharField(null=False, blank=False, max_length=40, unique=True)
+    is_active = models.BooleanField(null=False, blank=False, default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=False, blank=False)
 
-#     def save(self, *args, **kwargs):
-#         # Generate a secure 40-char key if not already set
-#         if not self.url_key:
-#             alphabet = string.ascii_letters + string.digits
-#             self.url_key = ''.join(secrets.choice(alphabet) for _ in range(40))
+    def save(self, *args, **kwargs):
+        # Generate a secure 40-char key if not already set
+        if not self.url_key:
+            alphabet = string.ascii_letters + string.digits
+            self.url_key = ''.join(secrets.choice(alphabet) for _ in range(20))
 
-#         # Set default expiry if not already set (e.g., 1 day)
-#         if not self.expires_at:
-#             self.expires_at = timezone.now() + timedelta(days=1)
+        # Set default expiry if not already set (e.g., 1 day)
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(days=1)
 
-#         super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-#     def is_expired(self):
-#         """Check if the URL has expired"""
-#         return timezone.now() > self.expires_at
+    def is_expired(self):
+        """Check if the URL has expired"""
+        return timezone.now() > self.expires_at
 
-#     def get_download_url(self):
-#         """Return full URL"""
-#         return f"https://example.com/download/{self.url_key}/"
+    def get_download_url(self, request=None):
+        """Return full URL"""
+        path = reverse('port:certificate_request_download', kwargs={'key' : self.url_key})
+        
+        if request:
+            return request.build_absolute_uri(path)
+        return path
 
-#     class Meta:
-#         verbose_name = 'Certificate Public URL'
+    class Meta:
+        verbose_name = 'Certificate Public Download URL'
 
-#     def __str__(self):
-#         return str(self.pk)
+    def __str__(self):
+        return str(self.pk)

@@ -354,11 +354,13 @@
       <div class="app-body" style="margin-left: 15%; margin-right: 15%">
         <h1 class="page-title">{{certificate.title}} of {{event_name}}</h1>
 
+        {% if has_certificates_access %}
         <div class="top-actions">
           <button onclick="openModal('importModal')">Import Names</button>
           <button onclick="openModal('addModal')">Add people</button>
           <button onclick="openModal('updateTemplateModal')">Update Template</button>
         </div>
+        {% endif %}
 
         <div class="link-box">
           <label><b>Certificate link:</b></label>
@@ -395,8 +397,10 @@
                 <th>Sl.</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Download certificate (.svg)</th>
+                <th>Download certificate (.png)</th>
+                {% if has_certificates_access %}
                 <th>Delete</th>
+                {% endif %}
               </tr>
             </thead>
 
@@ -409,7 +413,9 @@
                   <td>{{receiver.name}}</td>
                   <td>{{receiver.email}}</td>
                   <td><button type="submit" name="download_receiver_certificate" value="{{receiver.id}}">Download</button></td>
+                  {% if has_certificates_access %}
                   <td><button type="submit" name="delete_receiver" value="{{receiver.id}}">Delete</button></td>
+                  {% endif %}
                 </tr>
                 {% endfor %}
               </form>
@@ -425,6 +431,7 @@
       </div>
     </div>
 
+    {% if has_certificates_access %}
     <div id="importModal" class="modal-overlay">
       <div class="modal-box" onclick="event.stopPropagation()">
         <form method="POST" enctype="multipart/form-data">
@@ -459,6 +466,7 @@
         </form>
       </div>
     </div>
+    {% endif %}
 
     <div id="publishModal" class="modal-overlay">
       <div class="modal-box" onclick="event.stopPropagation()">
