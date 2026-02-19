@@ -352,7 +352,7 @@
       </div>
 
       <div class="app-body" style="margin-left: 15%; margin-right: 15%">
-        <h1 class="page-title">{{certificate.title}} of {{event_name}}</h1>
+        <h1 class="page-title"><span style="color:#9b6100">{{certificate.title}}</span> of {{event_name}}</h1>
 
         {% if has_certificates_access %}
         <div class="top-actions">
@@ -436,8 +436,9 @@
       <div class="modal-box" onclick="event.stopPropagation()">
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <h3>Names (csv)</h3>
-          <input type="file" name="csv_file" class="input" accept=".csv" />
+          <h3>Names (csv) <span style="color:red">*</span></h3>
+          <input type="file" name="csv_file" class="input" accept=".csv" required />
+          <p style="color:crimson;font-weight:bolder">Warning: This will remove all previous entries (inluding the ones manually added) and put the new ones instead!</p>
           <button class="confirm-btn" type="submit" name="add_csv">Confirm</button>
         </form>
       </div>
@@ -447,10 +448,10 @@
       <div class="modal-box" onclick="event.stopPropagation()">
         <form method="POST">
           {% csrf_token %}
-          <h3>Name</h3>
-          <input type="text" name="name" class="input" />
-          <h3>Email</h3>
-          <input type="email" name="email" class="input" />
+          <h3>Name <span style="color:red">*</span></h3>
+          <input type="text" name="name" class="input" required />
+          <h3>Email <span style="color:red">*</span></h3>
+          <input type="email" name="email" class="input" required />
           <button class="confirm-btn" type="submit" name="add_receiver">Confirm</button>
         </form>
       </div>
@@ -460,8 +461,8 @@
       <div class="modal-box" onclick="event.stopPropagation()">
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <h3>Update Template (SVG)</h3>
-          <input type="file" name="svg_template" class="input" accept=".svg" />
+          <h3>Update Template (SVG) <span style="color:red">*</span></h3>
+          <input type="file" name="svg_template" class="input" accept=".svg" required />
           <button class="confirm-btn" type="submit" name="update_template">Confirm</button>
         </form>
       </div>

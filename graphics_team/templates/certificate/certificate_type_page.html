@@ -304,23 +304,25 @@
           <div id="modalContent" class="event-modal-box">
             <form method="POST" enctype="multipart/form-data">
               {% csrf_token %}
-              <div class="event-modal-title">Name of certificate</div>
+              <div class="event-modal-title">Name of certificate <span style="color:red">*</span></div>
   
               <input
                 type="text"
                 class="event-modal-input"
                 id="certificate_name"
                 name="certificate_name"
+                required
                 placeholder="Enter the name of the certificate"
               />
   
-              <div class="event-modal-title">Add template (svg)</div>
+              <div class="event-modal-title">Add template (svg) <span style="color:red">*</span></div>
   
               <input
                 type="file"
                 class="event-modal-input"
                 name="svg_template"
                 accept=".svg"
+                required
                 id="templateFile"
               />
   
