@@ -8,8 +8,9 @@ import sys
 import xml.etree.ElementTree as ET
 from PIL import ImageFont
 from django.core.files.base import ContentFile
-
 from graphics_team.models import Certificate_Receivers
+from insb_port import settings
+from django.core.mail import send_mail
 
 # from ctypes.util import find_library
 
@@ -155,3 +156,25 @@ class Certificate_Manager:
         except:
             print('Cairo SVG Error')
             return None
+        
+    def sendOTPToUserViaEmail(request, user_email, otp):
+        
+        '''Sends an email to the users email (The personal email they provided when they registered for the event) with the OTP to get their certificate'''
+                
+        subject="Your OTP for Certificate - IEEE NSU SB Portal"
+                
+        message=f"Dear user,\nYour OTP for certificate is:\n{otp}\n\nPlease, do not share this link anywhere else.\nThank you.\n\nThis message was generated from IEEE NSU SB Portal System. If you are not supposed to recieve this email, please contact our Website Development Team."
+        
+        email_from = settings.EMAIL_HOST_USER
+        
+        recipient_list = [user_email]
+        try:
+            send_mail(
+                    subject, message, email_from, recipient_list
+                )
+            mail_sent=True
+        except Exception as e:
+            mail_sent=False
+            print(e)
+        
+        return mail_sent #the function returns if the mail is sent or not.

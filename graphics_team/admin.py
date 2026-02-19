@@ -18,7 +18,20 @@ class Graphics_Drive_Link(admin.ModelAdmin):
 
 admin.site.register(Certificate)
 admin.site.register(Certificate_Receivers)
-admin.site.register(Certificate_Template)
+
+@admin.register(Certificate_Template)
+class Certificate_TemplateAdmin(admin.ModelAdmin):
+
+    fields = ['certificate', 'svg_filename']
+    readonly_fields = ("svg_filename",)
+
+    def svg_filename(self, obj):
+        if obj.svg_template:
+            return obj.svg_template.name  # just show stored path
+        return "-"
+
+    svg_filename.short_description = "SVG File Location"
+
 admin.site.register(Certificate_Public_URL)
 admin.site.register(Certificate_Receiver_Download_Request)
 admin.site.register(Certificate_Receiver_Download_URL)

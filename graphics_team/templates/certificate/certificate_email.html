@@ -183,36 +183,47 @@
 </head>
 <body>
     <div class="container">
-        {% if is_key_valid %}
-        <h1>Download Your {{certificate_title}} Certificate for {{event_name}}</h1>
-        <p class="subtitle">Enter your registered email address to download your certificate.</p>
+        {% if error_occured %}
+        <h1 style="color:red">An error has occured!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please try again later!</p>
+        {% endif %}
 
-        <form method="POST" id="emailForm">
-            {% csrf_token %}
-            <input type="hidden" name="certificate_id" value="{{ certificate_id }}">
-            <div class="email-input-container">
-                <input 
-                    type="email" 
-                    name="email" 
-                    class="email-input" 
-                    id="emailInput"
-                    placeholder="Enter your email address"
-                    required
-                    autocomplete="email"
-                >
-                <p class="error-message" id="errorMessage">Please enter a valid email address</p>
-                {% for message in messages %}
-                <p class="error-message show" id="errorMessage">{{message}}</p>
-                {% endfor %}
-            </div>
-            <button type="submit" class="confirm-btn" name="confirm_email" id="confirmBtn">Confirm</button>
-        </form>
-        {% else %}
+        {% if is_key_valid %}
+            {% if is_active %}
+            <h1>Download Your {{certificate_title}} Certificate for {{event_name}}</h1>
+            <p class="subtitle">Enter your registered email address to download your certificate.</p>
+    
+            <form method="POST" id="emailForm">
+                {% csrf_token %}
+                <input type="hidden" name="certificate_id" value="{{ certificate_id }}">
+                <div class="email-input-container">
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="email-input" 
+                        id="emailInput"
+                        placeholder="Enter your email address"
+                        required
+                        autocomplete="email"
+                    >
+                    <p class="error-message" id="errorMessage">Please enter a valid email address</p>
+                    {% for message in messages %}
+                    <p class="error-message show" id="errorMessage">{{message}}</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="confirm-btn" name="confirm_email" id="confirmBtn">Confirm</button>
+            </form>
+            {% else %}
+            <h1 style="color:orange">Link has been turned off!</h1>
+            <p class="subtitle" style="margin-bottom:0px">Please try again later or contact us!</p>
+            {% endif %}
+        {% elif not error_occured %}
         <h1 style="color:red">Invalid Link!</h1>
         <p class="subtitle" style="margin-bottom:0px">Please use the link that was given in your email!</p>
         {% endif %}
     </div>
 
+    {% if is_key_valid and is_active %}
     <script>
         const emailForm = document.getElementById('emailForm');
         const emailInput = document.getElementById('emailInput');
@@ -258,5 +269,6 @@
             emailInput.focus();
         });
     </script>
+    {% endif %}
 </body>
 </html>

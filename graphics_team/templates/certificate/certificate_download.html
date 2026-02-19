@@ -149,17 +149,21 @@
 </head>
 <body>
     <div class="container">
-        <h1>Download Your Certificate</h1>
+        {% if error_occured %}
+        <h1 style="color:red">An error has occured!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please try again later!</p>
+        {% endif %}
+
+        {% if is_request_valid %}
+        <h1>Download Your Certificate for {{event_name}}</h1>
         <p class="subtitle">Click the button below to download your certificate.</p>
-
-
-
 
         <button onclick="window.location.href='{{download_url}}'" class="download-btn">Download Certificate</button>
 
-        <a href="javascript:history.back()" class="back-link">
-            <span class="back-arrow">←</span> Go Back
-        </a>
+        {% elif not error_occured %}
+        <h1 style="color:red">Invalid Request!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please use the link that was given in your email and request again!</p>
+        {% endif %}
     </div>
 
     <script>

@@ -13,6 +13,8 @@ from io import BytesIO
 from django.core.files import File
 from django.contrib.auth.hashers import make_password, check_password
 
+from system_administration.models import PrivateFileStorage
+
 # Create your models here.
 #Table for Media Links and Images
 class Graphics_Link(models.Model):
@@ -47,11 +49,13 @@ class Certificate(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.event.event_name}"
-    
+
+private_storage = PrivateFileStorage()
+
 class Certificate_Template(models.Model):
 
     certificate = models.ForeignKey(Certificate, null=True, on_delete=models.SET_NULL)
-    svg_template = models.FileField(null=True, blank=True, upload_to='certificates/svg/')
+    svg_template = models.FileField(null=True, blank=True, storage=private_storage, upload_to='certificates/svg/')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

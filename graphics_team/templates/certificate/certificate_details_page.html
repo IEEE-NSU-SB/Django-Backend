@@ -383,7 +383,7 @@
 
           <div class="small-btn">
             <label class="toggle">
-              <input type="checkbox" id="toggleSwitch" />
+              <input type="checkbox" {% if certificate_public_url_obj.is_active %}checked{% endif %} id="toggleSwitch"/>
               <span class="slider"></span>
             </label>
             <span id="publishStatus" style="margin-left: 10px; font-weight: bold; color: red;">Not Published</span>
@@ -466,8 +466,7 @@
         </form>
       </div>
     </div>
-    {% endif %}
-
+    
     <div id="publishModal" class="modal-overlay">
       <div class="modal-box" onclick="event.stopPropagation()">
         <h3 id="publishModalTitle">Confirm Publish</h3>
@@ -478,6 +477,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
     {% include "common_js.html" %}
 

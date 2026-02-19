@@ -564,7 +564,7 @@ def certificate_details(request, certificate_id):
                     
                     certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
 
-                    path = settings.MEDIA_ROOT+str(certificate_template.svg_template)
+                    path = settings.PRIVATE_MEDIA_ROOT+str(certificate_template.svg_template)
                     if os.path.exists(path):
                         os.remove(path)
                     
@@ -607,12 +607,26 @@ def certificate_details(request, certificate_id):
                         response = HttpResponse(certificate_file, content_type='image/png')
                         response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
                         return response
+                
+                elif 'toggle_publish' in request.POST:
+                    publish_status = request.POST.get('toggle_publish')
+
+                    if publish_status == 'publish':
+                        is_active = True
+                    else:
+                        is_active = False
+
+                    Certificate_Public_URL.objects.filter(certificate_id=certificate_id).update(is_active=is_active)
+
+                    return redirect('graphics_team:certificate_details', certificate_id)
 
             certificate = Certificate.objects.get(id=certificate_id)
             event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
             try:
-                certificate_public_url = Certificate_Public_URL.objects.get(certificate_id=certificate.id).get_public_url(request)
+                certificate_public_url_obj = Certificate_Public_URL.objects.get(certificate_id=certificate_id)
+                certificate_public_url = certificate_public_url_obj.get_public_url(request)
             except:
+                certificate_public_url_obj = None
                 certificate_public_url = ''
 
             certificate_receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
@@ -623,6 +637,7 @@ def certificate_details(request, certificate_id):
                 'certificate':certificate,
                 'event_name':event_name_of_certificate,
                 'certificate_public_url':certificate_public_url,
+                'certificate_public_url_obj':certificate_public_url_obj,
                 'certificate_receivers':certificate_receivers,
                 'has_certificates_access': has_certificates_access
             }    
@@ -638,113 +653,164 @@ def certificate_details(request, certificate_id):
 
 def certificate_email(request, key):
 
-    if request.method == 'POST':
-        email_address = request.POST.get('email')
+    try:
+        if request.method == 'POST':
+            email_address = request.POST.get('email')
 
-        event_certificate = Certificate_Public_URL.objects.values_list('certificate_id', flat=True).get(url_key=key)
+            event_certificate = Certificate_Public_URL.objects.values_list('certificate_id', flat=True).get(url_key=key)
 
-        try:
-            certificate_receiver = Certificate_Receivers.objects.get(certificate_id=event_certificate, email=email_address)
-        except:
-            messages.warning(request, 'Email does not exist!')
-            return redirect('port:certificate_base', key)
+            try:
+                certificate_receiver = Certificate_Receivers.objects.get(certificate_id=event_certificate, email=email_address)
+            except:
+                messages.warning(request, 'Email does not exist!')
+                return redirect('port:certificate_base', key)
 
-        try:
-            download_request = Certificate_Receiver_Download_Request.objects.create(certificate_receiver=certificate_receiver, certificate_id=event_certificate, otp_code='', otp_expires_at=timezone.now())
-            print(download_request.set_otp())
-            request.session['cert_req_id'] = str(download_request.request_id)
+            try:
+                download_request = Certificate_Receiver_Download_Request.objects.create(certificate_receiver=certificate_receiver, certificate_id=event_certificate, otp_code='', otp_expires_at=timezone.now())
+                otp = download_request.set_otp()
+                if settings.DEBUG == True:
+                    print(otp)
+                if not Certificate_Manager.sendOTPToUserViaEmail(request, certificate_receiver.email, otp):
+                    print('Could not send OTP email')
+                request.session['cert_req_id'] = str(download_request.request_id)
 
-            return redirect('port:certificate_otp')
-        except Exception as e:
-            print(e)
-            messages.warning(request, 'Unable to request for download!')    
-            return redirect('port:certificate_base', key)
-    
-    if request.session.get('cert_req_id'):
-        request.session.pop('cert_req_id')
+                return redirect('port:certificate_otp')
+            except Exception as e:
+                print(e)
+                messages.warning(request, 'Unable to request for download!')    
+                return redirect('port:certificate_base', key)
+        
+        if request.session.get('cert_req_id'):
+            request.session.pop('cert_req_id')
 
-    is_key_valid = Certificate_Public_URL.objects.filter(url_key=key).exists()
-    if is_key_valid:
-        certificate_title, event_name = Certificate_Public_URL.objects.filter(url_key=key).values_list('certificate__title', 'certificate__event__event_name').first()
-    else:
-        certificate_title = ''
-        event_name = ''
-
-    context = {
-        'is_key_valid': is_key_valid,
-        'certificate_title': certificate_title,
-        'event_name': event_name,
-    }
+        is_key_valid = Certificate_Public_URL.objects.filter(url_key=key).exists()
+        if is_key_valid:
+            certificate_title, event_name, is_active = Certificate_Public_URL.objects.filter(url_key=key).values_list('certificate__title', 'certificate__event__event_name', 'is_active').first()
+        
+        context = {
+            'is_key_valid': is_key_valid,
+            'certificate_title': certificate_title or '',
+            'event_name': event_name or '',
+            'is_active': is_active or False
+        }
+    except:
+        context = {
+            'error_occured': True
+        }
 
     return render(request, "certificate/certificate_email.html", context)
 
 def certificate_otp(request):
 
-    if request.method == 'POST':
-        otp_code = request.POST.get('otp_code')
+    try:
+        if request.method == 'POST':
+            otp_code = request.POST.get('otp_code')
+
+            if request.session.get('cert_req_id'):
+                cert_req_id = request.session.get('cert_req_id')
+
+            if Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id).verify_otp(raw_otp=otp_code)[0]:
+                return redirect('port:certificate_download')
 
         if request.session.get('cert_req_id'):
             cert_req_id = request.session.get('cert_req_id')
+            is_request_valid = True
 
-        if Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id).verify_otp(raw_otp=otp_code)[0]:
-            return redirect('port:certificate_download')
+            certificate_download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
 
-    if request.session.get('cert_req_id'):
-        cert_req_id = request.session.get('cert_req_id')
-        is_request_valid = True
+            if certificate_download_request.is_used:
+                return redirect('port:certificate_download')
+            elif certificate_download_request.is_expired():
+                request.session.pop('cert_req_id')
+                return redirect('port:certificate_otp')
+            
+            certificate_receiver = certificate_download_request.certificate_receiver
 
-        certificate_download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
-        certificate_receiver = certificate_download_request.certificate_receiver
+            print(certificate_download_request.otp_code)
+            context = {
+                'is_request_valid': is_request_valid,
+                'cert_req_id': cert_req_id,
+                'certificate_receiver': certificate_receiver,
+            }
+        else:
+            is_request_valid = False
 
-        print(certificate_download_request.otp_code)
+            context = {
+                'is_request_valid': is_request_valid,
+            }
+    except:
+
         context = {
-            'is_request_valid': is_request_valid,
-            'cert_req_id': cert_req_id,
-            'certificate_receiver': certificate_receiver,
-        }
-    else:
-        is_request_valid = False
-
-        context = {
-            'is_request_valid': is_request_valid,
+            'error_occured': True
         }
 
     return render(request, "certificate/certificate_otp.html", context)
 
 def certificate_download(request):
 
-    if request.session.get('cert_req_id'):
-        cert_req_id = request.session.get('cert_req_id')
-        certificate_download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
+    try:
+        if request.session.get('cert_req_id'):
+            cert_req_id = request.session.get('cert_req_id')
+            certificate_download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
+            is_request_valid = True
 
-        if certificate_download_request.is_used:
-            request_download_url, created = Certificate_Receiver_Download_URL.objects.get_or_create(download_request=certificate_download_request)
-            download_url = request_download_url.get_download_url()
+            if certificate_download_request.is_used and not certificate_download_request.is_expired():
+                request_download_url, created = Certificate_Receiver_Download_URL.objects.get_or_create(download_request=certificate_download_request)
+                download_url = request_download_url.get_download_url()
+                event_name = certificate_download_request.certificate.event.event_name
+            elif certificate_download_request.is_expired():
+                request.session.pop('cert_req_id')
+                return redirect('port:certificate_download')
+            else:
+                return redirect('port:certificate_otp')
+
+            context = {
+                'is_request_valid': is_request_valid,
+                'event_name': event_name or '',
+                'download_url': download_url,
+            }
         else:
-            download_url = None
+            is_request_valid = False
+
+            context = {
+                'is_request_valid': is_request_valid,
+            }
+    except:
 
         context = {
-            'download_url': download_url,
+            'error_occured': True
         }
 
     return render(request, "certificate/certificate_download.html", context)
 
 def download_receiver_certificate(request, key):
 
-    if request.session.get('cert_req_id'):
-        request.session.pop('cert_req_id')
+    try:
+        certificate_receiver_download_url_obj = Certificate_Receiver_Download_URL.objects.get(url_key=key)
+        download_request = certificate_receiver_download_url_obj.download_request
 
-    download_request = Certificate_Receiver_Download_URL.objects.get(url_key=key).download_request
+        if certificate_receiver_download_url_obj.is_expired():
+            if request.session.get('cert_req_id'):
+                request.session.pop('cert_req_id')
 
-    # Get the object with the SVG FileField
-    certificate_template = Certificate_Template.objects.get(certificate_id=download_request.certificate_id)
-    svg_file = certificate_template.svg_template
+            context = {
+                'is_request_valid': False,
+            }
 
-    receiver_name = download_request.certificate_receiver.name
+            return render(request, "certificate/certificate_download.html", context)
 
-    certificate_file = Certificate_Manager.generate_certificate(svg_file=svg_file, receiver_name=receiver_name)
+        # Get the object with the SVG FileField
+        certificate_template = Certificate_Template.objects.get(certificate_id=download_request.certificate_id)
+        svg_file = certificate_template.svg_template
 
-    if certificate_file:
-        response = HttpResponse(certificate_file, content_type='image/png')
-        response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+        receiver_name = download_request.certificate_receiver.name
+
+        certificate_file = Certificate_Manager.generate_certificate(svg_file=svg_file, receiver_name=receiver_name)
+
+        if certificate_file:
+            response = HttpResponse(certificate_file, content_type='image/png')
+            response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
+            return response
+    except:
+        response = HttpResponse('An error has occured! Please try again later or contact us.')
         return response

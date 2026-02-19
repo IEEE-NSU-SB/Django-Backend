@@ -266,6 +266,11 @@
 </head>
 <body>
     <div class="container">
+        {% if error_occured %}
+        <h1 style="color:red">An error has occured!</h1>
+        <p class="subtitle" style="margin-bottom:0px">Please try again later!</p>
+        {% endif %}
+
         {% if is_request_valid %}
         <h1>Check your email</h1>
         <p class="subtitle">Please enter the six digit verification code we sent to</p>
@@ -306,7 +311,7 @@
         <a href="javascript:history.back()" class="back-link">
             <span class="back-arrow">←</span> Go Back
         </a>
-        {% else %}
+        {% elif not error_occured %}
         <h1 style="color:red">Invalid Request!</h1>
         <p class="subtitle" style="margin-bottom:0px">Please use the link that was given in your email and request again!</p>
         {% endif %}
