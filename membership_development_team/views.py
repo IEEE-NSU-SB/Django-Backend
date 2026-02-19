@@ -1004,7 +1004,7 @@ def generateExcelSheet_membersList(request):
 
             # Defining columns that will stay in the first row
             columns = ['IEEE ID','NSU ID', 'Name', 'Current Team', 'Current Position', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
-                    'Facebook URL']
+                    'Blood Group', 'Facebook URL']
 
             # Defining first column
             for column in range(len(columns)):
@@ -1028,6 +1028,7 @@ def generateExcelSheet_membersList(request):
                                                     'home_address',
                                                     'date_of_birth',
                                                     'gender',
+                                                    'blood_group',
                                                     'facebook_url').order_by('-position')
             for row in rows:
                 row_num += 1
