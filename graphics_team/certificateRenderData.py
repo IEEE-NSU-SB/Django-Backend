@@ -68,6 +68,33 @@ class Certificate_Manager:
             )
         
         return receivers
+    
+    def normalize_text_tspans(root, ns):
+        """
+        Converts multiple <tspan> children inside a <text> element
+        into a single <tspan> with combined text.
+        """
+        for text_elem in root.findall('.//svg:text', ns):
+            tspans = text_elem.findall('svg:tspan', ns)
+
+            if len(tspans) > 1:
+                # Combine all text content
+                combined_text = ''.join([
+                    (tspan.text or '') for tspan in tspans
+                ])
+
+                # Remove all existing tspans
+                for tspan in tspans:
+                    text_elem.remove(tspan)
+
+                # Clear direct text
+                text_elem.text = None
+
+                # Create one single tspan
+                new_tspan = ET.Element('{http://www.w3.org/2000/svg}tspan')
+                new_tspan.text = combined_text
+
+                text_elem.append(new_tspan)
 
     def replace_text_in_element(element, old_text, new_text):
         """
@@ -86,6 +113,8 @@ class Certificate_Manager:
         root = tree.getroot()
         ns = {'svg': 'http://www.w3.org/2000/svg'}
 
+        Certificate_Manager.normalize_text_tspans(root, ns)
+        
         # Regex to parse transform="translate(x y)"
         translate_re = re.compile(r'translate\(\s*([\d.-]+)\s+([\d.-]+)\s*\)')
         # Loop over all <text> elements
@@ -98,7 +127,7 @@ class Certificate_Manager:
                     x, y = match.groups()
                     font_size = int(text_elem.get('font-size', '40').replace('px',''))
                     font = ImageFont.truetype("C:/Users/Hp/Downloads/Gistesy.ttf", font_size)
-                    text_width = font.getlength('Mirza Farhan Shahriar')
+                    text_width = font.getlength('<<NAME>>')
                     original_x = float(x)
                     center_x = original_x + (text_width / 2)
 
@@ -116,7 +145,7 @@ class Certificate_Manager:
                             tspan.attrib.pop('x')
                         if 'y' in tspan.attrib:
                             tspan.attrib.pop('y')
-                            
+        
         # Serialize modified SVG to bytes
         svg_bytes = io.BytesIO()
         tree.write(svg_bytes, encoding='utf-8', xml_declaration=True)
@@ -138,7 +167,7 @@ class Certificate_Manager:
         ns = {'svg': 'http://www.w3.org/2000/svg'}
 
         # The text to search for
-        old_text = 'Mirza Farhan Shahriar'
+        old_text = '<<NAME>>'
 
         # Loop over all <text> elements
         for text_elem in root.findall('.//svg:text', ns):                            
