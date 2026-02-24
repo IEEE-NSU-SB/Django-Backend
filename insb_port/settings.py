@@ -247,6 +247,9 @@ DATE_INPUT_FORMATS = ['%d-%m-%Y']
 MEDIA_ROOT= os.path.join(BASE_DIR, 'User Files/')
 MEDIA_URL= "/media_files/" 
 
+#Private Media Files
+PRIVATE_MEDIA_ROOT= os.path.join(BASE_DIR, 'Private Files/')
+
 #to do user login required
 # LOGIN_REDIRECT_URL='users:dashboard'
 LOGOUT_REDIRECT_URL='users:logoutUser'

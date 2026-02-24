@@ -30,5 +30,9 @@ urlpatterns = [
     path('meeting_minutes/<int:team_primary>/create/', meeting_minutes_create, name="meeting_minutes_create_team"),
     # Edit an existing meeting
     path('meeting_minutes/<int:team_primary>/edit/<int:pk>/', meeting_minutes_edit, name="meeting_minutes_edit_team"),
-
+    #Certificate Page
+    path('certificates/', views.certificates_homepage, name="certificate_page"),
+    #Certificate type page
+    path('certificates/<int:event_id>/', views.event_certificates, name="event_certificates"),
+    path('certificates/details/<int:certificate_id>/', views.certificate_details, name="certificate_details"),
 ]

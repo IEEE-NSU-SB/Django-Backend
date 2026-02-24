@@ -1,0 +1,442 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Certificate Type | Graphics Team</title>
+
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+
+    {% include "common_css.html" %}
+
+    <style>
+      .page-title {
+        text-align: center;
+        margin-top: 100px;
+        font-size: 40px;
+        color: #00629b;
+        font-weight: bold;
+      }
+
+      .event-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .event-modal-overlay.active {
+        display: flex;
+      }
+
+      .event-modal-box {
+        width: 50%;
+        max-width: 600px;
+        background: white;
+        padding: 45px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+        animation: modalFadeIn 0.25s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .event-modal-title {
+        text-align: left;
+        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .event-modal-select,
+      .event-modal-input {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        background: #f4f8fc;
+        border: 1px solid #d9e2ec;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-sizing: border-box;
+      }
+
+      .event-modal-input::placeholder {
+        color: #6c757d;
+      }
+
+      .event-modal-input[type="file"] {
+        padding: 12px;
+        cursor: pointer;
+      }
+
+      .event-modal-input[type="file"]::file-selector-button {
+        background: #00629b;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      .event-modal-input[type="file"]::file-selector-button:hover {
+        background: #004d7a;
+      }
+
+      .event-modal-btn {
+        background: #00629b;
+        color: white;
+        padding: 12px 45px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(0, 98, 155, 0.3);
+        transition: transform 0.2s ease;
+      }
+
+      .hover-link {
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s ease;
+        color: inherit; /* inherit the text color from parent */
+      }
+
+      .hover-link:hover {
+        border-bottom-color: #00629b;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .app-body {
+          margin-left: 5%;
+          margin-right: 5%;
+        }
+
+        h2 {
+          font-size: 24px;
+        }
+
+        table {
+          font-size: 14px;
+        }
+
+        th, td {
+          padding: 8px 5px;
+        }
+
+        .event-modal-box {
+          width: 90%;
+          padding: 30px 20px;
+        }
+
+        .event-modal-btn {
+          padding: 10px 30px;
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .app-body {
+          margin-left: 2%;
+          margin-right: 2%;
+        }
+
+        h2 {
+          font-size: 20px;
+        }
+
+        table {
+          font-size: 12px;
+          overflow-x: auto;
+          display: block;
+          white-space: nowrap;
+        }
+
+        th, td {
+          padding: 6px 3px;
+        }
+
+        .event-modal-box {
+          width: 95%;
+          padding: 20px 15px;
+        }
+
+        .event-modal-title {
+          font-size: 16px;
+        }
+
+        .event-modal-input {
+          padding: 12px;
+          font-size: 14px;
+        }
+
+        .event-modal-btn {
+          padding: 8px 20px;
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app" id="app">
+      <!-- Sidebar -->
+      <div id="aside" class="app-aside modal nav-dropdown">
+        {% include 'users/sidebar.html' %}
+      </div>
+
+      <!-- Navbar -->
+      <div id="content" class="app-content box-shadow-z0" role="main">
+        {% include 'graphics_navbar.html' %}
+      </div>
+
+      <!-- Page Body -->
+      <div class="app-body" style="margin-left: 15%; margin-right: 15%">
+        <br />
+        <h2 style="justify-content: center; text-align: center">
+          Graphics Team -
+          <span style="color: #00629b">
+            <b>Certificate Type</b>
+          </span>
+        </h2>
+
+        {% if has_certificates_access %}
+        <div style="text-align: center; margin-top: 20px">
+          <button
+            type="button"
+            onclick="openCertificateTypeModal()"
+            style="
+              background-color: #00629b;
+              color: white;
+              padding: 12px 25px;
+              font-size: 16px;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+            "
+          >
+            Select Certificate Type
+          </button>
+        </div>
+        {% endif %}
+        <br />
+        <table border="1" width="100%" cellpadding="10" cellspacing="0">
+          <thead>
+            <tr style="background-color: #f2f2f2">
+              <th>SL No.</th>
+              <th>Type of Certificate</th>
+              <th>Download (svg)</th>
+              {% if has_certificates_access %}
+              <th>Action?</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            <form method="POST">
+              {% csrf_token %}
+              {% for certificate in all_certificates_of_event %}
+              <tr>
+                <td>{{forloop.counter}}</td>
+                <td style="cursor: pointer; font-weight: bold">
+                  <a href="{% url 'graphics_team:certificate_details' certificate.id %}" class="hover-link">{{certificate.title}}</a>
+                </td>
+                <td style="text-align: center">
+                  <button
+                    type="submit"
+                    name="download_svg"
+                    value="{{certificate.id}}"
+                    style="
+                      color: #00629b;
+                      text-decoration: none;
+                      font-weight: 600;
+                      cursor: pointer;
+                    "
+                  >
+                    Download
+                </button>
+                </td>      
+                {% if has_certificates_access %}
+                <td style="text-align: center">
+                  <button
+                    type="button"
+                    onclick="openDeleteModal({{certificate.id}})"
+                    style="
+                      color: #e74c3c;
+                      text-decoration: none;
+                      font-weight: 600;
+                      cursor: pointer;
+                      background: none;
+                      border: none;
+                    "
+                  >
+                    Delete
+                  </button>
+                </td>
+                {% endif %}          
+              </tr>
+    
+              {% endfor %}
+            </form>
+          </tbody>
+        </table>
+
+        {% if has_certificates_access %}
+        <!-- Modal -->
+        <div id="certificateTypeModal" class="event-modal-overlay">
+          <div id="modalContent" class="event-modal-box">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="event-modal-title">Name of certificate <span style="color:red">*</span></div>
+  
+              <input
+                type="text"
+                class="event-modal-input"
+                id="certificate_name"
+                name="certificate_name"
+                required
+                placeholder="Enter the name of the certificate"
+              />
+  
+              <div class="event-modal-title">Add template (svg) <span style="color:red">*</span></div>
+              <input
+              type="file"
+              class="event-modal-input"
+              name="svg_template"
+              accept=".svg"
+              required
+              id="templateFile"
+              />
+              <p style="color:crimson;font-weight:bolder">Warning: The template must have <code>&lt;&lt;NAME&gt;&gt;</code> as text to indicate where to put name and the text must be in editable format!</p>
+  
+              <div class="event-modal-title">Names to be placed (csv)</div>
+  
+              <input
+                type="file"
+                class="event-modal-input"
+                name="csv_file"
+                accept=".csv"
+                id="csvFile"
+              />
+  
+              <button class="event-modal-btn" name="create_certificate" type="submit">
+                Confirm
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="event-modal-overlay">
+          <div class="event-modal-box">
+            <h3 style="margin-bottom: 20px; color: #333;">Confirm Deletion</h3>
+            <p style="margin-bottom: 30px; color: #666;">Are you sure you want to delete this certificate? This action cannot be undone.</p>
+            <div style="display: flex; justify-content: space-between;">
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="delete_certificate_id" id="deleteCertificateInput">
+                <button
+                  type="button"
+                  onclick="closeDeleteModal()"
+                  style="
+                    background: #6c757d;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                  "
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  name="delete_certificate"
+                  style="
+                    background: #e74c3c;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                  "
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% include "common_js.html" %}
+
+    {% if has_certificates_access %}
+    <script>
+      function openCertificateTypeModal() {
+        document.getElementById("certificateTypeModal").classList.add("active");
+      }
+
+      function closeModal() {
+        document
+          .getElementById("certificateTypeModal")
+          .classList.remove("active");
+      }
+
+      document
+        .getElementById("certificateTypeModal")
+        .addEventListener("click", function (e) {
+          if (!document.getElementById("modalContent").contains(e.target)) {
+            closeModal();
+          }
+        });
+
+      let deleteCertificateId = null;
+
+      function openDeleteModal(id) {
+        deleteCertificateId = id;
+        document.getElementById('deleteCertificateInput').value = deleteCertificateId;
+        document.getElementById("deleteModal").classList.add("active");
+      }
+
+      function closeDeleteModal() {
+        document.getElementById("deleteModal").classList.remove("active");
+        deleteCertificateId = null;
+      }
+
+      function confirmDelete() {
+        if (deleteCertificateId) {
+          document.querySelector('form').submit();
+        }
+      }
+
+      document
+        .getElementById("deleteModal")
+        .addEventListener("click", function (e) {
+          if (!e.target.closest('.event-modal-box')) {
+            closeDeleteModal();
+          }
+        });
+    </script>
+    {% endif %}
+  </body>
+</html>

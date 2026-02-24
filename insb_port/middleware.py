@@ -16,7 +16,8 @@ class BlockSiteMiddleWare:
 
         if (full_url[2] != '127.0.0.1:8000' and 
             full_url[2] != 'localhost:8000' and 
-            full_url[2] != 'portal.ieeensusb.org' and not
+            full_url[2] != 'portal.ieeensusb.org' and 
+            full_url[2] != 'sandbox.ieeensusb.org' and not
             (full_url[2] == 'api.ieeensusb.org' and (full_url[3] == 'main_website' or full_url[3] == 'media_files'))):
             return HttpResponseForbidden()
 
