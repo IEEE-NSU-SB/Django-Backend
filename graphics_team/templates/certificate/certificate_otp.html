@@ -279,6 +279,14 @@
         <div class="error-message" id="errorMessage"></div>
         <div class="success-message" id="successMessage"></div>
 
+        {% for message in messages %}
+            {% if message.tags == 'warning' %}
+                <div class="error-message show">{{ message }}</div>
+            {% elif message.tags == 'success' %}
+                <div class="success-message show">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+
         <form method="POST" id="otpForm">
             {% csrf_token %}
             <div class="otp-container">
@@ -298,7 +306,7 @@
 
         <div class="timer-container">
             <span id="timerText">Code expires in</span>
-            <span class="timer" id="timer">02:00</span>
+            <span class="timer" id="timer">--:--</span>
         </div>
 
         <div class="resend-container">
@@ -327,7 +335,7 @@
         const successMessage = document.getElementById('successMessage');
 
         // Timer variables
-        let timeLeft = 120; // 2 minutes in seconds
+        let timeLeft = {{seconds_until_otp_expiry | default:0}}
         const timerElement = document.getElementById('timer');
         const timerText = document.getElementById('timerText');
         const resendBtn = document.getElementById('resendBtn');
@@ -335,7 +343,6 @@
 
         // Initialize timer
         function startTimer() {
-            timeLeft = 120;
             resendBtn.disabled = true;
             timerElement.classList.remove('expired');
             timerText.textContent = 'Code expires in';
@@ -480,7 +487,7 @@
             resendBtn.textContent = 'Sending...';
             
             // AJAX call to resend OTP
-            fetch('{}', {  // Update with your resend URL
+            fetch('{% url "port:certificate_resend_otp" %}', {  // Update with your resend URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -490,15 +497,17 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.success) {
                     showSuccess('New code sent to your email!');
                     clearOTP();
-                    startTimer();
-                    resendBtn.textContent = 'Resent!';
-                    setTimeout(() => {
-                        resendBtn.textContent = 'Resend code';
-                        hideSuccess();
-                    }, 3000);
+                    window.location.reload();
+                    // startTimer();
+                    // resendBtn.textContent = 'Resent!';
+                    // setTimeout(() => {
+                    //     resendBtn.textContent = 'Resend code';
+                    //     hideSuccess();
+                    // }, 3000);
                 } else {
                     showError(data.error || 'Failed to resend code. Please try again.');
                     resendBtn.disabled = false;

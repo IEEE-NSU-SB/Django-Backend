@@ -18,7 +18,7 @@ import traceback
 from django.utils import timezone
 import logging
 from system_administration.system_error_handling import ErrorHandling
-from django.http import Http404, HttpResponse,HttpResponseBadRequest
+from django.http import Http404, HttpResponse,HttpResponseBadRequest, JsonResponse
 from datetime import datetime
 from port.renderData import PortData
 from users.renderData import PanelMembersData,member_login_permission
@@ -505,12 +505,12 @@ def event_certificates(request, event_id):
                     try:
                         certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
 
-                        path = settings.MEDIA_ROOT+str(certificate_template.svg_template)
-                        if os.path.exists(path):
-                            os.remove(path)
+                        if not Certificate_Manager.delete_certificate_template_file(certificate_template):
+                            messages.warning(request, 'Could not find/remove certificate template file!')
+                        
                         certificate_template.delete()
                     except:
-                        pass
+                        messages.warning(request, 'Certificate Template did not exist!')
 
                     Certificate.objects.get(id=certificate_id).delete()
 
@@ -563,14 +563,13 @@ def certificate_details(request, certificate_id):
                     svg_file = Certificate_Manager.pre_process_svg_certificate(svg_file=svg_template)
                     
                     certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
-
-                    path = settings.PRIVATE_MEDIA_ROOT+str(certificate_template.svg_template)
-                    if os.path.exists(path):
-                        os.remove(path)
                     
-                    certificate_template.delete()
-                    
-                    Certificate_Template.objects.create(certificate_id=certificate_id, svg_template=svg_file)
+                    if not Certificate_Manager.delete_certificate_template_file(certificate_template):
+                        messages.warning(request, 'Could not find/remove previous certificate template file!')
+                    else:
+                        certificate_template.delete()
+                        Certificate_Template.objects.create(certificate_id=certificate_id, svg_template=svg_file)
+                        messages.success(request, 'New certificate template file added!')
 
                     return redirect('graphics_team:certificate_details', certificate_id)
 
@@ -708,9 +707,13 @@ def certificate_otp(request):
 
             if request.session.get('cert_req_id'):
                 cert_req_id = request.session.get('cert_req_id')
-
-            if Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id).verify_otp(raw_otp=otp_code)[0]:
+            
+            success, message = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id).verify_otp(raw_otp=otp_code)
+            if success:
                 return redirect('port:certificate_download')
+            else:
+                messages.warning(request, message)
+                return redirect('port:certificate_otp')
 
         if request.session.get('cert_req_id'):
             cert_req_id = request.session.get('cert_req_id')
@@ -731,6 +734,7 @@ def certificate_otp(request):
                 'is_request_valid': is_request_valid,
                 'cert_req_id': cert_req_id,
                 'certificate_receiver': certificate_receiver,
+                'seconds_until_otp_expiry': certificate_download_request.seconds_until(),
             }
         else:
             is_request_valid = False
@@ -814,3 +818,24 @@ def download_receiver_certificate(request, key):
     except:
         response = HttpResponse('An error has occured! Please try again later or contact us.')
         return response
+
+def certificate_resend_otp(request):
+
+    if request.method == 'POST':
+
+        if request.session.get('cert_req_id'):
+            cert_req_id = request.session.get('cert_req_id')
+            download_request = Certificate_Receiver_Download_Request.objects.get(request_id=cert_req_id)
+
+            otp = download_request.set_otp()
+            if settings.DEBUG == True:
+                print(otp)
+            if not Certificate_Manager.sendOTPToUserViaEmail(request, download_request.certificate_receiver.email, otp):
+                print('Could not send OTP email')
+            
+            messages.success(request, 'New code sent to your email!')
+            return JsonResponse({'success':True})
+        else:
+            return JsonResponse({'success':False})
+    else:
+        return HttpResponse('Not Allowed', status=403)

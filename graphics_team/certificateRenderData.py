@@ -8,7 +8,7 @@ import sys
 import xml.etree.ElementTree as ET
 from PIL import ImageFont
 from django.core.files.base import ContentFile
-from graphics_team.models import Certificate_Receivers
+from graphics_team.models import Certificate_Receivers, Certificate_Template
 from insb_port import settings
 from django.core.mail import send_mail
 
@@ -156,6 +156,17 @@ class Certificate_Manager:
         except:
             print('Cairo SVG Error')
             return None
+        
+    def delete_certificate_template_file(certificate_template_obj:Certificate_Template):
+
+        try:
+            path = settings.PRIVATE_MEDIA_ROOT+str(certificate_template_obj.svg_template)
+            if os.path.exists(path):
+                os.remove(path)
+            return True
+        except:
+            return False
+
         
     def sendOTPToUserViaEmail(request, user_email, otp):
         

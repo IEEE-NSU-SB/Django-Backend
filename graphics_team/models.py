@@ -128,7 +128,22 @@ class Certificate_Receiver_Download_Request(models.Model):
     def can_attempt(self):
         return self.attempts < self.max_attempts
     
-    def set_otp(self, length=6, validity_minutes=5):
+    def seconds_until(self):
+        now = timezone.now()
+        target = self.otp_expires_at 
+
+        if target is None:
+            return 0
+
+        delta = (target - now).total_seconds()
+
+        # Handle negative or zero
+        if delta <= 0:
+            return 0
+
+        return int(delta)
+    
+    def set_otp(self, length=6, validity_minutes=2):
         """Generate and hash OTP, set expiration"""
         otp_raw = f"{random.randint(0, 10**length - 1):0{length}}"
         self.otp_code = make_password(otp_raw)
