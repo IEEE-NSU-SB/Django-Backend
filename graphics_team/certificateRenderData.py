@@ -126,7 +126,7 @@ class Certificate_Manager:
                 if match:
                     x, y = match.groups()
                     font_size = int(text_elem.get('font-size', '40').replace('px',''))
-                    font = ImageFont.truetype("C:/Users/Hp/Downloads/Gistesy.ttf", font_size)
+                    font = ImageFont.truetype(settings.PRIVATE_MEDIA_ROOT + "/Fonts/Gistesy.ttf", font_size)
                     text_width = font.getlength('<<NAME>>')
                     original_x = float(x)
                     center_x = original_x + (text_width / 2)
