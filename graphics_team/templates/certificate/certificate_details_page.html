@@ -463,6 +463,7 @@
           {% csrf_token %}
           <h3>Update Template (SVG) <span style="color:red">*</span></h3>
           <input type="file" name="svg_template" class="input" accept=".svg" required />
+          <p style="color:crimson;font-weight:bolder">Warning: The template must have <code>&lt;&lt;NAME&gt;&gt;</code> as text to indicate where to put name and the text must be in editable format!</p>
           <button class="confirm-btn" type="submit" name="update_template">Confirm</button>
         </form>
       </div>
