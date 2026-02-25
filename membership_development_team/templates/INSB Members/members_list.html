@@ -198,6 +198,12 @@
                   <td>{{ member.name  }}</td>
                   {% if has_view_permission %}
                   <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
+                    {% if member.is_active_member %}
+                      <span class="text-success"><b>Active</b></span>
+                    {% else %}
+                      <span class="text-danger"><b>Inactive</b></span>
+                    {% endif %}
+                  </td>
                   {% endif %}
                   <td>{{ member.nsu_id }}</td>
                   <td>{{ member.email_ieee }}</td>
@@ -205,12 +211,6 @@
                   <td>{{ member.team.team_name }}</td>
                   <td>{{ member.blood_group }}</td>
                   {% if has_view_permission %}
-                    {% if member.is_active_member %}
-                      <span class="text-success"><b>Active</b></span>
-                    {% else %}
-                      <span class="text-danger"><b>Inactive</b></span>
-                    {% endif %}
-                  </td>
                   <td>{{ member.contact_no }}</td>
                   {% endif %}
                                 
