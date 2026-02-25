@@ -462,7 +462,7 @@ td {
                       <p>If the IEEE ID is not registered in the IEEE NSU SB Registered Member Database, it would not make any effect. Renewal Data will be kept stored in the system</p>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">No</button>
+                      <button type="button" class="btn dark-white p-x-md" onclick="closeModal('m-s-a')">No</button>
                       <form method="POST">
                         {% csrf_token %}
                         <input type="submit" class="btn success p-x-md" name="renew_button" value="Renew"></input>  
