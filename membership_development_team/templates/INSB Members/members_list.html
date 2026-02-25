@@ -157,6 +157,8 @@
         <div class="tb_search">
           <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
         </div>
+
+        {% if has_view_permission %}
         <div class="status_filter">
           <select class="form-control" id="membershipFilter" aria-label="Membership Filter">
             <option value="all" selected>All Membership Status</option>
@@ -164,6 +166,7 @@
             <option value="inactive">Inactive</option>
           </select>
         </div>
+        {% endif %}
         <br>
       </div>
       <div class="table-responsive">
@@ -172,14 +175,16 @@
           <thead>
             <tr>
               <th data-priority="1">IEEE ID</th>
-              <th data-priority="1">NSU ID</th>
+              {% if has_view_permission %}
+              <th data-priority="1">Membership</th>
+              {% endif %}
               <th data-priority="1">Name</th>
+              <th data-priority="1">NSU ID</th>
               <th data-priority="1">Email</th>
               <th data-priority="1">Current Position</th>
               <th data-priority="1">Current Team</th>
               <th data-priority="1">Blood Group</th>
               {% if has_view_permission %}
-              <th data-priority="1">Membership</th>
               <th data-priority="1">Contact No</th>
               {% endif %}
             </tr>
@@ -190,14 +195,16 @@
               <tr>
               
                   <td style="color:#00629B"><a href="{% if has_view_permission %} {% if is_branch %}{% url 'central_branch:member_details' member.ieee_id %}{% else %}{% url 'membership_development_team:member_details' member.ieee_id %}{% endif %} {% else %}https://ieeensusb.org/member-profile/{{member.ieee_id}}/{% endif %}">{{ member.ieee_id  }}</a></td>
-                  <td>{{ member.nsu_id }}</td>
                   <td>{{ member.name  }}</td>
+                  {% if has_view_permission %}
+                  <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
+                  {% endif %}
+                  <td>{{ member.nsu_id }}</td>
                   <td>{{ member.email_ieee }}</td>
                   <td>{{ member.position.role }}</td>
                   <td>{{ member.team.team_name }}</td>
                   <td>{{ member.blood_group }}</td>
                   {% if has_view_permission %}
-                  <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
                     {% if member.is_active_member %}
                       <span class="text-success"><b>Active</b></span>
                     {% else %}
