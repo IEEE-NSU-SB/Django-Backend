@@ -178,8 +178,8 @@
               <th data-priority="1">Current Position</th>
               <th data-priority="1">Current Team</th>
               <th data-priority="1">Blood Group</th>
-              <th data-priority="1">Membership</th>
               {% if has_view_permission %}
+              <th data-priority="1">Membership</th>
               <th data-priority="1">Contact No</th>
               {% endif %}
             </tr>
@@ -196,6 +196,7 @@
                   <td>{{ member.position.role }}</td>
                   <td>{{ member.team.team_name }}</td>
                   <td>{{ member.blood_group }}</td>
+                  {% if has_view_permission %}
                   <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
                     {% if member.is_active_member %}
                       <span class="text-success"><b>Active</b></span>
@@ -203,7 +204,6 @@
                       <span class="text-danger"><b>Inactive</b></span>
                     {% endif %}
                   </td>
-                  {% if has_view_permission %}
                   <td>{{ member.contact_no }}</td>
                   {% endif %}
                                 
