@@ -195,7 +195,6 @@
               <tr>
               
                   <td style="color:#00629B"><a href="{% if has_view_permission %} {% if is_branch %}{% url 'central_branch:member_details' member.ieee_id %}{% else %}{% url 'membership_development_team:member_details' member.ieee_id %}{% endif %} {% else %}https://ieeensusb.org/member-profile/{{member.ieee_id}}/{% endif %}">{{ member.ieee_id  }}</a></td>
-                  <td>{{ member.name  }}</td>
                   {% if has_view_permission %}
                   <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
                     {% if member.is_active_member %}
@@ -205,6 +204,7 @@
                     {% endif %}
                   </td>
                   {% endif %}
+                  <td>{{ member.name  }}</td>
                   <td>{{ member.nsu_id }}</td>
                   <td>{{ member.email_ieee }}</td>
                   <td>{{ member.position.role }}</td>
