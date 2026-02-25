@@ -126,6 +126,12 @@ class Certificate_Manager:
                 if match:
                     x, y = match.groups()
                     font_size = int(text_elem.get('font-size', '40').replace('px',''))
+
+                    ################################################################
+                    # PUT FONTS IN /.local/fonts/ and also in Private Files/fonts/ #
+                    # RUN:  fc-cache -f -v FOR LINUX OR INSTALL FONT IN WINDOWS   ##
+                    #                                                              #
+                    ################################################################
                     font = ImageFont.truetype(settings.PRIVATE_MEDIA_ROOT + "/fonts/Gistesy.ttf", font_size)
                     text_width = font.getlength('<<NAME>>')
                     original_x = float(x)

@@ -433,9 +433,9 @@ td {
                   <button type="submit" class="btn btn-danger" onclick="openModal('m-s-b')">Delete</button>
                     {% for i in details %}
                         {% if i.renewal_status %}
-                            <button type="submit" disabled class="btn" data-toggle="modal" onclick="openModal('m-s-b')" ui-toggle-class="bounce" ui-target="#animate">Renew Membership</button>
+                            <button type="submit" disabled class="btn" data-toggle="modal" onclick="openModal('m-s-a')" ui-toggle-class="bounce" ui-target="#animate">Renew Membership</button>
                         {% else %}
-                        <button type="submit" class="btn" data-toggle="modal" onclick="openModal('m-s-b')" ui-toggle-class="bounce" ui-target="#animate">Renew Membership</button>
+                        <button type="submit" class="btn" data-toggle="modal" onclick="openModal('m-s-a')" ui-toggle-class="bounce" ui-target="#animate">Renew Membership</button>
 
                         {% endif %}
                     {% endfor %}
