@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="{% static 'logos/INSB.png' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Certificate</title>
@@ -15,7 +16,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #00629B 0%, #002855 100%);
-            background: #00629b59;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -155,8 +155,12 @@
         {% endif %}
 
         {% if is_request_valid %}
-        <h1>Download Your Certificate for {{event_name}}</h1>
-        <p class="subtitle">Click the button below to download your certificate.</p>
+            <img src="{% static 'logos/INSB.png' %}" alt="INSB Logo" class="logo" height="75px">
+
+            <h1>Certificate for {{event_name}}</h1>
+            <h1>
+                Click the button below to download your certificate.
+            </h1>
 
         <button onclick="window.location.href='{{download_url}}'" class="download-btn">Download Certificate</button>
 
