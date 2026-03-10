@@ -45,4 +45,13 @@ urlpatterns = [
     path('get_sb_news_details/<int:news_id>/', SBNewsDetails.as_view(), name='sb_news_details'),
     path('get_member_details/<int:ieee_id>/', MemberProfileView.as_view(), name='member_profile'),
     path('get_exemplary_members/', ExemplaryMembersListView.as_view(), name='exemplary_members_list'),
+    path('get_faq/', FAQView.as_view(), name='faq_details'),
+    path('get_gallery/', GalleryView.as_view(), name='gallery_view'),
+    path('sc_ag_feedback/', SC_AG_FeedBack.as_view(), name='branch_feedback'),
+    path('sc_ag_feedback/<int:sc_ag_primary>/', SC_AG_FeedBack.as_view(), name='sc_ag_feedback'),
+    path('add_research_paper/', AddResearchPaperView.as_view(), name='add_research_paper'),
+    path('api/switches/', SwitchesAPI.as_view()),
+    path('event_feedback/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback'),
+    path('get_event_feedbacks/<int:event_id>/', EventFeedbackView.as_view(), name='event_feedback_list'),
+    path('get_portal_developers/', PortalDevelopersList.as_view(), name='portal_developers_list'),
 ]

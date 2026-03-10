@@ -13,10 +13,10 @@
 
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
         body, html {
-        
-        margin: 0;
-        
+        margin: 0; 
+        font-family: 'Instrument Sans', sans-serif !important;
         align-items: center;
         justify-content: center;
         }
@@ -142,7 +142,7 @@
         
     </style>
 </head>
-<body>
+<body style="background-color: white;">
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
 
@@ -166,7 +166,7 @@
         <!--navbar content-->
         
         <!-- ############ PAGE START-->
-        <div ui-view class="app-body" style="justify-content:center; margin-left:15%; margin-right:15%;" id="view">
+        <div ui-view class="app-body" style="justify-content:center; margin-left:10%; margin-right:10%;" id="view">
 
             <!--Start from here-->
             <br>
@@ -204,47 +204,52 @@
             </div>
             <br>
             
-            <!--Form link copy section-->
-            <div class="form_link" style="justify-content:center;">
-                <label><h6>Renewal Form Link:</h6></label>
-                <input type="text" id="urlInput" value={{form_link}}>
-                <button class="copyButton" id="copyButton"><i class="fa fa-copy"></i></button>
-            </div>
+            <div style="justify-content:center;; padding: 18px; border-radius: 8px;">
+              
+              <!--Form link copy section-->
+              <div>
+                <h5 style="text-align: center; color: black;">Renewal Form Link:</h5>
+                <div style="display: flex; justify-content: center;">
+                  <input type="text" style="background: #FFD100; border: 1px solid black; border-radius: 4px;" id="urlInput" value={{form_link}}>
+                  <button class="copyButton" style="color: #002855; background: #FFD100; border: 1px solid black; border-radius: 4px; margin-left: 2px;" id="copyButton"><i class="fa fa-copy"></i></button>
+                </div>
+              </div>
 
             <br>
             
             <!--Messages-->
             <div style="justify-content:center; text-align:center;">
               {% if messages %}
-                  {% for message in messages %}
-                      <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
+              {% for message in messages %}
+              <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
                   {% endfor %}
-              {% endif %}
-            </div>
-            <!--Messages End-->
-            <br>
-            <!--Bar chart options for application status-->
-            <div class="row">
-              <div class="col-md-6">
-                <div style="justify-content:center;text-align:center;">
-                  <h4>Renewal Statistics</h4> 
-                  <div class="card-body">
-                    <canvas id="doughnut" data-colors='["#BA0C2F", "#FFC72C","#007377"]'></canvas>
-                  </div>
+                  {% endif %}
                 </div>
-              </div>
-              <div class="col-md-6">
-                <div style="justify-content:center;text-align:center;">
-                  <h4>Chapters, Affinity Group Renewal Stats</h4> 
-                  <div class="card-body">
-                    <!--Logo colors of the SC & AGs-->
-                    <canvas id="doughnut2" data-colors='["#679B41","#951A32","#FEC937","#6b2974"]'></canvas>
+                <!--Messages End-->
+                <br>
+                <!--Bar chart options for application status-->
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="text-center">
+                      <h4 style="color: black;">Renewal Statistics</h4>
+                      <div class="card-body">
+                        <canvas id="doughnut" data-colors='["#BA0C2F","#FFC72C","#007377"]'></canvas>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            
 
+                  <div class="col-md-6">
+                    <div class="text-center">
+                      <h4 style="color: black;">Chapters, Affinity Group Renewal Stats</h4>
+                      <div class="card-body">
+                        <canvas id="doughnut2" data-colors='["#679B41","#951A32","#FEC937","#6b2974"]'></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+          </div>
+            
+            
             <!--Session Table-->
             <br>
             <br>
@@ -279,6 +284,7 @@
                         <tr>
                           <th data-priority="1">IEEE ID</th>
                           <th data-priority="1">Name</th>
+                          <th data-priority="1">Team</th>
                           <th data-priority="1">IEEE Email</th>
                           <th data-priority="1">Contact No</th>
                           <th data-priority="1">Renewal Status</th>
@@ -290,6 +296,7 @@
                           <tr>
                               <td style="color:#00629B"><a href="{% url 'membership_development_team:request_details' session_id request.id %}">{{ request.ieee_id  }}</a></td>
                               <td>{{ request.name  }}</td>
+                              <td>{% if request.team_name %}{{request.team_name}}{% else %}General Member{% endif %}</td>
                               <td>{{ request.email_ieee }}</td>
                               <td>{{ request.contact_no }}</td>
                               {% if request.renewal_status %}
@@ -330,7 +337,7 @@
                           <h5 class="modal-title">Edit Renewal Form for {{session_name}} session</h5>
                           </div>
                           
-                          <div class="modal-body text-left p-lg">
+                          <div class="">
 
                               <form method="POST">
                                   {% csrf_token %}
@@ -566,59 +573,34 @@
         
         // ... (getChartColorsArray and fetchData functions remain unchanged)
         
-        async function initializeDougnutChart() {
-        try {
-            var isdoughnutchart = document.getElementById('doughnut');
-            var type=1; //Meaning that we need the renewal data only
-            var data = await fetchData(type); // Fetch data from the Django API
-            var doughnutChartColors = getChartColorsArray('doughnut');
-            
-            var doughnutChart = new Chart(isdoughnutchart, {
-            type: 'doughnut',
-            data: {
-                labels: data.labels, // Use the fetched labels
-                datasets: [
-                {
-                    data: data.values, // Use the fetched data values
-                    backgroundColor: doughnutChartColors,
-                    hoverBackgroundColor: doughnutChartColors,
-                    hoverBorderColor: "#fff"
-                }
-                ]
-            }
-            });
-        } catch (error) {
-            console.error('Error initializing chart:', error);
-        }
-        }
-        async function initializeDougnutChart2() {
-          try {
-              var isdoughnutchart = document.getElementById('doughnut2');
-              var type=2; //Meaning that we need the SC AG renewal stats
-              var data = await fetchData(2); // Fetch data from the Django API
-              var doughnutChartColors = getChartColorsArray('doughnut2');
-              
-              var doughnutChart = new Chart(isdoughnutchart, {
+  async function initializeDoughnutChart(canvasId, type) {
+      try {
+          const canvas = document.getElementById(canvasId);
+          const data = await fetchData(type);  // fetch API data
+          const colors = getChartColorsArray(canvasId); // read colors from data-attribute
+
+          new Chart(canvas, {
               type: 'doughnut',
               data: {
-                  labels: data.labels, // Use the fetched labels
+                  labels: data.labels,
                   datasets: [
-                  {
-                      data: data.values, // Use the fetched data values
-                      backgroundColor: doughnutChartColors,
-                      hoverBackgroundColor: doughnutChartColors,
-                      hoverBorderColor: "#fff"
-                  }
+                      {
+                          data: data.values,
+                          backgroundColor: colors,
+                          hoverBackgroundColor: colors,
+                          hoverBorderColor: "#fff"
+                      }
                   ]
-              }
-              });
-          } catch (error) {
-              console.error('Error initializing chart:', error);
-          }
-          }
-        
-        initializeDougnutChart();
-        initializeDougnutChart2();
+              },
+          });
+      } catch (error) {
+          console.error(`Error initializing chart ${canvasId}:`, error);
+      }
+  }
+
+initializeDoughnutChart('doughnut', 1);   // Main renewal statistics
+initializeDoughnutChart('doughnut2', 2);  // SC/AG renewal statistics
+
     </script>
     <!--Renewal Stat Script End-->
 

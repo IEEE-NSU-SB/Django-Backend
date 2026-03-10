@@ -8,6 +8,8 @@ from main_website.renderData import HomepageItems
 from port.models import Panels, Roles_and_Position, VolunteerAwards
 from port.renderData import PortData
 from recruitment.models import recruited_members, recruitment_session
+from system_administration.models import Project_Developers, Project_leads, system
+from system_administration.render_access import Access_Render
 from users.models import Panel_Members, VolunteerAwardRecievers
 from .serializers import *
 from main_website.models import *
@@ -15,11 +17,42 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from users.renderData import getTypeOfEventStats, getEventNumberStat
 from django.utils import timezone
+
+class SwitchesAPI(APIView):
+
+    def get(self, request):
+        get_system=system.objects.first()
+
+        if request.user.is_authenticated:
+
+            if(Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username)
+                or Access_Render.eb_access(username=request.user.username) or Access_Render.belongs_to_sc_ag_panels(username=request.user.username)):
+                
+                
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': False,
+                    },
+                })
+            else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                })
+        else:
+                return Response({
+                    "config": {
+                        'main_website_under_maintenance': get_system.main_website_under_maintenance,
+                    },
+                })
 
 class AchievementListView(ListAPIView):
     serializer_class = AchievementSerializer
@@ -109,7 +142,7 @@ class BlogsView(APIView):
         serializer = BlogListSerializer(blogs, many=True, context={'request':request})
         return Response(serializer.data)
     
-    @csrf_exempt
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         serializer = BlogCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -434,7 +467,7 @@ class TeamInfoView(APIView):
 
     def get(self, request, team_primary):
         team_details = Teams.objects.get(primary=team_primary)
-        team_serialized = TeamSerializer(team_details).data
+        team_serialized = TeamSerializer(team_details, context={'request':request}).data
 
         team_co_ordinators=[]
         team_incharges=[]
@@ -593,27 +626,49 @@ class MemberProfileView(APIView):
         awards = VolunteerAwardRecievers.objects.filter(award_reciever=member_details)
         awards_serialized = VolunteerAwardTitleSerializer(awards, many=True).data
 
+        branch_current_position_data = {
+            'organization': 'IEEE NSU SB',
+            'currentPosition': member_details.position.role if member_details.position else 'None',
+            'team': member_details.team.team_name if member_details.team else '',
+            'tenure': '',
+            'current': True
+        }
+
         #get current sc_ag position data for all sc_ag
         sc_ag_position_data = SC_AG_Members.objects.filter(member=ieee_id).order_by('sc_ag__primary')
 
         #get previous branch position data
-        # branch_prev_position_data = PortData.get_branch_previous_position_data(ieee_id)
-        # branch_prev_position_data_serialized = PanelMemberPositionSerializer(branch_prev_position_data, many=True).data
-        # #get previous sc_ag position data for all sc_ag
-        # sc_ag_previous_position_data = PortData.get_sc_ag_previous_position_data(request,ieee_id)
+        branch_prev_position_data = PortData.get_branch_previous_position_data(ieee_id)
+        branch_prev_position_data_serialized = PanelMemberPositionSerializer(branch_prev_position_data, many=True).data
+        
+        #get previous sc_ag position data for all sc_ag
+        sc_ag_previous_position_data=Panel_Members.objects.filter(~Q(tenure__panel_of__primary=1), member=Members.objects.get(ieee_id=ieee_id),tenure__current=False).order_by('-tenure__year')
+        # sc_ag_previous_position_data_serialized = PanelMemberPositionSerializer(sc_ag_previous_position_data, many=True).data
+        sc_ag_position_data_serialized = []
+        for data in sc_ag_position_data:
+            if data.position:
+                sc_ag_position_data_serialized.append(
+                    {
+                        'organization': data.sc_ag.short_form,
+                        'currentPosition': data.position.role if data.position else 'None',
+                        'team': data.team.team_name if data.team else '',
+                        'tenure': '',
+                        'current': True
+                    }
+                )
 
-        # has_branch_prev_position=False
-        # if branch_prev_position_data.count() > 0:
-        #     has_branch_prev_position = True
+            for prev_data in sc_ag_previous_position_data:
+                if prev_data.position.role_of.primary == data.sc_ag.primary:
+                    sc_ag_position_data_serialized.append(PanelMemberPositionSerializer(prev_data).data)
 
-        has_current_branch_position = True
-        #if there is no current position but there is a previous position then don't display text
-        #otherwise show it
-        # if has_branch_prev_position and member_data.team is None:
-        #     has_current_branch_position = False
+        roles = []
+        roles.append(branch_current_position_data)
+        roles.extend(branch_prev_position_data_serialized)
+        roles.extend(sc_ag_position_data_serialized)
 
         data = {
-            'achievements':awards_serialized
+            'achievements':awards_serialized,
+            'roles':roles,
         }
         member_details_serialized.update(data)
 
@@ -656,3 +711,104 @@ class ExemplaryMembersListView(ListAPIView):
 
     queryset = ExemplaryMembers.objects.all().order_by('rank')
     serializer_class = ExemplaryMemberSerializer
+
+class FAQView(APIView):
+
+    def get(self, request):
+        all_categories = FAQ_Question_Category.objects.all().order_by('id')
+
+        data = {}
+
+        for category in all_categories:
+            question_answers_serialized = FAQ_QuestionsSerializer(FAQ_Questions.objects.filter(title=category).order_by('pk'), many=True).data
+            data.update({
+                category.title: question_answers_serialized
+            })
+
+        return Response(data)
+    
+class GalleryView(APIView):
+
+    def get(self, request):
+
+        all_images=GalleryImages.objects.all().order_by('-pk')
+        all_videos=GalleryVideos.objects.all().order_by('-pk')
+
+        all_images_serialized = GalleryImageSerializer(all_images, many=True, context={'request':request}).data
+        all_videos_serialized = GalleryVideoSerializer(all_videos, many=True).data
+
+        data = {
+            'images': all_images_serialized,
+            'videos': all_videos_serialized
+        }
+
+        return Response(data)
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class SC_AG_FeedBack(APIView):
+
+    def post(self, request, sc_ag_primary=None):
+
+        if sc_ag_primary:
+            request.data['society'] = sc_ag_primary
+        else:
+            request.data['society'] = 1
+
+        serializer = SC_AG_FeedBack_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")   
+class AddResearchPaperView(APIView):
+
+    def post(self, request):
+        
+        serializer = ResearchPaper_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Research Paper submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+
+class EventFeedbackView(APIView):
+
+    def get(self, request, event_id):
+
+        event_feedbacks = Event_Feedback.objects.filter(event_id=event_id, approved=True)
+        event_feedbacks_serialized = EventFeedbackSerializer(event_feedbacks, many=True).data
+
+        return Response(event_feedbacks_serialized)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, event_id):
+        
+        request.data['event_id'] = event_id
+        serializer = EventFeedback_CreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'Feedback submitted successfully!'}, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)  # Debug
+        return Response({'message':'An error has occured!'}, status=status.HTTP_400_BAD_REQUEST)
+    
+class PortalDevelopersList(APIView):
+
+    def get(self, request):
+        
+        project_leads=Project_leads.objects.all()
+        project_developers=Project_Developers.objects.all().order_by('-reputation_point')
+
+        project_leads_serialized = ProjectLeadsSerializer(project_leads, many=True, context={'request':request}).data
+        project_developers_serialized = ProjectDevelopersSerializer(project_developers, many=True, context={'request':request}).data
+
+        data = {
+            'project_leads':project_leads_serialized,
+            'project_developers':project_developers_serialized
+        }
+
+        return Response(data)

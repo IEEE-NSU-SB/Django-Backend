@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Graphics_Link,Graphics_Banner_Image,Graphics_Form_Link,Graphics_Drive_links
+from .models import Certificate_Receiver_Download_Request, Certificate_Receiver_Download_URL, Graphics_Link,Graphics_Banner_Image,Graphics_Form_Link,Graphics_Drive_links,Certificate,Certificate_Receivers,Certificate_Template, Certificate_Public_URL
 # Register your models here.
 @admin.register(Graphics_Link)
 class Graphics_Link(admin.ModelAdmin):
@@ -15,3 +15,23 @@ class Graphics_Form_Link(admin.ModelAdmin):
 @admin.register(Graphics_Drive_links)
 class Graphics_Drive_Link(admin.ModelAdmin):
     list_display = ['link_title','link','created_at']
+
+admin.site.register(Certificate)
+admin.site.register(Certificate_Receivers)
+
+@admin.register(Certificate_Template)
+class Certificate_TemplateAdmin(admin.ModelAdmin):
+
+    fields = ['certificate', 'svg_filename']
+    readonly_fields = ("svg_filename",)
+
+    def svg_filename(self, obj):
+        if obj.svg_template:
+            return obj.svg_template.name  # just show stored path
+        return "-"
+
+    svg_filename.short_description = "SVG File Location"
+
+admin.site.register(Certificate_Public_URL)
+admin.site.register(Certificate_Receiver_Download_Request)
+admin.site.register(Certificate_Receiver_Download_URL)

@@ -3,11 +3,13 @@ from datetime import datetime
 import re
 from rest_framework import serializers
 from central_branch.renderData import Branch
-from central_events.models import Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from central_events.models import Event_Feedback, Events, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from chapters_and_affinity_group.models import SC_AG_FeedBack
 from graphics_team.models import Graphics_Banner_Image
 from main_website.models import *
 from media_team.models import Media_Images
 from port.models import Panels, Roles_and_Position, Teams
+from system_administration.models import Project_Developers, Project_leads
 from users.models import Panel_Members, VolunteerAwardRecievers
 from django.utils import timezone
 from django.utils.html import strip_tags
@@ -338,10 +340,11 @@ class ResearchPaperSerializer(serializers.ModelSerializer):
 
     authors = serializers.SerializerMethodField()
     link = serializers.URLField(source='publication_link')
+    img = serializers.ImageField(source='research_banner_picture')
 
     class Meta:
         model = Research_Papers
-        fields = ['id', 'title', 'authors', 'link']
+        fields = ['id', 'img', 'title', 'authors', 'link']
 
     def get_authors(self, obj):
         author_names = strip_tags(obj.author_names).replace('&nbsp;', '').split(',')
@@ -712,8 +715,118 @@ class ExemplaryMemberSerializer(serializers.ModelSerializer):
         model = ExemplaryMembers
         fields = '__all__'
 
-# class PanelMemberPositionSerializer(serializers.ModelField):
+class PanelMemberPositionSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         models = Roles_and_Position
-#         fields = ['organization', 'currentPosition']
+    organization = serializers.SerializerMethodField()
+    currentPosition = serializers.CharField(source='position')
+    tenure = serializers.StringRelatedField()
+    team = serializers.StringRelatedField()
+    current = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Panel_Members
+        fields = ['organization', 'currentPosition', 'tenure', 'team', 'current']
+
+    def get_organization(self, obj):
+        return obj.position.role_of.short_form
+
+    def get_current(self, obj):        
+        current = self.context.get('current')
+        if current:
+            return current
+        else:
+            return False
+        
+class FAQ_QuestionsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FAQ_Questions
+        fields = ['question', 'answer']
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GalleryImages
+        fields = ['id', 'image']
+
+class GalleryVideoSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='video_title')
+    link = serializers.CharField(source='video_link')
+    description = serializers.CharField(source='video_description')
+
+    class Meta:
+        model = GalleryVideos
+        fields = ['id', 'title', 'link', 'description']
+
+class SC_AG_FeedBack_CreateSerializer(serializers.ModelSerializer):
+
+    date = serializers.DateField(default=date.today)  # auto-fill today if not provided
+    society = serializers.SlugRelatedField(
+        queryset=Chapters_Society_and_Affinity_Groups.objects.only('id', 'primary'),
+        slug_field='primary',   # frontend sends primary, not ID
+        required=False,
+        allow_null=True
+    )
+
+    class Meta:
+        model = SC_AG_FeedBack
+        fields = ['date', 'society', 'name', 'email', 'message']
+
+class ResearchPaper_CreateSerializer(serializers.ModelSerializer):
+
+    chapter = serializers.SlugRelatedField(
+        source='group',
+        queryset=Chapters_Society_and_Affinity_Groups.objects.only('id', 'primary'),
+        slug_field='primary',   # frontend sends primary, not ID
+        required=False,
+        allow_null=True
+    )
+    publish_date = serializers.DateField(default=date.today)
+    authors = serializers.CharField(source='author_names')
+    abstract = serializers.CharField(source='short_description')
+    bannerFile = serializers.ImageField(source='research_banner_picture')
+    publicationLink = serializers.URLField(source='publication_link')
+
+    class Meta:
+        model = Research_Papers
+        fields = ['chapter', 'authors', 'title', 'category', 'abstract', 'publicationLink', 'bannerFile', 'publish_date']
+
+    def create(self, validated_data):
+        validated_data['is_requested'] = True  # direct assignment
+        return super().create(validated_data)
+
+class EventFeedback_CreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Event_Feedback
+        fields = ['event_id', 'name', 'email', 'satisfaction', 'comment']
+
+class EventFeedbackSerializer(serializers.ModelSerializer):
+
+    feedback = serializers.CharField(source='comment')
+    satisfaction = serializers.CharField(source='get_satisfaction_display')
+
+    class Meta:
+        model = Event_Feedback
+        fields = ['name', 'satisfaction', 'feedback']
+
+class ProjectLeadsSerializer(serializers.ModelSerializer):
+
+    role = serializers.CharField(source='developer_type')
+    quote = serializers.CharField(source='developer_decription')
+    image = serializers.ImageField(source='developers_picture')
+
+    class Meta:
+        model = Project_leads
+        fields = ['name', 'role', 'quote', 'image', 'github_url', 'linkedin_url', 'facebook_url']
+
+class ProjectDevelopersSerializer(serializers.ModelSerializer):
+
+    role = serializers.CharField(source='developer_type')
+    quote = serializers.CharField(source='developer_decription')
+    image = serializers.ImageField(source='developers_picture')
+
+    class Meta:
+        model = Project_Developers
+        fields = ['name', 'role', 'quote', 'image', 'github_url', 'linkedin_url', 'facebook_url']

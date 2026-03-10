@@ -157,6 +157,17 @@
         <div class="tb_search">
           <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
         </div>
+
+        {% if has_view_permission %}
+        <div class="status_filter">
+          <select class="form-control" id="membershipFilter" aria-label="Membership Filter">
+            <option value="all" selected>All Membership Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        {% endif %}
+        <br>
       </div>
       <div class="table-responsive">
         <table class="table table-striped table-class" id="table-id">
@@ -164,8 +175,11 @@
           <thead>
             <tr>
               <th data-priority="1">IEEE ID</th>
-              <th data-priority="1">NSU ID</th>
+              {% if has_view_permission %}
+              <th data-priority="1">Membership</th>
+              {% endif %}
               <th data-priority="1">Name</th>
+              <th data-priority="1">NSU ID</th>
               <th data-priority="1">Email</th>
               <th data-priority="1">Current Position</th>
               <th data-priority="1">Current Team</th>
@@ -181,8 +195,17 @@
               <tr>
               
                   <td style="color:#00629B"><a href="{% if has_view_permission %} {% if is_branch %}{% url 'central_branch:member_details' member.ieee_id %}{% else %}{% url 'membership_development_team:member_details' member.ieee_id %}{% endif %} {% else %}https://ieeensusb.org/member-profile/{{member.ieee_id}}/{% endif %}">{{ member.ieee_id  }}</a></td>
-                  <td>{{ member.nsu_id }}</td>
+                  {% if has_view_permission %}
+                  <td data-membership="{% if member.is_active_member %}active{% else %}inactive{% endif %}">
+                    {% if member.is_active_member %}
+                      <span class="text-success"><b>Active</b></span>
+                    {% else %}
+                      <span class="text-danger"><b>Inactive</b></span>
+                    {% endif %}
+                  </td>
+                  {% endif %}
                   <td>{{ member.name  }}</td>
+                  <td>{{ member.nsu_id }}</td>
                   <td>{{ member.email_ieee }}</td>
                   <td>{{ member.position.role }}</td>
                   <td>{{ member.team.team_name }}</td>
@@ -407,8 +430,11 @@
 
 // SI SETTING
 $(function(){
-	// Just to append id number for each row  
+  // Just to append id number for each row  
 default_index();
+  $('#membershipFilter').on('change', function(){
+    applyTableFilters();
+  });
 					
 });
 
@@ -435,49 +461,51 @@ function default_index() {
 
 // All Table search script
 function FilterkeyWord_all_table() {
-  
-// Count td if you want to search on all table instead of specific column
+  applyTableFilters();
+}
 
-  var count = $('.table').children('tbody').children('tr:first-child').children('td').length; 
+function applyTableFilters(){
+  var table = document.getElementById("table-id");
+  if(!table){
+    return;
+  }
+  var count = $('.table').children('tbody').children('tr:first-child').children('td').length;
+  var input = document.getElementById("search_input_all");
+  var statusFilter = document.getElementById("membershipFilter");
+  var searchValue = input ? input.value.toLowerCase() : '';
+  var statusValue = statusFilter ? statusFilter.value : 'all';
+  var filtersApplied = (searchValue !== '') || (statusValue !== 'all');
+  var tr = table.getElementsByTagName("tr");
 
-        // Declare variables
-  var input, filter, table, tr, td, i;
-  input = document.getElementById("search_input_all");
-  var input_value =     document.getElementById("search_input_all").value;
-        filter = input.value.toLowerCase();
-  if(input_value !=''){
-        table = document.getElementById("table-id");
-        tr = table.getElementsByTagName("tr");
-
-        // Loop through all table rows, and hide those who don't match the search query
-        for (i = 1; i < tr.length; i++) {
-          
-          var flag = 0;
-           
-          for(j = 0; j < count; j++){
-            td = tr[i].getElementsByTagName("td")[j];
-            if (td) {
-             
-                var td_text = td.innerHTML;  
-                if (td.innerHTML.toLowerCase().indexOf(filter) > -1) {
-                //var td_text = td.innerHTML;  
-                //td.innerHTML = 'shaban';
-                  flag = 1;
-                } else {
-                  //DO NOTHING
-                }
-              }
-            }
-          if(flag==1){
-                     tr[i].style.display = "";
-          }else {
-             tr[i].style.display = "none";
-          }
+  for (var i = 1; i < tr.length; i++) {
+    var matchesSearch = false;
+    if(searchValue === ''){
+      matchesSearch = true;
+    }else{
+      for(var j = 0; j < count; j++){
+        var td = tr[i].getElementsByTagName("td")[j];
+        if(td && td.innerHTML.toLowerCase().indexOf(searchValue) > -1){
+          matchesSearch = true;
+          break;
         }
-    }else {
-      //RESET TABLE
-      $('#maxRows').trigger('change');
+      }
     }
+
+    var matchesStatus = true;
+    if(statusValue !== 'all'){
+      var statusCell = tr[i].querySelector('[data-membership]');
+      matchesStatus = statusCell ? statusCell.getAttribute('data-membership') === statusValue : false;
+    }
+
+    tr[i].style.display = (matchesSearch && matchesStatus) ? "" : "none";
+  }
+
+  if(!filtersApplied){
+    $('#maxRows').trigger('change');
+  }else{
+    $('.pagination').html('');
+    $('.rows_count').html('');
+  }
 }
   </script>
   <script>

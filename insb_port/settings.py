@@ -38,18 +38,39 @@ if(os.environ.get('SETTINGS')=='dev'):
 else:
     ALLOWED_HOSTS = ['ieeensusb.org','api.ieeensusb.org', 'portal.ieeensusb.org', 'sandbox.ieeensusb.org']
 
+CORS_ALLOW_CREDENTIALS = True
+
 if(os.environ.get('SETTINGS')=='dev'):
+    SESSION_COOKIE_SAMESITE = "Lax"  # works on localhost
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
     CORS_ALLOWED_ORIGINS = [
         "http://127.0.0.1:5173",
         "http://localhost:5173",
     ]
 
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ]
+
 else:
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
     CORS_ALLOWED_ORIGINS = [
         "http://ieeensusb.org",
         "https://ieeensusb.org",
+        "http://www.ieeensusb.org",
+        "https://www.ieeensusb.org",
         "http://react.ieeensusb.org",
-        "https://react.ieeensusb.org"
+        "https://react.ieeensusb.org",
+        "http://www.react.ieeensusb.org",
+        "https://www.react.ieeensusb.org"
     ]
 
 
@@ -225,6 +246,9 @@ DATE_INPUT_FORMATS = ['%d-%m-%Y']
 #Media Files
 MEDIA_ROOT= os.path.join(BASE_DIR, 'User Files/')
 MEDIA_URL= "/media_files/" 
+
+#Private Media Files
+PRIVATE_MEDIA_ROOT= os.path.join(BASE_DIR, 'Private Files/')
 
 #to do user login required
 # LOGIN_REDIRECT_URL='users:dashboard'

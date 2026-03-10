@@ -1,53 +1,9 @@
 {% load static %}
 {% block event_details_form %}
-<style>
-    label{
-        display: flex;
-    }
-    .item{
-        position: relative;
-    }
-    .item:hover>.tooltip{
-        opacity: 1;
-    }
-    .icon i{
-        font-size: 20px;
-        color: #000;
-        border-radius: 50%;
-        place-items: center;
-    }
-    .tooltip{
-        position: absolute;
-        background-color: rgba(59, 59, 59);
-        color: #fff;
-        padding: 10px;
-        left: 50%;
-        width: 200px;
-        text-align: center;
-        transform: translateX(-50%);
-        bottom: 100%;
-        will-change: transform;
-        opacity: 0;
-        transition: all 0.4s;
-    }
-    .tooltip::after{
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: rgba(59, 59, 59) transparent transparent transparent;
-    }
-</style>
-
-    <div class="container">
-        <div class="box">
-            <br>
-            <div class="box-header" style="text-align:center;">
-                <h1>Provide Event Details</h1>
-            </div>
+    <div class="container" id="PseudonameForContainer">
+        <div class="box" id="boxID">
+            <h1  class="form-title">Create Event</h1>
+            
             {% comment %} <!--Error Message-->
             <div class="py-3 text-center">
                 {% for message in messages %}
@@ -57,31 +13,26 @@
             <form method="POST" id="eventForm">
                 {% csrf_token %}
                 <div class="box-body">
+                    <!-- Event Name -->
                     <div class="form-group">
-                        <label>Event Name &nbsp;
-                            <span>
-                                <div class="item">
-                                    <div class="tooltip">Write the event name here</div>
-                                    <div class="icon"><i class="fa fa-info-circle" aria-hidden="true"></i></div>
-                                </div>
-                            </span>
+                        <label class="label-heading">Event Name &nbsp;
                         </label> 
                         <input
-                            placeholder="Eg. IEEE Event Full Name"
-                            class="form-control"
+                            placeholder="SPAC 2025, STEP25..."
+                            class="label-input"
                             type="text"
                             autocomplete="off"
                             required
                             name="event_name"/>
                     </div>
-                    <br>
-                    <div class="form-group">
+                    <!-- Event Description -->
+                    <div class="label-heading">
                         {{form.media}}
                         {{form.as_p}}
                     </div>
-                    <br>
+                    <!--Select Mega Event-->
                     <div class="form-group">
-                        <label>Mega Event of</label>    
+                        <label class="label-heading">Mega Event of</label>    
                         <select class="form-control" name="super_event">
                         <option selected value="null">--------------------</option>
                         {% for super_event in super_events %}
@@ -89,9 +40,9 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <br>
+                    <!-- Select Event Type -->
                     <div class="form-group">
-                        <label>Select Event Type: <span style="color:red">*<span></label>
+                        <label class="label-heading">Select Event Type: <span style="color:red; font-weight: normal;">*<span></label>
                         <select multiple class="form-control" name="event_type" required>
                         <option selected value="null">--------------------</option>
                             {% for event_type in event_types %}
@@ -100,9 +51,8 @@
                         </select>
                         <button type="button" class="btn btn-outline-success buttons mt-2" data-toggle="modal" data-target="#EventTypeModal">Add Event Type</button>
                     </div>
-                    <br>
                     {% comment %} <div class="form-group">
-                        <label for="exampleInputPassword3">Add a date for the Event</label>
+                        <label class="label-heading" for="exampleInputPassword3">Add a date for the Event</label>
                         <input
                             placeholder="Event Date"
                             name="event_date"
@@ -110,9 +60,9 @@
                             class="form-control"
                         />
                     </div>
-                    <br>
+                    <!-- Event Time -->
                     <div class="form-group">
-                        <label>Event Time: <span style="color:red">*<span></label> 
+                        <label class="label-heading">Event Time: <span style="color:red">*<span></label> 
                         <input
                             placeholder="Eg. 9:00 AM - 5:00 PM"
                             class="form-control"
@@ -125,24 +75,22 @@
                             
                     </div> {% endcomment %}
                     <div class="form-group">
-                        <label for="startDateTime">Add a (tentative) start date for the Event: </label>
-                        <input type="datetime-local" id="startDateTime" name="start_date_time" required>
+                        <label class="label-heading" for="startDateTime">Tentative start date: </label>
+                        <input class="label-input" type="datetime-local" id="startDateTime" name="start_date_time" required>
                     </div>
-                    <br>
                     <div class="form-group">
-                        <label for="endDateTime">Add a end date for the Event: </label>
-                        <input type="datetime-local" id="endDateTime" name="end_date_time" required>
+                        <label class="label-heading" for="endDateTime">Tentative end date: </label>
+                        <input class="label-input" type="datetime-local" id="endDateTime" name="end_date_time" required>
                     </div>
                     <div id="error-message" style="color: red; display: none;"></div><br>
-                    <br>
-
-                    <div style="text-align: center;">
+                    <!-- Buttons -->
+                    <div class="continue-collab-cancel-btn">
                         {% if is_branch %}
-                        <a href="{% url 'central_branch:event_control' %}" class="btn btn-outline b-danger text-danger" style="margin-bottom:15px;">Cancel</a>
+                        <a href="{% url 'central_branch:event_control' %}" class="btn btn-outline b-danger text-danger">Cancel</a>
                         {% else %}
-                        <a href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}" class="btn btn-outline b-danger text-danger" style="margin-bottom:15px;">Cancel</a>
+                        <a href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}" class="btn btn-outline b-danger text-danger">Cancel</a>
                         {% endif %}
-                        <input type="submit" name="next" class="btn btn-outline b-success text-success" value="Continue to Collaborations Tab" style="margin-bottom:15px;">
+                        <input type="submit" name="next" class="btn btn-outline b-success text-success" value="Continue to Collaborations Tab">
                     </div>
                     <br> 
                 </div>

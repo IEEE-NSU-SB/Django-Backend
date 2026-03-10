@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render,redirect
 from django.db import DatabaseError
 from system_administration.system_logs import System_Logs
+from django.db.models import F
 import users
 from users.models import MemberSkillSets, Members
 from port.models import Chapters_Society_and_Affinity_Groups, Teams
@@ -614,8 +615,7 @@ def renewal_session_data(request,pk):
         get_all_sc_ag=PortData.get_all_sc_ag(request=request)
         session_name=renewal_data.get_renewal_session_name(pk)
         session_id=renewal_data.get_renewal_session_id(session_name=session_name)
-        get_renewal_requests=Renewal_requests.objects.filter(session_id=session_id).values('id','name','email_associated','email_ieee','contact_no','ieee_id','renewal_status').order_by('id')
-            
+        get_renewal_requests=Renewal_requests.objects.filter(session_id=session_id).annotate(team_name=F('team__team_name')).values('id','name','email_associated','email_ieee','contact_no','ieee_id','renewal_status','team_name').order_by('id')
         #loading team member data for form credential edit
         load_team_members=renderData.MDT_DATA.load_team_members()
         
@@ -831,7 +831,7 @@ def renewal_request_details(request,pk,request_id):
                     # #show success message
                     messages.success(request,f"Membership with IEEE ID {ieee_id} has been renewed!")
                     # Send an Email to the Applicants Associated Email
-                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0]['email_associated'],reciever_name=renewal_request_details[0]['name'])
+                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0].email_associated,reciever_name=renewal_request_details[0].name)
                     if email_stat:
                         messages.success(request,"Renewal Confirmation email was sent to the member's Associated email address.")
                     else:
@@ -847,9 +847,9 @@ def renewal_request_details(request,pk,request_id):
                     #update the member in INSB Registered Members Database
                     try:
                         new_member_from_renewal=Members.objects.create(
-                            ieee_id=ieee_id,nsu_id=renewal_request_details[0]['nsu_id'],name=name,contact_no=renewal_request_details[0]['contact_no'],
-                            email_personal=renewal_request_details[0]['email_associated'],
-                            email_ieee=renewal_request_details[0]['email_ieee'],last_renewal_session=Renewal_Sessions.objects.get(id=get_renewal_session.id)
+                            ieee_id=ieee_id,nsu_id=renewal_request_details[0].nsu_id,name=name,contact_no=renewal_request_details[0].contact_no,
+                            email_personal=renewal_request_details[0].email_associated,
+                            email_ieee=renewal_request_details[0].email_ieee,last_renewal_session=Renewal_Sessions.objects.get(id=get_renewal_session.id)
                         )
                         new_member_from_renewal.save()
                     except:
@@ -859,7 +859,7 @@ def renewal_request_details(request,pk,request_id):
                     messages.success(request,f"Membership has been renewed!\nThis member with the associated IEEE ID: {ieee_id} was not found in the IEEE NSU SB Registered Member Database!\nHowever, the system kept the Data of renewal!")
                     
                     # Send an Email to the Applicants Associated Email
-                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0]['email_associated'],reciever_name=renewal_request_details[0]['name'])
+                    email_stat=email_sending.send_email_upon_renewal_confirmed(reciever_email=renewal_request_details[0].email_associated,reciever_name=renewal_request_details[0].name)
                     if email_stat:
                         messages.success(request,"Renewal Confirmation email was sent to the member's Associated email address.")
                     else:
@@ -1004,7 +1004,7 @@ def generateExcelSheet_membersList(request):
 
             # Defining columns that will stay in the first row
             columns = ['IEEE ID','NSU ID', 'Name', 'Current Team', 'Current Position', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
-                    'Facebook URL']
+                    'Blood Group', 'Facebook URL']
 
             # Defining first column
             for column in range(len(columns)):
@@ -1028,6 +1028,7 @@ def generateExcelSheet_membersList(request):
                                                     'home_address',
                                                     'date_of_birth',
                                                     'gender',
+                                                    'blood_group',
                                                     'facebook_url').order_by('-position')
             for row in rows:
                 row_num += 1

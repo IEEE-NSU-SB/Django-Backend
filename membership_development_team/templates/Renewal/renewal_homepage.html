@@ -66,7 +66,7 @@
         
     </style>
 </head>
-<body>
+<body style="background-color: white;">
     <!-- ############ LAYOUT START-->
     <div class="app" id="app">
 
@@ -237,6 +237,15 @@
         {% include "common_js.html" %}
     {% endblock common_js %}
     <script src="{% static 'table_search.js'%}"></script>
+<script>
+function openModal(id) { 
+    document.getElementById(id).classList.add("modal-show");
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove("modal-show");
+}
+</script>
 
 
 </body>

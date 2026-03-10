@@ -173,6 +173,7 @@ class Event_Feedback(models.Model):
     email = models.EmailField(null=False,blank=False)
     satisfaction = models.CharField(null=False,blank=False,max_length=50,choices=[("very_satisfied", "Very Satisfied"), ("satisfied", "Satisfied"),("not_satisfied", "Not Satisfied")])
     comment = models.TextField(null=False,blank=False,max_length=400)
+    approved = models.BooleanField(null=False,blank=False,default=False)
 
     class Meta:
         verbose_name="Event Feedback"

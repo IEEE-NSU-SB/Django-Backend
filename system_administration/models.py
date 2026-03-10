@@ -207,6 +207,8 @@ class Graphics_Data_Access(models.Model):
     event_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Event Access")
     graphics_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Graphics Access")
     graphics_view_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Graphics View Access")
+    certificates_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Certificates Access")
+    certificates_view_access = models.BooleanField(default=False,null=False,blank=False, verbose_name="Certificates View Access")
 
     class Meta:
 
@@ -323,5 +325,21 @@ class General_Log(models.Model):
     def __str__(self) ->str:
         return str(self.pk)
     
+from django.core.files.storage import FileSystemStorage
+class PrivateFileStorage(FileSystemStorage):
+    """
+    Storage for private files.
+    Files are stored in PRIVATE_MEDIA_ROOT
+    No URL is available.
+    """
 
-  
+    def __init__(self, *args, **kwargs):
+        kwargs["location"] = settings.PRIVATE_MEDIA_ROOT
+        kwargs["base_url"] = None  # disable URL generation
+        super().__init__(*args, **kwargs)
+
+    def url(self, name):
+        """
+        Prevent URL access to private files.
+        """
+        return None
