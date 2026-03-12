@@ -245,7 +245,7 @@
               <th>Type of Certificate</th>
               <th>Download (svg)</th>
               {% if has_certificates_access %}
-              <th>Action?</th>
+              <th>Action</th>
               {% endif %}
             </tr>
           </thead>
@@ -269,6 +269,7 @@
                       font-weight: 600;
                       cursor: pointer;
                       padding: 8px 16px;
+                      border: none;
                     "
                   >
                     Download
@@ -345,8 +346,9 @@
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div id="deleteModal" class="event-modal-overlay">
-          <div class="event-modal-box">
+
+        {% comment %} <div id="deleteModal" class="event-modal-overlay">
+          <div class="event-modal-box" style="max-width: 380px; width: 90%; margin: auto;" >
             <h3 style="margin-bottom: 20px; color: #333;">Confirm Deletion</h3>
             <p style="margin-bottom: 30px; color: #666;">Are you sure you want to delete this certificate? This action cannot be undone.</p>
             <div style="display: flex; justify-content: space-between;">
@@ -384,7 +386,49 @@
               </form>
             </div>
           </div>
-        </div>
+        </div> {% endcomment %}
+
+ <div id="deleteModal" class="event-modal-overlay">
+  <div class="event-modal-box" style="max-width: 380px; width: 90%; margin: auto;">
+    <h3 style="margin-bottom: 20px; color: #333;">Confirm Deletion</h3>
+    <p style="margin-bottom: 30px; color: #666;">Are you sure you want to delete this certificate? This action cannot be undone.</p>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="delete_certificate_id" id="deleteCertificateInput">
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button
+          type="button"
+          onclick="closeDeleteModal()"
+          style="
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          "
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          name="delete_certificate"
+          style="
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          "
+        >
+          Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+        
         {% endif %}
       </div>
     </div>

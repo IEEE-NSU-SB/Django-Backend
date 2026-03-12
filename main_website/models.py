@@ -116,7 +116,7 @@ class Achievements(models.Model):
     award_winning_datefield = models.DateField(null=True,blank=True)
     award_of=models.ForeignKey(Chapters_Society_and_Affinity_Groups,on_delete=models.CASCADE)
     award_picture=models.ImageField(null=False,blank=False,upload_to='main_website_files/achievements/')
-    
+     
     class Meta:
         verbose_name="Achievements"
     
