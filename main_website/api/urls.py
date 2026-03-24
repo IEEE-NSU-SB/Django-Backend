@@ -29,6 +29,7 @@ urlpatterns = [
     path('get_panels/<int:sc_ag_primary>/', PanelsListView.as_view(), name='panels_list_sc_ag'),
     path('get_panel_executives/', PanelExecutives.as_view(), name='panel_executives'),
     path('get_sc_ag_panel_executives/<int:sc_ag_primary>/', SCAGPanelExecutives.as_view(), name='sc_ag_panel_executives'),
+    path('get_sc_ag_panel_executives/<int:sc_ag_primary>/<str:panel_year>/', SCAGPanelExecutives.as_view(), name='sc_ag_panel_executives_year'),
     path('get_panel_executives/<str:panel_year>/', PanelExecutives.as_view(), name='panel_executives_sc_ag'),
     path('get_event_details/<int:event_id>/', EventView.as_view(), name='event_view'),
     path('get_mega_event_details/<int:event_id>/', MegaEventView.as_view(), name='mega_event_view'),
