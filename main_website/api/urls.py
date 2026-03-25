@@ -35,6 +35,7 @@ urlpatterns = [
     path('get_mega_event_details/<int:event_id>/', MegaEventView.as_view(), name='mega_event_view'),
     path('get_contact_info/', ContactInfoView.as_view(), name='contact_info'),
     path('get_ieee_r10_details/', IEEERegion10Details.as_view(), name='ieee_r10_details'),
+    path('get_ieee_bangladesh_section_details/', IEEEBangladeshSectionDetails.as_view(), name='ieee_bangladesh_section_details'),
     path('get_all_events/', EventsListView.as_view(), name='events_list'),
     path('get_upcoming_event/', UpcomingEvent.as_view(), name='upcoming_event'),
     path('get_team_details/<int:team_primary>/', TeamInfoView.as_view(), name='team_info'),

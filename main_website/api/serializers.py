@@ -621,6 +621,68 @@ class IEEERegion10Serializer(serializers.ModelSerializer):
         self.fields['MembershipLinks'].default = page_links.get('membership_development_link', [])
         self.fields['EventConferenceLinks'].default = page_links.get('events_and_conference_link', [])
 
+class IEEEBangladeshSectionSerializer(serializers.ModelSerializer):
+
+    aboutDetails = serializers.CharField(source='about_ieee_bangladesh')
+    aboutImage = serializers.ImageField(source='ieee_bangladesh_logo')
+    ieeebdlink = serializers.CharField(source='ieee_bd_link')
+    memVolDetails = serializers.CharField(source='member_and_volunteer_description')
+    memVolImage = serializers.ImageField(source='member_and_volunteer_picture')
+    memVolLinks = PageLinkSerializer(many=True, read_only=True)
+    benefitsDetails = serializers.CharField(source='benefits_description')
+    benefitsLinks = PageLinkSerializer(many=True, read_only=True)
+    stuBranchDetails = serializers.CharField(source='student_branches_description')
+    stuBranchLinks = PageLinkSerializer(many=True, read_only=True)
+    affinityDetails = serializers.CharField(source='affinity_groups_description')
+    affinityLinks = PageLinkSerializer(many=True, read_only=True)
+    communitySocietyDetails = serializers.CharField(source='community_and_society_description')
+    communitySocietyLinks = PageLinkSerializer(many=True, read_only=True)
+    achievementsDetails = serializers.CharField(source='achievements_description')
+    achievementsLinks = PageLinkSerializer(many=True, read_only=True)
+    gallery = serializers.SerializerMethodField()
+    chair = serializers.CharField(source='chair_name')
+    chairEmail = serializers.CharField(source='chair_email')
+    secretary = serializers.CharField(source='secretary_name')
+    secretaryEmail = serializers.CharField(source='secretary_email')
+    officeSecretary = serializers.CharField(source='office_secretary_name')
+    officeSecretaryNumber = serializers.CharField(source='office_secretary_number')
+
+    class Meta:
+        model = IEEE_Bangladesh_Section
+        fields = [
+            "aboutDetails", "aboutImage", "ieeebdlink",
+            "memVolDetails", "memVolImage", "memVolLinks",
+            "benefitsDetails", "benefitsLinks", "stuBranchDetails",
+            "stuBranchLinks", "affinityDetails", "affinityLinks",
+            "communitySocietyDetails", "communitySocietyLinks", "achievementsDetails",
+            "achievementsLinks", "gallery",
+            "chair", "chairEmail", "secretary",
+            "secretaryEmail", "officeSecretary", "officeSecretaryNumber"
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Assign dynamic link lists
+        page_links = Branch.get_about_page_links(page_title='ieee_bangladesh_section')
+        self.fields['memVolLinks'].default = page_links.get('members_and_volunteers_link', [])
+        self.fields['benefitsLinks'].default = page_links.get('benefits_link', [])
+        self.fields['stuBranchLinks'].default = page_links.get('student_branches_link', [])
+        self.fields['affinityLinks'].default = page_links.get('affinity_groups_link', [])
+        self.fields['communitySocietyLinks'].default = page_links.get('community_and_society_link', [])
+        self.fields['achievementsLinks'].default = page_links.get('achievement_link', [])
+
+    def get_gallery(self, obj):
+
+        all_images = Branch.get_all_ieee_bangladesh_section_images()
+        all_images_serialized = IEEE_Bangladesh_Section_Gallery_Serializer(all_images, many=True, context={'request': self.context.get('request')}).data
+        return all_images_serialized
+
+class IEEE_Bangladesh_Section_Gallery_Serializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = IEEE_Bangladesh_Section_Gallery
+        fields = ['picture']
+
 class TeamSerializer(serializers.ModelSerializer):
 
     title = serializers.CharField(source='team_name')

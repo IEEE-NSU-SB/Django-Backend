@@ -452,6 +452,12 @@ class IEEERegion10Details(RetrieveAPIView):
     def get_object(self):
         return IEEE_Region_10.objects.first()
     
+class IEEEBangladeshSectionDetails(RetrieveAPIView):
+    serializer_class = IEEEBangladeshSectionSerializer
+
+    def get_object(self):
+        return IEEE_Bangladesh_Section.objects.first()
+    
 class EventPagination(PageNumberPagination):
     page_size = 20  # Events per page
     # page_size_query_param = 'page_size'  # optional, allows ?page_size=3
