@@ -817,3 +817,8 @@ class PortalDevelopersList(APIView):
         }
 
         return Response(data)
+    
+class MagazinesListView(ListAPIView):
+
+    serializer_class = MagazinesSerializer
+    queryset = Magazines.objects.all().order_by('-publish_date')

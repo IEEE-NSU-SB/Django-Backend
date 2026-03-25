@@ -830,3 +830,16 @@ class ProjectDevelopersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project_Developers
         fields = ['name', 'role', 'quote', 'image', 'github_url', 'linkedin_url', 'facebook_url']
+
+class MagazinesSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(source='magazine_title')
+    publishedBy = serializers.CharField(source='published_by')
+    publishDate = serializers.DateField(source='publish_date')
+    picture = serializers.ImageField(source='magazine_picture')
+    description = serializers.CharField(source='magazine_short_description')
+    file = serializers.FileField(source='magazine_file')
+
+    class Meta:
+        model = Magazines
+        fields = ['title', 'publishedBy', 'publishDate', 'picture', 'description', 'file']
