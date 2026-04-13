@@ -1003,7 +1003,7 @@ def generateExcelSheet_membersList(request):
             font_style.font.bold = True
 
             # Defining columns that will stay in the first row
-            columns = ['Membership Status', 'IEEE ID','NSU ID', 'Name', 'Current Team', 'Current Position', 'Email (IEEE)','Email (Personal)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
+            columns = ['Membership Status', 'IEEE ID','NSU ID', 'Name', 'Current Team', 'Current Position', 'Email (IEEE)','Email (Personal)', 'Email (NSU)', 'School', 'Department', 'Major', 'Contact No', 'Home Address', 'Date Of Birth', 'Gender',
                     'Blood Group', 'Facebook URL']
 
             # Defining first column
@@ -1022,6 +1022,7 @@ def generateExcelSheet_membersList(request):
                                                     'position__role',
                                                     'email_ieee',
                                                     'email_personal',
+                                                    'email_nsu',
                                                     'school',
                                                     'department',
                                                     'major',
