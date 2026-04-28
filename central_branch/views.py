@@ -6230,7 +6230,7 @@ def mail(request):
                         })
 
                 # Create a batch request
-                batch = BatchHttpRequest(callback=handle_batch_response)
+                batch = gmail_service.new_batch_http_request(callback=handle_batch_response)
                 
 
                     # if exception is not None:
@@ -6249,8 +6249,6 @@ def mail(request):
                             format='metadata',
                             metadataHeaders=['From', 'Subject', 'Date', 'internalDate']
                         ), request_id=thread_id)
-
-                batch._batch_uri = 'https://www.googleapis.com/batch/gmail/v1'
 
                 batch.execute()
 
