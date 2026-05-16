@@ -616,9 +616,7 @@ def certificate_details(request, certificate_id):
                         is_active = False
 
                     Certificate_Public_URL.objects.filter(certificate_id=certificate_id).update(is_active=is_active)
-
                     return redirect('graphics_team:certificate_details', certificate_id)
-
             certificate = Certificate.objects.get(id=certificate_id)
             event_name_of_certificate = Events.objects.values_list('event_name', flat=True).get(id=certificate.event_id)
             try:

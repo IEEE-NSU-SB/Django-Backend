@@ -165,9 +165,8 @@ if(os.environ.get('SETTINGS')=='dev'):
             'USER': os.environ.get('DEV_DATABASE_USER'),
             'PASSWORD': os.environ.get('DEV_DATABASE_PASSWORD'),
             'HOST': os.environ.get('DEV_DATABASE_HOST'),
-            'PORT':'', 
+            'PORT':'',  
             
-
         }
     }
 if(os.environ.get('SETTINGS')=='prod'):
