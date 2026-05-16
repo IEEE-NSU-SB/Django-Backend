@@ -452,6 +452,12 @@ class IEEERegion10Details(RetrieveAPIView):
     def get_object(self):
         return IEEE_Region_10.objects.first()
     
+class IEEEBangladeshSectionDetails(RetrieveAPIView):
+    serializer_class = IEEEBangladeshSectionSerializer
+
+    def get_object(self):
+        return IEEE_Bangladesh_Section.objects.first()
+    
 class EventPagination(PageNumberPagination):
     page_size = 20  # Events per page
     # page_size_query_param = 'page_size'  # optional, allows ?page_size=3
@@ -504,13 +510,18 @@ class TeamInfoView(APIView):
     
 class SCAGPanelExecutives(APIView):
 
-    def get(self, request, sc_ag_primary):
+    def get(self, request, sc_ag_primary, panel_year=None):
         #getting the particular society object
-        society = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)        
-        #getting current tenure
-        current_tenure = Panels.objects.get(current = True, panel_of = society)
+        society = Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary)
+
+        if panel_year:
+            tenure = Panels.objects.get(panel_of = society, year=panel_year)
+        else:
+            #getting current tenure
+            tenure = Panels.objects.get(current = True, panel_of = society)
+            pass        
         #getting the faculty
-        faculty_advisor = Panel_Members.objects.filter(tenure = current_tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
+        faculty_advisor = Panel_Members.objects.filter(tenure = tenure, position = Roles_and_Position.objects.get(is_faculty = True,role_of = society,is_sc_ag_eb_member = True))
         faculty_advisor_serialized = PanelMembersSerializer(faculty_advisor, many=True, context={'request': request}).data
 
         eb_members = []
@@ -518,7 +529,7 @@ class SCAGPanelExecutives(APIView):
         for role in roles:
             try:
                 #getting the member of the particular society whose role matches with the role iteration in the list and is if current panel
-                member = Panel_Members.objects.filter(tenure = current_tenure,position = role)
+                member = Panel_Members.objects.filter(tenure = tenure,position = role)
                 eb_members.extend(member)
             except:
                 pass
@@ -812,3 +823,8 @@ class PortalDevelopersList(APIView):
         }
 
         return Response(data)
+    
+class MagazinesListView(ListAPIView):
+
+    serializer_class = MagazinesSerializer
+    queryset = Magazines.objects.all().order_by('-publish_date')
