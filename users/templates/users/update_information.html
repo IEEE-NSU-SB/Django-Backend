@@ -382,7 +382,6 @@
             const nsuId = form.querySelector('input[name="nsu_id"]');
             const dob = form.querySelector('input[name="dob"]');
             const gender = form.querySelector('input[name="gender"]');
-            const ieeeEmail = form.querySelector('input[name="email_ieee"]');
             const major = form.querySelector('input[name="major"]');
             const facebookUrl = form.querySelector('input[name="facebook_url"]');
             const loader = document.getElementById('loader'); // Loader
@@ -440,7 +439,6 @@
             isNotNone(contactNo.value.trim(), 'Contact Number');
             isNotOnlyNone(linkedinUrl.value.trim(), 'LinkedIn URL');
             isNotOnlyNone(facebookUrl.value.trim(), 'FaceBook URL');
-            isNotOnlyNone(ieeeEmail.value.trim(), 'IEEE Email');
             
             if (emailPersonal && !isEmailValid(emailPersonal.value.trim())) {
                 isValid = false;
@@ -465,10 +463,6 @@
             if (gender && !isGenderValid(gender.value.trim())) {
                 isValid = false;
                 errorMessage += 'Gender must be either Male or Female.\n';
-            }
-            if (ieeeEmail.value != "" && !isIeeeEmailValid(ieeeEmail.value.trim())) {
-                isValid = false;
-                errorMessage += 'IEEE Email must end with @ieee.org.\n';
             }
             if (linkedinUrl && linkedinUrl.value.trim() !== '' && !linkedinUrl.value.trim().startsWith('https://')) {
                 isValid = false;
