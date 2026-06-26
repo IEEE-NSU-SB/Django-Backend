@@ -35,7 +35,7 @@ ANSI_ESCAPE = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 def log(message, color=None):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    colored = f"{COLORS.get(color, '')}[{timestamp}] {message}{COLORS['reset'] if color else ''}"
+    colored = f"{COLORS.get(color, '')}[{timestamp}] {message}{COLORS['reset'] if color else ''}" # type: ignore
     plain = ANSI_ESCAPE.sub('', colored)
 
     print(colored)
@@ -78,7 +78,7 @@ def run_command(command, env=None, shell=True):
             if process.stdout:
                 for line in process.stdout:
                     print(line, end='')  # Keeps color in terminal (if subprocess outputs it)
-                    logfile.write(ANSI_ESCAPE.sub('', line))  # Strip colors for log
+                    logfile.write(ANSI_ESCAPE.sub('', line))  # type: ignore # Strip colors for log
 
         if process.returncode != 0:
             log(f"Command failed with exit code {process.returncode}", "red")
