@@ -606,6 +606,42 @@ def certificate_details(request, certificate_id):
                         response = HttpResponse(certificate_file, content_type='image/png')
                         response['Content-Disposition'] = 'attachment; filename="Certificate.png"'
                         return response
+
+                elif 'download_receiver_certificate_pdf' in request.POST:
+
+                    # Get certificate SVG template
+                    certificate_template = Certificate_Template.objects.get(
+                        certificate_id=certificate_id
+                    )
+
+                    svg_file = certificate_template.svg_template
+
+                    # Get selected receiver
+                    receiver_id = request.POST.get(
+                        'download_receiver_certificate_pdf'
+                    )
+
+                    receiver = Certificate_Receivers.objects.get(
+                        id=receiver_id
+                    )
+
+                    # Generate personalized PDF
+                    certificate_pdf = Certificate_Manager.generate_certificate_pdf(
+                        svg_file=svg_file,
+                        receiver_name=receiver.name
+                    )
+
+                    if certificate_pdf:
+                        response = HttpResponse(
+                            certificate_pdf,
+                            content_type='application/pdf'
+                        )
+
+                        response['Content-Disposition'] = (
+                            f'attachment; filename="{receiver.name}_Certificate.pdf"'
+                        )
+
+                        return response
                 
                 elif 'toggle_publish' in request.POST:
                     publish_status = request.POST.get('toggle_publish')

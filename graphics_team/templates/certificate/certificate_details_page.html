@@ -418,7 +418,9 @@
                 <th>Sl.</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Download certificate (.png)</th>
+                <th>Download (.png)</th>
+                <th>Download (.pdf)</th>
+
                 {% if has_certificates_access %}
                 <th>Delete</th>
                 {% endif %}
@@ -430,20 +432,39 @@
                 {% csrf_token %}
                 {% for receiver in certificate_receivers %}
                 <tr>
-                  <td>{{forloop.counter}}</td>
-                  <td>{{receiver.name}}</td>
-                  <td>{{receiver.email}}</td>
-                  <td><button type="submit" name="download_receiver_certificate" value="{{receiver.id}}">Download</button></td>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ receiver.name }}</td>
+                  <td>{{ receiver.email }}</td>
+
+                  <td>
+                    <button
+                      type="submit"
+                      name="download_receiver_certificate"
+                      value="{{ receiver.id }}"
+                    >
+                      Download PNG
+                    </button>
+                  </td>
+
+                  <td>
+                    <button
+                      type="submit"
+                      name="download_receiver_certificate_pdf"
+                      value="{{ receiver.id }}"
+                    >
+                      Download PDF
+                    </button>
+                  </td>
+
                   {% if has_certificates_access %}
                   <td>
-                    {% comment %} <button type="submit" name="delete_receiver" {% endcomment %}
-                      {% comment %} onclick="openDeleteModal({{receiver.id}})" {% endcomment %}
-                    {% comment %} value="{{receiver.id}}" {% endcomment %}
-                  {% comment %} >Delete</button> {% endcomment %}
-                  <button type="button"
-  onclick="openDeleteModal({{receiver.id}})">
-Delete
-</button>
+                    <button
+                      type="button"
+                      data-receiver-id="{{ receiver.id }}"
+                      onclick="openDeleteModal(this.dataset.receiverId)"
+                    >
+                      Delete
+                    </button>
                   </td>
                   {% endif %}
                 </tr>

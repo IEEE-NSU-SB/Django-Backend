@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 from graphics_team.models import Certificate_Receivers, Certificate_Template
 from insb_port import settings
 from django.core.mail import send_mail
+import cairosvg
 
 # from ctypes.util import find_library
 
@@ -188,8 +189,47 @@ class Certificate_Manager:
             )
 
             return png_bytes
-        except:
-            print('Cairo SVG Error')
+        except Exception as e:
+            print("Cairo SVG Error:", repr(e))
+            return None
+
+    def generate_certificate_pdf(svg_file, receiver_name):
+
+        svg_file.open('rb')
+        svg_content = svg_file.read().decode('utf-8')
+        svg_file.close()
+
+        tree = ET.ElementTree(ET.fromstring(svg_content))
+        root = tree.getroot()
+
+        ns = {
+            'svg': 'http://www.w3.org/2000/svg'
+        }
+
+        old_text = '<<NAME>>'
+
+        # Replace <<NAME>> with receiver's actual name
+        for text_elem in root.findall('.//svg:text', ns):
+            Certificate_Manager.replace_text_in_element(
+                text_elem,
+                old_text,
+                receiver_name
+            )
+
+        updated_svg = ET.tostring(
+            root,
+            encoding='unicode'
+        )
+
+        try:
+            pdf_bytes = cairosvg.svg2pdf(
+                bytestring=updated_svg.encode('utf-8')
+            )
+
+            return pdf_bytes
+
+        except Exception as e:
+            print("Cairo PDF Error:", repr(e))
             return None
         
     def delete_certificate_template_file(certificate_template_obj:Certificate_Template):
