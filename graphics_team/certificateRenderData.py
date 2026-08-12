@@ -1,16 +1,18 @@
-
 import csv
 from ctypes import CDLL
 import io
 import os
+import base64
+import base64
 import re
 import sys
 import xml.etree.ElementTree as ET
-from PIL import ImageFont
+from PIL import Image, ImageDraw, ImageFont
 from django.core.files.base import ContentFile
 from graphics_team.models import Certificate_Receivers, Certificate_Template
 from insb_port import settings
 from django.core.mail import send_mail
+from django.conf import settings
 import cairosvg
 
 # from ctypes.util import find_library
@@ -193,6 +195,93 @@ class Certificate_Manager:
             print("Cairo SVG Error:", repr(e))
             return None
 
+    @staticmethod
+    def replace_name_with_font_image(root, ns, receiver_name):
+        font_path = settings.PRIVATE_MEDIA_ROOT + "/fonts/Gistesy.ttf"
+
+        for text_elem in root.findall('.//svg:text', ns):
+            element_text = ''.join(text_elem.itertext())
+
+            if '<<NAME>>' not in element_text:
+                continue
+
+            font_size_value = text_elem.get('font-size', '40').replace('px', '')
+            try:
+                font_size = int(float(font_size_value))
+            except:
+                font_size = 40
+
+            font = ImageFont.truetype(font_path, font_size)
+
+            bbox = font.getbbox(receiver_name)
+            text_width = max(1, bbox[2] - bbox[0])
+            text_height = max(1, bbox[3] - bbox[1])
+
+            padding = max(10, int(font_size * 0.25))
+            image_width = text_width + (padding * 2)
+            image_height = text_height + (padding * 2)
+
+            image = Image.new("RGBA", (image_width, image_height), (255, 255, 255, 0))
+            draw = ImageDraw.Draw(image)
+
+            fill = text_elem.get('fill', '#000000')
+
+            draw.text(
+                (padding - bbox[0], padding - bbox[1]),
+                receiver_name,
+                font=font,
+                fill=fill
+            )
+
+            buffer = io.BytesIO()
+            image.save(buffer, format="PNG")
+            encoded_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            buffer.close()
+
+            x_value = text_elem.get('x', '0')
+            y_value = text_elem.get('y', '0')
+
+            try:
+                x = float(x_value)
+            except:
+                x = 0.0
+
+            try:
+                y = float(y_value)
+            except:
+                y = 0.0
+
+            text_anchor = text_elem.get('text-anchor', 'start')
+
+            if text_anchor == 'middle':
+                image_x = x - (image_width / 2)
+            elif text_anchor == 'end':
+                image_x = x - image_width
+            else:
+                image_x = x
+
+            image_y = y - image_height + padding
+
+            image_elem = ET.Element('{http://www.w3.org/2000/svg}image')
+            image_elem.set('x', str(image_x))
+            image_elem.set('y', str(image_y))
+            image_elem.set('width', str(image_width))
+            image_elem.set('height', str(image_height))
+            image_elem.set('{http://www.w3.org/1999/xlink}href', f'data:image/png;base64,{encoded_image}')
+
+            parent = None
+            for possible_parent in root.iter():
+                if text_elem in list(possible_parent):
+                    parent = possible_parent
+                    break
+
+            if parent is not None:
+                index = list(parent).index(text_elem)
+                parent.remove(text_elem)
+                parent.insert(index, image_elem)
+
+            break
+
     def generate_certificate_pdf(svg_file, receiver_name):
 
         svg_file.open('rb')
@@ -208,7 +297,12 @@ class Certificate_Manager:
 
         old_text = '<<NAME>>'
 
-        # Replace <<NAME>> with receiver's actual name
+        Certificate_Manager.replace_name_with_font_image(
+            root,
+            ns,
+            receiver_name
+        )
+
         for text_elem in root.findall('.//svg:text', ns):
             Certificate_Manager.replace_text_in_element(
                 text_elem,
@@ -241,6 +335,45 @@ class Certificate_Manager:
             return True
         except:
             return False
+
+
+    @staticmethod
+    def embed_gistesy_font(svg_content):
+        font_path = os.path.join(
+            settings.PRIVATE_MEDIA_ROOT,
+            "fonts",
+            "Gistesy.ttf"
+        )
+
+        if not os.path.exists(font_path):
+            print("Gistesy font not found:", font_path)
+            return svg_content
+
+        with open(font_path, "rb") as font_file:
+            font_base64 = base64.b64encode(
+                font_file.read()
+            ).decode("utf-8")
+
+        font_style = f"""
+        <style type="text/css">
+            @font-face {{
+                font-family: 'Gistesy';
+                src: url('data:font/ttf;base64,{font_base64}') format('truetype');
+            }}
+
+            #recipient-name {{
+                font-family: 'Gistesy' !important;
+            }}
+        </style>
+        """
+
+        svg_content = svg_content.replace(
+            ">",
+            ">" + font_style,
+            1
+        )
+
+        return svg_content
 
         
     def sendOTPToUserViaEmail(request, user_email, otp):

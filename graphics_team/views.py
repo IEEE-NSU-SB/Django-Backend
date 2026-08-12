@@ -1,5 +1,8 @@
 import csv
 import os
+import io
+import zipfile
+import re
 from graphics_team.certificateRenderData import Certificate_Manager
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
@@ -548,6 +551,103 @@ def certificate_details(request, certificate_id):
         has_only_view_access = has_certificates_view_access and not has_certificates_access
 
         if has_certificates_access or has_certificates_view_access:
+            if request.method == 'GET':
+                receiver_id = request.GET.get('download_receiver_certificate')
+                receiver_pdf_id = request.GET.get('download_receiver_certificate_pdf')
+                download_all_pdf = request.GET.get('download_all_pdf')
+
+                if receiver_id:
+                    certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+                    svg_file = certificate_template.svg_template
+
+                    receiver = Certificate_Receivers.objects.filter(
+                        id=receiver_id,
+                        certificate_id=certificate_id
+                    ).first()
+
+                    if not receiver:
+                        messages.error(request, 'Participant does not exist for this certificate!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
+
+                    certificate_file = Certificate_Manager.generate_certificate(
+                        svg_file=svg_file,
+                        receiver_name=receiver.name
+                    )
+
+                    if certificate_file:
+                        response = HttpResponse(certificate_file, content_type='image/png')
+                        response['Content-Disposition'] = f'attachment; filename="{receiver.name}_Certificate.png"'
+                        return response
+
+                if receiver_pdf_id:
+                    certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+                    svg_file = certificate_template.svg_template
+
+                    receiver = Certificate_Receivers.objects.filter(
+                        id=receiver_pdf_id,
+                        certificate_id=certificate_id
+                    ).first()
+
+                    if not receiver:
+                        messages.error(request, 'Participant does not exist for this certificate!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
+
+                    certificate_pdf = Certificate_Manager.generate_certificate_pdf(
+                        svg_file=svg_file,
+                        receiver_name=receiver.name
+                    )
+
+                    if certificate_pdf:
+                        response = HttpResponse(
+                            certificate_pdf,
+                            content_type='application/pdf'
+                        )
+                        response['Content-Disposition'] = (
+                            f'attachment; filename="{receiver.name}_Certificate.pdf"'
+                        )
+                        return response
+
+                if download_all_pdf:
+                    certificate_template = Certificate_Template.objects.get(certificate_id=certificate_id)
+                    receivers = Certificate_Receivers.objects.filter(certificate_id=certificate_id)
+
+                    if not receivers.exists():
+                        messages.warning(request, 'No participants found for this certificate!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
+
+                    zip_buffer = io.BytesIO()
+                    generated_count = 0
+
+                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                        for receiver in receivers:
+                            certificate_pdf = Certificate_Manager.generate_certificate_pdf(
+                                svg_file=certificate_template.svg_template,
+                                receiver_name=receiver.name
+                            )
+
+                            if certificate_pdf:
+                                safe_name = re.sub(r'[^A-Za-z0-9._-]+', '_', receiver.name).strip('_')
+                                if not safe_name:
+                                    safe_name = f'participant_{receiver.id}'
+
+                                pdf_filename = f'{receiver.id}_{safe_name}_Certificate.pdf'
+                                zip_file.writestr(pdf_filename, certificate_pdf)
+                                generated_count += 1
+
+                    if generated_count == 0:
+                        messages.error(request, 'Could not generate any PDF certificates!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
+
+                    zip_buffer.seek(0)
+                    response = HttpResponse(
+                        zip_buffer.getvalue(),
+                        content_type='application/zip'
+                    )
+                    response['Content-Disposition'] = (
+                        f'attachment; filename="certificate_{certificate_id}_all_pdfs.zip"'
+                    )
+                    return response
+
             if request.method == 'POST' and not has_only_view_access:
                 if 'add_receiver' in request.POST:
                     name = request.POST.get('name')
@@ -585,6 +685,12 @@ def certificate_details(request, certificate_id):
 
                     return redirect('graphics_team:certificate_details', certificate_id)
                 
+                elif 'delete_all_receivers' in request.POST:
+                    Certificate_Receivers.objects.filter(certificate_id=certificate_id).delete()
+                    messages.success(request, 'All participants were deleted successfully!')
+
+                    return redirect('graphics_team:certificate_details', certificate_id)
+
                 elif 'delete_receiver' in request.POST:
                     receiver_id = request.POST.get('delete_receiver')
 
@@ -598,7 +704,16 @@ def certificate_details(request, certificate_id):
                     svg_file = certificate_template.svg_template
 
                     receiver_id = request.POST.get('download_receiver_certificate')
-                    receiver_name = Certificate_Receivers.objects.get(id=receiver_id).name
+                    receiver = Certificate_Receivers.objects.filter(
+                        id=receiver_id,
+                        certificate_id=certificate_id
+                    ).first()
+
+                    if not receiver:
+                        messages.error(request, 'Participant does not exist for this certificate!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
+
+                    receiver_name = receiver.name
 
                     certificate_file = Certificate_Manager.generate_certificate(svg_file=svg_file, receiver_name=receiver_name)
 
@@ -621,9 +736,14 @@ def certificate_details(request, certificate_id):
                         'download_receiver_certificate_pdf'
                     )
 
-                    receiver = Certificate_Receivers.objects.get(
-                        id=receiver_id
-                    )
+                    receiver = Certificate_Receivers.objects.filter(
+                        id=receiver_id,
+                        certificate_id=certificate_id
+                    ).first()
+
+                    if not receiver:
+                        messages.error(request, 'Participant does not exist for this certificate!')
+                        return redirect('graphics_team:certificate_details', certificate_id)
 
                     # Generate personalized PDF
                     certificate_pdf = Certificate_Manager.generate_certificate_pdf(

@@ -38,6 +38,24 @@
         border-radius: 8px;
       }
 
+      .top-action-link {
+        display: inline-block;
+        background: #00629b;
+        color: white;
+        border: none;
+        padding: 16px 42px;
+        margin: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 8px;
+        text-decoration: none;
+      }
+
+      .top-action-link:hover {
+        color: white;
+        text-decoration: none;
+      }
+
       .modal-overlay {
         display: none;
         position: fixed;
@@ -197,6 +215,18 @@
         border-radius: 4px;
       }
 
+      .table .download-btn {
+        display: inline-block;
+        background: #f2f2f2;
+        color: #000;
+        border: 1px solid #aaa;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: normal;
+      }
+
       .toggle {
         position: relative;
         display: inline-block;
@@ -258,7 +288,8 @@
           margin-bottom: 20px;
         }
 
-        .top-actions button {
+        .top-actions button,
+        .top-action-link {
           padding: 12px 20px;
           font-size: 16px;
           margin: 4px;
@@ -380,6 +411,8 @@
           <button onclick="openModal('importModal')">Import Names</button>
           <button onclick="openModal('addModal')">Add people</button>
           <button onclick="openModal('updateTemplateModal')">Update Template</button>
+          <a href="?download_all_pdf=1" class="top-action-link">Download All PDF</a>
+          <button onclick="openModal('deleteAllModal')" style="background:#dc3545;">Delete All</button>
         </div>
         {% endif %}
 
@@ -428,48 +461,43 @@
             </thead>
 
             <tbody id="participantTableBody">
-              <form method="POST">
-                {% csrf_token %}
-                {% for receiver in certificate_receivers %}
-                <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ receiver.name }}</td>
-                  <td>{{ receiver.email }}</td>
+              {% for receiver in certificate_receivers %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ receiver.name }}</td>
+                <td>{{ receiver.email }}</td>
 
-                  <td>
-                    <button
-                      type="submit"
-                      name="download_receiver_certificate"
-                      value="{{ receiver.id }}"
-                    >
-                      Download PNG
-                    </button>
-                  </td>
+                <td>
+                  <a
+                    class="download-btn"
+                    href="?download_receiver_certificate={{ receiver.id }}"
+                  >
+                    Download PNG
+                  </a>
+                </td>
 
-                  <td>
-                    <button
-                      type="submit"
-                      name="download_receiver_certificate_pdf"
-                      value="{{ receiver.id }}"
-                    >
-                      Download PDF
-                    </button>
-                  </td>
+                <td>
+                  <a
+                    class="download-btn"
+                    href="?download_receiver_certificate_pdf={{ receiver.id }}"
+                  >
+                    Download PDF
+                  </a>
+                </td>
 
-                  {% if has_certificates_access %}
-                  <td>
-                    <button
-                      type="button"
-                      data-receiver-id="{{ receiver.id }}"
-                      onclick="openDeleteModal(this.dataset.receiverId)"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                  {% endif %}
-                </tr>
-                {% endfor %}
-              </form>
+                {% if has_certificates_access %}
+                <td>
+                  <button
+                    type="button"
+                    data-receiver-id="{{ receiver.id }}"
+                    onclick="openDeleteModal(this.dataset.receiverId)"
+                  >
+                    Delete
+                  </button>
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -516,6 +544,37 @@
           <input type="file" name="svg_template" class="input" accept=".svg" required />
           <p style="color:crimson;font-weight:bolder">Warning: The template must have <code>&lt;&lt;NAME&gt;&gt;</code> as text to indicate where to put name and the text must be in editable format!</p>
           <button class="confirm-btn" type="submit" name="update_template">Confirm</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="deleteAllModal" class="modal-overlay">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <h3 style="text-align:center;">Confirm Delete All</h3>
+        <p style="text-align:center; margin-bottom:25px;">
+          Are you sure you want to delete all participants from this certificate? This action cannot be undone.
+        </p>
+
+        <form method="POST">
+          {% csrf_token %}
+          <div style="display:flex; justify-content:center; gap:15px;">
+            <button
+              type="button"
+              style="padding:10px 20px; border:none; border-radius:5px; background:#6c757d; color:white; cursor:pointer;"
+              onclick="document.getElementById('deleteAllModal').classList.remove('active')"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              name="delete_all_receivers"
+              value="1"
+              style="padding:10px 20px; border:none; border-radius:5px; background:#dc3545; color:white; cursor:pointer;"
+            >
+              Delete All
+            </button>
+          </div>
         </form>
       </div>
     </div>
